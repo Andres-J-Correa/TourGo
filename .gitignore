@@ -1,0 +1,41 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/client/node_modules
+/client/.pnp
+/client/.pnp.js
+
+# testing
+/client/coverage
+
+# production
+/client/build
+
+# misc
+/client/.DS_Store
+/client/.env.local
+/client/.env.development.local
+/client/.env.test.local
+/client/.env.production.local
+
+/client/yarn.lock
+/client/npm-debug.log*
+/client/yarn-debug.log*
+/client/yarn-error.log*
+
+# Ignore .vs directory
+/server/.vs
+/client/.vs
+
+# Ignore bin and obj directories
+/server/TourGo.Web.Api/obj
+/server/TourGo.Web.Api/bin
+
+# Ignore appSettings
+/server/TourGo.Web.Api/appsettings.Development.json
+
+# Ignore user-specific service dependencies
+/server/TourGo.Web.Api/Properties/
+
+# Ignore configuration files
+/server/TourGo.Web.Api/.config/
