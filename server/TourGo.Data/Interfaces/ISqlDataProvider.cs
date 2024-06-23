@@ -3,7 +3,7 @@ using System.Data.SqlClient;
 
 namespace TourGo.Data.Providers
 {
-    public interface IDataProvider
+    public interface ISqlDataProvider
     {
         /// <summary>
         /// This is used when we want to execute a SQL SELECT Statement. This is intended to bring

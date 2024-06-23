@@ -8,9 +8,9 @@ namespace TourGo.Services
     public class UserService : IUserService
     {
         private IAuthenticationService<int> _authenticationService;
-        private IDataProvider _dataProvider;
+        private ISqlDataProvider _dataProvider;
 
-        public UserService(IAuthenticationService<int> authSerice, IDataProvider dataProvider)
+        public UserService(IAuthenticationService<int> authSerice, ISqlDataProvider dataProvider)
         {
             _authenticationService = authSerice;
             _dataProvider = dataProvider;

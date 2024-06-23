@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TourGo.Web.Models")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7102a7a96aa33fa2043e5b484d050c79896c7871")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4c35cded7e3fa6af5174123fb2a7143fc1992efa")]
 [assembly: System.Reflection.AssemblyProductAttribute("TourGo.Web.Models")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TourGo.Web.Models")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

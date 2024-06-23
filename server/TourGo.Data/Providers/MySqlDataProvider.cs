@@ -1,32 +1,32 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using TourGo.Data.Providers;
 
 namespace TourGo.Data
 {
-    public sealed class SqlDataProvider : ISqlDataProvider
+    public sealed class MySqlDataProvider : IMySqlDataProvider
     {
         private readonly string connectionString;
 
-        public SqlDataProvider(string connectionString)
+        public MySqlDataProvider(string connectionString)
         {
             this.connectionString = connectionString;
         }
 
         public void ExecuteCmd(
-            string storedProc,
-            Action<SqlParameterCollection> inputParamMapper,
+        string storedProc,
+            Action<MySqlParameterCollection> inputParamMapper,
             Action<IDataReader, short> map,
-            Action<SqlParameterCollection> returnParameters = null,
-            Action<SqlCommand> cmdModifier = null
+            Action<MySqlParameterCollection> returnParameters = null,
+            Action<MySqlCommand> cmdModifier = null
         )
         {
             if (map == null)
                 throw new NullReferenceException("ObjectMapper is required.");
 
-            SqlDataReader reader = null;
-            SqlCommand cmd = null;
-            SqlConnection conn = null;
+            MySqlDataReader reader = null;
+            MySqlCommand cmd = null;
+            MySqlConnection conn = null;
             short result = 0;
             try
             {
@@ -86,13 +86,13 @@ namespace TourGo.Data
         }
 
         public int ExecuteNonQuery(
-            string storedProc,
-            Action<SqlParameterCollection> paramMapper,
-            Action<SqlParameterCollection> returnParameters = null
+        string storedProc,
+            Action<MySqlParameterCollection> paramMapper,
+            Action<MySqlParameterCollection> returnParameters = null
         )
         {
-            SqlCommand cmd = null;
-            SqlConnection conn = null;
+            MySqlCommand cmd = null;
+            MySqlConnection conn = null;
 
             try
             {
@@ -131,15 +131,13 @@ namespace TourGo.Data
 
         #region - Private Methods (Execute, GetCommand) -
 
-        private SqlConnection GetConnection()
+        private MySqlConnection GetConnection()
         {
-            return new SqlConnection(connectionString);
+            return new MySqlConnection(connectionString);
         }
-
-        private SqlCommand GetCommand(SqlConnection conn, string cmdText = null, Action<SqlParameterCollection> paramMapper = null)
+        private MySqlCommand GetCommand(MySqlConnection conn, string cmdText = null, Action<MySqlParameterCollection> paramMapper = null)
         {
-            SqlCommand cmd = null;
-
+            MySqlCommand cmd = null;
             if (conn != null)
                 cmd = conn.CreateCommand();
 

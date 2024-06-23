@@ -18,16 +18,22 @@ namespace TourGo.Web.StartUp
 
             services.AddSingleton<IConfiguration>(configuration);   // IConfiguration explicitly
 
-            string connString = configuration.GetConnectionString("Default");
+            string sqlConnString = configuration.GetConnectionString("Sql");
+            string mySqlConnString = configuration.GetConnectionString("MySql");
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.2
 
             services.AddSingleton<IAuthenticationService<int>, WebAuthenticationService>();
 
-            services.AddSingleton<IDataProvider, SqlDataProvider>(delegate (IServiceProvider provider)
+            services.AddSingleton<ISqlDataProvider, SqlDataProvider>(delegate (IServiceProvider provider)
             {
-                return new SqlDataProvider(connString);
+                return new SqlDataProvider(sqlConnString);
             }
             );
+
+            services.AddSingleton<IMySqlDataProvider, MySqlDataProvider>(delegate (IServiceProvider provider)
+            {
+                return new MySqlDataProvider(mySqlConnString);
+            });
 
             services.AddSingleton<IIdentityProvider<int>, WebAuthenticationService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
