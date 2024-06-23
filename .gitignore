@@ -34,8 +34,5 @@
 # Ignore appSettings
 /server/TourGo.Web.Api/appsettings.Development.json
 
-# Ignore user-specific service dependencies
-/server/TourGo.Web.Api/Properties/
-
 # Ignore configuration files
 /server/TourGo.Web.Api/.config/

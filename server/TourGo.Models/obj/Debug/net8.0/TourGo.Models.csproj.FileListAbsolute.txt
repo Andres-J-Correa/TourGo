@@ -1,0 +1,12 @@
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\bin\Debug\net8.0\TourGo.Models.deps.json
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\bin\Debug\net8.0\TourGo.Models.dll
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\bin\Debug\net8.0\TourGo.Models.pdb
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\obj\Debug\net8.0\TourGo.Models.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\obj\Debug\net8.0\TourGo.Models.AssemblyInfoInputs.cache
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\obj\Debug\net8.0\TourGo.Models.AssemblyInfo.cs
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\obj\Debug\net8.0\TourGo.Models.csproj.CoreCompileInputs.cache
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\obj\Debug\net8.0\TourGo.Models.sourcelink.json
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\obj\Debug\net8.0\TourGo.Models.dll
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\obj\Debug\net8.0\refint\TourGo.Models.dll
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\obj\Debug\net8.0\TourGo.Models.pdb
+C:\Users\Andres\Desktop\MyStuff\Programming\TourGo\TourGo\server\TourGo.Models\obj\Debug\net8.0\ref\TourGo.Models.dll
