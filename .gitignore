@@ -3,19 +3,14 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-
-# To force user interaction with the merging of this file
-*.csproj merge=binary
-
 # User-specific files
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
-
-# User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 .env.development
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -27,11 +22,10 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+artifacts/
 
 # Visual Studio 2015 cache/options directory
 .vs/
-# Uncomment if you have tasks that create the project's static files in wwwroot
-#wwwroot/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -49,9 +43,8 @@ dlldata.c
 # .NET Core
 project.lock.json
 project.fragment.lock.json
-artifacts/
 
-# We want to share lauchsettings
+# We want to share launchSettings
 #**/Properties/launchSettings.json
 
 *_i.c
@@ -154,13 +147,13 @@ publish/
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
-# TODO: Comment the next line if you want to checkin your web deploy settings
+# TODO: Comment the next line if you want to check in your web deploy settings
 # but database connection strings (with potential passwords) will be unencrypted
 *.pubxml
 *.publishproj
 
 # Microsoft Azure Web App publish settings. Comment the next line if you want to
-# checkin your Azure Web App publish settings, but sensitive information contained
+# check in your Azure Web App publish settings, but sensitive information contained
 # in these scripts will be unencrypted
 PublishScripts/
 
@@ -170,7 +163,7 @@ PublishScripts/
 **/packages/*
 # except build/, which is used as an MSBuild target.
 !**/packages/build/
-# Uncomment if necessary however generally it will be regenerated when needed
+# Uncomment if necessary, however generally it will be regenerated when needed
 #!**/packages/repositories.config
 # NuGet v3's project.json files produces more ignorable files
 *.nuget.props
@@ -206,10 +199,6 @@ ClientBin/
 *.pfx
 *.publishsettings
 orleans.codegen.cs
-
-# Since there are multiple workflows, uncomment next line to ignore bower_components
-# (https://github.com/github/gitignore/pull/1529#issuecomment-104372622)
-#bower_components/
 
 # RIA/Silverlight projects
 Generated_Code/
@@ -296,7 +285,7 @@ __pycache__/
 one.lock
 !SqlInit/one.lock
 
-# ignore all yarn.lock except the one we care about
+# Ignore all yarn.lock except the one we care about
 yarn.lock
 !client/yarn.lock
 
@@ -308,16 +297,14 @@ package-lock.json
 !node/package-lock.json
 
 # Ignore build output and other generated files
-/bin/
-/obj/
 *.pdb
 *.log
 
 # Ignore project-specific generated files
-*.csproj.nuget.dgspec.json
-*.csproj.nuget.g.targets
-project.assets.json
-project.nuget.cache
+/server/*.csproj.nuget.dgspec.json
+/server/*.csproj.nuget.g.targets
+/server/project.assets.json
+/server/project.nuget.cache
 
 # Ignore user-specific files
 *.user
