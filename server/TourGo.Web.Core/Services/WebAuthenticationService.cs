@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using TourGo.Models.Domain;
-using TourGo.Services.Security;
 using System.Reflection;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -46,8 +45,6 @@ namespace TourGo.Web.Core.Services
                     identity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, singleRole, ClaimValueTypes.String));
                 }
             }
-
-            identity.AddTenantId(user.TenantId);
 
             identity.AddClaims(extraClaims);
 
@@ -135,10 +132,6 @@ namespace TourGo.Web.Core.Services
                         break;
 
                     default:
-                        if (identity.IsTenantIdClaim(claim.Type))
-                        {
-                            baseUser.TenantId = claim.Value;
-                        }
 
                         break;
                 }
