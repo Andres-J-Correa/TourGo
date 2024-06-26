@@ -6,10 +6,11 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Security.Principal;
 using TourGo.Models;
+using TourGo.Services;
 
 namespace TourGo.Web.Core.Services
 {
-    public class WebAuthenticationService : TourGo.Services.IAuthenticationService<int>
+    public class WebAuthenticationService : IAuthenticationService<int>
     {
         private readonly static string _title = null;
         private IHttpContextAccessor _contextAccessor;
@@ -47,10 +48,6 @@ namespace TourGo.Web.Core.Services
             ClaimsIdentity identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme
                                                             , ClaimsIdentity.DefaultNameClaimType
                                                             , ClaimsIdentity.DefaultRoleClaimType);
-
-            identity.AddClaim(new Claim("http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider"
-                                , _title
-                                , ClaimValueTypes.String));
 
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.String, _title, originalIssuer));
 

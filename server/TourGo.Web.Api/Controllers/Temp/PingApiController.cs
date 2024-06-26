@@ -30,5 +30,17 @@ namespace TourGo.Web.Api.Controllers
 
             return Ok200(response);
         }
+
+        [HttpGet("auth")]
+        public ActionResult<ItemResponse<object>> PingAuth()
+        {
+            Logger.LogInformation("Ping endpoint firing");
+
+            ItemResponse<object> response = new ItemResponse<object>();
+
+            response.Item = DateTime.Now.Ticks;
+
+            return Ok200(response);
+        }
     }
 }

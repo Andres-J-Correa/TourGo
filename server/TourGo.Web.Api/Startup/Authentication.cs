@@ -40,17 +40,12 @@ namespace TourGo.Web.StartUp
             // If you don't want the cookie to be automatically authenticated and assigned to
             // HttpContext.User, remove the CookieAuthenticationDefaults.AuthenticationScheme
             // parameter passed to AddAuthentication.
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            })
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
                 options.Cookie = cookie;
                 options.SlidingExpiration = true;
-                options.TicketDataFormat = new TokenSecureDataFormat(jsonWebTokenConfig, "Cookies");
+                options.TicketDataFormat = new TokenSecureDataFormat(jsonWebTokenConfig, "Cookies", services.BuildServiceProvider().GetRequiredService<ILogger<TokenSecureDataFormat>>());
                 options.AccessDeniedPath = "/unauthorized";
                 options.LoginPath = "/login";
                 options.LogoutPath = "/logout";

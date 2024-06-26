@@ -56,8 +56,6 @@ namespace TourGo.Services
                 Name = email
                 ,
                 Roles = allRoles
-                ,
-                TenantId = "Acme Corp UId"
             };
 
             Claim fullName = new Claim("CustomClaim", "test val");
@@ -162,7 +160,6 @@ namespace TourGo.Services
             user.Id = reader.GetSafeInt32(index++);
             user.Name = reader.GetSafeString(index++);
             user.Roles = reader.DeserializeObject<List<string>>(index++);
-            user.TenantId = "TourGo.Tenant";
             return user;
         }
     }
