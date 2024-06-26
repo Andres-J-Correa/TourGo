@@ -1,33 +1,44 @@
-﻿using System.Security.Claims;
+﻿using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
+using System.Data;
+using System.Security.Claims;
+using TourGo.Data;
+using TourGo.Data.Extensions;
 using TourGo.Data.Providers;
 using TourGo.Models;
 using TourGo.Models.Domain;
+using TourGo.Models.Enums;
+using TourGo.Models.Requests.Users;
 
 namespace TourGo.Services
 {
     public class UserService : IUserService
     {
         private IAuthenticationService<int> _authenticationService;
-        private ISqlDataProvider _dataProvider;
+        private IMySqlDataProvider _mySqlDataProvider;
 
-        public UserService(IAuthenticationService<int> authSerice, ISqlDataProvider dataProvider)
+        public UserService(IAuthenticationService<int> authSerice, IMySqlDataProvider dataProvider)
         {
             _authenticationService = authSerice;
-            _dataProvider = dataProvider;
+            _mySqlDataProvider = dataProvider;
         }
 
         public async Task<bool> LogInAsync(string email, string password)
         {
             bool isSuccessful = false;
 
-            IUserAuthData response = Get(email, password);
+            bool isValidCredentials = IsValidCredentials(email, password);
 
-            if (response != null)
+            if (isValidCredentials)
             {
-                await _authenticationService.LogInAsync(response);
-                isSuccessful = true;
-            }
+                IUserAuthData response = Get(email);
 
+                if (response != null)
+                {
+                    await _authenticationService.LogInAsync(response);
+                    isSuccessful = true;
+                }
+            }
             return isSuccessful;
         }
 
@@ -55,39 +66,103 @@ namespace TourGo.Services
             return isSuccessful;
         }
 
-        public int Create(object userModel)
+        public int Create(UserAddRequest request)
         {
-            //make sure the password column can hold long enough string. put it to 100 to be safe
-
             int userId = 0;
-            string password = "Get from user model when you have a concreate class";
+            string proc = "users_insert";
             string salt = BCrypt.BCryptHelper.GenerateSalt();
-            string hashedPassword = BCrypt.BCryptHelper.HashPassword(password, "");
+            string hashedPassword = BCrypt.BCryptHelper.HashPassword(request.Password, salt);
+            string authProviderUserId;
 
-            //DB provider call to create user and get us a user id
+            switch (request.AuthProvider)
+            {
+                default:
+                    authProviderUserId = request.Email;
+                    break;
+            }
 
-            //be sure to store both salt and passwordHash
-            //DO NOT STORE the original password value that the user passed us
+            _mySqlDataProvider.ExecuteNonQuery(proc, (MySqlParameterCollection coll) =>
+            {
+                coll.AddWithValue("p_name", request.Name);
+                coll.AddWithValue("p_email", request.Email);
+                coll.AddWithValue("p_phone", request.Phone);
+                coll.AddWithValue("p_providerId", request.AuthProvider);
+                coll.AddWithValue("p_providerUserId", authProviderUserId);
+                coll.AddWithValue("p_roleId", request.Role);
+                coll.AddWithValue("p_passwordHash", hashedPassword);
+                coll.AddOutputParameter("p_insertedParameter", SqlDbType.Int);
+
+            }, (MySqlParameterCollection returnColl) =>
+            {
+                int.TryParse(returnColl["p_insertedParameter"].Value.ToString(), out userId);
+            });
 
             return userId;
         }
 
-        /// <summary>
-        /// Gets the Data call to get a give user
-        /// </summary>
-        /// <param name="email"></param>
-        /// <param name="passwordHash"></param>
-        /// <returns></returns>
-        private IUserAuthData Get(string email, string password)
+        public bool UserExists(string email)
         {
-            //make sure the password column can hold long enough string. put it to 100 to be safe
-            string passwordFromDb = "";
+            string proc = "users_exists";
+            bool result = false;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (MySqlParameterCollection coll) =>
+            {
+                coll.AddWithValue("p_email", email);
+            }, (IDataReader reader, short set) =>
+            {
+                result = reader.GetSafeBool(0);
+            });
+
+            return result;
+        }
+
+        private bool IsValidCredentials(string email, string password)
+        {
+            string proc = "users_get_hashPassword_byEmail";
+            string passwordFromDb = null;
+            bool isValidCredentials = false;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (MySqlParameterCollection coll) =>
+            {
+                coll.AddWithValue("p_email", email);
+
+            }, (IDataReader reader, short set) =>
+            {
+                passwordFromDb = reader.GetSafeString(0);
+            });
+
+            if (passwordFromDb != null) 
+            {
+                isValidCredentials = BCrypt.BCryptHelper.CheckPassword(password, passwordFromDb);
+            }
+
+            return isValidCredentials;
+        }
+    
+        private IUserAuthData Get (string email)
+        {
+            string proc = "users_selectBase_ByEmail";
             UserBase user = null;
 
-            //get user object from db;
+            _mySqlDataProvider.ExecuteCmd(proc, (MySqlParameterCollection coll) =>
+            {
+                coll.AddWithValue("p_email", email);
+            }, (IDataReader reader, short set) =>
+            {
+                int index = 0;
+                user = MapBaseUser(reader, ref index);
+            });
 
-            bool isValidCredentials = BCrypt.BCryptHelper.CheckPassword(password, passwordFromDb);
+            return user;
+        }
 
+        private static UserBase MapBaseUser(IDataReader reader, ref int index)
+        {
+            UserBase user = new UserBase();
+            user.Id = reader.GetSafeInt32(index++);
+            user.Name = reader.GetSafeString(index++);
+            user.Roles = reader.DeserializeObject<List<string>>(index++);
+            user.TenantId = "TourGo.Tenant";
             return user;
         }
     }

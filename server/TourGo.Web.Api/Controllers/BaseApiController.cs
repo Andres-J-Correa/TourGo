@@ -15,22 +15,22 @@ namespace TourGo.Web.Controllers
             Logger = logger;
         }
 
-        protected OkObjectResult Ok200(BaseResponse respone)
+        protected OkObjectResult Ok200(BaseResponse response)
         {
 
-            return base.Ok(respone);
+            return base.Ok(response);
         }
 
-        protected CreatedResult Created201(IItemResponse respone)
+        protected CreatedResult Created201(IItemResponse response)
         {
-            string url = Request.Path + "/" + respone.Item.ToString();
+            string url = Request.Path + "/" + response.Item.ToString();
 
-            return base.Created(url, respone);
+            return base.Created(url, response);
         }
 
-        protected NotFoundObjectResult NotFound404(BaseResponse respone)
+        protected NotFoundObjectResult NotFound404(BaseResponse response)
         {
-            return base.NotFound(respone);
+            return base.NotFound(response);
         }
 
         protected ObjectResult CustomResponse(HttpStatusCode code, BaseResponse response)

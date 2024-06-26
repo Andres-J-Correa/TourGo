@@ -26,27 +26,7 @@ namespace TourGo.Web.Core.Services
 
         public async Task LogInAsync(IUserAuthData user, params Claim[] extraClaims)
         {
-            ClaimsIdentity identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme
-                                                            , ClaimsIdentity.DefaultNameClaimType
-                                                            , ClaimsIdentity.DefaultRoleClaimType);
-
-            identity.AddClaim(new Claim("http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider"
-                                , _title
-                                , ClaimValueTypes.String));
-
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.String));
-
-            identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, user.Name, ClaimValueTypes.String));
-
-            if (user.Roles != null && user.Roles.Any())
-            {
-                foreach (string singleRole in user.Roles)
-                {
-                    identity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, singleRole, ClaimValueTypes.String));
-                }
-            }
-
-            identity.AddClaims(extraClaims);
+            ClaimsIdentity identity = ExtractClaims(user, extraClaims);
 
             AuthenticationProperties props = new AuthenticationProperties
             {
@@ -61,6 +41,39 @@ namespace TourGo.Web.Core.Services
             await _contextAccessor.HttpContext
                 .SignInAsync(AuthenticationDefaults.AuthenticationScheme, principal, props);
         }
+
+        public static ClaimsIdentity ExtractClaims(IUserAuthData user, Claim[] extraClaims, string originalIssuer = null)
+        {
+            ClaimsIdentity identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme
+                                                            , ClaimsIdentity.DefaultNameClaimType
+                                                            , ClaimsIdentity.DefaultRoleClaimType);
+
+            identity.AddClaim(new Claim("http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider"
+                                , _title
+                                , ClaimValueTypes.String));
+
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.String, _title, originalIssuer));
+
+            identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, user.Name, ClaimValueTypes.String, _title, originalIssuer));
+
+            //identity.AddClaim(new Claim(ClaimTypes.Email, user.Email, ClaimValueTypes.String, _title, originalIssuer));
+
+            if (user.Roles != null && user.Roles.Any())
+            {
+                foreach (string singleRole in user.Roles)
+                {
+                    identity.AddClaim(new Claim(ClaimsIdentity.DefaultRoleClaimType, singleRole, ClaimValueTypes.String, _title, originalIssuer));
+                }
+            }
+
+            if (extraClaims != null)
+            {
+                identity.AddClaims(extraClaims);
+            }
+
+            return identity;
+        }
+
 
         public async Task LogOutAsync()
         {

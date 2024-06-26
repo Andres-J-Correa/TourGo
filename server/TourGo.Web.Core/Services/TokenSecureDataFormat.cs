@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TourGo.Web.Core.Services
 {
-    public class TokenSecureDataFormat : ISecureDataFormat<AuthenticationTicket>, ISecureDataFormat<AuthenticationProperties>
+    public class TokenSecureDataFormat : ISecureDataFormat<AuthenticationTicket> 
     {
         private readonly string _secret;
         private readonly int _expirationDays;
@@ -21,84 +21,6 @@ namespace TourGo.Web.Core.Services
             _authSchema = authSchema;
         }
 
-        public string Protect(AuthenticationProperties data)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_secret);
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Audience = _config.Audience,
-
-                Expires = DateTime.UtcNow.AddDays(_expirationDays),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            // Subject = data.Principal. ClaimsIdentity
-            tokenDescriptor.Issuer = _config.Issuer;
-            var claims = data.Items.Select(a => new Claim(a.Key, a.Value));
-
-            tokenDescriptor.Subject = new ClaimsIdentity(claims);
-
-
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
-        public string Protect(AuthenticationProperties data, string purpose)
-        {
-            return Protect(data);
-        }
-
-        AuthenticationProperties ISecureDataFormat<AuthenticationProperties>.Unprotect(string protectedText)
-        {
-            
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-            TokenValidationParameters tp = new TokenValidationParameters();
-
-            tp.ValidIssuer = _config.Issuer;
-            tp.ValidAudience = _config.Audience;
-            tp.ClockSkew = TimeSpan.FromMinutes(0);
-            tp.RequireExpirationTime = true;
-            tp.IssuerSigningKey = GetSymmetricSecurityKey(_secret);
-
-            SecurityToken token = null;
-            //AuthenticationTicket auth = null;
-            JwtSecurityToken unvalidatedToken = null;
-            AuthenticationProperties props = null;
-            try
-            {
-                unvalidatedToken = tokenHandler.ReadJwtToken(protectedText);
-                ClaimsPrincipal claimsP = tokenHandler.ValidateToken(protectedText, tp, out token);
-
-                var kvp = claimsP.Claims.Select((sc => new KeyValuePair<string, string>(sc.Type, sc.Value)));
-
-                Dictionary<string, string> dict = new Dictionary<string, string>(kvp);
-
-                props = new AuthenticationProperties(dict);
-
-
-            }
-            catch (Exception ex)
-            {
-                //TODO: Replace this with proper logging
-                // If you are getting an exception here delete your aut cookie and log in again.
-                Console.WriteLine(ex.ToString());
-
-                //throw;
-            }
-
-            //props.Items.TryGetValue()
-
-            return props;
-        }
-
-        AuthenticationProperties ISecureDataFormat<AuthenticationProperties>.Unprotect(string protectedText, string purpose)
-        {
-            return (this as ISecureDataFormat<AuthenticationProperties>).Unprotect(protectedText);
-        }
-
-        #region - ISecureDataFormat<AuthenticationTicket> -
         public string Protect(AuthenticationTicket data)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -106,42 +28,43 @@ namespace TourGo.Web.Core.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Audience = _config.Audience,
-
+                Issuer = _config.Issuer,
                 Expires = DateTime.UtcNow.AddDays(_expirationDays),
+                Subject = new ClaimsIdentity(data.Principal.Claims),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
-            // Subject = data.Principal. ClaimsIdentity
-            tokenDescriptor.Issuer = _config.Issuer;
-            tokenDescriptor.Subject = new ClaimsIdentity(data.Principal.Claims);
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
 
-        public string Protect(AuthenticationTicket data, string purpose)
+        public string Protect(AuthenticationTicket data, string ? purpose)
         {
             return Protect(data);
         }
 
         public AuthenticationTicket Unprotect(string protectedText)
         {
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-            TokenValidationParameters tp = new TokenValidationParameters();
-
-            tp.ValidIssuer = _config.Issuer;
-            tp.ValidAudience = _config.Audience;
-            tp.ClockSkew = TimeSpan.FromMinutes(0);
-            tp.RequireExpirationTime = true;
-            tp.IssuerSigningKey = GetSymmetricSecurityKey(_secret);
+            TokenValidationParameters tp = new TokenValidationParameters()
+            {
+                ValidIssuer = _config.Issuer,
+                ValidAudience = _config.Audience,
+                ClockSkew = TimeSpan.FromMinutes(5),
+                IssuerSigningKey = GetSymmetricSecurityKey(_secret),
+                RequireExpirationTime = true,
+                ValidateAudience = true,
+                ValidateIssuer = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true
+            };
 
             SecurityToken token = null;
             AuthenticationTicket auth = null;
-            JwtSecurityToken unvalidatedToken = null;
 
             try
             {
-                unvalidatedToken = tokenHandler.ReadJwtToken(protectedText);
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+                JwtSecurityToken unvalidatedToken = tokenHandler.ReadJwtToken(protectedText);
                 ClaimsPrincipal claimsP = tokenHandler.ValidateToken(protectedText, tp, out token);
 
                 auth = new AuthenticationTicket(claimsP, _authSchema);
@@ -158,7 +81,7 @@ namespace TourGo.Web.Core.Services
             return auth;
         }
 
-        public AuthenticationTicket Unprotect(string protectedText, string purpose)
+        public AuthenticationTicket Unprotect(string? protectedText, string? purpose)
         {
             return Unprotect(protectedText);
         }
@@ -171,15 +94,10 @@ namespace TourGo.Web.Core.Services
             return signingCredentials;
         }
 
-        private SymmetricSecurityKey GetSymmetricSecurityKey(string jwtSecret)
+        private static SymmetricSecurityKey GetSymmetricSecurityKey(string jwtSecret)
         {
             return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
         }
-
-
-
-        #endregion
-
 
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Net;
 using TourGo.Web.Core;
+using TourGo.Web.Core.Services;
 
 namespace TourGo.Web.StartUp
 {
@@ -49,7 +50,7 @@ namespace TourGo.Web.StartUp
             {
                 options.Cookie = cookie;
                 options.SlidingExpiration = true;
-                options.TicketDataFormat = new TourGo.Web.Core.Services.TokenSecureDataFormat(jsonWebTokenConfig, "Cookies");
+                options.TicketDataFormat = new TokenSecureDataFormat(jsonWebTokenConfig, "Cookies");
                 options.AccessDeniedPath = "/unauthorized";
                 options.LoginPath = "/login";
                 options.LogoutPath = "/logout";
