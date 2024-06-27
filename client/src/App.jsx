@@ -2,7 +2,10 @@ import { useState, useEffect, Suspense } from "react";
 import { Helmet } from "react-helmet";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { pageRoutes } from "./routes";
+import { publicFlattenedRoutes } from "./routes";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import theme from "assets/theme";
 import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -13,30 +16,27 @@ const App = () => {
     <Route
       key={`route-${idx}`}
       path={route.path}
+      exact={route.exact}
       element={<route.component />}
     />
   );
 
   useEffect(() => {
-    const mappedRoutes = pageRoutes.map(mapRoutes);
+    const mappedRoutes = publicFlattenedRoutes.map(mapRoutes);
 
     setRoutes(mappedRoutes);
   }, []);
 
   return (
-    <div id="top" className={`app`}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Helmet>
         <title>Tour Go</title>
       </Helmet>
-      <header className="header center">
-        <h1>Tour Go</h1>
-      </header>
 
-      <main>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>{routes}</Routes>
-        </Suspense>
-      </main>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>{routes}</Routes>
+      </Suspense>
 
       <ToastContainer
         position="top-right"
@@ -51,7 +51,7 @@ const App = () => {
         theme="light"
       />
       <ToastContainer />
-    </div>
+    </ThemeProvider>
   );
 };
 

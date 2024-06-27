@@ -1,10 +1,12 @@
 import React from "react";
+import ClientNavbar from "./navbars/client/ClientNavbar";
+import { publicRoutes } from "routes/publicRoutes";
 
 function Home() {
   return (
-    <React.Fragment>
-      <div>Home</div>
-    </React.Fragment>
+    <>
+      <ClientNavbar routes={publicRoutes} />
+    </>
   );
 }
 
