@@ -1,12 +1,12 @@
-import React from "react";
-import ClientNavbar from "./navbars/client/ClientNavbar";
-import { publicRoutes } from "routes/publicRoutes";
+import React, { Fragment } from "react";
+import Navbar from "components/commonUI/navbars/DefaultNavbar";
 
 function Home() {
   return (
-    <>
-      <ClientNavbar routes={publicRoutes} />
-    </>
+    <Fragment>
+      <Navbar />
+      <div className="bg-success vh-100"></div>
+    </Fragment>
   );
 }
 

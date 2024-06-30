@@ -6,7 +6,7 @@ const flattenRoutes = (routes) => {
 
   routes = routes || [];
   routes.forEach((item) => {
-    if (item.path !== undefined) {
+    if (Boolean(item.path) && Boolean(item.component)) {
       flatRoutes.push(item);
     }
     if (typeof item.collapse !== "undefined") {

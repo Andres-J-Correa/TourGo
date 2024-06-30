@@ -1,29 +1,185 @@
 import { lazy } from "react";
-import Icon from "@mui/material/Icon";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
 
 export const publicRoutes = [
   {
     name: "home",
-    icon: <Icon>home</Icon>,
     path: "/",
     component: lazy(() => import("components/Home")),
     exact: true,
     isAnonymous: true,
+    isNavbar: false,
   },
   {
-    name: "account",
-    icon: <Icon>account_circle</Icon>,
-    columns: 1,
-    rowsPerColumn: 2,
+    name: "test",
+    isNavbar: true,
+    icon: <FontAwesomeIcon icon={faPaperclip} className="icon" />,
     collapse: [
       {
-        name: "Get started",
+        name: "landing pages1",
         collapse: [
           {
-            name: "login",
+            name: "about-us1",
+            path: "/landing-pages/about-us",
           },
           {
-            name: "sign up",
+            name: "contact-us1",
+            path: "/landing-pages/contact-us",
+          },
+        ],
+      },
+      {
+        name: "profile",
+        collapse: [
+          {
+            name: "testProfile1",
+            path: "/profile",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: "test2",
+    isNavbar: true,
+    icon: <FontAwesomeIcon icon={faPaperclip} className="icon" />,
+    collapse: [
+      {
+        name: "landing pages2",
+        collapse: [
+          {
+            name: "about-us2",
+            path: "/landing-pages/about-us",
+          },
+          {
+            name: "contact-us2",
+            path: "/landing-pages/contact-us",
+          },
+        ],
+      },
+      {
+        name: "profile2",
+        collapse: [
+          {
+            name: "testProfile2",
+            path: "/profile",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: "test2",
+    isNavbar: true,
+    icon: <FontAwesomeIcon icon={faPaperclip} className="icon" />,
+    collapse: [
+      {
+        name: "landing pages2",
+        collapse: [
+          {
+            name: "about-us2",
+            path: "/landing-pages/about-us",
+          },
+          {
+            name: "contact-us2",
+            path: "/landing-pages/contact-us",
+          },
+        ],
+      },
+      {
+        name: "profile2",
+        collapse: [
+          {
+            name: "testProfile2",
+            path: "/profile",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: "test2",
+    isNavbar: true,
+    icon: <FontAwesomeIcon icon={faPaperclip} className="icon" />,
+    collapse: [
+      {
+        name: "landing pages2",
+        collapse: [
+          {
+            name: "about-us2",
+            path: "/landing-pages/about-us",
+          },
+          {
+            name: "contact-us2",
+            path: "/landing-pages/contact-us",
+          },
+        ],
+      },
+      {
+        name: "profile2",
+        collapse: [
+          {
+            name: "testProfile2",
+            path: "/profile",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: "test2",
+    isNavbar: true,
+    icon: <FontAwesomeIcon icon={faPaperclip} className="icon" />,
+    collapse: [
+      {
+        name: "landing pages2",
+        collapse: [
+          {
+            name: "about-us2",
+            path: "/landing-pages/about-us",
+          },
+          {
+            name: "contact-us2",
+            path: "/landing-pages/contact-us",
+          },
+        ],
+      },
+      {
+        name: "profile2",
+        collapse: [
+          {
+            name: "testProfile2",
+            path: "/profile",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: "test2",
+    isNavbar: true,
+    icon: <FontAwesomeIcon icon={faPaperclip} className="icon" />,
+    collapse: [
+      {
+        name: "landing pages2",
+        collapse: [
+          {
+            name: "about-us2",
+            path: "/landing-pages/about-us",
+          },
+          {
+            name: "contact-us2",
+            path: "/landing-pages/contact-us",
+          },
+        ],
+      },
+      {
+        name: "profile2",
+        collapse: [
+          {
+            name: "testProfile2",
+            path: "/profile",
           },
         ],
       },

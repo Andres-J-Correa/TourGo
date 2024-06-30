@@ -1,13 +1,15 @@
-import { useState, useEffect, Suspense } from "react";
-import { Helmet } from "react-helmet";
+import React, { useState, useEffect, Suspense } from "react";
+
+import { Helmet, HelmetProvider } from "react-helmet-async";
+
 import { Routes, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import { publicFlattenedRoutes } from "./routes";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import theme from "assets/theme";
-import "./App.css";
+
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
 
 const App = () => {
   const [routes, setRoutes] = useState([]);
@@ -28,8 +30,7 @@ const App = () => {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <HelmetProvider>
       <Helmet>
         <title>Tour Go</title>
       </Helmet>
@@ -51,7 +52,7 @@ const App = () => {
         theme="light"
       />
       <ToastContainer />
-    </ThemeProvider>
+    </HelmetProvider>
   );
 };
 
