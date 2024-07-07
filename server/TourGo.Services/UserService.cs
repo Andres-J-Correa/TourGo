@@ -51,10 +51,9 @@ namespace TourGo.Services
 
             IUserAuthData response = new UserBase
             {
-                Id = id
-                ,
-                Name = email
-                ,
+                Id = id,
+                FirstName = email,
+                LastName = email,
                 Roles = allRoles
             };
 
@@ -81,7 +80,8 @@ namespace TourGo.Services
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (MySqlParameterCollection coll) =>
             {
-                coll.AddWithValue("p_name", request.Name);
+                coll.AddWithValue("p_firstName", request.FirstName);
+                coll.AddWithValue("p_lastName", request.LastName);
                 coll.AddWithValue("p_email", request.Email);
                 coll.AddWithValue("p_phone", request.Phone);
                 coll.AddWithValue("p_providerId", request.AuthProvider);
@@ -106,6 +106,22 @@ namespace TourGo.Services
             _mySqlDataProvider.ExecuteCmd(proc, (MySqlParameterCollection coll) =>
             {
                 coll.AddWithValue("p_email", email);
+            }, (IDataReader reader, short set) =>
+            {
+                result = reader.GetSafeBool(0);
+            });
+
+            return result;
+        }
+
+        public bool PhoneExists(string phone)
+        {
+            string proc = "users_phone_exists";
+            bool result = false;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (MySqlParameterCollection coll) =>
+            {
+                coll.AddWithValue("p_phone", phone);
             }, (IDataReader reader, short set) =>
             {
                 result = reader.GetSafeBool(0);
@@ -158,7 +174,8 @@ namespace TourGo.Services
         {
             UserBase user = new UserBase();
             user.Id = reader.GetSafeInt32(index++);
-            user.Name = reader.GetSafeString(index++);
+            user.FirstName = reader.GetSafeString(index++);
+            user.LastName = reader.GetSafeString(index++);
             user.Roles = reader.DeserializeObject<List<string>>(index++);
             return user;
         }

@@ -9,7 +9,7 @@ namespace TourGo.Models.Requests.Users
 {
     public class UserValidateRequest
     {
-        [Required, EmailAddress, StringLength(200)]
+        [Required, EmailAddress, StringLength(100)]
         public string Email { get; set; }
     }
 }

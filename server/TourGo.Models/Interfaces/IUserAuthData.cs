@@ -3,7 +3,8 @@
     public interface IUserAuthData
     {
         int Id { get; }
-        string Name { get; }
+        string FirstName { get; }
+        string LastName { get; }
         IEnumerable<string> Roles { get; }
     }
 }

@@ -11,10 +11,13 @@ namespace TourGo.Models.Requests.Users
 {
     public class UserAddRequest
     {
-        [Required, StringLength(150, MinimumLength = 2)]
-        public string Name { get; set; }
+        [Required, StringLength(50, MinimumLength = 2)]
+        public string FirstName { get; set; }
 
-        [Required, EmailAddress, StringLength(200)]
+        [Required, StringLength(50, MinimumLength = 2)]
+        public string LastName { get; set; }
+
+        [Required, EmailAddress, StringLength(100)]
         public string Email { get; set; }
 
         [Required, Phone, StringLength(20, MinimumLength = 4)]
@@ -27,6 +30,7 @@ namespace TourGo.Models.Requests.Users
         public int Role { get; set; }
 
         [Required, StringLength(50, MinimumLength = 8)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).*$", ErrorMessage = "Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character.")]
         public string Password { get; set; }
 
         [Required, Compare("Password")]

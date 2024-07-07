@@ -51,7 +51,9 @@ namespace TourGo.Web.Core.Services
 
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.String, _title, originalIssuer));
 
-            identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, user.Name, ClaimValueTypes.String, _title, originalIssuer));
+            identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, user.FirstName, ClaimValueTypes.String, _title, originalIssuer));
+
+            identity.AddClaim(new Claim(ClaimTypes.Surname, user.LastName, ClaimValueTypes.String, _title, originalIssuer));
 
             //identity.AddClaim(new Claim(ClaimTypes.Email, user.Email, ClaimValueTypes.String, _title, originalIssuer));
 
@@ -128,7 +130,11 @@ namespace TourGo.Web.Core.Services
                         break;
 
                     case ClaimTypes.Name:
-                        baseUser.Name = claim.Value;
+                        baseUser.FirstName = claim.Value;
+                        break;
+
+                    case ClaimTypes.Surname:
+                        baseUser.LastName = claim.Value;
                         break;
 
                     case ClaimTypes.Role:

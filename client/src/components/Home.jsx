@@ -1,10 +1,10 @@
 import React, { Fragment } from "react";
-import Navbar from "components/commonUI/navbars/DefaultNavbar";
+import ClientNavbarContainer from "components/client/navbars/ClientNavbarContainer";
 
 function Home() {
   return (
     <Fragment>
-      <Navbar />
+      <ClientNavbarContainer />
       <div className="bg-success vh-100"></div>
     </Fragment>
   );

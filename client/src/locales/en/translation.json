@@ -1,0 +1,63 @@
+{
+  "common": {
+    "error": "Error",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "unknown": "Unknown",
+    "loading": "Loading...",
+    "success": "Success!",
+    "requestFailed": "Request failed"
+  },
+  "yup": {
+    "required": "This field is required",
+    "min": "The value must be greater or equal to {{min}}",
+    "max": "The value must be less or equal to {{max}}",
+    "minLength": "The value must have at least {{min}} characters",
+    "maxLength": "The value must have at most {{max}} characters",
+    "email": "The value must be an email",
+    "emailTaken": "The email is already taken",
+    "phone": "The value must be a valid phone number",
+    "phoneTaken": "The phone is already taken",
+    "password": {
+      "lowercase": "The password must have at least one lowercase letter",
+      "uppercase": "The password must have at least one uppercase letter",
+      "number": "The password must have at least one number",
+      "special": "The password must have at least one special character"
+    },
+    "confirmPassword": "The password does not match",
+    "incorrectCredentials": "Incorrect credentials"
+  },
+  "client": {
+    "navbar": {
+      "account": "Account",
+      "login": "Login",
+      "logout": "Logout",
+      "logoutConfirm": "Are you sure you want to log out?",
+      "register": "Register"
+    },
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Welcome back!",
+      "email": "Email",
+      "password": "Password",
+      "button": "Sign In",
+      "noAccount": "Don't have an account?",
+      "register": "Register"
+    },
+    "register": {
+      "title": "Register",
+      "subtitle": "Create an account!",
+      "firstName": "First name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "button": "Register",
+      "alreadyHaveAccount": "Already have an account?",
+      "login": "Login"
+    }
+  }
+}

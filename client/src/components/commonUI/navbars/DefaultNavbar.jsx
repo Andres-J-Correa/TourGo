@@ -1,6 +1,4 @@
-import React from "react";
-
-import NavbarItem from "./NavbarItem";
+import React, { useState, useEffect } from "react";
 
 import {
   Container,
@@ -13,24 +11,30 @@ import {
   Nav,
 } from "reactstrap";
 
-import { publicRoutes } from "routes/publicRoutes";
+import NavbarItem from "./NavbarItem";
+import UserAccountDropdown from "components/client/users/UserAccountDropdown";
+import LanguageSelector from "components/commonUI/languages/LanguageSelector";
 
-import Proptypes from "prop-types";
-
+import PropTypes from "prop-types";
 import "./navbar.css";
 
-function DefaultNavbar({ brand = "TourGo" }) {
-  const [isOpen, setIsOpen] = React.useState(false);
+function DefaultNavbar({
+  brand = "Tour Go",
+  isOpen,
+  toggle,
+  navbarItems = [],
+  showLanguageSelector = true,
+  showUserItem = true,
+}) {
+  const [mappedItems, setMappedItems] = useState([]);
 
-  const mapNavbarItems = (routes) => {
-    return routes
-      .filter((route) => route.isNavbar)
-      .map((route, index) => (
-        <NavbarItem route={route} key={`nav-item-${index}-${route.name}`} />
-      ));
-  };
+  useEffect(() => {
+    const navbarMappedItems = navbarItems.map((item, index) => (
+      <NavbarItem navItem={item} key={`navbar-item-${index}-${item.name}`} />
+    ));
 
-  const toggle = () => setIsOpen(!isOpen);
+    setMappedItems(navbarMappedItems);
+  }, [navbarItems]);
 
   return (
     <Container className="position-sticky z-index-sticky top-0">
@@ -45,17 +49,16 @@ function DefaultNavbar({ brand = "TourGo" }) {
             <NavbarBrand className="font-weight-bolder ms-sm-3" href="/">
               {brand}
             </NavbarBrand>
-            <NavbarToggler
-              onClick={toggle}
-              className="shadow-none ms-2"
-            ></NavbarToggler>
+            <NavbarToggler onClick={toggle} className="shadow-none ms-2" />
             <Collapse
               isOpen={isOpen}
               navbar
               className="pt-3 pb-2 py-lg-0 w-100"
             >
               <Nav className="ms-auto" navbar>
-                {mapNavbarItems(publicRoutes)}
+                {showLanguageSelector && <LanguageSelector />}
+                {mappedItems}
+                {showUserItem && <UserAccountDropdown />}
               </Nav>
             </Collapse>
           </Navbar>
@@ -65,8 +68,28 @@ function DefaultNavbar({ brand = "TourGo" }) {
   );
 }
 
-export default DefaultNavbar;
-
 DefaultNavbar.propTypes = {
-  brand: Proptypes.string,
+  brand: PropTypes.string,
+  isOpen: PropTypes.bool.isRequired,
+  toggle: PropTypes.func.isRequired,
+  navbarItems: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      path: PropTypes.string,
+      collapse: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string.isRequired,
+          path: PropTypes.string,
+          collapse: PropTypes.arrayOf(
+            PropTypes.shape({
+              name: PropTypes.string.isRequired,
+              path: PropTypes.string,
+            })
+          ),
+        })
+      ),
+    })
+  ),
 };
+
+export default DefaultNavbar;

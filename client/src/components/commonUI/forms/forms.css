@@ -1,0 +1,12 @@
+.custom-error-message {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-error-message:hover {
+  transform: translateY(-50%) scale(1.2);
+}

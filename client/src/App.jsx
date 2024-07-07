@@ -1,6 +1,8 @@
 import React, { useState, useEffect, Suspense } from "react";
 
-import { Helmet, HelmetProvider } from "react-helmet-async";
+import { HelmetProvider } from "react-helmet-async";
+
+import { AppContextProvider } from "./contexts/GlobalAppContext";
 
 import { Routes, Route } from "react-router-dom";
 import { publicFlattenedRoutes } from "./routes";
@@ -24,34 +26,32 @@ const App = () => {
   );
 
   useEffect(() => {
-    const mappedRoutes = publicFlattenedRoutes.map(mapRoutes);
+    if (routes.length === 0) {
+      const mappedRoutes = publicFlattenedRoutes.map(mapRoutes);
 
-    setRoutes(mappedRoutes);
-  }, []);
+      setRoutes(mappedRoutes);
+    }
+  }, [routes]);
 
   return (
     <HelmetProvider>
-      <Helmet>
-        <title>Tour Go</title>
-      </Helmet>
-
       <Suspense fallback={<div>Loading...</div>}>
-        <Routes>{routes}</Routes>
+        <AppContextProvider>
+          <Routes>{routes}</Routes>
+        </AppContextProvider>
       </Suspense>
 
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={1000}
         hideProgressBar={false}
-        newestOnTop={false}
+        newestOnTop={true}
         closeOnClick
         rtl={false}
-        pauseOnFocusLoss
         draggable
         pauseOnHover
         theme="light"
       />
-      <ToastContainer />
     </HelmetProvider>
   );
 };

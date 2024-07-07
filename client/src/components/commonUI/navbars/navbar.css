@@ -12,13 +12,21 @@
   border-radius: 0.75rem;
 }
 
+.navbar .nav-item {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.navbar .dropdown-item {
+  font-size: 0.875rem;
+}
+
 .navbar .container-fluid {
   padding-left: 0;
   padding-right: 0;
 }
 
 .navbar .navbar-brand {
-  color: #344767;
   font-size: 1.1rem;
   padding-top: 0;
   padding-bottom: 0;
@@ -37,12 +45,27 @@
   text-transform: capitalize;
 }
 
+@media (max-width: 991.98px) {
+  .navbar .dropdown-menu {
+    margin-top: 0;
+    max-height: 200px;
+  }
+
+  .down-arrow {
+    margin-left: auto;
+  }
+}
+
 @media (min-width: 991.98px) {
+  .down-arrow {
+    margin-left: 0.5rem;
+  }
+
   .dropdown .dropdown-menu:before {
     font-family: "FontAwesome";
     content: "\f0d8";
     position: absolute;
-    top: -11%;
+    top: -1.25rem;
     left: 28px;
     right: auto;
     font-size: 22px;
@@ -50,9 +73,13 @@
     transition: top 0.35s ease;
   }
 
+  .dropdown .dropdown-menu {
+    margin-top: 1rem;
+  }
+
   .dropdown-menu .hidden-box {
     position: absolute;
-    top: -15%;
+    top: -1.6rem;
     right: 0.1rem;
     width: 100%;
     padding-top: 1rem;

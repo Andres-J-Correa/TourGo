@@ -1,0 +1,63 @@
+{
+  "common": {
+    "error": "Error",
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "yes": "Si",
+    "no": "No",
+    "unknown": "Desconocido",
+    "loading": "Cargando...",
+    "success": "Éxito!",
+    "requestFailed": "Solicitud fallida"
+  },
+  "yup": {
+    "required": "Este campo es obligatorio",
+    "min": "El valor debe ser mayor o igual a {{min}}",
+    "max": "El valor debe ser menor o igual a {{max}}",
+    "minLength": "El valor debe tener al menos {{min}} caracteres",
+    "maxLength": "El valor debe tener como maximo {{max}} caracteres",
+    "email": "El valor debe ser un correo",
+    "emailTaken": "El correo ya existe",
+    "phone": "El valor debe ser un numero de telefono valido",
+    "phoneTaken": "El numero de telefono ya existe",
+    "password": {
+      "lowercase": "La contraseña debe tener al menos una minuscula",
+      "uppercase": "La contraseña debe tener al menos una mayuscula",
+      "number": "La contraseña debe tener al menos un numero",
+      "special": "La contraseña debe tener al menos un caracter especial"
+    },
+    "confirmPassword": "La contraseña no coincide",
+    "incorrectCredentials": "Credenciales incorrectas"
+  },
+  "client": {
+    "navbar": {
+      "account": "Cuenta",
+      "login": "Iniciar sesión",
+      "logout": "Cerrar sesión",
+      "logoutConfirm": "¿Seguro que quieres cerrar la sesión?",
+      "register": "Registrarse"
+    },
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Bienvenido de vuelta!",
+      "email": "Correo",
+      "password": "Contraseña",
+      "button": "Iniciar sesión",
+      "noAccount": "¿No tienes una cuenta?",
+      "register": "Registrarse"
+    },
+    "register": {
+      "title": "Registrarse",
+      "subtitle": "Crea una cuenta!",
+      "firstName": "Primer nombre",
+      "lastName": "Apellido",
+      "email": "Correo",
+      "phone": "Telefono",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "button": "Registrarse",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "login": "Iniciar sesión"
+    }
+  }
+}

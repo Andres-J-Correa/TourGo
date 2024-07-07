@@ -1,16 +1,23 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import * as serviceWorker from "./serviceWorker";
-import "./index.css";
+
+import { LanguageProvider } from "./contexts/LanguageContext";
+import "./locales/i18n"; // Initialize i18n
+
 import App from "./App";
+import "./index.css";
+
+import * as serviceWorker from "./serviceWorker";
 import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <React.StrictMode>
-      <App />
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
     </React.StrictMode>
   </BrowserRouter>
 );

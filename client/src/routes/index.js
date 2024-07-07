@@ -9,8 +9,8 @@ const flattenRoutes = (routes) => {
     if (Boolean(item.path) && Boolean(item.component)) {
       flatRoutes.push(item);
     }
-    if (typeof item.collapse !== "undefined") {
-      flatRoutes = [...flatRoutes, ...flattenRoutes(item.collapse)];
+    if (typeof item.subRoutes !== "undefined") {
+      flatRoutes = [...flatRoutes, ...flattenRoutes(item.subRoutes)];
     }
   });
   return flatRoutes;
