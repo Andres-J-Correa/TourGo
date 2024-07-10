@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using TourGo.Models.Domain;
 using System.Reflection;
 using System.Security.Claims;
 using System.Security.Principal;
 using TourGo.Models;
 using TourGo.Services;
+using TourGo.Models.Domain.Users;
 
 namespace TourGo.Web.Core.Services
 {
@@ -55,7 +55,7 @@ namespace TourGo.Web.Core.Services
 
             identity.AddClaim(new Claim(ClaimTypes.Surname, user.LastName, ClaimValueTypes.String, _title, originalIssuer));
 
-            //identity.AddClaim(new Claim(ClaimTypes.Email, user.Email, ClaimValueTypes.String, _title, originalIssuer));
+            identity.AddClaim(new Claim(ClaimTypes.Email, user.Email, ClaimValueTypes.String, _title, originalIssuer));
 
             if (user.Roles != null && user.Roles.Any())
             {
@@ -135,6 +135,10 @@ namespace TourGo.Web.Core.Services
 
                     case ClaimTypes.Surname:
                         baseUser.LastName = claim.Value;
+                        break;
+
+                    case ClaimTypes.Email:
+                        baseUser.Email = claim.Value;
                         break;
 
                     case ClaimTypes.Role:

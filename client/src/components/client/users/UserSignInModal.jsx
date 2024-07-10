@@ -1,33 +1,26 @@
-import React, { useState, useRef } from "react";
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardFooter,
-  Col,
-  Button,
-  Modal,
-  ModalBody,
-  Spinner,
-} from "reactstrap";
+import React, { useRef } from "react";
 import { Formik, Form } from "formik";
+import { Button, Spinner } from "reactstrap";
 import CustomField from "components/commonUI/forms/CustomField";
-
-import { useUserSignInSchema } from "./constants";
+import { useUserSignInSchema } from "components/client/users/validationSchemas";
 import { usersLogin } from "services/userAuthService";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
+import AuthCard from "components/client/users/AuthCard";
+import withModal from "components/client/users/withModal";
 
-function UserSignInModal({ isOpen, toggle, onSignUp }) {
-  const [loading, setLoading] = useState(false);
-
+function UserSignIn({
+  toggle,
+  onSignUp,
+  onPasswordReset,
+  loading,
+  setLoading,
+}) {
   const { user } = useAppContext();
   const { t } = useLanguage();
-
   const formRef = useRef(null);
-
   const validationSchema = useUserSignInSchema();
 
   const handleSubmit = async (values) => {
@@ -37,10 +30,7 @@ function UserSignInModal({ isOpen, toggle, onSignUp }) {
       if (!Boolean(response?.item)) {
         throw new Error("User not found");
       }
-      toast.success(t("common.success"), {
-        pauseOnHover: false,
-        draggable: false,
-      });
+      toast.success(t("common.success"));
       toggle();
       user.set((prev) => ({ ...prev, isAuthenticated: true }));
     } catch {
@@ -53,90 +43,79 @@ function UserSignInModal({ isOpen, toggle, onSignUp }) {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      toggle={toggle}
-      centered={true}
-      className="px-sm-5"
-      backdrop={loading ? "static" : true}
-      keyboard={!loading}
+    <AuthCard
+      title={t("client.login.title")}
+      subtitle={t("client.login.subtitle")}
+      footer={
+        Boolean(onSignUp) ? (
+          <p className="mb-0 mt-3 text-sm mx-auto">
+            {t("client.login.noAccount")}{" "}
+            <span
+              className="text-success text-gradient font-weight-bold"
+              onClick={loading ? null : onSignUp}
+              role="button"
+            >
+              {t("client.login.register")}
+            </span>
+          </p>
+        ) : null
+      }
     >
-      <ModalBody className="p-0">
-        <Col xs="12" className="mx-auto">
-          <Card className="z-index-0">
-            <CardHeader className="p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div className="bg-gradient-success shadow-info border-radius-lg py-3 pe-1 text-center py-4">
-                <h4 className="font-weight-bolder text-white mt-1 mb-0">
-                  {t("client.login.title")}
-                </h4>
-                <p className="mb-1 text-sm text-white">
-                  {t("client.login.subtitle")}
-                </p>
-              </div>
-            </CardHeader>
-            <CardBody className="pb-0">
-              <Formik
-                initialValues={{
-                  email: "",
-                  password: "",
-                }}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmit}
-                innerRef={formRef}
-              >
-                <Form>
-                  <CustomField
-                    name="email"
-                    type="email"
-                    className="form-control"
-                    placeholder={t("client.login.email")}
-                  />
-                  <CustomField
-                    name="password"
-                    type="password"
-                    className="form-control w-100"
-                    placeholder={t("client.login.password")}
-                  />
-                  <div className="text-center">
-                    <Button
-                      type="submit"
-                      size="lg"
-                      disabled={loading}
-                      className="bg-gradient-success w-100 mt-4 mb-0"
-                    >
-                      {loading ? (
-                        <Spinner size="sm" />
-                      ) : (
-                        t("client.login.button")
-                      )}
-                    </Button>
-                  </div>
-                </Form>
-              </Formik>
-            </CardBody>
-            <CardFooter className="text-center pt-0 pb-3 px-sm-4 px-1">
-              <p className="mb-0 mt-3 text-sm mx-auto">
-                {" "}
-                {t("client.login.noAccount")}{" "}
-                <span
-                  className="text-success text-gradient font-weight-bold"
-                  onClick={onSignUp}
-                  role="button"
-                >
-                  {t("client.login.register")}
-                </span>
-              </p>
-            </CardFooter>
-          </Card>
-        </Col>
-      </ModalBody>
-    </Modal>
+      <Formik
+        initialValues={{
+          email: "",
+          password: "",
+        }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+        innerRef={formRef}
+      >
+        <Form>
+          <CustomField
+            name="email"
+            type="email"
+            className="form-control"
+            placeholder={t("client.login.email")}
+          />
+          <CustomField
+            name="password"
+            type="password"
+            className="form-control w-100"
+            placeholder={t("client.login.password")}
+            autoComplete="current-password"
+          />
+          <div className="text-end">
+            <button
+              type="button"
+              className="btn btn-link m-0 p-0"
+              onClick={onPasswordReset}
+              disabled={loading}
+            >
+              Forgot your password?
+            </button>
+          </div>
+          <div className="text-center">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={loading}
+              className="bg-gradient-success w-100 mt-3 mb-0"
+            >
+              {loading ? <Spinner size="sm" /> : t("client.login.button")}
+            </Button>
+          </div>
+        </Form>
+      </Formik>
+    </AuthCard>
   );
 }
 
-export default UserSignInModal;
-
-UserSignInModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
+UserSignIn.propTypes = {
   toggle: PropTypes.func.isRequired,
+  onSignUp: PropTypes.func,
+  onPasswordReset: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
+  setLoading: PropTypes.func.isRequired,
 };
+
+export default withModal(UserSignIn);

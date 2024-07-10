@@ -1,4 +1,5 @@
-﻿using TourGo.Web.Core;
+﻿using TourGo.Models.Domain.Config.Emails;
+using TourGo.Web.Core;
 using TourGo.Web.StartUp;
 
 namespace TourGo.Web.Api
@@ -27,6 +28,8 @@ namespace TourGo.Web.Api
             services.AddOptions();
             services.Configure<SecurityConfig>(Configuration.GetSection("SecurityConfig"));
             services.Configure<JsonWebTokenConfig>(Configuration.GetSection("JsonWebTokenConfig"));
+            services.Configure<BrevoConfig>(Configuration.GetSection("BrevoConfig"));
+            services.Configure<EmailConfig>(Configuration.GetSection("EmailConfig"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

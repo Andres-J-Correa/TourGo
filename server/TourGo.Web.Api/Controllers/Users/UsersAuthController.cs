@@ -1,9 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using TourGo.Models;
+using TourGo.Models.Domain.Config.Emails;
+using TourGo.Models.Domain.Users;
+using TourGo.Models.Enums;
 using TourGo.Models.Requests.Users;
 using TourGo.Services;
+using TourGo.Services.Interfaces.Email;
 using TourGo.Web.Controllers;
 using TourGo.Web.Models.Responses;
 
@@ -15,18 +20,22 @@ namespace TourGo.Web.Api.Controllers.Users
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService<int> _authService;
+        private readonly IEmailService _emailService;
+        private readonly EmailConfig _emailConfig;
 
-        public UsersAuthController(ILogger<UsersAuthController> logger, IUserService userService, IAuthenticationService<int> authService) : base(logger)
+        public UsersAuthController(ILogger<UsersAuthController> logger, IUserService userService, IAuthenticationService<int> authService, IEmailService emailService, IOptions<EmailConfig> emailConfig) : base(logger)
         {
             _userService = userService;
             _authService = authService;
+            _emailService = emailService;
+            _emailConfig = emailConfig.Value;
         }
 
         #region Public Endpoints
 
         [HttpPost("exists")]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<bool>> UserExists(UserValidateRequest request)
+        public ActionResult<ItemResponse<bool>> UserExists(EmailValidateRequest request)
         {
 
             ObjectResult result = null;
@@ -152,6 +161,114 @@ namespace TourGo.Web.Api.Controllers.Users
             }
 
             return result;
+        }
+
+        [HttpPost("resetPassword")]
+        [AllowAnonymous]
+        public async Task<ActionResult<SuccessResponse>> ResetPassword(EmailValidateRequest request)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                IUserAuthData user = _userService.Get(request.Email);
+
+                if (user != null)
+                {
+                    DateTime TokenExpirationDate = DateTime.UtcNow.AddHours(_emailConfig.TokenExpirationHours);
+                    Guid token = _userService.CreateToken(user.Id, UserTokenTypeEnum.PasswordReset, TokenExpirationDate);
+
+                    await _emailService.UserPasswordReset(user, token.ToString());
+
+                    SuccessResponse response = new SuccessResponse();
+                    result = Ok200(response);
+                }
+                else
+                {
+                    int iCode = 404;
+                    ErrorResponse response = new ErrorResponse("Email not found");
+                    result = StatusCode(iCode, response);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse(ex.Message);
+
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("validateToken/{token}")]
+        [AllowAnonymous]
+        public ActionResult<ItemResponse<bool>> ValidateToken (string token)
+        {
+            int iCode = 200;
+            BaseResponse response;
+
+            try
+            {
+                UserToken userToken = _userService.GetUserToken(token);
+
+                if (userToken != null)
+                {
+                    bool isValid = DateTime.UtcNow <= userToken.Expiration;
+
+                    response = new ItemResponse<bool> { Item = isValid };
+                }
+                else
+                {
+                    iCode = 404;
+                    response = new ErrorResponse("Token not Found");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                iCode = 500;
+                Logger.LogError(ex.ToString());
+                response = new ErrorResponse($"Generic Error: {ex.Message}");
+            }
+
+            return StatusCode(iCode, response);
+        }
+
+        [HttpPut("changePassword")]
+        [AllowAnonymous]
+        public ActionResult<SuccessResponse> ChangePassword (UserUpdatePasswordRequest request)
+        {
+            int iCode = 200;
+            BaseResponse response = null;
+
+            try
+            {
+                UserToken userToken = _userService.GetUserToken(request.Token);
+
+                if (userToken != null)
+                {
+                    _userService.ChangePassword(userToken.UserId, request.Password);
+
+                    _userService.DeleteUserToken(userToken);
+
+                    response = new SuccessResponse();
+                }
+                else
+                {
+                    iCode = 404;
+                    response = new ErrorResponse("Token not Found");
+                }
+            }
+            catch (Exception ex)
+            {
+                iCode = 500;
+                Logger.LogError(ex.ToString());
+                response = new ErrorResponse($"Generic Error: {ex.Message}");
+            }
+
+            return StatusCode(iCode, response);
         }
 
         #endregion

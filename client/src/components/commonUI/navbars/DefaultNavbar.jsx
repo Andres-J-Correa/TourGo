@@ -41,10 +41,8 @@ function DefaultNavbar({
       <Row>
         <Col xs="12">
           <Navbar
-            color="light"
-            light
             expand="lg"
-            className="blur border-radius-xl top-0 z-index-fixed shadow position-absolute my-3 p-2 start-0 end-0 mx-4"
+            className="blur border-radius-xl top-0 z-index-fixed shadow position-absolute my-4 p-2 start-0 end-0 mx-4"
           >
             <NavbarBrand className="font-weight-bolder ms-sm-3" href="/">
               {brand}

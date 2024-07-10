@@ -8,7 +8,11 @@
     "unknown": "Desconocido",
     "loading": "Cargando...",
     "success": "Éxito!",
-    "requestFailed": "Solicitud fallida"
+    "requestFailed": "Solicitud fallida",
+    "notFound": "No encontrado",
+    "redirecting": "Redireccionando...",
+    "checkEmail": "Comprueba tu correo",
+    "sessionExpired": "Sesión expirada, por favor inicia sesión de nuevo"
   },
   "yup": {
     "required": "Este campo es obligatorio",
@@ -58,6 +62,21 @@
       "button": "Registrarse",
       "alreadyHaveAccount": "¿Ya tienes una cuenta?",
       "login": "Iniciar sesión"
+    },
+    "passwordReset": {
+      "title": "Restablecer contraseña",
+      "subtitle": "Recibirá un correo en maximo 60 segundos",
+      "email": "Correo",
+      "button": "Restablecer contraseña",
+      "back": "Volver a"
+    },
+    "passwordChange": {
+      "title": "Cambia tu contraseña",
+      "subtitle": "Ingresa tu nueva contraseña",
+      "oldPassword": "Contraseña anterior",
+      "newPassword": "Nueva contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "button": "Cambia tu contraseña"
     }
   }
 }

@@ -6,7 +6,7 @@ using TourGo.Data;
 using TourGo.Data.Extensions;
 using TourGo.Data.Providers;
 using TourGo.Models;
-using TourGo.Models.Domain;
+using TourGo.Models.Domain.Users;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Users;
 
@@ -54,6 +54,7 @@ namespace TourGo.Services
                 Id = id,
                 FirstName = email,
                 LastName = email,
+                Email = email,
                 Roles = allRoles
             };
 
@@ -67,8 +68,7 @@ namespace TourGo.Services
         {
             int userId = 0;
             string proc = "users_insert";
-            string salt = BCrypt.BCryptHelper.GenerateSalt();
-            string hashedPassword = BCrypt.BCryptHelper.HashPassword(request.Password, salt);
+            string hashedPassword = GetHashedPassword(request.Password);
             string authProviderUserId;
 
             switch (request.AuthProvider)
@@ -130,30 +130,40 @@ namespace TourGo.Services
             return result;
         }
 
-        private bool IsValidCredentials(string email, string password)
+        public UserToken GetUserToken(string token)
         {
-            string proc = "users_get_hashPassword_byEmail";
-            string passwordFromDb = null;
-            bool isValidCredentials = false;
+            UserToken userToken = null;
+            string proc = "users_tokens_select_byToken";
 
             _mySqlDataProvider.ExecuteCmd(proc, (MySqlParameterCollection coll) =>
             {
-                coll.AddWithValue("p_email", email);
-
+                coll.AddWithValue("p_token", token);
             }, (IDataReader reader, short set) =>
             {
-                passwordFromDb = reader.GetSafeString(0);
+                int index = 0;
+                userToken = MapUserToken(reader, ref index);
             });
 
-            if (passwordFromDb != null) 
-            {
-                isValidCredentials = BCrypt.BCryptHelper.CheckPassword(password, passwordFromDb);
-            }
+            return userToken;
+        }
 
-            return isValidCredentials;
+        public Guid CreateToken( int userId, UserTokenTypeEnum tokenType, DateTime expirationDate)
+        {
+            Guid guid = Guid.NewGuid();
+            string proc = "users_tokens_insert";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (MySqlParameterCollection coll) =>
+            {
+                coll.AddWithValue("p_userId", userId);
+                coll.AddWithValue("p_token", guid.ToString());
+                coll.AddWithValue("p_tokenTypeId", (int)tokenType);
+                coll.AddWithValue("p_expiration", expirationDate);
+            });
+
+            return guid;
         }
     
-        private IUserAuthData Get (string email)
+        public IUserAuthData Get (string email)
         {
             string proc = "users_selectBase_ByEmail";
             UserBase user = null;
@@ -170,14 +180,83 @@ namespace TourGo.Services
             return user;
         }
 
+        public void ChangePassword(int userId, string password)
+        {
+
+            string hashedPassword = GetHashedPassword(password);
+
+            string proc = "users_auth_upsert_password";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (MySqlParameterCollection coll) =>
+            {
+                coll.AddWithValue("p_userId", userId);
+                coll.AddWithValue("p_newPassword", hashedPassword);
+            });
+        }
+
+        public void DeleteUserToken (UserToken userToken)
+        {
+            string proc = "users_tokens_delete";
+
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (MySqlParameterCollection coll) =>
+            {
+                coll.AddWithValue("p_userId", userToken.UserId);
+                coll.AddWithValue("p_tokenTypeId", (int)userToken.TokenType);
+                coll.AddWithValue("p_token", userToken.Token);
+            });
+        }
+
+        private bool IsValidCredentials(string email, string password)
+        {
+            string proc = "users_get_hashPassword_byEmail";
+            string passwordFromDb = null;
+            bool isValidCredentials = false;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (MySqlParameterCollection coll) =>
+            {
+                coll.AddWithValue("p_email", email);
+
+            }, (IDataReader reader, short set) =>
+            {
+                passwordFromDb = reader.GetSafeString(0);
+            });
+
+            if (passwordFromDb != null)
+            {
+                isValidCredentials = BCrypt.BCryptHelper.CheckPassword(password, passwordFromDb);
+            }
+
+            return isValidCredentials;
+        }
+
         private static UserBase MapBaseUser(IDataReader reader, ref int index)
         {
             UserBase user = new UserBase();
             user.Id = reader.GetSafeInt32(index++);
             user.FirstName = reader.GetSafeString(index++);
             user.LastName = reader.GetSafeString(index++);
+            user.Email = reader.GetSafeString(index++);
             user.Roles = reader.DeserializeObject<List<string>>(index++);
             return user;
+        }
+
+        private static UserToken MapUserToken(IDataReader reader, ref int index)
+        {
+            UserToken userToken = new UserToken();
+            userToken.Token = reader.GetSafeString(index++);
+            userToken.UserId = reader.GetSafeInt32(index++);
+            userToken.TokenType = (UserTokenTypeEnum)reader.GetSafeInt32(index++);
+            userToken.Expiration = reader.GetSafeDateTime(index++);
+            return userToken;
+        }
+
+        private static string GetHashedPassword(string password)
+        {
+            string hashedPassword;
+            string salt = BCrypt.BCryptHelper.GenerateSalt();
+            hashedPassword = BCrypt.BCryptHelper.HashPassword(password, salt);
+            return hashedPassword;
         }
     }
 }

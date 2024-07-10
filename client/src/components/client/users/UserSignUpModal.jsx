@@ -1,26 +1,16 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardFooter,
-  Col,
-  Row,
-  FormGroup,
-  Button,
-  Modal,
-  ModalBody,
-  Spinner,
-} from "reactstrap";
+import { Col, Row, FormGroup, Button, Spinner } from "reactstrap";
 
 import { Formik, Form } from "formik";
 
 import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 import CustomField from "components/commonUI/forms/CustomField";
+import AuthCard from "./AuthCard";
+import withModal from "components/client/users/withModal";
 
-import { useUserSignUpSchema } from "./constants";
+import { useUserSignUpSchema } from "components/client/users/validationSchemas";
 import { useLanguage } from "contexts/LanguageContext";
 import { usersRegister } from "services/userAuthService";
 
@@ -38,9 +28,7 @@ const initialValues = {
   authProvider: 1, //TODO this should be changed later for OAuth login
 };
 
-function UserSignUpModal({ isOpen, toggle, onSignIn }) {
-  const [loading, setLoading] = useState(false);
-
+function UserSignUpModal({ onSignIn, loading, setLoading }) {
   const { t } = useLanguage();
   const validationSchema = useUserSignUpSchema();
 
@@ -53,10 +41,7 @@ function UserSignUpModal({ isOpen, toggle, onSignIn }) {
       if (!Boolean(response?.item)) {
         throw new Error("User not found");
       }
-      toast.success(t("common.success"), {
-        pauseOnHover: false,
-        draggable: false,
-      });
+      toast.success(t("common.success"));
       onSignIn();
     } catch (error) {
       if (error?.appErrors?.includes("Email already exists")) {
@@ -73,121 +58,98 @@ function UserSignUpModal({ isOpen, toggle, onSignIn }) {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      toggle={toggle}
-      centered={true}
-      className="px-sm-5"
-      backdrop={loading ? "static" : true}
-      keyboard={!loading}
+    <AuthCard
+      title={t("client.register.title")}
+      subtitle={t("client.register.subtitle")}
+      footer={
+        <p className="mb-0 mt-3 text-sm mx-auto">
+          {" "}
+          {t("client.register.alreadyHaveAccount")}{" "}
+          <span
+            className="text-success text-gradient font-weight-bold"
+            onClick={loading ? null : onSignIn}
+            role="button"
+          >
+            {t("client.register.login")}
+          </span>
+        </p>
+      }
     >
-      <ModalBody className="p-0">
-        <Col xs="12" className="mx-auto">
-          <Card className="z-index-0">
-            <CardHeader className="p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div className="bg-gradient-success shadow-info border-radius-lg py-3 pe-1 text-center py-4">
-                <h4 className="font-weight-bolder text-white mt-1 mb-0">
-                  {t("client.register.title")}
-                </h4>
-                <p className="mb-1 text-sm text-white">
-                  {t("client.register.subtitle")}
-                </p>
-              </div>
-            </CardHeader>
-            <CardBody className="pb-0">
-              <Formik
-                initialValues={{ ...initialValues }}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmit}
-                innerRef={formRef}
-              >
-                <Form>
-                  <Row>
-                    <Col md={6} sm={12}>
-                      <CustomField
-                        name="firstName"
-                        type="text"
-                        className="form-control"
-                        placeholder={t("client.register.firstName")}
-                      />
-                    </Col>
-                    <Col md={6} sm={12}>
-                      <CustomField
-                        name="lastName"
-                        type="text"
-                        className="form-control"
-                        placeholder={t("client.register.lastName")}
-                      />
-                    </Col>
-                  </Row>
-                  <CustomField
-                    name="email"
-                    type="email"
-                    className="form-control"
-                    placeholder={t("client.register.email")}
-                  />
-                  <FormGroup className="position-relative">
-                    <PhoneInputField
-                      name="phone"
-                      type="text"
-                      className="form-control"
-                      placeholder={t("client.register.phone")}
-                    />
-                    <CustomErrorMessage name="phone" />
-                  </FormGroup>
-                  <CustomField
-                    name="password"
-                    type="password"
-                    className="form-control"
-                    placeholder={t("client.register.password")}
-                  />
-                  <CustomField
-                    name="confirmPassword"
-                    type="password"
-                    className="form-control"
-                    placeholder={t("client.register.confirmPassword")}
-                  />
-                  <div className="text-center">
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="bg-gradient-success mt-4 mb-0"
-                      disabled={loading}
-                    >
-                      {" "}
-                      {loading ? (
-                        <Spinner size="sm" />
-                      ) : (
-                        t("client.register.button")
-                      )}
-                    </Button>
-                  </div>
-                </Form>
-              </Formik>
-            </CardBody>
-            <CardFooter className="text-center pt-0 pb-3 px-sm-4 px-1">
-              <p className="mb-0 mt-3 text-sm mx-auto">
-                {" "}
-                {t("client.register.alreadyHaveAccount")}{" "}
-                <span
-                  className="text-success text-gradient font-weight-bold"
-                  onClick={onSignIn}
-                  role="button"
-                >
-                  {t("client.register.login")}
-                </span>
-              </p>
-            </CardFooter>
-          </Card>
-        </Col>
-      </ModalBody>
-    </Modal>
+      <Formik
+        initialValues={{ ...initialValues }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+        innerRef={formRef}
+      >
+        <Form>
+          <Row>
+            <Col md={6} sm={12}>
+              <CustomField
+                name="firstName"
+                type="text"
+                className="form-control"
+                placeholder={t("client.register.firstName")}
+              />
+            </Col>
+            <Col md={6} sm={12}>
+              <CustomField
+                name="lastName"
+                type="text"
+                className="form-control"
+                placeholder={t("client.register.lastName")}
+              />
+            </Col>
+          </Row>
+          <CustomField
+            name="email"
+            type="email"
+            className="form-control"
+            placeholder={t("client.register.email")}
+          />
+          <FormGroup className="position-relative">
+            <PhoneInputField
+              name="phone"
+              type="text"
+              className="form-control d-flex"
+              placeholder={t("client.register.phone")}
+              autoComplete="tel"
+            />
+            <CustomErrorMessage name="phone" />
+          </FormGroup>
+          <CustomField
+            name="password"
+            type="password"
+            className="form-control"
+            placeholder={t("client.register.password")}
+            autoComplete="new-password"
+          />
+          <CustomField
+            name="confirmPassword"
+            type="password"
+            className="form-control"
+            placeholder={t("client.register.confirmPassword")}
+          />
+          <div className="text-center">
+            <Button
+              type="submit"
+              size="lg"
+              className="bg-gradient-success mt-3 mb-0"
+              disabled={loading}
+            >
+              {" "}
+              {loading ? <Spinner size="sm" /> : t("client.register.button")}
+            </Button>
+          </div>
+        </Form>
+      </Formik>
+    </AuthCard>
   );
 }
 
-export default UserSignUpModal;
+export default withModal(UserSignUpModal);
 
 UserSignUpModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  toggle: PropTypes.func.isRequired,
+  onSignIn: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
+  setLoading: PropTypes.func.isRequired,
 };

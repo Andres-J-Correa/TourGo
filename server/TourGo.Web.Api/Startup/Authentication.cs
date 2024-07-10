@@ -35,7 +35,7 @@ namespace TourGo.Web.StartUp
             cookie.Path = "/";
             cookie.SameSite = SameSiteMode.None;
             cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-            cookie.MaxAge = TimeSpan.FromDays(security.CookieDays);
+            cookie.MaxAge = TimeSpan.FromSeconds(30);
 
             // If you don't want the cookie to be automatically authenticated and assigned to
             // HttpContext.User, remove the CookieAuthenticationDefaults.AuthenticationScheme

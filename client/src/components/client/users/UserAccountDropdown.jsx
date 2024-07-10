@@ -9,6 +9,7 @@ import { DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
 import HoverDropDown from "components/commonUI/navbars/HoverDropdown";
 import UserSignInModal from "components/client/users/UserSignInModal";
 import UserSignUpModal from "components/client/users/UserSignUpModal";
+import UserPasswordResetModal from "./UserPasswordResetModal";
 
 import { usersLogout } from "services/userAuthService";
 
@@ -20,6 +21,7 @@ import PropTypes from "prop-types";
 const defaultModals = {
   login: false,
   register: false,
+  reset: false,
 };
 function UserAccountDropdown() {
   const [modals, setModals] = useState({
@@ -64,29 +66,30 @@ function UserAccountDropdown() {
           style={{ minWidth: "auto" }}
         >
           <div className="hidden-box">{/* For hover effect */}</div>
-          <DropdownItems
-            isAuthenticated={user.current?.isAuthenticated}
-            toggle={toggle}
-            t={t}
-            setUser={user.set}
-          />
+          <DropdownItems user={user} toggle={toggle} t={t} />
         </DropdownMenu>
       </HoverDropDown>
       <UserSignInModal
         isOpen={modals.login}
         toggle={toggle("login")}
         onSignUp={toggle("register")}
+        onPasswordReset={toggle("reset")}
       />
       <UserSignUpModal
         isOpen={modals.register}
         toggle={toggle("register")}
         onSignIn={toggle("login")}
       />
+      <UserPasswordResetModal
+        isOpen={modals.reset}
+        toggle={toggle("reset")}
+        onSignIn={toggle("login")}
+      />
     </React.Fragment>
   );
 }
 
-function DropdownItems({ isAuthenticated, toggle, t, setUser }) {
+function DropdownItems({ user, toggle, t }) {
   const handleLogout = () => {
     const logoutAsync = async () => {
       try {
@@ -120,12 +123,12 @@ function DropdownItems({ isAuthenticated, toggle, t, setUser }) {
           showConfirmButton: true,
           confirmButtonText: t("common.ok"),
         });
-        setUser((prev) => ({ ...prev, isAuthenticated: false }));
+        user.logout();
       }
     });
   };
 
-  const items = isAuthenticated
+  const items = user.current.isAuthenticated
     ? [
         {
           key: "logout",

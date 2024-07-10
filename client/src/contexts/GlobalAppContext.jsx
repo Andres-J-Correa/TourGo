@@ -17,8 +17,12 @@ const AppContext = createContext();
 export const AppContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState({ ...defaultUser });
 
+  const logout = () => {
+    setCurrentUser({ ...defaultUser });
+  };
+
   const contextValue = {
-    user: { current: currentUser, set: setCurrentUser },
+    user: { current: currentUser, set: setCurrentUser, logout },
   };
 
   useEffect(() => {

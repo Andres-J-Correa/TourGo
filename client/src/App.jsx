@@ -2,6 +2,9 @@ import React, { useState, useEffect, Suspense } from "react";
 
 import { HelmetProvider } from "react-helmet-async";
 
+import ClientNavbarContainer from "components/client/navbars/ClientNavbarContainer";
+import GlobalErrorHandler from "components/commonUI/errors/GlobalErrorHandler";
+
 import { AppContextProvider } from "./contexts/GlobalAppContext";
 
 import { Routes, Route } from "react-router-dom";
@@ -37,15 +40,17 @@ const App = () => {
     <HelmetProvider>
       <Suspense fallback={<div>Loading...</div>}>
         <AppContextProvider>
-          <Routes>{routes}</Routes>
+          <GlobalErrorHandler>
+            <ClientNavbarContainer />
+            <Routes>{routes}</Routes>
+          </GlobalErrorHandler>
         </AppContextProvider>
       </Suspense>
 
       <ToastContainer
         position="top-right"
-        autoClose={1000}
+        autoClose={2000}
         hideProgressBar={false}
-        newestOnTop={true}
         closeOnClick
         rtl={false}
         draggable

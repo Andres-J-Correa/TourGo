@@ -8,7 +8,11 @@
     "unknown": "Unknown",
     "loading": "Loading...",
     "success": "Success!",
-    "requestFailed": "Request failed"
+    "requestFailed": "Request failed",
+    "notFound": "Not found",
+    "redirecting": "Redirecting...",
+    "checkEmail": "Check your email",
+    "sessionExpired": "Session expired, please log in again"
   },
   "yup": {
     "required": "This field is required",
@@ -58,6 +62,21 @@
       "button": "Register",
       "alreadyHaveAccount": "Already have an account?",
       "login": "Login"
+    },
+    "passwordReset": {
+      "title": "Password Reset",
+      "subtitle": "You will receive an e-mail in maximum 60 seconds",
+      "email": "Email",
+      "button": "Reset Password",
+      "back": "Back to"
+    },
+    "passwordChange": {
+      "title": "Change Password",
+      "subtitle": "Enter your new password below",
+      "oldPassword": "Old Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "button": "Change Password"
     }
   }
 }

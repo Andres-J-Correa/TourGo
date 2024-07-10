@@ -6,6 +6,11 @@ export const publicRoutes = [
     path: "/",
     component: lazy(() => import("components/Home")),
     exact: true,
-    isAnonymous: true,
+  },
+  {
+    name: "changePassword",
+    path: "/changePassword",
+    component: lazy(() => import("components/client/users/UserPasswordChange")),
+    exact: true,
   },
 ];

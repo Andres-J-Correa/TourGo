@@ -9,7 +9,7 @@ using TourGo.Models.Enums;
 
 namespace TourGo.Models.Requests.Users
 {
-    public class UserAddRequest
+    public class UserAddRequest: PasswordValidateRequest
     {
         [Required, StringLength(50, MinimumLength = 2)]
         public string FirstName { get; set; }
@@ -28,12 +28,5 @@ namespace TourGo.Models.Requests.Users
 
         [Required, ValidEnum(typeof(UserRoleEnum))]
         public int Role { get; set; }
-
-        [Required, StringLength(50, MinimumLength = 8)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).*$", ErrorMessage = "Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character.")]
-        public string Password { get; set; }
-
-        [Required, Compare("Password")]
-        public string ConfirmPassword { get; set; }
     }
 }

@@ -1,6 +1,10 @@
-﻿using TourGo.Data;
+﻿using sib_api_v3_sdk.Api;
+using sib_api_v3_sdk.Client;
+using TourGo.Data;
 using TourGo.Data.Providers;
 using TourGo.Services;
+using TourGo.Services.Email;
+using TourGo.Services.Interfaces.Email;
 using TourGo.Web.Api.StartUp.DependencyInjection;
 using TourGo.Web.Core.Services;
 
@@ -43,6 +47,15 @@ namespace TourGo.Web.StartUp
             {
                 return MemoryCacheDefault.Instance;
             });
+
+            services.AddSingleton<TransactionalEmailsApi>(provider =>
+            {
+                Configuration.Default.ApiKey["api-key"] = configuration.GetSection("BrevoConfig:ApiKey").Value;
+                return new TransactionalEmailsApi();
+            });
+
+            services.AddSingleton<IEmailService, EmailService>();
+            services.AddSingleton<ITemplateLoader, TemplateLoader>();
 
             GetAllEntities().ForEach(tt =>
             {

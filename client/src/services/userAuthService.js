@@ -3,7 +3,7 @@ import {
   onGlobalSuccess,
   API_HOST_PREFIX,
 } from "../services/serviceHelpers";
-import axios from "axios";
+import axiosClient from "services/axiosClient";
 
 const api = `${API_HOST_PREFIX}/users/auth`;
 
@@ -28,7 +28,7 @@ export const usersRegister = async (payload) => {
     data: payload,
   };
   try {
-    const response = await axios(config);
+    const response = await axiosClient(config);
     onGlobalSuccess(response);
     return response.data;
   } catch (error) {
@@ -52,7 +52,7 @@ export const usersLogin = async (payload) => {
   };
 
   try {
-    const response = await axios(config);
+    const response = await axiosClient(config);
     onGlobalSuccess(response);
     return response.data;
   } catch (error) {
@@ -76,7 +76,7 @@ export const getCurrentUser = async () => {
     url: `${api}/current`,
   };
   try {
-    const response = await axios(config);
+    const response = await axiosClient(config);
     onGlobalSuccess(response);
     return response.data;
   } catch (error) {
@@ -95,7 +95,7 @@ export const usersLogout = async () => {
     withCredentials: true,
   };
   try {
-    const response = await axios(config);
+    const response = await axiosClient(config);
     onGlobalSuccess(response);
     return response.data;
   } catch (error) {
@@ -118,7 +118,7 @@ export const userExists = async (email) => {
     data: { email },
   };
   try {
-    const response = await axios(config);
+    const response = await axiosClient(config);
     onGlobalSuccess(response);
     return response.data;
   } catch (error) {
@@ -141,10 +141,83 @@ export const phoneExists = async (phone) => {
     data: { phone },
   };
   try {
-    const response = await axios(config);
+    const response = await axiosClient(config);
     onGlobalSuccess(response);
     return response.data;
   } catch (error) {
     return onGlobalError(error);
+  }
+};
+
+/**
+ *
+ * @param {{email: string}} payload
+ * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
+ */
+export const forgotPassword = async (payload) => {
+  const config = {
+    method: "POST",
+    url: `${api}/forgotPassword`,
+    data: payload,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+export const resetPassword = async (payload) => {
+  const config = {
+    method: "POST",
+    url: `${api}/resetPassword`,
+    data: payload,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+/**
+ *
+ * @param {string} token
+ * @returns {Promise<{item: boolean, isSuccessful: boolean, transactionId: string}>}
+ */
+export const validateToken = async (token) => {
+  const config = {
+    method: "GET",
+    url: `${api}/validateToken/${token}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+/**
+ *
+ * @param {{token: string, password: string, confirmPassword: string}} payload
+ * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
+ */
+export const changePassword = async (payload) => {
+  const config = {
+    method: "PUT",
+    url: `${api}/changePassword`,
+    data: payload,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError()(error);
   }
 };
