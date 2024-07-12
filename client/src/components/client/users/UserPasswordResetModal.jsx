@@ -21,7 +21,7 @@ function UserPasswordResetModal({
 }) {
   const validationSchema = useUserPasswordResetSchema();
 
-  const { t } = useLanguage();
+  const { t, getTranslatedErrorMessage } = useLanguage();
 
   const formRef = useRef(null);
 
@@ -38,8 +38,10 @@ function UserPasswordResetModal({
         onSignIn();
       }
     } catch (error) {
-      toast.error(t("common.error"));
-      formRef.current?.setFieldError("email", t("yup.incorrectCredentials"));
+      const errorMessage = getTranslatedErrorMessage(error);
+
+      toast.error(errorMessage);
+      formRef.current?.setFieldError("email", errorMessage);
     } finally {
       setLoading(false);
     }

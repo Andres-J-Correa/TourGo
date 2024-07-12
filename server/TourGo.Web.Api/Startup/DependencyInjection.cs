@@ -5,6 +5,8 @@ using TourGo.Data.Providers;
 using TourGo.Services;
 using TourGo.Services.Email;
 using TourGo.Services.Interfaces.Email;
+using TourGo.Services.Interfaces.Users;
+using TourGo.Services.Users;
 using TourGo.Web.Api.StartUp.DependencyInjection;
 using TourGo.Web.Core.Services;
 
@@ -26,7 +28,7 @@ namespace TourGo.Web.StartUp
             string mySqlConnString = configuration.GetConnectionString("MySql");
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.2
 
-            services.AddSingleton<IAuthenticationService<int>, WebAuthenticationService>();
+            services.AddSingleton<IWebAuthenticationService<int>, WebAuthenticationService>();
 
             services.AddSingleton<ISqlDataProvider, SqlDataProvider>(delegate (IServiceProvider provider)
             {
@@ -56,6 +58,8 @@ namespace TourGo.Web.StartUp
 
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<ITemplateLoader, TemplateLoader>();
+            services.AddSingleton<IUserTokenService, UserTokenService>();
+            services.AddSingleton<IUserAuthService, UserAuthService>();
 
             GetAllEntities().ForEach(tt =>
             {

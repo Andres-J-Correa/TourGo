@@ -10,6 +10,7 @@ using TourGo.Web.Core;
 using TourGo.Web.Models.Responses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TourGo.Services.Interfaces.Users;
 
 namespace TourGo.Web.Api.Controllers
 {
@@ -17,16 +18,16 @@ namespace TourGo.Web.Api.Controllers
     [ApiController]
     public class TempAuthApiController : BaseApiController
     {
-        private IUserService _userService;
-        private IAuthenticationService<int> _authService;
+        private IUserAuthService _userAuthService;
+        private IWebAuthenticationService<int> _authService;
         IOptions<SecurityConfig> _options;
 
-        public TempAuthApiController(IUserService userService
-            , IAuthenticationService<int> authService
+        public TempAuthApiController(IUserAuthService userAuthService
+            , IWebAuthenticationService<int> authService
             , ILogger<TempAuthApiController> logger
             , IOptions<SecurityConfig> options) : base(logger)
         {
-            _userService = userService;
+            _userAuthService = userAuthService;
 
             _authService = authService;
             _options = options;
@@ -37,7 +38,7 @@ namespace TourGo.Web.Api.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<SuccessResponse>> LoginAsync(int userId, string userName, string role)
         {
-            await _userService.LogInTest(userName + "@dispostable.com", "password", userId, new string[] { role });
+            await _userAuthService.LogInTest(userName + "@dispostable.com", "password", userId, new string[] { role });
 
             ItemResponse<object> response = new ItemResponse<object>();
             response.Item = _options;

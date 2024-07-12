@@ -22,7 +22,7 @@ function UserPasswordChange() {
   const tokenId = searchParams.get("tokenId");
 
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, getTranslatedErrorMessage } = useLanguage();
   const validationSchema = useUserPasswordChangeSchema();
   const formRef = useRef(null);
 
@@ -31,13 +31,13 @@ function UserPasswordChange() {
     try {
       const response = await changePassword({ ...values, token: tokenId });
       if (!response?.isSuccessful) {
-        throw new Error(response?.message || "Error changing password");
+        throw new Error("Error changing password");
       }
       toast.success(t("common.success"));
       setIsTokenValid(false);
       navigate("/");
-    } catch {
-      toast.error(t("common.error"));
+    } catch (error) {
+      toast.error(getTranslatedErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -49,14 +49,15 @@ function UserPasswordChange() {
         .then((response) => {
           setIsTokenValid(response?.item ? true : false);
         })
-        .catch(() => {
+        .catch((error) => {
+          toast.error(getTranslatedErrorMessage(error));
           toast.warning(t("common.redirecting"), {
             autoClose: 3000,
           });
           setTimeout(() => navigate("/"), 3000);
         });
     }
-  }, [isTokenValid, token, t, navigate]);
+  }, [isTokenValid, token, t, navigate, getTranslatedErrorMessage]);
 
   useEffect(() => {
     if (!token && tokenId) {

@@ -9,7 +9,6 @@
     "loading": "Cargando...",
     "success": "Éxito!",
     "requestFailed": "Solicitud fallida",
-    "notFound": "No encontrado",
     "redirecting": "Redireccionando...",
     "checkEmail": "Comprueba tu correo",
     "sessionExpired": "Sesión expirada, por favor inicia sesión de nuevo"
@@ -21,9 +20,7 @@
     "minLength": "El valor debe tener al menos {{min}} caracteres",
     "maxLength": "El valor debe tener como maximo {{max}} caracteres",
     "email": "El valor debe ser un correo",
-    "emailTaken": "El correo ya existe",
     "phone": "El valor debe ser un numero de telefono valido",
-    "phoneTaken": "El numero de telefono ya existe",
     "password": {
       "lowercase": "La contraseña debe tener al menos una minuscula",
       "uppercase": "La contraseña debe tener al menos una mayuscula",
@@ -77,6 +74,39 @@
       "newPassword": "Nueva contraseña",
       "confirmPassword": "Confirmar contraseña",
       "button": "Cambia tu contraseña"
+    }
+  },
+  "errors": {
+    "http": {
+      "400": "Solicitud incorrecta",
+      "401": "No autorizado",
+      "403": "Prohibido",
+      "404": "Recurso no encontrado",
+      "405": "Método no permitido",
+      "406": "No aceptable",
+      "408": "Tiempo de espera de la solicitud",
+      "409": "Conflicto",
+      "410": "Desaparecido",
+      "413": "Carga útil demasiado grande",
+      "415": "Tipo de medio no soportado",
+      "429": "Demasiadas solicitudes",
+      "500": "Error interno del servidor",
+      "501": "No implementado",
+      "502": "Mala pasarela",
+      "503": "Servicio no disponible",
+      "504": "Tiempo de espera de la pasarela"
+    },
+    "custom": {
+      "1000": "Ocurrió un error inesperado. Por favor, inténtelo de nuevo más tarde.",
+      "2000": "Error de autenticación",
+      "2001": "Usuario no encontrado",
+      "2002": "La cuenta está bloqueada. Por favor, restablezca la contraseña.",
+      "2003": "Correo electrónico o contraseña incorrectos.",
+      "2004": "Token no encontrado",
+      "3000": "Error de gestión de usuarios",
+      "3001": "El usuario ya existe",
+      "3002": "El correo ya existe",
+      "3003": "El número de telefono ya existe"
     }
   }
 }

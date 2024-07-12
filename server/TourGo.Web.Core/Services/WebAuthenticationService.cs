@@ -10,7 +10,7 @@ using TourGo.Models.Domain.Users;
 
 namespace TourGo.Web.Core.Services
 {
-    public class WebAuthenticationService : IAuthenticationService<int>
+    public class WebAuthenticationService : IWebAuthenticationService<int>
     {
         private readonly static string _title = null;
         private IHttpContextAccessor _contextAccessor;

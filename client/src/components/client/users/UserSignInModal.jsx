@@ -19,7 +19,7 @@ function UserSignIn({
   setLoading,
 }) {
   const { user } = useAppContext();
-  const { t } = useLanguage();
+  const { t, getTranslatedErrorMessage } = useLanguage();
   const formRef = useRef(null);
   const validationSchema = useUserSignInSchema();
 
@@ -33,10 +33,12 @@ function UserSignIn({
       toast.success(t("common.success"));
       toggle();
       user.set((prev) => ({ ...prev, isAuthenticated: true }));
-    } catch {
-      formRef.current?.setFieldError("email", t("yup.incorrectCredentials"));
-      formRef.current?.setFieldError("password", t("yup.incorrectCredentials"));
-      toast.error(t("common.error"));
+    } catch (error) {
+      const errorMessage = getTranslatedErrorMessage(error);
+
+      formRef.current?.setFieldError("email", errorMessage);
+      formRef.current?.setFieldError("password", errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

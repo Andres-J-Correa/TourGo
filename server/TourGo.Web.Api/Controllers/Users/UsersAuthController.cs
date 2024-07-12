@@ -9,7 +9,9 @@ using TourGo.Models.Enums;
 using TourGo.Models.Requests.Users;
 using TourGo.Services;
 using TourGo.Services.Interfaces.Email;
+using TourGo.Services.Interfaces.Users;
 using TourGo.Web.Controllers;
+using TourGo.Web.Models.Enums;
 using TourGo.Web.Models.Responses;
 
 namespace TourGo.Web.Api.Controllers.Users
@@ -19,15 +21,20 @@ namespace TourGo.Web.Api.Controllers.Users
     public class UsersAuthController : BaseApiController
     {
         private readonly IUserService _userService;
-        private readonly IAuthenticationService<int> _authService;
+        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IUserAuthService _userAuthService;
+        private readonly IUserTokenService _userTokenService;
         private readonly IEmailService _emailService;
+
         private readonly EmailConfig _emailConfig;
 
-        public UsersAuthController(ILogger<UsersAuthController> logger, IUserService userService, IAuthenticationService<int> authService, IEmailService emailService, IOptions<EmailConfig> emailConfig) : base(logger)
+        public UsersAuthController(ILogger<UsersAuthController> logger, IUserService userService, IWebAuthenticationService<int> webAuthService, IEmailService emailService, IUserAuthService userAuthService , IUserTokenService userTokenService, IOptions<EmailConfig> emailConfig) : base(logger)
         {
             _userService = userService;
-            _authService = authService;
+            _webAuthService = webAuthService;
             _emailService = emailService;
+            _userAuthService = userAuthService;
+            _userTokenService = userTokenService;
             _emailConfig = emailConfig.Value;
         }
 
@@ -91,76 +98,71 @@ namespace TourGo.Web.Api.Controllers.Users
         [AllowAnonymous]
         public ActionResult<ItemResponse<int>> Create(UserAddRequest request)
         {
-            ObjectResult result = null;
-
             try
             {
 
                 bool userExists = _userService.UserExists(request.Email);
 
+                if (userExists)
+                {
+                    ErrorResponse errorResponse = new ErrorResponse("Email already exists", UserManagementErrorCode.EmailAlreadyExists);
+                    return StatusCode(409, errorResponse);
+                }
+
                 bool phoneExists = _userService.PhoneExists(request.Phone);
 
-                if (!userExists && !phoneExists)
+                if (phoneExists)
                 {
-                    int userId = _userService.Create(request);
-
-                    ItemResponse<int> response = new ItemResponse<int>() { Item = userId };
-
-                    result = Created201(response);
+                    ErrorResponse errorResponse = new ErrorResponse("Phone already exists", UserManagementErrorCode.PhoneAlreadyExists);
+                    return StatusCode(409, errorResponse);
                 }
-                else
-                {
-                    List<string> errors = new List<string>();
-                    if (userExists) errors.Add("Email already exists");
-                    if (phoneExists) errors.Add("Phone already exists");
 
-                    ErrorResponse response = new ErrorResponse(errors);
-                    result = StatusCode(409, response);
-                }
+                int userId = _userService.Create(request);
+
+                ItemResponse<int> response = new ItemResponse<int>() { Item = userId };
+
+                return Created201(response);
 
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex.ToString());
-                ErrorResponse response = new ErrorResponse(ex.Message);
+                ErrorResponse errorResponse = new ErrorResponse(ex.Message);
 
-                result = StatusCode(500, response);
+                return StatusCode(500, errorResponse);
             }
-
-            return result;
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<ActionResult<ItemResponse<bool>>> LoginAsync(UserLoginRequest request)
         {
-            ObjectResult result = null;
-
             try
             {
-
-                bool isSuccess = await _userService.LogInAsync(request.Email, request.Password);
-
-                if (isSuccess)
+                if (!_userService.UserExists(request.Email))
                 {
-                    ItemResponse<bool> response = new ItemResponse<bool>() { Item = isSuccess };
-                    result = Created201(response);
+                    return StatusCode(401, new ErrorResponse("User not found.", AuthenticationErrorCode.UserNotFound));
                 }
-                else
+
+                if (_userAuthService.IsLoginBlocked(request.Email))
                 {
-                    ErrorResponse response = new ErrorResponse($"Incorrect email or password.");
-                    result = StatusCode(401, response);
+                    return StatusCode(401, new ErrorResponse("Account is locked, please reset the password.", AuthenticationErrorCode.AccountLocked));
                 }
+
+                bool isSuccess = await _userAuthService.LogInAsync(request.Email, request.Password);
+
+                if (!isSuccess)
+                {
+                    return StatusCode(401, new ErrorResponse("Incorrect email or password.", AuthenticationErrorCode.IncorrectCredentials));
+                }
+
+                return Created201(new ItemResponse<bool> { Item = isSuccess });
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
-                ErrorResponse response = new ErrorResponse(ex.Message);
-
-                result = StatusCode(500, response);
+                Logger.LogError(ex, "An error occurred during login");
+                return StatusCode(500, new ErrorResponse("An unexpected error occurred. Please try again later."));
             }
-
-            return result;
         }
 
         [HttpPost("resetPassword")]
@@ -176,7 +178,7 @@ namespace TourGo.Web.Api.Controllers.Users
                 if (user != null)
                 {
                     DateTime TokenExpirationDate = DateTime.UtcNow.AddHours(_emailConfig.TokenExpirationHours);
-                    Guid token = _userService.CreateToken(user.Id, UserTokenTypeEnum.PasswordReset, TokenExpirationDate);
+                    Guid token = _userTokenService.CreateToken(user.Id, UserTokenTypeEnum.PasswordReset, TokenExpirationDate);
 
                     await _emailService.UserPasswordReset(user, token.ToString());
 
@@ -186,7 +188,7 @@ namespace TourGo.Web.Api.Controllers.Users
                 else
                 {
                     int iCode = 404;
-                    ErrorResponse response = new ErrorResponse("Email not found");
+                    ErrorResponse response = new ErrorResponse("Email not found", AuthenticationErrorCode.UserNotFound);
                     result = StatusCode(iCode, response);
                 }
             }
@@ -211,7 +213,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
             try
             {
-                UserToken userToken = _userService.GetUserToken(token);
+                UserToken userToken = _userTokenService.GetUserToken(token);
 
                 if (userToken != null)
                 {
@@ -222,7 +224,7 @@ namespace TourGo.Web.Api.Controllers.Users
                 else
                 {
                     iCode = 404;
-                    response = new ErrorResponse("Token not Found");
+                    response = new ErrorResponse("Token not Found", AuthenticationErrorCode.TokenNotFound);
                 }
             }
             catch (Exception ex)
@@ -245,20 +247,22 @@ namespace TourGo.Web.Api.Controllers.Users
 
             try
             {
-                UserToken userToken = _userService.GetUserToken(request.Token);
+                UserToken userToken = _userTokenService.GetUserToken(request.Token);
 
                 if (userToken != null)
                 {
                     _userService.ChangePassword(userToken.UserId, request.Password);
 
-                    _userService.DeleteUserToken(userToken);
+                    _userTokenService.DeleteUserToken(userToken);
+
+                    _userAuthService.RestartFailedAttempts(userToken.UserId);
 
                     response = new SuccessResponse();
                 }
                 else
                 {
                     iCode = 404;
-                    response = new ErrorResponse("Token not Found");
+                    response = new ErrorResponse("Token not Found", AuthenticationErrorCode.TokenNotFound);
                 }
             }
             catch (Exception ex)
@@ -283,7 +287,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
             try
             {
-                IUserAuthData user = _authService.GetCurrentUser();
+                IUserAuthData user = _webAuthService.GetCurrentUser();
                 response = new ItemResponse<IUserAuthData>() { Item = user };
             }
             catch (Exception ex)
@@ -303,7 +307,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
             try
             {
-                await _authService.LogOutAsync();
+                await _webAuthService.LogOutAsync();
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);

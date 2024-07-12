@@ -9,7 +9,6 @@
     "loading": "Loading...",
     "success": "Success!",
     "requestFailed": "Request failed",
-    "notFound": "Not found",
     "redirecting": "Redirecting...",
     "checkEmail": "Check your email",
     "sessionExpired": "Session expired, please log in again"
@@ -21,9 +20,7 @@
     "minLength": "The value must have at least {{min}} characters",
     "maxLength": "The value must have at most {{max}} characters",
     "email": "The value must be an email",
-    "emailTaken": "The email is already taken",
     "phone": "The value must be a valid phone number",
-    "phoneTaken": "The phone is already taken",
     "password": {
       "lowercase": "The password must have at least one lowercase letter",
       "uppercase": "The password must have at least one uppercase letter",
@@ -77,6 +74,39 @@
       "newPassword": "New Password",
       "confirmPassword": "Confirm Password",
       "button": "Change Password"
+    }
+  },
+  "errors": {
+    "http": {
+      "400": "Bad Request",
+      "401": "Unauthorized",
+      "403": "Forbidden",
+      "404": "Resource not found",
+      "405": "Method Not Allowed",
+      "406": "Not Acceptable",
+      "408": "Request Timeout",
+      "409": "Conflict",
+      "410": "Gone",
+      "413": "Payload Too Large",
+      "415": "Unsupported Media Type",
+      "429": "Too Many Requests",
+      "500": "Internal server error",
+      "501": "Not Implemented",
+      "502": "Bad Gateway",
+      "503": "Service Unavailable",
+      "504": "Gateway Timeout"
+    },
+    "custom": {
+      "1000": "An unexpected error occurred. Please try again later.",
+      "2000": "Authentication error",
+      "2001": "User not found",
+      "2002": "Account is locked. Please reset the password.",
+      "2003": "Incorrect email or password.",
+      "2004": "Token not found",
+      "3000": "User Management error",
+      "3001": "User already exists",
+      "3002": "Email already exists",
+      "3003": "Phone already exists"
     }
   }
 }

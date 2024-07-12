@@ -31,7 +31,7 @@ const withModal = (WrappedComponent) => {
   ModalComponent.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     toggle: PropTypes.func.isRequired,
-    backdrop: PropTypes.bool,
+    backdrop: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     keyboard: PropTypes.bool,
   };
 

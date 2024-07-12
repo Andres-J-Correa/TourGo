@@ -8,7 +8,7 @@ namespace TourGo.Services
     /// Current IPrincipal
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IAuthenticationService<T> : IIdentityProvider<T>
+    public interface IWebAuthenticationService<T> : IIdentityProvider<T>
     {
         /// <summary>
         /// </summary>

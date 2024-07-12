@@ -32,7 +32,7 @@ function UserAccountDropdown() {
     setModals((prev) => ({ ...defaultModals, [key]: !prev[key] }));
   };
 
-  const { t } = useLanguage();
+  const { t, getTranslatedErrorMessage } = useLanguage();
   const { user } = useAppContext();
 
   const truncateString = (str) => {
@@ -66,7 +66,12 @@ function UserAccountDropdown() {
           style={{ minWidth: "auto" }}
         >
           <div className="hidden-box">{/* For hover effect */}</div>
-          <DropdownItems user={user} toggle={toggle} t={t} />
+          <DropdownItems
+            user={user}
+            toggle={toggle}
+            t={t}
+            getTranslatedErrorMessage={getTranslatedErrorMessage}
+          />
         </DropdownMenu>
       </HoverDropDown>
       <UserSignInModal
@@ -89,17 +94,14 @@ function UserAccountDropdown() {
   );
 }
 
-function DropdownItems({ user, toggle, t }) {
+function DropdownItems({ user, toggle, t, getTranslatedErrorMessage }) {
   const handleLogout = () => {
     const logoutAsync = async () => {
       try {
-        const response = await usersLogout();
-        if (!Boolean(response?.isSuccessful)) {
-          throw new Error("User not found");
-        }
+        await usersLogout();
         return true;
       } catch (error) {
-        Swal.showValidationMessage(`${t("common.requestFailed")} ${error}`);
+        Swal.showValidationMessage(getTranslatedErrorMessage(error));
       }
     };
 

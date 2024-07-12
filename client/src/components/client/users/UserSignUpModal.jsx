@@ -13,6 +13,7 @@ import withModal from "components/client/users/withModal";
 import { useUserSignUpSchema } from "components/client/users/validationSchemas";
 import { useLanguage } from "contexts/LanguageContext";
 import { usersRegister } from "services/userAuthService";
+import { errorCodes } from "constants/errorCodes";
 
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
@@ -29,7 +30,7 @@ const initialValues = {
 };
 
 function UserSignUpModal({ onSignIn, loading, setLoading }) {
-  const { t } = useLanguage();
+  const { t, getTranslatedErrorMessage } = useLanguage();
   const validationSchema = useUserSignUpSchema();
 
   const formRef = useRef(null);
@@ -44,14 +45,24 @@ function UserSignUpModal({ onSignIn, loading, setLoading }) {
       toast.success(t("common.success"));
       onSignIn();
     } catch (error) {
-      if (error?.appErrors?.includes("Email already exists")) {
-        formRef?.current?.setFieldError("email", t("yup.emailTaken"));
+      if (
+        Number(error?.response.data?.code) === errorCodes.EMAIL_ALREADY_EXISTS
+      ) {
+        formRef?.current?.setFieldError(
+          "email",
+          t(`errors.custom.${errorCodes.EMAIL_ALREADY_EXISTS}`)
+        );
       }
-      if (error?.appErrors?.includes("Phone already exists")) {
-        formRef?.current?.setFieldError("phone", t("yup.phoneTaken"));
+      if (
+        Number(error?.response.data?.code) === errorCodes.PHONE_ALREADY_EXISTS
+      ) {
+        formRef?.current?.setFieldError(
+          "phone",
+          t(`errors.custom.${errorCodes.PHONE_ALREADY_EXISTS}`)
+        );
       }
 
-      toast.error(t("common.error"));
+      toast.error(getTranslatedErrorMessage(error));
     } finally {
       setLoading(false);
     }

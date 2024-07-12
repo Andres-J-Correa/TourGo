@@ -73,13 +73,14 @@ namespace TourGo.Web.Core.Services
                 }
                 else
                 {
-                    throw new SecurityTokenException("Token validation failed.");
+                    _logger.LogWarning("Token validation failed.");
+                    return null; // Indicate failure
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Exception during token validation");
-                throw;
+                return null; // Indicate failure
             }
         }
 
