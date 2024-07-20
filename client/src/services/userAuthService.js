@@ -171,7 +171,7 @@ export const forgotPassword = async (payload) => {
 export const resetPassword = async (payload) => {
   const config = {
     method: "POST",
-    url: `${api}/resetPassword`,
+    url: `${api}/password/reset`,
     data: payload,
   };
   try {
@@ -210,7 +210,7 @@ export const validateToken = async (token) => {
 export const changePassword = async (payload) => {
   const config = {
     method: "PUT",
-    url: `${api}/changePassword`,
+    url: `${api}/password/change`,
     data: payload,
   };
   try {

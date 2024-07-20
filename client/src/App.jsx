@@ -2,7 +2,7 @@ import React, { useState, useEffect, Suspense } from "react";
 
 import { HelmetProvider } from "react-helmet-async";
 
-import ClientNavbarContainer from "components/client/navbars/ClientNavbarContainer";
+import NavbarContainer from "components/commonUI/navbars/NavbarContainer";
 import GlobalErrorHandler from "components/commonUI/errors/GlobalErrorHandler";
 
 import { AppContextProvider } from "./contexts/GlobalAppContext";
@@ -19,18 +19,17 @@ import "./App.css";
 const App = () => {
   const [routes, setRoutes] = useState([]);
 
-  const mapRoutes = (route, idx) => (
+  const mapRoute = (route, idx) => (
     <Route
       key={`route-${idx}`}
       path={route.path}
-      exact={route.exact}
       element={<route.component />}
     />
   );
 
   useEffect(() => {
     if (routes.length === 0) {
-      const mappedRoutes = publicFlattenedRoutes.map(mapRoutes);
+      const mappedRoutes = publicFlattenedRoutes.map(mapRoute);
 
       setRoutes(mappedRoutes);
     }
@@ -41,7 +40,7 @@ const App = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <AppContextProvider>
           <GlobalErrorHandler>
-            <ClientNavbarContainer />
+            <NavbarContainer />
             <Routes>{routes}</Routes>
           </GlobalErrorHandler>
         </AppContextProvider>

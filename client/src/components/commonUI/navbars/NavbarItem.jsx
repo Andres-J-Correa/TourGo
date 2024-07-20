@@ -1,103 +1,179 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-
 import HoverDropdown from "./HoverDropdown";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
-
 import { DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
+import PropTypes from "prop-types";
+import classNames from "classnames";
 
-import Proptypes from "prop-types";
+// Helper function to render inner items in a dropdown
+const renderInnerItem = (innerItem, innerIndex) => (
+  <Link
+    className={classNames("dropdown-item", {
+      "text-uppercase": innerItem.uppercase,
+      "text-capitalize": innerItem.capitalize,
+    })}
+    key={`inner-${innerIndex}-${innerItem.name}`}
+    to={innerItem.path || "#"}
+  >
+    {innerItem.name}
+  </Link>
+);
 
-function NavbarItem({ navItem }) {
-  const innerItemMapper = (innerItem, innerIndex) => (
-    <Link
-      className="text-capitalize dropdown-item"
-      key={`inner-${innerIndex}-${innerItem.name}`}
-      to={innerItem.path}
-    >
-      {innerItem.name}
-    </Link>
-  );
+// Helper function to render sub-items in a dropdown
+const renderSubItem = (subItem, subIndex) => {
+  const isHeader = subItem.collapse?.length > 0;
 
-  const subItemMapper = (subItem, subIndex) => (
+  return (
     <React.Fragment key={`sub-${subIndex}-${subItem.name}`}>
-      {Boolean(subItem.path) ? (
-        <Link to={subItem.path} className="text-capitalize dropdown-item">
+      {subItem.path ? (
+        <Link
+          to={subItem.path}
+          className={classNames("dropdown-item", {
+            "text-uppercase": subItem.uppercase,
+            "text-capitalize": subItem.capitalize,
+          })}
+        >
           {subItem.name}
         </Link>
       ) : (
         <DropdownItem
-          header
-          className="font-weight-bolder align-items-center px-1 text-capitalize"
+          header={isHeader}
+          className={classNames(
+            {
+              "font-weight-bolder": isHeader,
+              "text-uppercase": subItem.uppercase,
+              "text-capitalize": subItem.capitalize,
+            },
+            "align-items-center px-1"
+          )}
+          onClick={subItem.action}
         >
           {subItem.name}
         </DropdownItem>
       )}
-      {Boolean(subItem.collapse) &&
-        !Boolean(subItem.path) &&
-        subItem.collapse.map(innerItemMapper)}
+      {subItem.collapse && subItem.collapse.map(renderInnerItem)}
     </React.Fragment>
   );
+};
 
-  if (Boolean(navItem.collapse)) {
-    return (
-      <HoverDropdown nav inNavbar className="mx-2">
-        <DropdownToggle
-          nav
-          role="button"
-          className="ps-2 d-flex cursor-pointer align-items-center nav-link text-capitalize"
-        >
-          {Boolean(navItem.icon) && navItem.icon}
-          {navItem.name}
-          <FontAwesomeIcon
-            icon={faChevronDown}
-            size="xs"
-            className="down-arrow"
-          />
-        </DropdownToggle>
-        <DropdownMenu flip className="border-0 shadow px-3 border-radius-xl">
-          <div className="hidden-box">{/* For hover effect */}</div>
-          {navItem.collapse.map(subItemMapper)}
-        </DropdownMenu>
-      </HoverDropdown>
-    );
-  } else if (Boolean(navItem.path)) {
-    return (
-      <NavLink to={navItem.path} className="nav-link text-capitalize">
-        {navItem.icon && (
-          <FontAwesomeIcon
-            icon={navItem.icon.props.icon}
-            className="me-2 icon"
-          />
+// Main NavbarItem component
+const NavbarItem = React.memo(({ navItem }) => {
+  // Render dropdown menu if the nav item has a collapse property
+  const renderDropdownMenu = () => (
+    <HoverDropdown nav inNavbar className="mx-2">
+      <DropdownToggle
+        nav
+        role="button"
+        className={classNames(
+          "ps-2 d-flex cursor-pointer align-items-center nav-link",
+          {
+            "text-uppercase": navItem.uppercase,
+            "text-capitalize": navItem.capitalize,
+          }
         )}
+      >
+        {navItem.icon}
         {navItem.name}
-      </NavLink>
-    );
+        <FontAwesomeIcon
+          icon={faChevronDown}
+          size="xs"
+          className="down-arrow"
+        />
+      </DropdownToggle>
+      <DropdownMenu
+        flip
+        className="border-0 shadow px-3 border-radius-xl min-width-auto"
+      >
+        <div className="hidden-box">{/* For hover effect */}</div>
+        {navItem.collapse.map(renderSubItem)}
+      </DropdownMenu>
+    </HoverDropdown>
+  );
+
+  // Render a link if the nav item has a path property
+  const renderNavLink = () => (
+    <NavLink
+      to={navItem.path}
+      className={classNames("nav-link nav-action-item", {
+        "text-uppercase": navItem.uppercase,
+        "text-capitalize": navItem.capitalize,
+      })}
+    >
+      {navItem.icon && (
+        <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
+      )}
+      {navItem.name}
+    </NavLink>
+  );
+
+  // Render a dropdown item with an action if the nav item has an action property
+  const renderActionItem = () => (
+    <div
+      className={classNames("dropdown-item text-center px-1 nav-action-item", {
+        "text-uppercase": navItem.uppercase,
+        "text-capitalize": navItem.capitalize,
+      })}
+      onClick={navItem.action}
+      role="button"
+    >
+      {navItem.name}
+    </div>
+  );
+
+  // Render a default dropdown item if none of the above properties are present
+  const renderDefaultItem = () => (
+    <DropdownItem
+      header
+      className={classNames("text-center px-1", {
+        "text-uppercase": navItem.uppercase,
+        "text-capitalize": navItem.capitalize,
+      })}
+    >
+      {navItem.name}
+    </DropdownItem>
+  );
+
+  // Determine which rendering function to use based on the nav item's properties
+  if (navItem.collapse?.length > 0) {
+    return renderDropdownMenu();
+  } else if (navItem.path && !navItem.action) {
+    return renderNavLink();
+  } else if (navItem.action) {
+    return renderActionItem();
   } else {
-    return null;
+    return renderDefaultItem();
   }
-}
+});
 
 export default NavbarItem;
 
 NavbarItem.propTypes = {
-  navItem: Proptypes.shape({
-    name: Proptypes.string.isRequired,
-    path: Proptypes.string,
-    icon: Proptypes.any.isRequired,
-    collapse: Proptypes.arrayOf(
-      Proptypes.shape({
-        name: Proptypes.string.isRequired,
-        path: Proptypes.string,
-        collapse: Proptypes.arrayOf(
-          Proptypes.shape({
-            name: Proptypes.string.isRequired,
-            path: Proptypes.string,
+  navItem: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    path: PropTypes.string, // path is not required if action is present
+    action: PropTypes.func, // action is not required if path is present
+    icon: PropTypes.object,
+    uppercase: PropTypes.bool,
+    capitalize: PropTypes.bool,
+    collapse: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        path: PropTypes.string,
+        action: PropTypes.func,
+        uppercase: PropTypes.bool,
+        capitalize: PropTypes.bool,
+        collapse: PropTypes.arrayOf(
+          PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            path: PropTypes.string,
+            action: PropTypes.func,
+            uppercase: PropTypes.bool,
+            capitalize: PropTypes.bool,
           })
         ),
       })
     ),
-  }),
+  }).isRequired,
 };

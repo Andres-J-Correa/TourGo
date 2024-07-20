@@ -11,7 +11,8 @@
     "requestFailed": "Request failed",
     "redirecting": "Redirecting...",
     "checkEmail": "Check your email",
-    "sessionExpired": "Session expired, please log in again"
+    "sessionExpired": "Session expired, please log in again",
+    "areYouProvider": "Sell your tours, sign up!"
   },
   "yup": {
     "required": "This field is required",
@@ -33,10 +34,9 @@
   "client": {
     "navbar": {
       "account": "Account",
-      "login": "Login",
+      "loginRegister": "Login or Register",
       "logout": "Logout",
-      "logoutConfirm": "Are you sure you want to log out?",
-      "register": "Register"
+      "logoutConfirm": "Are you sure you want to log out?"
     },
     "login": {
       "title": "Sign In",

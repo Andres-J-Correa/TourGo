@@ -41,7 +41,7 @@ namespace TourGo.Services.Email
                 var recipient = new SendSmtpEmailTo(user.Email, user.FirstName);
                 var recipients = new List<SendSmtpEmailTo> { recipient };
 
-                string customLink = $"{_emailConfig.DomainUrl}/changePassword?tokenId={token}";
+                string customLink = $"{_emailConfig.DomainUrl}/users/password/change?tokenId={token}";
                 string htmlTemplate = _templateLoader.LoadTemplate("passwordReset.html");
 
                 if (string.IsNullOrEmpty(htmlTemplate))

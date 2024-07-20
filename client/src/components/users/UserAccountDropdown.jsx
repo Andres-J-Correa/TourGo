@@ -7,8 +7,8 @@ import Swal from "sweetalert2";
 import { DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
 
 import HoverDropDown from "components/commonUI/navbars/HoverDropdown";
-import UserSignInModal from "components/client/users/UserSignInModal";
-import UserSignUpModal from "components/client/users/UserSignUpModal";
+import UserSignInModal from "components/users/UserSignInModal";
+import { SignUpFormModal } from "components/commonUI/forms/SignUpForm";
 import UserPasswordResetModal from "./UserPasswordResetModal";
 
 import { usersLogout } from "services/userAuthService";
@@ -23,7 +23,7 @@ const defaultModals = {
   register: false,
   reset: false,
 };
-function UserAccountDropdown() {
+function UserAccountDropdown({ showRegister = true }) {
   const [modals, setModals] = useState({
     ...defaultModals,
   });
@@ -62,8 +62,7 @@ function UserAccountDropdown() {
         <DropdownMenu
           flip
           end={true}
-          className="border-0 shadow px-3 border-radius-xl"
-          style={{ minWidth: "auto" }}
+          className="border-0 shadow px-3 border-radius-xl min-width-auto"
         >
           <div className="hidden-box">{/* For hover effect */}</div>
           <DropdownItems
@@ -77,10 +76,10 @@ function UserAccountDropdown() {
       <UserSignInModal
         isOpen={modals.login}
         toggle={toggle("login")}
-        onSignUp={toggle("register")}
+        onSignUp={showRegister ? toggle("register") : null}
         onPasswordReset={toggle("reset")}
       />
-      <UserSignUpModal
+      <SignUpFormModal
         isOpen={modals.register}
         toggle={toggle("register")}
         onSignIn={toggle("login")}
@@ -140,13 +139,8 @@ function DropdownItems({ user, toggle, t, getTranslatedErrorMessage }) {
       ]
     : [
         {
-          key: "register",
-          label: t("client.navbar.register"),
-          action: toggle("register"),
-        },
-        {
           key: "login",
-          label: t("client.navbar.login"),
+          label: t("client.navbar.loginRegister"),
           action: toggle("login"),
         },
       ];
@@ -154,7 +148,7 @@ function DropdownItems({ user, toggle, t, getTranslatedErrorMessage }) {
   return items.map((item, index) => (
     <DropdownItem
       key={`dropdown-item-${index}-${item.key}`}
-      className="text-center px-1 text-capitalize"
+      className="text-center px-1"
       onClick={item.action}
     >
       {item.label}
@@ -163,6 +157,10 @@ function DropdownItems({ user, toggle, t, getTranslatedErrorMessage }) {
 }
 
 export default UserAccountDropdown;
+
+UserAccountDropdown.propTypes = {
+  showRegister: PropTypes.bool,
+};
 
 DropdownItems.proptypes = {
   isAuthenticated: PropTypes.bool.isRequired,

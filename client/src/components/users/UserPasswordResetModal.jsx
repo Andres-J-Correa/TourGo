@@ -3,10 +3,10 @@ import React, { useRef } from "react";
 import { Button, Spinner } from "reactstrap";
 import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
-import AuthCard from "components/client/users/AuthCard";
-import withModal from "components/client/users/withModal";
+import AuthCard from "components/commonUI/forms/AuthCard";
+import withModal from "components/commonUI/forms/withModal";
 
-import { useUserPasswordResetSchema } from "components/client/users/validationSchemas";
+import { useUserPasswordResetSchema } from "components/users/validationSchemas";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
 import { resetPassword } from "services/userAuthService";

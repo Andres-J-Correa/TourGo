@@ -16,6 +16,5 @@ const flattenRoutes = (routes) => {
   return flatRoutes;
 };
 
-// const authProtectedFlattenRoutes = flattenRoutes([...securedRoutes]);
 const publicFlattenedRoutes = flattenRoutes([...publicRoutes]);
-export { /*authProtectedFlattenRoutes, */ publicFlattenedRoutes };
+export { publicFlattenedRoutes };

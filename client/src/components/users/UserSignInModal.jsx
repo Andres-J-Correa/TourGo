@@ -2,14 +2,14 @@ import React, { useRef } from "react";
 import { Formik, Form } from "formik";
 import { Button, Spinner } from "reactstrap";
 import CustomField from "components/commonUI/forms/CustomField";
-import { useUserSignInSchema } from "components/client/users/validationSchemas";
+import { useUserSignInSchema } from "components/users/validationSchemas";
 import { usersLogin } from "services/userAuthService";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
-import AuthCard from "components/client/users/AuthCard";
-import withModal from "components/client/users/withModal";
+import AuthCard from "components/commonUI/forms/AuthCard";
+import withModal from "components/commonUI/forms/withModal";
 
 function UserSignIn({
   toggle,

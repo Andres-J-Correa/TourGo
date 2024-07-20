@@ -11,7 +11,8 @@
     "requestFailed": "Solicitud fallida",
     "redirecting": "Redireccionando...",
     "checkEmail": "Comprueba tu correo",
-    "sessionExpired": "Sesión expirada, por favor inicia sesión de nuevo"
+    "sessionExpired": "Sesión expirada, por favor inicia sesión de nuevo",
+    "areYouProvider": "Vende tus tours, únete!"
   },
   "yup": {
     "required": "Este campo es obligatorio",
@@ -33,10 +34,9 @@
   "client": {
     "navbar": {
       "account": "Cuenta",
-      "login": "Iniciar sesión",
+      "loginRegister": "Iniciar sesión o Registrarse",
       "logout": "Cerrar sesión",
-      "logoutConfirm": "¿Seguro que quieres cerrar la sesión?",
-      "register": "Registrarse"
+      "logoutConfirm": "¿Seguro que quieres cerrar la sesión?"
     },
     "login": {
       "title": "Iniciar sesión",

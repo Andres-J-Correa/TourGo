@@ -4,12 +4,11 @@ import { Container, Button, Spinner } from "reactstrap";
 import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
 import DefaultHeader from "components/commonUI/headers/DefaultHeader";
-import AuthCard from "./AuthCard";
-import { useUserPasswordChangeSchema } from "components/client/users/validationSchemas";
+import AuthCard from "components/commonUI/forms/AuthCard";
+import { useUserPasswordChangeSchema } from "components/users/validationSchemas";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
 import { changePassword, validateToken } from "services/userAuthService";
-import "react-lazy-load-image-component/src/effects/blur.css";
 import backgroundImage from "assets/images/password-reset-bg.jpg";
 import NoRecords404 from "components/commonUI/errors/NoRecords404";
 
@@ -71,9 +70,9 @@ function UserPasswordChange() {
         <>
           <DefaultHeader
             backgroundImage={backgroundImage}
-            className="max-vh-50 m-3 border-radius-xl"
+            className="m-3 border-radius-xl min-vh-50"
           />
-          <Container className="mt-md-n8">
+          <Container className="mt-n5">
             <AuthCard
               title={t("client.passwordChange.title")}
               subtitle={t("client.passwordChange.subtitle")}

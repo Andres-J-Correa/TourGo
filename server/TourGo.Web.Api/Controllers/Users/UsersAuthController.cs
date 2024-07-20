@@ -165,7 +165,7 @@ namespace TourGo.Web.Api.Controllers.Users
             }
         }
 
-        [HttpPost("resetPassword")]
+        [HttpPost("password/reset")]
         [AllowAnonymous]
         public async Task<ActionResult<SuccessResponse>> ResetPassword(EmailValidateRequest request)
         {
@@ -238,7 +238,7 @@ namespace TourGo.Web.Api.Controllers.Users
             return StatusCode(iCode, response);
         }
 
-        [HttpPut("changePassword")]
+        [HttpPut("password/change")]
         [AllowAnonymous]
         public ActionResult<SuccessResponse> ChangePassword (UserUpdatePasswordRequest request)
         {

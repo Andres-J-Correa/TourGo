@@ -3,8 +3,8 @@ import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 import { toast } from "react-toastify";
 import axiosClient from "services/axiosClient";
-import UserSignInModal from "components/client/users/UserSignInModal";
-import UserPasswordResetModal from "components/client/users/UserPasswordResetModal";
+import UserSignInModal from "components/users/UserSignInModal";
+import UserPasswordResetModal from "components/users/UserPasswordResetModal";
 
 const defaultModals = {
   login: false,

@@ -6,7 +6,7 @@ function Home() {
   return (
     <DefaultHeader
       backgroundImage={backgroundImage}
-      className="max-vh-50 m-3 border-radius-xl position-relative"
+      className="min-vh-75 m-3 border-radius-xl"
     >
       <div className="home-page text-light">
         <div className="home-page__content">
