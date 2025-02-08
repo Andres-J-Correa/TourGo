@@ -15,27 +15,15 @@ const userRoutes = [
     component: lazy(() => import("components/users/UsersLandingPage")),
   },
   {
+    name: "home",
+    path: "/home",
+    component: lazy(() => import("components/Home")),
+  },
+  {
     name: "changePassword",
     path: "/users/password/change",
     component: lazy(() => import("components/users/UserPasswordChange")),
   },
 ];
 
-const providerRoutes = [
-  {
-    name: "providersLandingPage",
-    path: "/provider",
-    component: lazy(() => import("components/providers/ProvidersLandingPage")),
-  },
-  {
-    name: "providerSignUp",
-    path: "/provider/signup",
-    component: lazy(() => import("components/providers/ProvidersSignUpView")),
-  },
-];
-
-export const publicRoutes = [
-  ...userRoutes,
-  ...generalRoutes,
-  ...providerRoutes,
-];
+export const publicRoutes = [...userRoutes, ...generalRoutes];

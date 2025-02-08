@@ -1,33 +1,24 @@
 import React, { useState, useEffect } from "react";
-
-import {
-  Container,
-  Row,
-  Col,
-  Navbar,
-  NavbarBrand,
-  NavbarToggler,
-  Collapse,
-  Nav,
-} from "reactstrap";
-
+import { Navbar, NavbarBrand, NavbarToggler, Collapse, Nav } from "reactstrap";
 import NavbarItem from "./NavbarItem";
 import LanguageSelector from "components/commonUI/languages/LanguageSelector";
-
 import { useAppContext } from "contexts/GlobalAppContext";
-
 import PropTypes from "prop-types";
 import "./navbar.css";
+
+const _logger = require("debug")("navbar");
 
 function DefaultNavbar({
   brand = "Tour Go",
   isOpen,
   toggle,
-  navbarItems = [],
+  navbarItems,
   showLanguageSelector = true,
-  leftCustomComponents = [],
-  rightCustomComponents = [],
+  leftCustomComponents,
+  rightCustomComponents,
 }) {
+  _logger("DefaultNavbar rendering");
+
   const [mappedItems, setMappedItems] = useState({
     right: [],
     left: [],
@@ -39,7 +30,9 @@ function DefaultNavbar({
     const leftItems = [],
       rightItems = [];
 
-    for (let i = 0; i < navbarItems.length; i++) {
+    if (!navbarItems) return;
+
+    for (let i = 0; i < navbarItems?.length; i++) {
       const element = navbarItems[i];
 
       if (!element.isAnonymous && !user.current?.isAuthenticated) {
@@ -61,41 +54,33 @@ function DefaultNavbar({
       }
     }
 
+    const leftCustomComps = leftCustomComponents || [];
+    const rightCustomComps = rightCustomComponents || [];
+
     setMappedItems({
-      right: [...rightItems, ...rightCustomComponents],
-      left: [...leftCustomComponents, ...leftItems],
+      right: [...rightItems, ...rightCustomComps],
+      left: [...leftCustomComps, ...leftItems],
     });
   }, [navbarItems, user, leftCustomComponents, rightCustomComponents]);
 
   return (
-    <Container className="position-sticky z-index-sticky top-0">
-      <Row>
-        <Col xs="12">
-          <Navbar
-            expand="lg"
-            className="blur border-radius-xl top-0 z-index-fixed shadow position-absolute my-4 p-2 start-0 end-0 mx-4"
-          >
-            <NavbarBrand className="font-weight-bolder ms-sm-3" href="/">
-              {brand}
-            </NavbarBrand>
-            <NavbarToggler onClick={toggle} className="shadow-none ms-2" />
-            <Collapse
-              isOpen={isOpen}
-              navbar
-              className="pt-3 pb-2 py-lg-0 w-100"
-            >
-              <Nav className="justify-content-end w-100" navbar>
-                <div className="left-items">{mappedItems.left}</div>
-                <div className="right-items">
-                  {showLanguageSelector && <LanguageSelector />}
-                  {mappedItems.right}
-                </div>
-              </Nav>
-            </Collapse>
-          </Navbar>
-        </Col>
-      </Row>
-    </Container>
+    <div>
+      <Navbar expand="lg" className="blur shadow p-2">
+        <NavbarBrand className="font-weight-bolder ms-sm-3" href="/">
+          {brand}
+        </NavbarBrand>
+        <NavbarToggler onClick={toggle} className="shadow-none ms-2" />
+        <Collapse isOpen={isOpen} navbar className="pt-3 pb-2 py-lg-0 w-100">
+          <Nav className="justify-content-end w-100" navbar>
+            <div className="left-items">{mappedItems.left}</div>
+            <div className="right-items">
+              {showLanguageSelector && <LanguageSelector />}
+              {mappedItems.right}
+            </div>
+          </Nav>
+        </Collapse>
+      </Navbar>
+    </div>
   );
 }
 

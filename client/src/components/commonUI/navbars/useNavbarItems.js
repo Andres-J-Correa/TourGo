@@ -5,13 +5,7 @@ import { useLanguage } from "contexts/LanguageContext";
 export const useNavbarItems = () => {
   const { t } = useLanguage();
 
-  const clientItems = [
-    {
-      name: t("common.areYouProvider"),
-      position: "left",
-      path: "/provider",
-      isAnonymous: true,
-    },
+  const adminItems = [
     {
       name: t("common.cancel"),
       icon: <FontAwesomeIcon icon={faPaperclip} className="icon" />,
@@ -50,21 +44,7 @@ export const useNavbarItems = () => {
     },
   ];
 
-  const providerItems = [
-    {
-      name: "landing pages",
-      path: "/provider",
-      isAnonymous: true,
-    },
-    {
-      name: "profile",
-      path: "/profile",
-      isAnonymous: true,
-    },
-  ];
-
   return {
-    clientItems,
-    providerItems,
+    adminItems,
   };
 };

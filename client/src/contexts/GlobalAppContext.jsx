@@ -42,10 +42,6 @@ export const AppContextProvider = ({ children }) => {
           ...data.item,
           isAuthenticated: true,
         }));
-
-        if (item.roles.includes("TourProvider")) {
-          navigate("/provider/dashboard");
-        }
       })
       .catch(() => {
         if (currentUser.isAuthenticated) {

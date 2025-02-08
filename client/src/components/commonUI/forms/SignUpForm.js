@@ -72,8 +72,7 @@ function SignUpForm({ onSignIn, loading, setLoading, role = 2 }) {
       initialValues={{ ...initialValues, role }}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
-      innerRef={formRef}
-    >
+      innerRef={formRef}>
       <Form>
         <Row>
           <Col md={6} sm={12}>
@@ -127,8 +126,7 @@ function SignUpForm({ onSignIn, loading, setLoading, role = 2 }) {
             type="submit"
             size="lg"
             className="bg-gradient-success mt-3 mb-0"
-            disabled={loading}
-          >
+            disabled={loading}>
             {" "}
             {loading ? <Spinner size="sm" /> : t("client.register.button")}
           </Button>
@@ -152,14 +150,12 @@ function _signUpFormModal({ onSignIn, loading, setLoading, role = 2 }) {
             <span
               className="text-success text-gradient font-weight-bold"
               onClick={loading ? null : onSignIn}
-              role="button"
-            >
+              role="button">
               {t("client.register.login")}
             </span>
           </p>
         )
-      }
-    >
+      }>
       <SignUpForm
         onSignIn={onSignIn}
         loading={loading}
@@ -183,7 +179,7 @@ SignUpForm.propTypes = {
 
 SignUpFormModal.propTypes = {
   onSignIn: PropTypes.func,
-  loading: PropTypes.bool.isRequired,
-  setLoading: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  setLoading: PropTypes.func,
   role: PropTypes.number,
 };

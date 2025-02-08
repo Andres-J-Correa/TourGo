@@ -3,7 +3,9 @@ using sib_api_v3_sdk.Client;
 using TourGo.Data;
 using TourGo.Data.Providers;
 using TourGo.Services;
+using TourGo.Services.Bookings;
 using TourGo.Services.Email;
+using TourGo.Services.Interfaces.Bookings;
 using TourGo.Services.Interfaces.Email;
 using TourGo.Services.Interfaces.Users;
 using TourGo.Services.Users;
@@ -60,6 +62,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<ITemplateLoader, TemplateLoader>();
             services.AddSingleton<IUserTokenService, UserTokenService>();
             services.AddSingleton<IUserAuthService, UserAuthService>();
+            services.AddSingleton<IBookingService, BookingService>();
 
             GetAllEntities().ForEach(tt =>
             {

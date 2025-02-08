@@ -76,6 +76,13 @@
       "button": "Change Password"
     }
   },
+  "providers": {
+    "landing": {
+      "title": "Join Our Platform and Boost Your Sales!",
+      "subtitle": "Become a part of our community and showcase your tours to a wider audience, increasing your bookings and brand visibility.",
+      "button": "Get Started"
+    }
+  },
   "errors": {
     "http": {
       "400": "Bad Request",

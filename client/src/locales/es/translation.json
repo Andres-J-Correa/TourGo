@@ -76,6 +76,13 @@
       "button": "Cambia tu contraseña"
     }
   },
+  "providers": {
+    "landing": {
+      "title": "¡Únete a nuestra plataforma y aumenta tus ventas!",
+      "subtitle": "Conviértete en parte de nuestra comunidad y muestra tus tours a una audiencia más amplia, aumentando tus reservas y la visibilidad de tu marca.",
+      "button": "Empezar"
+    }
+  },
   "errors": {
     "http": {
       "400": "Solicitud incorrecta",
