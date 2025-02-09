@@ -275,10 +275,6 @@ namespace TourGo.Web.Api.Controllers.Users
             return StatusCode(iCode, response);
         }
 
-        #endregion
-
-        #region Private Endpoints
-
         [HttpGet("current")]
         public ActionResult<ItemResponse<IUserAuthData>> GetCurrrent()
         {
@@ -311,7 +307,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
-   
+
             }
             catch (Exception ex)
             {
@@ -323,6 +319,10 @@ namespace TourGo.Web.Api.Controllers.Users
 
             return result;
         }
+
+        #endregion
+
+        #region Private Endpoints
 
         #endregion
 
