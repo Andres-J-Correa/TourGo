@@ -7,7 +7,9 @@ using TourGo.Services.Bookings;
 using TourGo.Services.Email;
 using TourGo.Services.Interfaces.Bookings;
 using TourGo.Services.Interfaces.Email;
+using TourGo.Services.Interfaces.Security;
 using TourGo.Services.Interfaces.Users;
+using TourGo.Services.Security;
 using TourGo.Services.Users;
 using TourGo.Web.Api.StartUp.DependencyInjection;
 using TourGo.Web.Core.Services;
@@ -63,6 +65,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IUserTokenService, UserTokenService>();
             services.AddSingleton<IUserAuthService, UserAuthService>();
             services.AddSingleton<IBookingService, BookingService>();
+            services.AddSingleton<ISecureEntities<int,int>, EntityAuthService>();
 
             GetAllEntities().ForEach(tt =>
             {

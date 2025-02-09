@@ -24,7 +24,7 @@ namespace TourGo.Services.Bookings
             _mySqlDataProvider = dataProvider;
         }
 
-        public Paged<BookingBase>? GetBookingsByArrivalDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize)
+        public Paged<BookingBase>? GetBookingsByArrivalDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize, int userId)
         {
             Paged<BookingBase>? pagedBookings = null;
             List<BookingBase>? bookings = null;
@@ -33,15 +33,16 @@ namespace TourGo.Services.Bookings
             string proc = "bookings_select_byArrivalDate";
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
-                coll.AddWithValue("p_startDate", startDate);
-                coll.AddWithValue("p_endDate", endDate);
+                coll.AddWithValue("p_startDate", startDate.ToString("yyyy-MM-dd"));
+                coll.AddWithValue("p_endDate", endDate.ToString("yyyy-MM-dd"));
                 coll.AddWithValue("p_pageIndex", pageIndex);
                 coll.AddWithValue("p_pageSize", pageSize);
+                coll.AddWithValue("p_userId", userId);
             }, (reader, set) =>
             {
                 int index = 0;
 
-                BookingBase booking = MapBookingBase(reader, index);
+                BookingBase booking = MapBookingBase(reader, ref index);
                 bookings ??= new List<BookingBase>();
                 bookings.Add(booking);
 
@@ -55,7 +56,7 @@ namespace TourGo.Services.Bookings
             return pagedBookings;
         }
 
-        public Paged<BookingBase>? GetBookingsByDepartureDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize)
+        public Paged<BookingBase>? GetBookingsByDepartureDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize, int userId)
         {
             Paged<BookingBase>? pagedBookings = null;
             List<BookingBase>? bookings = null;
@@ -64,15 +65,16 @@ namespace TourGo.Services.Bookings
             string proc = "bookings_select_byDepartureDate";
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
-                coll.AddWithValue("p_startDate", startDate);
-                coll.AddWithValue("p_endDate", endDate);
+                coll.AddWithValue("p_startDate", startDate.ToString("yyyy-MM-dd"));
+                coll.AddWithValue("p_endDate", endDate.ToString("yyyy-MM-dd"));
                 coll.AddWithValue("p_pageIndex", pageIndex);
                 coll.AddWithValue("p_pageSize", pageSize);
+                coll.AddWithValue("p_userId", userId);
             }, (reader, set) =>
             {
                 int index = 0;
 
-                BookingBase booking = MapBookingBase(reader, index);
+                BookingBase booking = MapBookingBase(reader, ref index);
                 bookings ??= new List<BookingBase>();
                 bookings.Add(booking);
 
@@ -86,7 +88,7 @@ namespace TourGo.Services.Bookings
             return pagedBookings;
         }
 
-        private static BookingBase MapBookingBase(IDataReader reader, int index)
+        private static BookingBase MapBookingBase(IDataReader reader, ref int index)
         {
             BookingBase booking = new BookingBase();
             booking.Id = reader.GetSafeInt32(index++);
@@ -107,12 +109,12 @@ namespace TourGo.Services.Bookings
             booking.DateCreated = reader.GetSafeDateTime(index++);
             booking.DateModified = reader.GetSafeDateTime(index++);
             booking.Invoices = new List<Invoice>();
-            booking.Invoices.Add(new Invoice()
-            {
-                Subtotal = reader.GetSafeDecimal(index++),
-                Charges = reader.GetSafeDecimal(index++),
-                Paid = reader.GetSafeDecimal(index++),
-            });
+            Invoice activeInvoice = new Invoice();
+            activeInvoice.Subtotal = reader.GetSafeDecimal(index++);
+            activeInvoice.Charges = reader.GetSafeDecimal(index++);
+            activeInvoice.Paid = reader.GetSafeDecimal(index++);
+            booking.Invoices.Add(activeInvoice);
+
             return booking;
         }
     }

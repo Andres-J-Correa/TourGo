@@ -21,8 +21,4 @@
     <ProjectReference Include="..\TourGo.Models\TourGo.Models.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Security\" />
-  </ItemGroup>
-
 </Project>

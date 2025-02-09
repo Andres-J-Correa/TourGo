@@ -1,11 +1,88 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TourGo.Models;
+using TourGo.Models.Domain.Bookings;
+using TourGo.Services;
+using TourGo.Services.Interfaces.Bookings;
+using TourGo.Web.Controllers;
+using TourGo.Web.Models.Responses;
 
 namespace TourGo.Web.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/bookings")]
     [ApiController]
-    public class BookingsController : ControllerBase
+    public class BookingsController : BaseApiController
     {
+        private readonly IBookingService _bookingService;
+        private readonly IWebAuthenticationService<int> _webAuthService;
+
+        public BookingsController(ILogger<BookingsController> logger, IBookingService bookingService, IWebAuthenticationService<int> webAuthenticationService) : base(logger)
+        {
+            _bookingService = bookingService;
+            _webAuthService = webAuthenticationService;
+        }
+
+        [HttpGet("arrival")]
+        public ActionResult<Paged<BookingBase>> GetBookingsByArrivalDate([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int pageIndex, [FromQuery] int pageSize)
+        {
+            int code = 200;
+            BaseResponse response;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                Paged<BookingBase>? pagedBookings = _bookingService.GetBookingsByArrivalDate(startDate, endDate, pageIndex, pageSize, userId);
+
+                if (pagedBookings != null)
+                {
+                    response = new ItemResponse<Paged<BookingBase>> { Item = pagedBookings };
+                }         
+                else
+                {
+                    response = new ErrorResponse("No bookings found");
+                    code = 404;
+                }              
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.Message);
+                code = 500;
+                response = new ErrorResponse(ex.Message);
+            }
+
+            return StatusCode(code, response);
+        }
+
+        [HttpGet("departure")]
+        public ActionResult<Paged<BookingBase>> GetBookingsByDepartureDate([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int pageIndex, [FromQuery] int pageSize)
+        {
+            int code = 200;
+            BaseResponse response;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                Paged<BookingBase>? pagedBookings = _bookingService.GetBookingsByDepartureDate(startDate, endDate, pageIndex, pageSize, userId);
+
+                if (pagedBookings != null)
+                {
+                    response = new ItemResponse<Paged<BookingBase>> { Item = pagedBookings };
+                }
+                else
+                {
+                    response = new ErrorResponse("No bookings found");
+                    code = 404;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.Message);
+                code = 500;
+                response = new ErrorResponse(ex.Message);
+            }
+
+            return StatusCode(code, response);
+        }
+
     }
 }

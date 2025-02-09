@@ -42,14 +42,14 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpPost("exists")]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<bool>> UserExists(EmailValidateRequest request)
+        public ActionResult<ItemResponse<bool>> UserExists(EmailValidateRequest model)
         {
 
             ObjectResult result = null;
 
             try
             {
-                bool exists = _userService.UserExists(request.Email);
+                bool exists = _userService.UserExists(model.Email);
 
                 ItemResponse<bool> response = new ItemResponse<bool> { Item = exists };
 
@@ -69,14 +69,14 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpPost("exists/phone")]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<bool>> PhoneExists(PhoneValidateRequest request)
+        public ActionResult<ItemResponse<bool>> PhoneExists(PhoneValidateRequest model)
         {
 
             ObjectResult result = null;
 
             try
             {
-                bool exists = _userService.PhoneExists(request.Phone);
+                bool exists = _userService.PhoneExists(model.Phone);
 
                 ItemResponse<bool> response = new ItemResponse<bool> { Item = exists };
 
@@ -96,12 +96,12 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<int>> Create(UserAddRequest request)
+        public ActionResult<ItemResponse<int>> Create(UserAddRequest model)
         {
             try
             {
 
-                bool userExists = _userService.UserExists(request.Email);
+                bool userExists = _userService.UserExists(model.Email);
 
                 if (userExists)
                 {
@@ -109,7 +109,7 @@ namespace TourGo.Web.Api.Controllers.Users
                     return StatusCode(409, errorResponse);
                 }
 
-                bool phoneExists = _userService.PhoneExists(request.Phone);
+                bool phoneExists = _userService.PhoneExists(model.Phone);
 
                 if (phoneExists)
                 {
@@ -117,7 +117,7 @@ namespace TourGo.Web.Api.Controllers.Users
                     return StatusCode(409, errorResponse);
                 }
 
-                int userId = _userService.Create(request);
+                int userId = _userService.Create(model);
 
                 ItemResponse<int> response = new ItemResponse<int>() { Item = userId };
 
@@ -135,21 +135,21 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult<ItemResponse<bool>>> LoginAsync(UserLoginRequest request)
+        public async Task<ActionResult<ItemResponse<bool>>> LoginAsync(UserLoginRequest model)
         {
             try
             {
-                if (!_userService.UserExists(request.Email))
+                if (!_userService.UserExists(model.Email))
                 {
                     return StatusCode(401, new ErrorResponse("User not found.", AuthenticationErrorCode.UserNotFound));
                 }
 
-                if (_userAuthService.IsLoginBlocked(request.Email))
+                if (_userAuthService.IsLoginBlocked(model.Email))
                 {
                     return StatusCode(401, new ErrorResponse("Account is locked, please reset the password.", AuthenticationErrorCode.AccountLocked));
                 }
 
-                bool isSuccess = await _userAuthService.LogInAsync(request.Email, request.Password);
+                bool isSuccess = await _userAuthService.LogInAsync(model.Email, model.Password);
 
                 if (!isSuccess)
                 {
@@ -167,13 +167,13 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpPost("password/reset")]
         [AllowAnonymous]
-        public async Task<ActionResult<SuccessResponse>> ResetPassword(EmailValidateRequest request)
+        public async Task<ActionResult<SuccessResponse>> ResetPassword(EmailValidateRequest model)
         {
             ObjectResult result = null;
 
             try
             {
-                IUserAuthData user = _userService.Get(request.Email);
+                IUserAuthData user = _userService.Get(model.Email);
 
                 if (user != null)
                 {
@@ -240,18 +240,18 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpPut("password/change")]
         [AllowAnonymous]
-        public ActionResult<SuccessResponse> ChangePassword (UserUpdatePasswordRequest request)
+        public ActionResult<SuccessResponse> ChangePassword (UserUpdatePasswordRequest model)
         {
             int iCode = 200;
             BaseResponse response = null;
 
             try
             {
-                UserToken userToken = _userTokenService.GetUserToken(request.Token);
+                UserToken userToken = _userTokenService.GetUserToken(model.Token);
 
                 if (userToken != null)
                 {
-                    _userService.ChangePassword(userToken.UserId, request.Password);
+                    _userService.ChangePassword(userToken.UserId, model.Password);
 
                     _userTokenService.DeleteUserToken(userToken);
 

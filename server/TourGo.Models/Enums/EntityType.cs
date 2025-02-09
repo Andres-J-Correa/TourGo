@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TourGo.Models.Enums
+{
+    public enum EntityType
+    {
+        User = 1,
+        Hotel = 2,
+        Room = 3,
+        Booking = 4,
+    }
+}
