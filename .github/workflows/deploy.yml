@@ -44,7 +44,7 @@ jobs:
           script: |
             pwd
             rm -rf /home/u635088371/public_html/*
-            cp -r ./client/build/* /home/u635088371/public_html/
+            cp -r /github/workspace/client/build/* /home/u635088371/public_html/
 
       # ---- Server Deployment (ASP.NET Core) ----
       - name: Show Current Directory (Server)
@@ -72,5 +72,5 @@ jobs:
           script: |
             pwd
             mkdir -p /home/u635088371/api
-            cp -r ./server/publish/* /home/u635088371/api/
+            cp -r /github/workspace/server/publish/* /home/u635088371/api/
             pm2 restart my-api || pm2 start "dotnet /home/u635088371/api/TourGo.Web.Api.dll" --name "my-api"
