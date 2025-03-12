@@ -317,3 +317,5 @@ package-lock.json
 
 # Ignore appSettings
 /server/TourGo.Web.Api/appsettings.Development.json
+
+server/publish/
