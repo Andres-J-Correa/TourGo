@@ -14,6 +14,9 @@ jobs:
         uses: actions/checkout@v4
 
       # ---- Client Deployment (React App) ----
+      - name: Show Current Directory (Client)
+        run: pwd && ls -la
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
@@ -21,11 +24,15 @@ jobs:
 
       - name: Install Dependencies with Yarn
         working-directory: ./client
-        run: yarn install --frozen-lockfile
+        run: |
+          pwd
+          yarn install --frozen-lockfile
 
       - name: Build Client with Yarn
         working-directory: ./client
-        run: yarn build
+        run: |
+          pwd
+          yarn build
 
       - name: Deploy Client via SSH
         uses: appleboy/ssh-action@v0.1.7
@@ -35,10 +42,14 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            pwd
             rm -rf /home/u635088371/public_html/*
             cp -r ./client/build/* /home/u635088371/public_html/
 
       # ---- Server Deployment (ASP.NET Core) ----
+      - name: Show Current Directory (Server)
+        run: pwd && ls -la
+
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4
         with:
@@ -47,6 +58,7 @@ jobs:
       - name: Build and Publish Server
         working-directory: ./server
         run: |
+          pwd
           dotnet restore
           dotnet publish -c Release -o ./publish
 
@@ -58,6 +70,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            pwd
             mkdir -p /home/u635088371/api
             cp -r ./server/publish/* /home/u635088371/api/
             pm2 restart my-api || pm2 start "dotnet /home/u635088371/api/TourGo.Web.Api.dll" --name "my-api"

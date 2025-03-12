@@ -319,3 +319,4 @@ package-lock.json
 /server/TourGo.Web.Api/appsettings.Development.json
 
 server/publish/
+client/build/
