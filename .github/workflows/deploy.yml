@@ -1,0 +1,66 @@
+name: Deploy Client and Server to Hostinger
+
+on:
+  push:
+    branches:
+      - main  # Trigger on main branch merge
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ---- Client Deployment (React App) ----
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Client Dependencies
+        run: |
+          cd client
+          npm install
+
+      - name: Build Client
+        run: |
+          cd client
+          npm run build
+
+      - name: Deploy Client via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/u635088371/public_html
+            rm -rf *
+            cp -r ~/client/build/* .
+
+      # ---- Server Deployment (ASP.NET Core) ----
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build and Publish Server
+        run: |
+          cd server
+          dotnet restore
+          dotnet publish -c Release -o ./publish
+
+      - name: Deploy Server via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            mkdir -p /home/YOUR_USERNAME/api
+            cp -r ~/server/publish/* /home/YOUR_USERNAME/api
+            cd /home/u635088371/api
+            pm2 restart ecosystem.config.js || pm2 start dotnet /home/YOUR_USERNAME/api/YourServerApp.dll
+
