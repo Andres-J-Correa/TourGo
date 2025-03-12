@@ -50,9 +50,9 @@ jobs:
           port: 65002
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "*" # Only the contents of the build folder
+          source: "client/build/*" # Relative to the root of the repo
           target: "/home/u635088371/domains/lightgray-narwhal-970006.hostingersite.com/public_html"
-          working-directory: ./client/build # Set the context to the build folder
+          strip_components: 2 # Strips both "client" and "build" from the path
 
       # ---- Server Deployment (ASP.NET Core) ----
       - name: Show Current Directory (Server)
@@ -86,9 +86,9 @@ jobs:
           port: 65002
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "*" # Only the contents of the publish folder
+          source: "server/publish/*" # Relative to the root of the repo
           target: "/home/u635088371/domains/lightgray-narwhal-970006.hostingersite.com/api"
-          working-directory: ./server/publish # Set the context to the publish folder
+          strip_components: 2 # Strips both "server" and "publish" from the path
 
       - name: Deploy Server via SSH
         uses: appleboy/ssh-action@v0.1.7
