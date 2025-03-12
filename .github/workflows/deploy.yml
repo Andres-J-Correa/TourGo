@@ -3,7 +3,7 @@ name: Deploy Client and Server to Hostinger
 on:
   push:
     branches:
-      - main # Trigger on main branch merge
+      - main
 
 jobs:
   deploy:
@@ -41,8 +41,9 @@ jobs:
           port: 65002
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "./client/build/*"
-          target: "/home/u635088371/public_html/"
+          source: "./client/build/"
+          target: "/home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/public_html/"
+          strip_components: 2 # Ensures only contents are uploaded, not the "build" folder itself
 
       # ---- Server Deployment (ASP.NET Core) ----
       - name: Show Current Directory (Server)
@@ -67,8 +68,9 @@ jobs:
           port: 65002
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "./server/publish/*"
-          target: "/home/u635088371/api/"
+          source: "./server/publish/"
+          target: "/home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/api/"
+          strip_components: 2 # Ensures only contents are uploaded, not the "publish" folder itself
 
       - name: Deploy Server via SSH
         uses: appleboy/ssh-action@v0.1.7
@@ -78,4 +80,4 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            pm2 restart my-api || pm2 start "dotnet /home/u635088371/api/TourGo.Web.Api.dll" --name "my-api"
+            pm2 restart my-api || pm2 start "dotnet /home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/api/TourGo.Web.Api.dll" --name "my-api"
