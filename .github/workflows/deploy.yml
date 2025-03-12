@@ -3,7 +3,7 @@ name: Deploy Client and Server to Hostinger
 on:
   push:
     branches:
-      - main  # Trigger on main branch merge
+      - main # Trigger on main branch merge
 
 jobs:
   deploy:
@@ -17,17 +17,17 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
-      - name: Install Client Dependencies
+      - name: Install Dependencies with Yarn
         run: |
           cd client
-          npm install
+          yarn install --frozen-lockfile
 
-      - name: Build Client
+      - name: Build Client with Yarn
         run: |
           cd client
-          npm run build
+          yarn build
 
       - name: Deploy Client via SSH
         uses: appleboy/ssh-action@v0.1.7
@@ -36,15 +36,14 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /home/u635088371/public_html
-            rm -rf *
-            cp -r ~/client/build/* .
+            rm -rf /home/u635088371/public_html/*
+            cp -r ./client/build/* /home/u635088371/public_html/
 
       # ---- Server Deployment (ASP.NET Core) ----
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
 
       - name: Build and Publish Server
         run: |
@@ -59,8 +58,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            mkdir -p /home/YOUR_USERNAME/api
-            cp -r ~/server/publish/* /home/YOUR_USERNAME/api
+            mkdir -p /home/u635088371/api
+            cp -r ~/server/publish/* /home/u635088371/api
             cd /home/u635088371/api
-            pm2 restart ecosystem.config.js || pm2 start dotnet /home/YOUR_USERNAME/api/YourServerApp.dll
-
+            pm2 restart ecosystem.config.js || pm2 start dotnet /home/u635088371/api/TourGo.Web.Api.dll
