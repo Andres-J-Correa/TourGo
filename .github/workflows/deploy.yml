@@ -34,17 +34,15 @@ jobs:
           pwd
           yarn build
 
-      - name: Deploy Client via SSH
-        uses: appleboy/ssh-action@v0.1.7
+      - name: Upload Client Build Files to Hostinger
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           port: 65002
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: |
-            pwd
-            rm -rf /home/u635088371/public_html/*
-            cp -r /github/workspace/client/build/* /home/u635088371/public_html/
+          source: "./client/build/*"
+          target: "/home/u635088371/public_html/"
 
       # ---- Server Deployment (ASP.NET Core) ----
       - name: Show Current Directory (Server)
@@ -62,6 +60,16 @@ jobs:
           dotnet restore
           dotnet publish -c Release -o ./publish
 
+      - name: Upload Server Files to Hostinger
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: 65002
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "./server/publish/*"
+          target: "/home/u635088371/api/"
+
       - name: Deploy Server via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -70,7 +78,4 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            pwd
-            mkdir -p /home/u635088371/api
-            cp -r /github/workspace/server/publish/* /home/u635088371/api/
             pm2 restart my-api || pm2 start "dotnet /home/u635088371/api/TourGo.Web.Api.dll" --name "my-api"
