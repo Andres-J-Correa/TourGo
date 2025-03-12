@@ -24,15 +24,14 @@ jobs:
 
       - name: Install Dependencies with Yarn
         working-directory: ./client
-        run: |
-          pwd
-          yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile
 
       - name: Build Client with Yarn
         working-directory: ./client
-        run: |
-          pwd
-          yarn build
+        run: yarn build
+
+      - name: Show Build Directory Contents (Client)
+        run: ls -la ./client/build/
 
       - name: Clean Old Client Files on Hostinger
         uses: appleboy/ssh-action@v0.1.7
@@ -41,17 +40,17 @@ jobs:
           port: 65002
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: rm -rf /home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/public_html/*
+          script: rm -rf /home/u635088371/domains/lightgray-narwhal-970006.hostingersite.com/public_html/*
 
-      - name: Upload Client Build Files to Hostinger
-        uses: appleboy/scp-action@master
+      - name: Upload Client Build Files to Hostinger (Using Rsync)
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           port: 65002
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "./client/build/*"
-          target: "/home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/public_html/"
+          script: |
+            rsync -avz ./client/build/ /home/u635088371/domains/lightgray-narwhal-970006.hostingersite.com/public_html/
 
       # ---- Server Deployment (ASP.NET Core) ----
       - name: Show Current Directory (Server)
@@ -65,9 +64,11 @@ jobs:
       - name: Build and Publish Server
         working-directory: ./server
         run: |
-          pwd
           dotnet restore
           dotnet publish -c Release -o ./publish
+
+      - name: Show Publish Directory Contents (Server)
+        run: ls -la ./server/publish/
 
       - name: Clean Old Server Files on Hostinger
         uses: appleboy/ssh-action@v0.1.7
@@ -76,17 +77,17 @@ jobs:
           port: 65002
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: rm -rf /home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/api/*
+          script: rm -rf /home/u635088371/domains/lightgray-narwhal-970006.hostingersite.com/api/*
 
-      - name: Upload Server Files to Hostinger
-        uses: appleboy/scp-action@master
+      - name: Upload Server Files to Hostinger (Using Rsync)
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           port: 65002
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "./server/publish/*"
-          target: "/home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/api/"
+          script: |
+            rsync -avz ./server/publish/ /home/u635088371/domains/lightgray-narwhal-970006.hostingersite.com/api/
 
       - name: Deploy Server via SSH
         uses: appleboy/ssh-action@v0.1.7
@@ -96,4 +97,4 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            pm2 restart my-api || pm2 start "dotnet /home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/api/TourGo.Web.Api.dll" --name "my-api"
+            pm2 restart my-api || pm2 start "dotnet /home/u635088371/domains/lightgray-narwhal-970006.hostingersite.com/api/TourGo.Web.Api.dll" --name "my-api"
