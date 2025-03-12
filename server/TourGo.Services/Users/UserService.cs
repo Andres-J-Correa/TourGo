@@ -32,7 +32,7 @@ namespace TourGo.Services.Users
         public int Create(UserAddRequest request)
         {
             int userId = 0;
-            string proc = "users_insert_v2";
+            string proc = "users_insert";
             string hashedPassword = GetHashedPassword(request.Password);
             string authProviderUserId;
 
@@ -53,7 +53,6 @@ namespace TourGo.Services.Users
                 coll.AddWithValue("p_providerUserId", authProviderUserId);
                 coll.AddWithValue("p_roleId", request.Role);
                 coll.AddWithValue("p_passwordHash", hashedPassword);
-                coll.AddWithValue("p_hotelId", request.HotelId);
                 coll.AddOutputParameter("p_newId", MySqlDbType.Int32);
 
             }, (returnColl) =>

@@ -28,8 +28,5 @@ namespace TourGo.Models.Requests.Users
 
         [Required, ValidEnum(typeof(UserRoleEnum))]
         public int Role { get; set; }
-
-        [Required, ValidEnum(typeof(HotelsEnum))]
-        public int HotelId { get; set; }
     }
 }
