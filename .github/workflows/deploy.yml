@@ -34,6 +34,15 @@ jobs:
           pwd
           yarn build
 
+      - name: Clean Old Client Files on Hostinger
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: 65002
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: rm -rf /home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/public_html/*
+
       - name: Upload Client Build Files to Hostinger
         uses: appleboy/scp-action@master
         with:
@@ -43,7 +52,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "./client/build/"
           target: "/home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/public_html/"
-          strip_components: 2 # Ensures only contents are uploaded, not the "build" folder itself
+          strip_components: 1
 
       # ---- Server Deployment (ASP.NET Core) ----
       - name: Show Current Directory (Server)
@@ -61,6 +70,15 @@ jobs:
           dotnet restore
           dotnet publish -c Release -o ./publish
 
+      - name: Clean Old Server Files on Hostinger
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: 65002
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: rm -rf /home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/api/*
+
       - name: Upload Server Files to Hostinger
         uses: appleboy/scp-action@master
         with:
@@ -70,7 +88,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "./server/publish/"
           target: "/home/u635088371/domain/lightgray-narwhal-970006.hostingersite.com/api/"
-          strip_components: 2 # Ensures only contents are uploaded, not the "publish" folder itself
+          strip_components: 1
 
       - name: Deploy Server via SSH
         uses: appleboy/ssh-action@v0.1.7
