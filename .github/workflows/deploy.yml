@@ -20,14 +20,12 @@ jobs:
           node-version: "20"
 
       - name: Install Dependencies with Yarn
-        run: |
-          cd client
-          yarn install --frozen-lockfile
+        working-directory: ./client
+        run: yarn install --frozen-lockfile
 
       - name: Build Client with Yarn
-        run: |
-          cd client
-          yarn build
+        working-directory: ./client
+        run: yarn build
 
       - name: Deploy Client via SSH
         uses: appleboy/ssh-action@v0.1.7
@@ -47,8 +45,8 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Build and Publish Server
+        working-directory: ./server
         run: |
-          cd server
           dotnet restore
           dotnet publish -c Release -o ./publish
 
@@ -61,6 +59,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             mkdir -p /home/u635088371/api
-            cp -r ~/server/publish/* /home/u635088371/api
-            cd /home/u635088371/api
-            pm2 restart ecosystem.config.js || pm2 start dotnet /home/u635088371/api/TourGo.Web.Api.dll
+            cp -r ./server/publish/* /home/u635088371/api/
+            pm2 restart my-api || pm2 start "dotnet /home/u635088371/api/TourGo.Web.Api.dll" --name "my-api"
