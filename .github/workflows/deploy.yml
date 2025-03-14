@@ -35,4 +35,4 @@ jobs:
             cd client
             yarn install
             yarn build
-            sudo rsync -avz ./dist/ /var/www/html/
+            sudo rsync -avz ./build/ /var/www/html/
