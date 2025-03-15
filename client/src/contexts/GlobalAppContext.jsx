@@ -23,6 +23,7 @@ export const AppContextProvider = ({ children }) => {
 
   const logout = () => {
     setCurrentUser({ ...defaultUser });
+    navigate("/");
   };
 
   const contextValue = {
@@ -42,6 +43,8 @@ export const AppContextProvider = ({ children }) => {
           ...data.item,
           isAuthenticated: true,
         }));
+
+        navigate("/home");
       })
       .catch(() => {
         if (currentUser.isAuthenticated) {

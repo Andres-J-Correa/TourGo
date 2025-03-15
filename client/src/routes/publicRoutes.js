@@ -11,13 +11,13 @@ const generalRoutes = [
 const userRoutes = [
   {
     name: "usersLandingPage",
-    path: "/",
+    path: "/home",
     component: lazy(() => import("components/users/UsersLandingPage")),
   },
   {
-    name: "home",
-    path: "/home",
-    component: lazy(() => import("components/Home")),
+    name: "landingPage",
+    path: "/",
+    component: lazy(() => import("components/LandingPage")),
   },
   {
     name: "changePassword",
