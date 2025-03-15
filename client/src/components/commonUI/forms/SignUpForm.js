@@ -28,7 +28,7 @@ const initialValues = {
   authProvider: 1, //TODO this should be changed later for OAuth login
 };
 
-function SignUpForm({ onSignIn, loading, setLoading, role = 2 }) {
+function SignUpForm({ onSignIn, loading, setLoading }) {
   const { t, getTranslatedErrorMessage } = useLanguage();
   const validationSchema = useUserSignUpSchema();
 
@@ -69,7 +69,7 @@ function SignUpForm({ onSignIn, loading, setLoading, role = 2 }) {
 
   return (
     <Formik
-      initialValues={{ ...initialValues, role }}
+      initialValues={{ ...initialValues }}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
       innerRef={formRef}>
@@ -136,7 +136,7 @@ function SignUpForm({ onSignIn, loading, setLoading, role = 2 }) {
   );
 }
 
-function _signUpFormModal({ onSignIn, loading, setLoading, role = 2 }) {
+function _signUpFormModal({ onSignIn, loading, setLoading }) {
   const { t } = useLanguage();
   return (
     <AuthCard
@@ -160,7 +160,6 @@ function _signUpFormModal({ onSignIn, loading, setLoading, role = 2 }) {
         onSignIn={onSignIn}
         loading={loading}
         setLoading={setLoading}
-        role={role}
       />
     </AuthCard>
   );
@@ -174,12 +173,10 @@ SignUpForm.propTypes = {
   onSignIn: PropTypes.func,
   loading: PropTypes.bool.isRequired,
   setLoading: PropTypes.func.isRequired,
-  role: PropTypes.number,
 };
 
 SignUpFormModal.propTypes = {
   onSignIn: PropTypes.func,
   loading: PropTypes.bool,
   setLoading: PropTypes.func,
-  role: PropTypes.number,
 };

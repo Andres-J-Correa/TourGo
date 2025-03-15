@@ -1,4 +1,5 @@
 import { publicRoutes } from "./publicRoutes";
+import { privateRoutes } from "./privateRoutes";
 
 // flatten the list of all nested routes
 const flattenRoutes = (routes) => {
@@ -17,4 +18,6 @@ const flattenRoutes = (routes) => {
 };
 
 const publicFlattenedRoutes = flattenRoutes([...publicRoutes]);
-export { publicFlattenedRoutes };
+const privateFlattenedRoutes = flattenRoutes([...privateRoutes]);
+
+export { publicFlattenedRoutes, privateFlattenedRoutes };

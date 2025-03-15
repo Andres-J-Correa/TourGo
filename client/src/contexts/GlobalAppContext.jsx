@@ -45,7 +45,6 @@ export const AppContextProvider = ({ children }) => {
         getCurrentHotel(),
       ]);
 
-      debugger;
       const user = userData.status === "fulfilled" ? userData.value.item : null;
       const hotel =
         hotelData.status === "fulfilled" ? hotelData.value.item : null;
@@ -66,7 +65,9 @@ export const AppContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    fetchUserAndHotel();
+    if (!currentUser.isAuthenticated) {
+      fetchUserAndHotel();
+    }
   }, [fetchUserAndHotel, currentUser.isAuthenticated]);
 
   return (

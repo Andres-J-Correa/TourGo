@@ -45,13 +45,13 @@ export const useNavbarItems = () => {
           collapse: [
             {
               name: "Registra un alojamiento",
-              path: "/hotel/register",
+              path: "/hotels/register",
               capitalize: true,
               isAnonymous: true,
             },
             {
               name: "Solictud de acceso a un alojamiento",
-              path: "/hotel/request-access",
+              path: "/hotels/access-request",
               capitalize: true,
               isAnonymous: true,
             },

@@ -5,10 +5,10 @@ import { HelmetProvider } from "react-helmet-async";
 import NavbarContainer from "components/commonUI/navbars/NavbarContainer";
 import GlobalErrorHandler from "components/commonUI/errors/GlobalErrorHandler";
 
-import { AppContextProvider } from "./contexts/GlobalAppContext";
+import { useAppContext } from "./contexts/GlobalAppContext";
 
 import { Routes, Route } from "react-router-dom";
-import { publicFlattenedRoutes } from "./routes";
+import { publicFlattenedRoutes, privateFlattenedRoutes } from "./routes";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,6 +19,8 @@ import "./App.css";
 const App = () => {
   const [routes, setRoutes] = useState([]);
 
+  const { user } = useAppContext();
+
   const mapRoute = (route, idx) => (
     <Route
       key={`route-${idx}`}
@@ -28,22 +30,23 @@ const App = () => {
   );
 
   useEffect(() => {
-    if (routes.length === 0) {
-      const mappedRoutes = publicFlattenedRoutes.map(mapRoute);
+    const publicRoutes = publicFlattenedRoutes.map(mapRoute);
+    const privateRoutes = privateFlattenedRoutes.map(mapRoute);
 
-      setRoutes(mappedRoutes);
-    }
-  }, [routes]);
+    const mappedRoutes = user.current.isAuthenticated
+      ? [...privateRoutes, ...publicRoutes]
+      : publicRoutes;
+
+    setRoutes(mappedRoutes);
+  }, [user]);
 
   return (
     <HelmetProvider>
       <Suspense fallback={<div>Loading...</div>}>
-        <AppContextProvider>
-          <GlobalErrorHandler>
-            <NavbarContainer />
-            <Routes>{routes}</Routes>
-          </GlobalErrorHandler>
-        </AppContextProvider>
+        <GlobalErrorHandler>
+          <NavbarContainer />
+          <Routes>{routes}</Routes>
+        </GlobalErrorHandler>
       </Suspense>
 
       <ToastContainer

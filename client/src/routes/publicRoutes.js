@@ -10,11 +10,6 @@ const generalRoutes = [
 
 const userRoutes = [
   {
-    name: "usersLandingPage",
-    path: "/home",
-    component: lazy(() => import("components/users/UsersLandingPage")),
-  },
-  {
     name: "landingPage",
     path: "/",
     component: lazy(() => import("components/LandingPage")),

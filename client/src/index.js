@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-
+import { AppContextProvider } from "./contexts/GlobalAppContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import "./locales/i18n"; // Initialize i18n
 
@@ -15,9 +15,11 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <React.StrictMode>
-      <LanguageProvider>
-        <App />
-      </LanguageProvider>
+      <AppContextProvider>
+        <LanguageProvider>
+          <App />
+        </LanguageProvider>
+      </AppContextProvider>
     </React.StrictMode>
   </BrowserRouter>
 );

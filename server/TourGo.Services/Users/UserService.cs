@@ -51,7 +51,6 @@ namespace TourGo.Services.Users
                 coll.AddWithValue("p_phone", request.Phone);
                 coll.AddWithValue("p_providerId", request.AuthProvider);
                 coll.AddWithValue("p_providerUserId", authProviderUserId);
-                coll.AddWithValue("p_roleId", request.Role);
                 coll.AddWithValue("p_passwordHash", hashedPassword);
                 coll.AddOutputParameter("p_newId", MySqlDbType.Int32);
 

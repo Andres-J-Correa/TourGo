@@ -13,7 +13,6 @@ const api = `${API_HOST_PREFIX}/users/auth`;
  * email: string,
  * phone: string,
  * authProvider: number,
- * role: number,
  * password: string,
  * confirmPassword: string}} payload
  * @returns {Promise<{ item: number ,isSuccessful: boolean, transactionId: string}>}

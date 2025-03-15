@@ -8,9 +8,9 @@ namespace TourGo.Models.Enums
 {
     public enum UserRoleEnum
     {
-        Admin = 1,
-        Customer = 2,
-        Promotor = 4,
-        TourProvider = 3
+        SuperAdmin = 1,
+        Admin = 2,
+        Owner = 3,
+        User = 4
     }
 }
