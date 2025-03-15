@@ -291,7 +291,6 @@ yarn.lock
 
 # env.development file
 client/.env.development
-client/.env
 
 package-lock.json
 !node/package-lock.json
