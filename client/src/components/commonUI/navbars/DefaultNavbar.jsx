@@ -9,7 +9,7 @@ import "./navbar.css";
 const _logger = require("debug")("navbar");
 
 function DefaultNavbar({
-  brand = "Tour Go",
+  brand = "TourGo",
   isOpen,
   toggle,
   navbarItems,
