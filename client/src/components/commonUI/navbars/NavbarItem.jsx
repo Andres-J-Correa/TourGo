@@ -6,6 +6,7 @@ import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
 import PropTypes from "prop-types";
 import classNames from "classnames";
+import "./navbaritem.css";
 
 // Helper function to render inner items in a dropdown
 const renderInnerItem = (innerItem, innerIndex) => (
@@ -13,10 +14,10 @@ const renderInnerItem = (innerItem, innerIndex) => (
     className={classNames("dropdown-item", {
       "text-uppercase": innerItem.uppercase,
       "text-capitalize": innerItem.capitalize,
+      "item-long-text": innerItem.name.length > 25,
     })}
     key={`inner-${innerIndex}-${innerItem.name}`}
-    to={innerItem.path || "#"}
-  >
+    to={innerItem.path || "#"}>
     {innerItem.name}
   </Link>
 );
@@ -33,8 +34,8 @@ const renderSubItem = (subItem, subIndex) => {
           className={classNames("dropdown-item", {
             "text-uppercase": subItem.uppercase,
             "text-capitalize": subItem.capitalize,
-          })}
-        >
+            "item-long-text": subItem.name.length > 25,
+          })}>
           {subItem.name}
         </Link>
       ) : (
@@ -45,11 +46,11 @@ const renderSubItem = (subItem, subIndex) => {
               "font-weight-bolder": isHeader,
               "text-uppercase": subItem.uppercase,
               "text-capitalize": subItem.capitalize,
+              "item-long-text": subItem.name.length > 25,
             },
             "align-items-center px-1"
           )}
-          onClick={subItem.action}
-        >
+          onClick={subItem.action}>
           {subItem.name}
         </DropdownItem>
       )}
@@ -73,9 +74,11 @@ const NavbarItem = React.memo(({ navItem }) => {
             "text-capitalize": navItem.capitalize,
           }
         )}
-      >
+        title={navItem?.name?.length > 20 ? navItem.name : undefined}>
         {navItem.icon}
-        {navItem.name}
+        {navItem.name.length > 25
+          ? `${navItem.name.substring(0, 20)}...`
+          : navItem.name}
         <FontAwesomeIcon
           icon={faChevronDown}
           size="xs"
@@ -84,8 +87,7 @@ const NavbarItem = React.memo(({ navItem }) => {
       </DropdownToggle>
       <DropdownMenu
         flip
-        className="border-0 shadow px-3 border-radius-xl min-width-auto"
-      >
+        className="border-0 shadow px-3 border-radius-xl min-width-auto">
         <div className="hidden-box">{/* For hover effect */}</div>
         {navItem.collapse.map(renderSubItem)}
       </DropdownMenu>
@@ -99,8 +101,7 @@ const NavbarItem = React.memo(({ navItem }) => {
       className={classNames("nav-link nav-action-item", {
         "text-uppercase": navItem.uppercase,
         "text-capitalize": navItem.capitalize,
-      })}
-    >
+      })}>
       {navItem.icon && (
         <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
       )}
@@ -116,8 +117,7 @@ const NavbarItem = React.memo(({ navItem }) => {
         "text-capitalize": navItem.capitalize,
       })}
       onClick={navItem.action}
-      role="button"
-    >
+      role="button">
       {navItem.name}
     </div>
   );
@@ -129,8 +129,7 @@ const NavbarItem = React.memo(({ navItem }) => {
       className={classNames("text-center px-1", {
         "text-uppercase": navItem.uppercase,
         "text-capitalize": navItem.capitalize,
-      })}
-    >
+      })}>
       {navItem.name}
     </DropdownItem>
   );

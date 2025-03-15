@@ -40,13 +40,15 @@ export const AppContextProvider = ({ children }) => {
 
   const fetchUserAndHotel = useCallback(async () => {
     try {
-      const [userData, hotelData] = await Promise.all([
+      const [userData, hotelData] = await Promise.allSettled([
         getCurrentUser(),
         getCurrentHotel(),
       ]);
 
-      const { item: user } = userData || {};
-      const { item: hotel } = hotelData || {};
+      debugger;
+      const user = userData.status === "fulfilled" ? userData.value.item : null;
+      const hotel =
+        hotelData.status === "fulfilled" ? hotelData.value.item : null;
 
       if (!user) {
         throw new Error("User not found");
@@ -65,7 +67,7 @@ export const AppContextProvider = ({ children }) => {
 
   useEffect(() => {
     fetchUserAndHotel();
-  }, [fetchUserAndHotel]);
+  }, [fetchUserAndHotel, currentUser.isAuthenticated]);
 
   return (
     <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>

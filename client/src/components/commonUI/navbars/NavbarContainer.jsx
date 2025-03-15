@@ -6,9 +6,9 @@ import { useNavbarItems } from "components/commonUI/navbars/useNavbarItems";
 const NavbarContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { adminItems } = useNavbarItems();
+  const { items } = useNavbarItems();
 
-  const currentItems = useMemo(() => adminItems, [adminItems]);
+  const currentItems = useMemo(() => items, [items]);
 
   const rightCustomComponents = useMemo(
     () => [<UserAccountDropdown key="userAccountDropdown" />],

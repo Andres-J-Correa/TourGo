@@ -1,0 +1,7 @@
+.item-long-text {
+  min-width: 200px;
+  word-break: break-word;
+  display: block !important;
+  overflow-wrap: anywhere;
+  white-space: normal !important;
+}

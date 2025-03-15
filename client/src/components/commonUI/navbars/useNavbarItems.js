@@ -1,41 +1,29 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
-import { useLanguage } from "contexts/LanguageContext";
+import { faHotel } from "@fortawesome/free-solid-svg-icons";
+import { useAppContext } from "contexts/GlobalAppContext";
 
 export const useNavbarItems = () => {
-  const { t } = useLanguage();
+  const { user } = useAppContext();
 
-  const adminItems = [
+  const withHotelItems = [
     {
-      name: t("common.cancel"),
-      icon: <FontAwesomeIcon icon={faPaperclip} className="icon" />,
+      name: user.current?.hotel?.name,
+      icon: <FontAwesomeIcon icon={faHotel} className="icon" />,
       main: true,
       capitalize: true,
       collapse: [
         {
-          name: "landing pages1",
+          name: "Paginas",
           capitalize: true,
           collapse: [
             {
-              name: "about-us1",
-              path: "/landing-pages/about-us",
+              name: "Inicio",
+              path: "/hotel/home",
               capitalize: true,
             },
             {
-              name: "contact-us1",
-              path: "/landing-pages/contact-us",
-              capitalize: true,
-            },
-          ],
-        },
-        {
-          name: "profile",
-          capitalize: true,
-          isAnonymous: true,
-          collapse: [
-            {
-              name: "testProfile1",
-              path: "/profile",
+              name: "Reservas",
+              path: "/hotel/reservations",
               capitalize: true,
             },
           ],
@@ -44,7 +32,40 @@ export const useNavbarItems = () => {
     },
   ];
 
+  const withoutHotelItems = [
+    {
+      name: "Alojamiento",
+      icon: <FontAwesomeIcon icon={faHotel} className="icon" />,
+      main: true,
+      capitalize: true,
+      collapse: [
+        {
+          name: "Paginas",
+          capitalize: true,
+          collapse: [
+            {
+              name: "Registra un alojamiento",
+              path: "/hotel/register",
+              capitalize: true,
+              isAnonymous: true,
+            },
+            {
+              name: "Solictud de acceso a un alojamiento",
+              path: "/hotel/request-access",
+              capitalize: true,
+              isAnonymous: true,
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const items = [
+    ...(user.current?.hotel?.id ? withHotelItems : withoutHotelItems),
+  ];
+
   return {
-    adminItems,
+    items,
   };
 };
