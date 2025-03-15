@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
+import { useNavigate } from "react-router-dom";
 
 function UserSignIn({
   toggle,
@@ -22,6 +23,7 @@ function UserSignIn({
   const { t, getTranslatedErrorMessage } = useLanguage();
   const formRef = useRef(null);
   const validationSchema = useUserSignInSchema();
+  const navigate = useNavigate();
 
   const handleSubmit = async (values) => {
     try {
@@ -31,6 +33,7 @@ function UserSignIn({
         throw new Error("User not found");
       }
       toast.success(t("common.success"));
+      navigate("/home");
       toggle();
       user.set((prev) => ({ ...prev, isAuthenticated: true }));
     } catch (error) {
@@ -55,14 +58,12 @@ function UserSignIn({
             <span
               className="text-success text-gradient font-weight-bold"
               onClick={loading ? null : onSignUp}
-              role="button"
-            >
+              role="button">
               {t("client.login.register")}
             </span>
           </p>
         ) : null
-      }
-    >
+      }>
       <Formik
         initialValues={{
           email: "",
@@ -70,8 +71,7 @@ function UserSignIn({
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
-        innerRef={formRef}
-      >
+        innerRef={formRef}>
         <Form>
           <CustomField
             name="email"
@@ -91,8 +91,7 @@ function UserSignIn({
               type="button"
               className="btn btn-link m-0 p-0"
               onClick={onPasswordReset}
-              disabled={loading}
-            >
+              disabled={loading}>
               Forgot your password?
             </button>
           </div>
@@ -101,8 +100,7 @@ function UserSignIn({
               type="submit"
               size="lg"
               disabled={loading}
-              className="bg-gradient-success w-100 mt-3 mb-0"
-            >
+              className="bg-gradient-success w-100 mt-3 mb-0">
               {loading ? <Spinner size="sm" /> : t("client.login.button")}
             </Button>
           </div>

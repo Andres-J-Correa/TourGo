@@ -1,8 +1,15 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 
 import { useNavigate } from "react-router-dom";
 
 import { getCurrentUser } from "services/userAuthService";
+import { getCurrentHotel } from "services/hotelService";
 
 import PropTypes from "prop-types";
 
@@ -12,6 +19,7 @@ const defaultUser = {
   lastName: "",
   roles: [],
   isAuthenticated: false,
+  hotel: null,
 };
 
 const AppContext = createContext();
@@ -30,28 +38,33 @@ export const AppContextProvider = ({ children }) => {
     user: { current: currentUser, set: setCurrentUser, logout },
   };
 
+  const fetchUserAndHotel = useCallback(async () => {
+    try {
+      const [userData, hotelData] = await Promise.all([
+        getCurrentUser(),
+        getCurrentHotel(),
+      ]);
+
+      const { item: user } = userData || {};
+      const { item: hotel } = hotelData || {};
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      setCurrentUser((prev) => ({
+        ...prev,
+        ...user,
+        hotel: hotel || null,
+      }));
+    } catch (error) {
+      setCurrentUser({ ...defaultUser });
+    }
+  }, []);
+
   useEffect(() => {
-    getCurrentUser()
-      .then((data) => {
-        const { item } = data;
-
-        if (!item) {
-          throw new Error("User not found");
-        }
-        setCurrentUser((prev) => ({
-          ...prev,
-          ...data.item,
-          isAuthenticated: true,
-        }));
-
-        navigate("/home");
-      })
-      .catch(() => {
-        if (currentUser.isAuthenticated) {
-          setCurrentUser({ ...defaultUser });
-        }
-      });
-  }, [currentUser.isAuthenticated, navigate]);
+    fetchUserAndHotel();
+  }, [fetchUserAndHotel]);
 
   return (
     <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
