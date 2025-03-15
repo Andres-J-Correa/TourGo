@@ -56,6 +56,7 @@ export const AppContextProvider = ({ children }) => {
         ...prev,
         ...user,
         hotel: hotel || null,
+        isAuthenticated: true,
       }));
     } catch (error) {
       setCurrentUser({ ...defaultUser });
