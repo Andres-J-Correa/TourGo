@@ -22,8 +22,9 @@ namespace TourGo.Web.Api.Controllers
             _webAuthService = webAuthenticationService;
         }
 
-        [HttpGet("arrival")]
-        public ActionResult<Paged<BookingBase>> GetBookingsByArrivalDate([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int pageIndex, [FromQuery] int pageSize)
+        [HttpGet("arrivals/{hotelId:int}")]
+        //TODO ADD FILTER TO READ HOTEL DATA
+        public ActionResult<Paged<BookingBase>> GetBookingsByArrivalDate([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int pageIndex, [FromQuery] int pageSize, int hotelId)
         {
             int code = 200;
             BaseResponse response;
@@ -31,7 +32,7 @@ namespace TourGo.Web.Api.Controllers
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                Paged<BookingBase>? pagedBookings = _bookingService.GetBookingsByArrivalDate(startDate, endDate, pageIndex, pageSize, userId);
+                Paged<BookingBase>? pagedBookings = _bookingService.GetBookingsByArrivalDate(startDate, endDate, pageIndex, pageSize, userId, hotelId);
 
                 if (pagedBookings != null)
                 {
@@ -53,8 +54,9 @@ namespace TourGo.Web.Api.Controllers
             return StatusCode(code, response);
         }
 
-        [HttpGet("departure")]
-        public ActionResult<Paged<BookingBase>> GetBookingsByDepartureDate([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int pageIndex, [FromQuery] int pageSize)
+        [HttpGet("departures/{hotelId:int}")]
+        //TODO ADD FILTER TO READ HOTEL DATA
+        public ActionResult<Paged<BookingBase>> GetBookingsByDepartureDate([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int pageIndex, [FromQuery] int pageSize, int hotelId)
         {
             int code = 200;
             BaseResponse response;
@@ -62,7 +64,7 @@ namespace TourGo.Web.Api.Controllers
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                Paged<BookingBase>? pagedBookings = _bookingService.GetBookingsByDepartureDate(startDate, endDate, pageIndex, pageSize, userId);
+                Paged<BookingBase>? pagedBookings = _bookingService.GetBookingsByDepartureDate(startDate, endDate, pageIndex, pageSize, userId, hotelId);
 
                 if (pagedBookings != null)
                 {

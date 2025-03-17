@@ -1,38 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHotel } from "@fortawesome/free-solid-svg-icons";
-import { useAppContext } from "contexts/GlobalAppContext";
 
 export const useNavbarItems = () => {
-  const { user } = useAppContext();
-
-  const withHotelItems = [
-    {
-      name: user.current?.hotel?.name,
-      icon: <FontAwesomeIcon icon={faHotel} className="icon" />,
-      main: true,
-      capitalize: true,
-      collapse: [
-        {
-          name: "Paginas",
-          capitalize: true,
-          collapse: [
-            {
-              name: "Inicio",
-              path: "/hotel/home",
-              capitalize: true,
-            },
-            {
-              name: "Reservas",
-              path: "/hotel/reservations",
-              capitalize: true,
-            },
-          ],
-        },
-      ],
-    },
-  ];
-
-  const withoutHotelItems = [
+  const hotelItems = [
     {
       name: "Alojamiento",
       icon: <FontAwesomeIcon icon={faHotel} className="icon" />,
@@ -47,13 +17,11 @@ export const useNavbarItems = () => {
               name: "Registra un alojamiento",
               path: "/hotels/register",
               capitalize: true,
-              isAnonymous: true,
             },
             {
-              name: "Solictud de acceso a un alojamiento",
-              path: "/hotels/access-request",
+              name: "Lista de alojamientos",
+              path: "/hotels",
               capitalize: true,
-              isAnonymous: true,
             },
           ],
         },
@@ -61,9 +29,7 @@ export const useNavbarItems = () => {
     },
   ];
 
-  const items = [
-    ...(user.current?.hotel?.id ? withHotelItems : withoutHotelItems),
-  ];
+  const items = [...hotelItems];
 
   return {
     items,

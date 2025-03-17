@@ -1,7 +1,7 @@
 import React from "react";
 
 const HotelAccessRequest = () => {
-  return <div>HotelAccessRequest</div>;
+  return <div>Accept Invite</div>;
 };
 
 export default HotelAccessRequest;

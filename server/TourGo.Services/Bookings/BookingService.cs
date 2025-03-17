@@ -24,7 +24,7 @@ namespace TourGo.Services.Bookings
             _mySqlDataProvider = dataProvider;
         }
 
-        public Paged<BookingBase>? GetBookingsByArrivalDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize, int userId)
+        public Paged<BookingBase>? GetBookingsByArrivalDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize, int userId, int hotelId)
         {
             Paged<BookingBase>? pagedBookings = null;
             List<BookingBase>? bookings = null;
@@ -38,6 +38,7 @@ namespace TourGo.Services.Bookings
                 coll.AddWithValue("p_pageIndex", pageIndex);
                 coll.AddWithValue("p_pageSize", pageSize);
                 coll.AddWithValue("p_userId", userId);
+                coll.AddWithValue("p_hotelId", hotelId);
             }, (reader, set) =>
             {
                 int index = 0;
@@ -56,7 +57,7 @@ namespace TourGo.Services.Bookings
             return pagedBookings;
         }
 
-        public Paged<BookingBase>? GetBookingsByDepartureDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize, int userId)
+        public Paged<BookingBase>? GetBookingsByDepartureDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize, int userId, int hotelId)
         {
             Paged<BookingBase>? pagedBookings = null;
             List<BookingBase>? bookings = null;
@@ -70,6 +71,7 @@ namespace TourGo.Services.Bookings
                 coll.AddWithValue("p_pageIndex", pageIndex);
                 coll.AddWithValue("p_pageSize", pageSize);
                 coll.AddWithValue("p_userId", userId);
+                coll.AddWithValue("p_hotelId", hotelId);
             }, (reader, set) =>
             {
                 int index = 0;
