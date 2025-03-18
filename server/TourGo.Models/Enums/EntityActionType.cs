@@ -8,8 +8,9 @@ namespace TourGo.Models.Enums
 {
     public enum EntityActionType
     {
-        Write = 1,
-        Read = 2,
-        Delete = 3,
+        Create,
+        Read,
+        Update,
+        Delete
     }
 }

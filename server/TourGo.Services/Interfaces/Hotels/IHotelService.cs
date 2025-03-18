@@ -1,9 +1,10 @@
 ﻿using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Requests.Hotels;
 
 namespace TourGo.Services.Interfaces.Hotels
 {
     public interface IHotelService
     {
-        HotelBase? GetHotel(int userId);
+        int Create(HotelAddRequest model, int userId);
     }
 }
