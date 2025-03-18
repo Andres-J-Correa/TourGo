@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Requests.Hotels;
 using TourGo.Services;
 using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
+using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 
 namespace TourGo.Web.Api.Controllers.Hotels
@@ -21,35 +24,38 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _hotelService = hotelService;
         }
 
-        [HttpGet("current")]
-        public ActionResult<HotelBase> GetHotel()
+        [HttpPost]
+        public ActionResult<ItemResponse<int>> Create(HotelAddRequest model)
         {
-            int code = 200;
-            BaseResponse response;
+            ObjectResult result = null;
 
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                HotelBase? hotel = _hotelService.GetHotel(userId);
 
-                if (hotel != null)
+                int id = _hotelService.Create(model, userId);
+
+                if (id == 0)
                 {
-                    response = new ItemResponse<HotelBase> { Item = hotel };
+                    throw new Exception("Failed to create hotel");
                 }
-                else
-                {
-                    response = new ErrorResponse("No hotel found");
-                    code = 404;
-                }
+
+                ItemResponse<int> response = new ItemResponse<int>() { Item = id };
+                result = Created201(response);
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.Message);
-                code = 500;
-                response = new ErrorResponse(ex.Message);
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse(ex.Message);
+
+                result = StatusCode(500, response);
             }
 
-            return StatusCode(code, response);
+            return result;
         }
     }
+
+    
+
+
 }

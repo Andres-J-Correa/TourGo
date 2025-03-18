@@ -20,16 +20,18 @@ namespace TourGo.Services.Security
         {
             bool isAuthorized = false;
 
-            string proc = $"authorization_{entityType.ToString("G")}_{actionType.ToString("G")}";
+            string proc = $"entity_auth";
 
-            _dataProvider.ExecuteNonQuery(proc, (coll) =>
+            _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
-                coll.AddWithValue("p_userId", userId);
-                coll.AddWithValue("p_entityId", entityId);
+                col.AddWithValue("p_userId", userId);
+                col.AddWithValue("p_entityId", entityId);
+                col.AddWithValue("p_actionType", actionType.ToString().ToLower());
+                col.AddWithValue("p_entityTypeId", (int)entityType);
 
                 MySqlParameter resultOut = new MySqlParameter("@p_isAuthorized", MySqlDbType.Bit);
                 resultOut.Direction = ParameterDirection.Output;
-                coll.Add(resultOut);
+                col.Add(resultOut);
 
             }, (returnColl) =>
             {

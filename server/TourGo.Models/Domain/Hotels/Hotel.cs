@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TourGo.Models.Domain.Hotels
 {
-    public class HotelBase
+    public class Hotel
     {
         public int Id { get; set; }
         public string Name { get; set; }

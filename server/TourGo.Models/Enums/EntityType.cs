@@ -8,9 +8,10 @@ namespace TourGo.Models.Enums
 {
     public enum EntityType
     {
-        User = 1,
-        Hotel = 2,
-        Room = 3,
-        Booking = 4,
+        Hotels = 1,
+        Rooms = 2,
+        Bookings = 3,
+        Financials = 4,
+        Guests = 5,
     }
 }
