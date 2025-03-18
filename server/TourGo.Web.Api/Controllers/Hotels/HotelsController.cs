@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Enums;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services;
 using TourGo.Services.Interfaces.Hotels;
@@ -53,9 +54,43 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return result;
         }
+
+        [HttpGet("{id:int}")]
+        [EntityAuth(EntityType.Hotels, EntityActionType.Read)]
+        public ActionResult<ItemResponse<Hotel>> Get(int id)
+        {
+            int iCode = 200;
+            BaseResponse response;
+
+            try
+            {
+                Hotel ? hotel = _hotelService.GetById(id);
+
+                if (hotel == null)
+                {
+                    iCode = 404;
+                    response = new ErrorResponse("Application Resource not found.");
+                }
+                else
+                {
+                    response = new ItemResponse<Hotel> { Item = hotel };
+                }
+            }
+            catch (Exception ex)
+            {
+
+                iCode = 500;
+                base.Logger.LogError(ex.ToString());
+                response = new ErrorResponse($"Generic Error: {ex.Message}");
+            }
+
+            return StatusCode(iCode, response);
+        }
+
+
     }
 
-    
+
 
 
 }

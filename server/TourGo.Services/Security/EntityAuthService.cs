@@ -27,15 +27,16 @@ namespace TourGo.Services.Security
                 col.AddWithValue("p_userId", userId);
                 col.AddWithValue("p_entityId", entityId);
                 col.AddWithValue("p_actionType", actionType.ToString().ToLower());
-                col.AddWithValue("p_entityTypeId", (int)entityType);
+                col.AddWithValue("p_resourceTypeId", (int)entityType);
 
-                MySqlParameter resultOut = new MySqlParameter("@p_isAuthorized", MySqlDbType.Bit);
+                MySqlParameter resultOut = new MySqlParameter("p_isAuthorized", MySqlDbType.Bit);
                 resultOut.Direction = ParameterDirection.Output;
                 col.Add(resultOut);
 
             }, (returnColl) =>
             {
-                isAuthorized = (bool)returnColl["p_isAuthorized"].Value;
+                object resultObj = returnColl["p_isAuthorized"].Value;
+                isAuthorized = Convert.ToInt32(resultObj) == 1;
             });
 
             return isAuthorized;
