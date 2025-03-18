@@ -47,7 +47,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             catch (Exception ex)
             {
                 Logger.LogError(ex.ToString());
-                ErrorResponse response = new ErrorResponse(ex.Message);
+                ErrorResponse response = new ErrorResponse();
 
                 result = StatusCode(500, response);
             }
@@ -81,13 +81,44 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 iCode = 500;
                 base.Logger.LogError(ex.ToString());
-                response = new ErrorResponse($"Generic Error: {ex.Message}");
+                response = new ErrorResponse();
             }
 
             return StatusCode(iCode, response);
         }
 
 
+        [HttpGet]
+        public ActionResult<ItemResponse<List<Hotel>>> GetUserHotels()
+        {
+            int iCode = 200;
+            BaseResponse response;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                List<Hotel>? hotels = _hotelService.GetUserHotels(userId);
+
+                if (hotels == null)
+                {
+                    iCode = 404;
+                    response = new ErrorResponse("Application Resource not found.");
+                }
+                else
+                {
+                    response = new ItemResponse<List<Hotel>> { Item = hotels };
+                }
+            }
+            catch (Exception ex)
+            {
+                iCode = 500;
+                base.Logger.LogError(ex.ToString());
+                response = new ErrorResponse();
+            }
+
+            return StatusCode(iCode, response);
+        }
     }
 
 

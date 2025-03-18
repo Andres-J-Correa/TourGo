@@ -60,7 +60,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 int iCode = 500;
                 Logger.LogError(ex.ToString());
-                ErrorResponse response = new ErrorResponse($"Generic Error: {ex.Message}");
+                ErrorResponse response = new ErrorResponse();
                 result = StatusCode(iCode, response);
             }
 
@@ -87,7 +87,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 int iCode = 500;
                 Logger.LogError(ex.ToString());
-                ErrorResponse response = new ErrorResponse($"Generic Error: {ex.Message}");
+                ErrorResponse response = new ErrorResponse();
                 result = StatusCode(iCode, response);
             }
 
@@ -127,7 +127,7 @@ namespace TourGo.Web.Api.Controllers.Users
             catch (Exception ex)
             {
                 Logger.LogError(ex.ToString());
-                ErrorResponse errorResponse = new ErrorResponse(ex.Message);
+                ErrorResponse errorResponse = new ErrorResponse();
 
                 return StatusCode(500, errorResponse);
             }
@@ -196,7 +196,7 @@ namespace TourGo.Web.Api.Controllers.Users
             {
 
                 Logger.LogError(ex.ToString());
-                ErrorResponse response = new ErrorResponse(ex.Message);
+                ErrorResponse response = new ErrorResponse();
 
                 result = StatusCode(500, response);
             }
@@ -232,7 +232,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 iCode = 500;
                 Logger.LogError(ex.ToString());
-                response = new ErrorResponse($"Generic Error: {ex.Message}");
+                response = new ErrorResponse();
             }
 
             return StatusCode(iCode, response);
@@ -269,7 +269,7 @@ namespace TourGo.Web.Api.Controllers.Users
             {
                 iCode = 500;
                 Logger.LogError(ex.ToString());
-                response = new ErrorResponse($"Generic Error: {ex.Message}");
+                response = new ErrorResponse();
             }
 
             return StatusCode(iCode, response);
@@ -290,7 +290,7 @@ namespace TourGo.Web.Api.Controllers.Users
             {
                 iCode = 500;
                 Logger.LogError(ex.ToString());
-                response = new ErrorResponse($"Generic Error: {ex.Message}");
+                response = new ErrorResponse();
             }
 
             return StatusCode(iCode, response);
@@ -312,7 +312,7 @@ namespace TourGo.Web.Api.Controllers.Users
             catch (Exception ex)
             {
                 Logger.LogError(ex.ToString());
-                ErrorResponse response = new ErrorResponse(ex.Message);
+                ErrorResponse response = new ErrorResponse();
 
                 result = StatusCode(500, response);
             }

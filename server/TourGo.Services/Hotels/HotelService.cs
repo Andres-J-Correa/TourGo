@@ -80,6 +80,28 @@ namespace TourGo.Services.Hotels
             return hotel;
         }
 
+        public List<Hotel>? GetUserHotels(int userId)
+        {
+            string proc = "hotels_select_by_user";
+            List<Hotel>? hotels = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_userId", userId);
+            }, (reader, set) =>
+            {
+                hotels ??= new List<Hotel>();
+
+                int index = 0;
+                Hotel hotel = new();
+                hotel.Id = reader.GetSafeInt32(index++);
+                hotel.Name = reader.GetSafeString(index++);
+                hotels.Add(hotel);
+            });
+
+            return hotels;
+        }
+
         private static Hotel MapHotel(IDataReader reader, ref int index)
         {
             Hotel hotel = new();

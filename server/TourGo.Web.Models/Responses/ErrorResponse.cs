@@ -9,6 +9,12 @@ namespace TourGo.Web.Models.Responses
 
         public int Code { get; set; } = (int)BaseErrorCode.UnknownError;
 
+        public ErrorResponse()
+        {
+            Errors = new List<string>();
+            Errors.Add("An unexpected error occurred while processing your request.");
+            this.IsSuccessful = false;
+        }
         public ErrorResponse(string errMsg)
         {
             Errors = new List<string>();

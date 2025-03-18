@@ -7,5 +7,6 @@ namespace TourGo.Services.Interfaces.Hotels
     {
         int Create(HotelAddRequest model, int userId);
         Hotel? GetById(int id);
+        List<Hotel>? GetUserHotels(int userId);
     }
 }
