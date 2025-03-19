@@ -3,8 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { getAll } from "services/hotelService";
 import { Container, Row, Col, Card } from "reactstrap";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
+import Breadcrumb from "components/commonUI/Breadcrumb";
 import { toast } from "react-toastify";
 import "./hotelsview.css";
+
+const breadcrumbs = [{ label: "Inicio", path: "/" }];
 
 const HotelsView = () => {
   const [hotels, setHotels] = useState([]);
@@ -37,6 +40,7 @@ const HotelsView = () => {
 
   return (
     <Container className="mt-4">
+      <Breadcrumb breadcrumbs={breadcrumbs} active="Hoteles" />
       {isLoading ? (
         <SimpleLoader />
       ) : (

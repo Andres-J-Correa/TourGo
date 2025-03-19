@@ -15,6 +15,7 @@ import * as Yup from "yup";
 import { getByHotelId, add } from "services/roomService";
 import CustomField from "components/commonUI/forms/CustomField";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
+import Breadcrumb from "components/commonUI/Breadcrumb";
 import { toast } from "react-toastify";
 
 // Validation Schema for Formik
@@ -38,6 +39,12 @@ const RoomsView = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { hotelId } = useParams();
+
+  const breadcrumbs = [
+    { label: "Inicio", path: "/" },
+    { label: "Hoteles", path: "/hotels" },
+    { label: "Hotel", path: `/hotels/${hotelId}` },
+  ];
 
   const toggleForm = () => setShowForm((prev) => !prev);
 
@@ -76,6 +83,7 @@ const RoomsView = () => {
 
   return (
     <div className="container mt-4">
+      <Breadcrumb breadcrumbs={breadcrumbs} active="Habitaciones" />
       <Row>
         <h1>Habitaciones</h1>
       </Row>

@@ -3,6 +3,7 @@ import { Row, Col, Table, Card } from "reactstrap";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { faEdit, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Breadcrumb from "components/commonUI/Breadcrumb";
 import { getMinimalById } from "services/hotelService";
 import { toast } from "react-toastify";
 
@@ -43,6 +44,11 @@ const todoList = [
   "Preparar facturas para las salidas del día",
 ];
 
+const breadcrumbs = [
+  { label: "Inicio", path: "/" },
+  { label: "Hoteles", path: "/hotels" },
+];
+
 const HotelLandingPage = () => {
   const [hotel, setHotel] = useState({});
   const { hotelId } = useParams();
@@ -64,6 +70,7 @@ const HotelLandingPage = () => {
 
   return (
     <div className="container mt-4">
+      <Breadcrumb breadcrumbs={breadcrumbs} active="Hotel" />
       {/* Header with Hotel Name and Edit Button */}
       <Row className="align-items-center mb-3">
         <Col>
