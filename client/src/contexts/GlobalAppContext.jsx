@@ -1,15 +1,8 @@
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  useContext,
-  useCallback,
-} from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 
 import { useNavigate } from "react-router-dom";
 
 import { getCurrentUser } from "services/userAuthService";
-import { getCurrentHotel } from "services/hotelService";
 
 import PropTypes from "prop-types";
 
@@ -19,7 +12,6 @@ const defaultUser = {
   lastName: "",
   roles: [],
   isAuthenticated: false,
-  hotel: null,
 };
 
 const AppContext = createContext();
@@ -38,37 +30,28 @@ export const AppContextProvider = ({ children }) => {
     user: { current: currentUser, set: setCurrentUser, logout },
   };
 
-  const fetchUserAndHotel = useCallback(async () => {
-    try {
-      const [userData, hotelData] = await Promise.allSettled([
-        getCurrentUser(),
-        getCurrentHotel(),
-      ]);
-
-      const user = userData.status === "fulfilled" ? userData.value.item : null;
-      const hotel =
-        hotelData.status === "fulfilled" ? hotelData.value.item : null;
-
-      if (!user) {
-        throw new Error("User not found");
-      }
-
-      setCurrentUser((prev) => ({
-        ...prev,
-        ...user,
-        hotel: hotel || null,
-        isAuthenticated: true,
-      }));
-    } catch (error) {
-      setCurrentUser({ ...defaultUser });
-    }
-  }, []);
-
   useEffect(() => {
     if (!currentUser.isAuthenticated) {
-      fetchUserAndHotel();
+      getCurrentUser()
+        .then((data) => {
+          const { item } = data;
+
+          if (!item) {
+            throw new Error("User not found");
+          }
+          setCurrentUser((prev) => ({
+            ...prev,
+            ...data.item,
+            isAuthenticated: true,
+          }));
+        })
+        .catch(() => {
+          if (currentUser.isAuthenticated) {
+            setCurrentUser({ ...defaultUser });
+          }
+        });
     }
-  }, [fetchUserAndHotel, currentUser.isAuthenticated]);
+  }, [currentUser.isAuthenticated, navigate]);
 
   return (
     <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>

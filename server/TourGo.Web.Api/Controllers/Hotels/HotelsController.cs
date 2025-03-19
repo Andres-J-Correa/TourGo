@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using TourGo.Models.Domain;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Hotels;
@@ -55,16 +56,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("details/{id:int}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<Hotel>> Get(int id)
+        public ActionResult<ItemResponse<Hotel>> GetDetails(int id)
         {
             int iCode = 200;
             BaseResponse response;
 
             try
             {
-                Hotel ? hotel = _hotelService.GetById(id);
+                Hotel ? hotel = _hotelService.GetDetails(id);
 
                 if (hotel == null)
                 {
@@ -89,7 +90,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
 
         [HttpGet]
-        public ActionResult<ItemResponse<List<Hotel>>> GetUserHotels()
+        public ActionResult<ItemsResponse<Lookup>> GetUserHotels()
         {
             int iCode = 200;
             BaseResponse response;
@@ -98,7 +99,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
                 int userId = _webAuthService.GetCurrentUserId();
 
-                List<Hotel>? hotels = _hotelService.GetUserHotels(userId);
+                List<Lookup>? hotels = _hotelService.GetUserHotelsMinimal(userId);
 
                 if (hotels == null)
                 {
@@ -107,7 +108,38 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 }
                 else
                 {
-                    response = new ItemResponse<List<Hotel>> { Item = hotels };
+                    response = new ItemsResponse<Lookup> { Items = hotels };
+                }
+            }
+            catch (Exception ex)
+            {
+                iCode = 500;
+                base.Logger.LogError(ex.ToString());
+                response = new ErrorResponse();
+            }
+
+            return StatusCode(iCode, response);
+        }
+
+        [HttpGet("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemResponse<Lookup>> GetMinimal(int id)
+        {
+            int iCode = 200;
+            BaseResponse response;
+
+            try
+            {
+                Lookup? lookup = _hotelService.GetMinimal(id);
+
+                if (lookup == null)
+                {
+                    iCode = 404;
+                    response = new ErrorResponse("Application Resource not found.");
+                }
+                else
+                {
+                    response = new ItemResponse<Lookup> { Item = lookup };
                 }
             }
             catch (Exception ex)

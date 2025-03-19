@@ -11,6 +11,11 @@ const hotelRoutes = [
     path: "/hotels",
     component: lazy(() => import("components/hotels/HotelsView")),
   },
+  {
+    name: "hotelLandingPage",
+    path: "/hotels/:id",
+    component: lazy(() => import("components/hotels/HotelLandingPage")),
+  },
 ];
 
 export const privateRoutes = [...hotelRoutes];

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TourGo.Data;
 using TourGo.Data.Providers;
+using TourGo.Models.Domain;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Requests.Hotels;
@@ -50,9 +51,9 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public Hotel ? GetById(int id)
+        public Hotel ? GetDetails(int id)
         {
-            string proc = "hotels_select_by_id";
+            string proc = "hotels_select_details_by_id";
             Hotel ? hotel = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -80,10 +81,31 @@ namespace TourGo.Services.Hotels
             return hotel;
         }
 
-        public List<Hotel>? GetUserHotels(int userId)
+        public Lookup? GetMinimal(int id)
         {
-            string proc = "hotels_select_by_user";
-            List<Hotel>? hotels = null;
+            string proc = "hotels_select_minimal_by_id";
+
+            Lookup? lookup = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", id);
+            }, (reader, set) =>
+            {
+                int index = 0;
+
+                lookup = new Lookup();
+                lookup.Id = reader.GetSafeInt32(index++);
+                lookup.Name = reader.GetSafeString(index++);
+            });
+
+            return lookup;
+        }
+
+        public List<Lookup>? GetUserHotelsMinimal(int userId)
+        {
+            string proc = "hotels_select_minimal_by_user";
+            List<Lookup>? hotels = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
@@ -91,11 +113,11 @@ namespace TourGo.Services.Hotels
             }, (reader, set) =>
             {
                 int index = 0;
-                Hotel hotel = new();
+                Lookup hotel = new();
                 hotel.Id = reader.GetSafeInt32(index++);
                 hotel.Name = reader.GetSafeString(index++);
 
-                hotels ??= new List<Hotel>();
+                hotels ??= new List<Lookup>();
 
                 hotels.Add(hotel);
             });

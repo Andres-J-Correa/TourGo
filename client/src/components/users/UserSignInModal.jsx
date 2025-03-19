@@ -33,7 +33,7 @@ function UserSignIn({
         throw new Error("User not found");
       }
       toast.success(t("common.success"));
-      navigate("/home");
+      navigate("/hotels");
       toggle();
       user.set((prev) => ({ ...prev, isAuthenticated: true }));
     } catch (error) {
