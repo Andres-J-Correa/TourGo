@@ -16,7 +16,7 @@ namespace TourGo.Services.Security
             _dataProvider = provider;
         }
 
-        public bool IsAuthorized(int userId, int entityId, EntityActionType actionType, EntityType entityType)
+        public bool IsAuthorized(int userId, int entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType)
         {
             bool isAuthorized = false;
 

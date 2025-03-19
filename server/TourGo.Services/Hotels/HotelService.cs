@@ -37,7 +37,7 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_taxId", model.TaxId);
                 param.AddWithValue("p_modifiedBy", userId);
 
-                MySqlParameter newIdOut = new MySqlParameter("@p_newId", MySqlDbType.Int32);
+                MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
                 newIdOut.Direction = ParameterDirection.Output;
                 param.Add(newIdOut);
             }, (returnColl) =>
@@ -90,12 +90,13 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_userId", userId);
             }, (reader, set) =>
             {
-                hotels ??= new List<Hotel>();
-
                 int index = 0;
                 Hotel hotel = new();
                 hotel.Id = reader.GetSafeInt32(index++);
                 hotel.Name = reader.GetSafeString(index++);
+
+                hotels ??= new List<Hotel>();
+
                 hotels.Add(hotel);
             });
 

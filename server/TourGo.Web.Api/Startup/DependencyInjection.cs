@@ -69,6 +69,8 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IBookingService, BookingService>();
             services.AddSingleton<ISecureEntities<int,int>, EntityAuthService>();
             services.AddSingleton<IHotelService, HotelService>();
+            services.AddSingleton<IRoomService, RoomService>();
+            services.AddSingleton<IExtraChargeService, ExtraChargeService>();
 
             GetAllEntities().ForEach(tt =>
             {

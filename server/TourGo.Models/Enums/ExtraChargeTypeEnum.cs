@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace TourGo.Models.Enums
 {
-    public enum EntityActionType
+    public enum  ExtraChargeTypeEnum
     {
-        Create,
-        Read,
-        Update,
-        Delete
+        Percentage = 1,
+        Daily = 2,
+        General = 3
     }
 }

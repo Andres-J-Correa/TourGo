@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TourGo.Services\TourGo.Services.csproj" />
+    <ProjectReference Include="..\TourGo.Web.Models\TourGo.Web.Models.csproj" />
   </ItemGroup>
 
 </Project>
