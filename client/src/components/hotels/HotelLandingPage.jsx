@@ -45,11 +45,11 @@ const todoList = [
 
 const HotelLandingPage = () => {
   const [hotel, setHotel] = useState({});
-  const { id } = useParams();
+  const { hotelId } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    getMinimalById(id)
+    getMinimalById(hotelId)
       .then((res) => {
         if (res.isSuccessful) {
           setHotel(res.item);
@@ -60,7 +60,7 @@ const HotelLandingPage = () => {
           toast.error("Hubo un error al cargar el hotel");
         }
       });
-  }, [id]);
+  }, [hotelId]);
 
   return (
     <div className="container mt-4">
@@ -72,7 +72,7 @@ const HotelLandingPage = () => {
         <Col className="text-end">
           <Link
             className="btn btn-outline-dark"
-            to={`/hotels/${id}/edit`}
+            to={`/hotels/${hotelId}/edit`}
             title="Editar Hotel">
             <FontAwesomeIcon icon={faEdit} size="lg" />
           </Link>
@@ -83,37 +83,37 @@ const HotelLandingPage = () => {
       <Row className="mb-3">
         <Link
           className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${id}/bookings/new`}>
+          to={`/hotels/${hotelId}/bookings/new`}>
           <FontAwesomeIcon icon={faPlus} /> Nueva Reserva
         </Link>
         <Link
           className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${id}/bookings`}>
+          to={`/hotels/${hotelId}/bookings`}>
           Reservas
         </Link>
         <Link
           className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${id}/rooms`}>
+          to={`/hotels/${hotelId}/rooms`}>
           Habitaciones
         </Link>
         <Link
           className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${id}/customers`}>
+          to={`/hotels/${hotelId}/customers`}>
           Clientes
         </Link>
         <Link
           className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${id}/staff`}>
+          to={`/hotels/${hotelId}/staff`}>
           Empleados
         </Link>
         <Link
           className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${id}/finances`}>
+          to={`/hotels/${hotelId}/finances`}>
           Finanzas
         </Link>
         <Link
           className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${id}/extra-charges`}>
+          to={`/hotels/${hotelId}/extra-charges`}>
           Cargos Extra
         </Link>
       </Row>
