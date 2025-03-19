@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Enums;
 using TourGo.Web.Models.Responses;
 
@@ -19,6 +20,7 @@ namespace TourGo.Web.StartUp
                     .Build();
 
                 o.Filters.Add(new AuthorizeFilter(policy));
+                o.Filters.Add(typeof(ModelBindAttribute));
             });
 
             Action<ApiBehaviorOptions> setUpApiBehavior = apiBehaviorOptions =>

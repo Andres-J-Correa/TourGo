@@ -1,0 +1,96 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Enums;
+using TourGo.Models.Requests.Hotels;
+using TourGo.Services;
+using TourGo.Services.Interfaces.Hotels;
+using TourGo.Web.Controllers;
+using TourGo.Web.Core.Filters;
+using TourGo.Web.Models.Responses;
+
+namespace TourGo.Web.Api.Controllers.Hotels
+{
+    [Route("api/rooms")]
+    [ApiController]
+    public class RoomsController : BaseApiController
+    {
+        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IRoomService _roomService;
+
+        public RoomsController(ILogger<RoomsController> logger, 
+                                IWebAuthenticationService<int> webAuthenticationService, 
+                                IRoomService roomService) : base(logger)
+        {
+            _webAuthService = webAuthenticationService;
+            _roomService = roomService;
+        }
+
+        [HttpPost("hotel/{id:int}")]
+        [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Create)]
+        public ActionResult<ItemResponse<int>> Create(RoomAddRequest model)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                int roomId = _roomService.Create(model, userId);
+
+                if (roomId == 0)
+                {
+                    throw new Exception("Failed to create room");
+                }
+
+                ItemResponse<int> response = new ItemResponse<int>() { Item = roomId };
+                result = Created201(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("hotel/{id:int}")]
+        [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemsResponse<Room>> GetByHotel(int id)
+        {
+            int code = 200;
+            BaseResponse response = null;
+
+            try
+            {
+                List<Room>? list = _roomService.GetByHotel(id);
+
+                if (list == null)
+                {
+                    code = 404;
+                    response = new ErrorResponse("App Resource not found.");
+                }
+                else
+                {
+                    response = new ItemsResponse<Room> { Items = list };
+                }
+            }
+            catch (Exception ex)
+            {
+                code = 500;
+                response = new ErrorResponse();
+                Logger.LogError(ex.ToString());
+            }
+
+
+            return StatusCode(code, response);
+
+        }
+
+
+
+    }
+}

@@ -16,9 +16,9 @@ namespace TourGo.Web.Core.Filters
         /// </summary>
         public string EntityIdField { get; set; }
 
-        public EntityType EntityTypeId { get; set; }
+        public EntityTypeEnum EntityTypeId { get; set; }
 
-        public EntityActionType Action { get; set; }
+        public EntityActionTypeEnum Action { get; set; }
 
         public abstract Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next);
 

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TourGo.Data;
 using TourGo.Data.Providers;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Domain.Users;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services.Interfaces.Hotels;
 
@@ -36,7 +37,7 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_taxId", model.TaxId);
                 param.AddWithValue("p_modifiedBy", userId);
 
-                MySqlParameter newIdOut = new MySqlParameter("@p_newId", MySqlDbType.Int32);
+                MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
                 newIdOut.Direction = ParameterDirection.Output;
                 param.Add(newIdOut);
             }, (returnColl) =>
@@ -47,6 +48,71 @@ namespace TourGo.Services.Hotels
             });
 
             return newId;
+        }
+
+        public Hotel ? GetById(int id)
+        {
+            string proc = "hotels_select_by_id";
+            Hotel ? hotel = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", id);
+            }, (reader, set) =>
+            {
+                int index = 0;
+
+                if (set == 0)
+                {
+                    hotel = MapHotel(reader, ref index);
+                }
+                else if(set == 1 && hotel != null)
+                {
+                    UserBase user = new();
+                    index = 0;
+                    user.Id = reader.GetSafeInt32(index++);
+                    user.FirstName = reader.GetSafeString(index++);
+                    user.LastName = reader.GetSafeString(index++);
+                    hotel.Owner = user;
+                }
+            });
+
+            return hotel;
+        }
+
+        public List<Hotel>? GetUserHotels(int userId)
+        {
+            string proc = "hotels_select_by_user";
+            List<Hotel>? hotels = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_userId", userId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                Hotel hotel = new();
+                hotel.Id = reader.GetSafeInt32(index++);
+                hotel.Name = reader.GetSafeString(index++);
+
+                hotels ??= new List<Hotel>();
+
+                hotels.Add(hotel);
+            });
+
+            return hotels;
+        }
+
+        private static Hotel MapHotel(IDataReader reader, ref int index)
+        {
+            Hotel hotel = new();
+            hotel.Id = reader.GetSafeInt32(index++);
+            hotel.Name = reader.GetSafeString(index++);
+            hotel.Phone = reader.GetSafeString(index++);
+            hotel.Address = reader.GetSafeString(index++);
+            hotel.Email = reader.GetSafeString(index++);
+            hotel.TaxId = reader.GetSafeString(index++);
+            return hotel;
         }
     }
 }

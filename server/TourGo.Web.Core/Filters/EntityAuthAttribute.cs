@@ -10,7 +10,7 @@ namespace TourGo.Web.Core.Filters
 {
     public class EntityAuthAttribute : TypeFilterAttribute
     {
-        public EntityAuthAttribute(EntityType entityTypeId, EntityActionType action)
+        public EntityAuthAttribute(EntityTypeEnum entityTypeId, EntityActionTypeEnum action)
             : base(typeof(EntityAuthFilterImplementation))
         {
             Arguments = new object[] { entityTypeId, action };
@@ -20,14 +20,14 @@ namespace TourGo.Web.Core.Filters
         {
             private readonly IIdentityProvider<int> _identityProvider;
             private readonly ISecureEntities<int, int> _entityAuthService;
-            private readonly EntityType _entityTypeId;
-            private readonly EntityActionType _action;
+            private readonly EntityTypeEnum _entityTypeId;
+            private readonly EntityActionTypeEnum _action;
 
             public EntityAuthFilterImplementation(
                 IIdentityProvider<int> identityProvider,
                 ISecureEntities<int, int> entityAuthService,
-                EntityType entityTypeId,
-                EntityActionType action)
+                EntityTypeEnum entityTypeId,
+                EntityActionTypeEnum action)
             {
                 _identityProvider = identityProvider;
                 _entityAuthService = entityAuthService;

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Enums;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services;
 using TourGo.Services.Interfaces.Hotels;
@@ -46,16 +47,81 @@ namespace TourGo.Web.Api.Controllers.Hotels
             catch (Exception ex)
             {
                 Logger.LogError(ex.ToString());
-                ErrorResponse response = new ErrorResponse(ex.Message);
+                ErrorResponse response = new ErrorResponse();
 
                 result = StatusCode(500, response);
             }
 
             return result;
         }
+
+        [HttpGet("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemResponse<Hotel>> Get(int id)
+        {
+            int iCode = 200;
+            BaseResponse response;
+
+            try
+            {
+                Hotel ? hotel = _hotelService.GetById(id);
+
+                if (hotel == null)
+                {
+                    iCode = 404;
+                    response = new ErrorResponse("Application Resource not found.");
+                }
+                else
+                {
+                    response = new ItemResponse<Hotel> { Item = hotel };
+                }
+            }
+            catch (Exception ex)
+            {
+
+                iCode = 500;
+                base.Logger.LogError(ex.ToString());
+                response = new ErrorResponse();
+            }
+
+            return StatusCode(iCode, response);
+        }
+
+
+        [HttpGet]
+        public ActionResult<ItemResponse<List<Hotel>>> GetUserHotels()
+        {
+            int iCode = 200;
+            BaseResponse response;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                List<Hotel>? hotels = _hotelService.GetUserHotels(userId);
+
+                if (hotels == null)
+                {
+                    iCode = 404;
+                    response = new ErrorResponse("Application Resource not found.");
+                }
+                else
+                {
+                    response = new ItemResponse<List<Hotel>> { Item = hotels };
+                }
+            }
+            catch (Exception ex)
+            {
+                iCode = 500;
+                base.Logger.LogError(ex.ToString());
+                response = new ErrorResponse();
+            }
+
+            return StatusCode(iCode, response);
+        }
     }
 
-    
+
 
 
 }

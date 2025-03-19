@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace TourGo.Models.Enums
 {
-    public enum EntityType
+    public enum EntityActionTypeEnum
     {
-        Hotels = 1,
-        Rooms = 2,
-        Bookings = 3,
-        Financials = 4,
-        Guests = 5,
+        Create,
+        Read,
+        Update,
+        Delete
     }
 }

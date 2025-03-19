@@ -48,7 +48,7 @@ namespace TourGo.Web.Api.Controllers
             {
                 Logger.LogError(ex.Message);
                 code = 500;
-                response = new ErrorResponse(ex.Message);
+                response = new ErrorResponse();
             }
 
             return StatusCode(code, response);
@@ -80,7 +80,7 @@ namespace TourGo.Web.Api.Controllers
             {
                 Logger.LogError(ex.Message);
                 code = 500;
-                response = new ErrorResponse(ex.Message);
+                response = new ErrorResponse();
             }
 
             return StatusCode(code, response);
