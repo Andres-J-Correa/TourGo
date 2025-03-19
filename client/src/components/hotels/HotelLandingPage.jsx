@@ -100,6 +100,11 @@ const HotelLandingPage = () => {
         </Link>
         <Link
           className="w-auto me-2 btn btn-outline-dark"
+          to={`/hotels/${hotelId}/calendar`}>
+          Calendario
+        </Link>
+        <Link
+          className="w-auto me-2 btn btn-outline-dark"
           to={`/hotels/${hotelId}/rooms`}>
           Habitaciones
         </Link>
