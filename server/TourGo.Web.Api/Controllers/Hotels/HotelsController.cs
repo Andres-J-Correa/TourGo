@@ -60,7 +60,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
         public ActionResult<ItemResponse<Hotel>> GetDetails(int id)
         {
-            int iCode = 200;
+            int code = 200;
             BaseResponse response;
 
             try
@@ -69,7 +69,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 if (hotel == null)
                 {
-                    iCode = 404;
+                    code = 404;
                     response = new ErrorResponse("Application Resource not found.");
                 }
                 else
@@ -80,19 +80,19 @@ namespace TourGo.Web.Api.Controllers.Hotels
             catch (Exception ex)
             {
 
-                iCode = 500;
+                code = 500;
                 base.Logger.LogError(ex.ToString());
                 response = new ErrorResponse();
             }
 
-            return StatusCode(iCode, response);
+            return StatusCode(code, response);
         }
 
 
         [HttpGet]
         public ActionResult<ItemsResponse<Lookup>> GetUserHotels()
         {
-            int iCode = 200;
+            int code = 200;
             BaseResponse response;
 
             try
@@ -103,7 +103,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 if (hotels == null)
                 {
-                    iCode = 404;
+                    code = 404;
                     response = new ErrorResponse("Application Resource not found.");
                 }
                 else
@@ -113,19 +113,19 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                iCode = 500;
+                code = 500;
                 base.Logger.LogError(ex.ToString());
                 response = new ErrorResponse();
             }
 
-            return StatusCode(iCode, response);
+            return StatusCode(code, response);
         }
 
         [HttpGet("{id:int}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
         public ActionResult<ItemResponse<Lookup>> GetMinimal(int id)
         {
-            int iCode = 200;
+            int code = 200;
             BaseResponse response;
 
             try
@@ -134,7 +134,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 if (lookup == null)
                 {
-                    iCode = 404;
+                    code = 404;
                     response = new ErrorResponse("Application Resource not found.");
                 }
                 else
@@ -144,13 +144,64 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                iCode = 500;
+                code = 500;
                 base.Logger.LogError(ex.ToString());
                 response = new ErrorResponse();
             }
 
-            return StatusCode(iCode, response);
+            return StatusCode(code, response);
         }
+
+        [HttpPut("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> Update(HotelUpdateRequest model)
+        {
+            int code = 200;
+            BaseResponse response = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                _hotelService.Update(model, userId);
+
+                response = new SuccessResponse();
+            }
+            catch (Exception ex)
+            {
+                code = 500;
+                response = new ErrorResponse();
+                Logger.LogError(ex.ToString());
+            }
+
+            return StatusCode(code, response);
+        }
+
+
+        [HttpDelete("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Delete)]
+        public ActionResult<SuccessResponse> Delete(int id)
+        {
+            int code = 200;
+            BaseResponse response = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                _hotelService.Delete(id, userId);
+
+                response = new SuccessResponse();
+            }
+            catch (Exception ex)
+            {
+                code = 500;
+                response = new ErrorResponse();
+                Logger.LogError(ex.ToString());
+            }
+
+            return StatusCode(code, response);
+        }
+
+
     }
 
 

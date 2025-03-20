@@ -22,7 +22,7 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Create(RoomAddRequest model, int userId)
+        public int Create(RoomAddEditRequest model, int userId)
         {
             string proc = "rooms_insert";
             int newId = 0;
@@ -46,6 +46,32 @@ namespace TourGo.Services.Hotels
             });
 
             return newId;
+        }
+
+        public void Update(RoomAddEditRequest model, int userId)
+        {
+            string proc = "rooms_update";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_name", model.Name);
+                param.AddWithValue("p_capacity", model.Capacity);
+                param.AddWithValue("p_description", model.Description);
+                param.AddWithValue("p_roomId", model.Id);
+                param.AddWithValue("p_modifiedBy", userId);
+
+            });
+        }
+
+        public void Delete(int id, int userId)
+        {
+            string proc = "rooms_delete";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_roomId", id);
+            });
         }
 
         public List<Room>? GetByHotel(int hotelId)

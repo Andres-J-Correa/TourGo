@@ -23,7 +23,7 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Create(ExtraChargeAddRequest model, int userId)
+        public int Create(ExtraChargeAddEditRequest model, int userId)
         {
 
             string proc = "extra_charges_insert";
@@ -35,7 +35,7 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_typeId", model.TypeId);
                 param.AddWithValue("p_amount", model.Amount);
                 param.AddWithValue("p_hotelId", model.Id);
-                param.AddWithValue("p_userId", userId);
+                param.AddWithValue("p_modifiedBy", userId);
 
                 MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
                 newIdOut.Direction = System.Data.ParameterDirection.Output;
@@ -48,6 +48,31 @@ namespace TourGo.Services.Hotels
             });
 
             return newId;
+        }
+
+        public void Update(ExtraChargeAddEditRequest model, int userId)
+        {
+
+            string proc = "extra_charges_update";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_name", model.Name);
+                param.AddWithValue("p_typeId", model.TypeId);
+                param.AddWithValue("p_amount", model.Amount);
+                param.AddWithValue("p_extraChargeId", model.Id);
+                param.AddWithValue("p_modifiedBy", userId);
+            });
+        }
+        public void Delete(int id, int userId)
+        {
+            string proc = "extra_charges_delete";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_extraChargeId", id);
+            });
         }
 
         public List<ExtraCharge>? GetByHotel(int hotelId)
