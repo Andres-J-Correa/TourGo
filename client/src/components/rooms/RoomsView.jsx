@@ -61,7 +61,7 @@ const RoomsView = () => {
         }
       })
       .catch((err) => {
-        if (err.response.status !== 404) {
+        if (err?.response?.status !== 404) {
           toast.error("Hubo un error al cargar las habitaciones");
         }
       })

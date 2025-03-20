@@ -1,23 +1,102 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Button, Row, Col, FormGroup, Label, Input } from "reactstrap";
-import { Formik, Form, Field } from "formik";
-import { getDetailsById } from "services/hotelService";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button, Row, Col, Spinner } from "reactstrap";
+import { Formik, Form } from "formik";
+import CustomField from "components/commonUI/forms/CustomField";
+import { getDetailsById, updateById, deleteById } from "services/hotelService";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import Breadcrumbs from "components/commonUI/Breadcrumb";
+import { addValidationSchema } from "./constants";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const HotelEdit = () => {
   const { hotelId } = useParams();
   const [hotel, setHotel] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const navigate = useNavigate();
 
   const breadcrumbs = [
     { label: "Inicio", path: "/" },
     { label: "Hoteles", path: "/hotels" },
     { label: "Hotel", path: `/hotels/${hotelId}` },
   ];
+
+  // Handles form cancel action
+  const handleCancel = (resetForm) => {
+    resetForm();
+    setIsEditing(false);
+  };
+
+  const updateHotel = (values) => {
+    setIsUploading(true);
+    updateById(values, hotelId)
+      .then((res) => {
+        if (res.isSuccessful) {
+          setHotel((prev) => ({ ...prev, ...values }));
+          toast.success("Hotel actualizado con éxito");
+          setIsEditing(false);
+        }
+      })
+      .catch(() => {
+        toast.error("Hubo un error al actualizar el hotel");
+      })
+      .finally(() => setIsUploading(false));
+  };
+
+  const handleSubmit = (values) => {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Quieres actualizar los datos del hotel?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        updateHotel(values);
+      }
+    });
+  };
+
+  const deletehotel = () => {
+    setIsUploading(true);
+    deleteById(hotelId)
+      .then((res) => {
+        if (res.isSuccessful) {
+          toast.success("Hotel eliminado con éxito");
+          setTimeout(() => {
+            navigate("/hotels");
+          }, 2000);
+        }
+      })
+      .catch(() => {
+        toast.error("Hubo un error al eliminar el hotel");
+      })
+      .finally(() => setIsUploading(false));
+  };
+
+  const handleDelete = () => {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Quieres eliminar este hotel?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deletehotel();
+      }
+    });
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -28,18 +107,12 @@ const HotelEdit = () => {
         }
       })
       .catch((err) => {
-        if (err.response.status !== 404) {
+        if (err?.response?.status !== 404) {
           toast.error("Hubo un error al cargar los detalles del hotel");
         }
       })
       .finally(() => setIsLoading(false));
   }, [hotelId]);
-
-  // Handles form cancel action
-  const handleCancel = (resetForm) => {
-    resetForm();
-    setIsEditing(false);
-  };
 
   return (
     <div className="container mt-4">
@@ -60,95 +133,77 @@ const HotelEdit = () => {
               email: hotel?.email,
               taxId: hotel?.taxId,
             }}
-            onSubmit={() => {}} // Empty function for now
+            validationSchema={addValidationSchema}
+            onSubmit={handleSubmit}
             enableReinitialize>
             {({ resetForm }) => (
               <Form>
                 <Row>
                   <Col md="6">
-                    <FormGroup>
-                      <Label>Nombre</Label>
-                      <Field
-                        name="name"
-                        type="text"
-                        as={Input}
-                        className="form-control"
-                        disabled={!isEditing}
-                      />
-                    </FormGroup>
+                    <CustomField
+                      name="name"
+                      type="text"
+                      placeholder="Nombre del Hotel"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
                   </Col>
 
                   <Col md="6">
-                    <FormGroup>
-                      <Label>Teléfono</Label>
-                      <Field
-                        name="phone"
-                        type="text"
-                        as={Input}
-                        className="form-control"
-                        disabled={!isEditing}
-                      />
-                    </FormGroup>
+                    <CustomField
+                      name="phone"
+                      type="text"
+                      placeholder="Teléfono"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
                   </Col>
 
                   <Col md="6">
-                    <FormGroup>
-                      <Label>Dirección</Label>
-                      <Field
-                        name="address"
-                        type="text"
-                        as={Input}
-                        className="form-control"
-                        disabled={!isEditing}
-                      />
-                    </FormGroup>
+                    <CustomField
+                      name="address"
+                      type="text"
+                      placeholder="Dirección"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
                   </Col>
 
                   <Col md="6">
-                    <FormGroup>
-                      <Label>Correo Electrónico</Label>
-                      <Field
-                        name="email"
-                        type="email"
-                        as={Input}
-                        className="form-control"
-                        disabled={!isEditing}
-                      />
-                    </FormGroup>
+                    <CustomField
+                      name="email"
+                      type="email"
+                      placeholder="Correo Electrónico"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
                   </Col>
 
                   <Col md="6">
-                    <FormGroup>
-                      <Label>Identificación Fiscal (NIT)</Label>
-                      <Field
-                        name="taxId"
-                        type="text"
-                        as={Input}
-                        className="form-control"
-                        disabled={!isEditing}
-                      />
-                    </FormGroup>
+                    <CustomField
+                      name="taxId"
+                      type="text"
+                      placeholder="Identificación Fiscal (NIT)"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
                   </Col>
                 </Row>
 
                 {/* Action Buttons */}
                 <div className="mt-3">
-                  {!isEditing ? (
-                    <Button
-                      className="bg-dark text-white"
-                      onClick={() => setIsEditing(true)}>
-                      Editar
-                    </Button>
-                  ) : (
+                  {isEditing && (
                     <>
                       <Button
                         type="submit"
-                        className="me-2 bg-success text-white">
-                        Guardar
+                        className="me-2 bg-success text-white"
+                        disabled={isUploading}>
+                        {isUploading ? <Spinner size="sm" /> : "Guardar"}
                       </Button>
                       <Button
                         type="button"
                         className="me-2 bg-secondary text-white"
+                        disabled={isUploading}
                         onClick={() => handleCancel(resetForm)}>
                         Cancelar
                       </Button>
@@ -158,6 +213,24 @@ const HotelEdit = () => {
               </Form>
             )}
           </Formik>
+          {!isEditing && (
+            <>
+              <Button
+                className="bg-dark text-white"
+                type="button"
+                disabled={isUploading}
+                onClick={() => setIsEditing(true)}>
+                Editar
+              </Button>
+              <Button
+                className="ms-2 bg-danger text-white"
+                type="button"
+                onClick={handleDelete}
+                disabled={isUploading}>
+                {isUploading ? <Spinner size="sm" /> : "Eliminar Hotel"}
+              </Button>
+            </>
+          )}
           {/* Hotel Info (Read-only Fields) */}
           <Row className="mb-3">
             <Col md="6">

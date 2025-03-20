@@ -56,7 +56,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpGet("hotel/{id:int}")]
-        [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Read)]
+        [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<ExtraCharge>> GetByHotel(int id)
         {
             int code = 200;

@@ -16,7 +16,7 @@ namespace TourGo.Services.Security
             _dataProvider = provider;
         }
 
-        public bool IsAuthorized(int userId, int entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType)
+        public bool IsAuthorized(int userId, int entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType, bool isBulk)
         {
             bool isAuthorized = false;
 
@@ -27,6 +27,7 @@ namespace TourGo.Services.Security
                 col.AddWithValue("p_userId", userId);
                 col.AddWithValue("p_entityId", entityId);
                 col.AddWithValue("p_actionType", actionType.ToString().ToLower());
+                col.AddWithValue("p_isBulk", isBulk ? 1 : 0);
                 col.AddWithValue("p_resourceTypeId", (int)entityType);
 
                 MySqlParameter resultOut = new MySqlParameter("p_isAuthorized", MySqlDbType.Bit);

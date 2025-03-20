@@ -46,7 +46,6 @@ const ExtraChargesView = () => {
   const handleAddExtraCharge = async (values) => {
     try {
       if (Number(values.typeId) === 1) values.amount = values.amount / 100;
-      debugger;
       setIsUploading(true);
       const res = await add(values, hotelId);
       if (res.isSuccessful && res.item > 0) {
@@ -71,7 +70,7 @@ const ExtraChargesView = () => {
         }
       })
       .catch((err) => {
-        if (err.response.status !== 404) {
+        if (err?.response?.status !== 404) {
           toast.error("Hubo un error al cargar los cargos adicionales");
         }
       })
