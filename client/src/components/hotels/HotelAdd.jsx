@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
-import * as Yup from "yup";
 import { Button, Spinner, Row, Col } from "reactstrap";
 import { add } from "services/hotelService";
 import { toast } from "react-toastify";
 import CustomField from "components/commonUI/forms/CustomField";
+import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import Breadcrumb from "components/commonUI/Breadcrumb";
+import { addValidationSchema } from "./constants";
 
 const breadcrumbs = [
   { label: "Inicio", path: "/" },
@@ -18,22 +19,6 @@ const HotelAdd = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   // Validation Schema
-  const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .required("El nombre es obligatorio")
-      .max(100, "Máximo 100 caracteres"),
-    phone: Yup.string()
-      .required("El teléfono es obligatorio")
-      .max(20, "Máximo 20 caracteres"),
-    address: Yup.string()
-      .required("La dirección es obligatoria")
-      .max(200, "Máximo 200 caracteres"),
-    email: Yup.string()
-      .required("El correo electrónico es obligatorio")
-      .email("Formato de correo inválido")
-      .max(100),
-    taxId: Yup.string().required("El ID Fiscal es obligatorio").max(100),
-  });
 
   // Form Submission
   const handleAddHotel = async (values) => {
@@ -66,7 +51,7 @@ const HotelAdd = () => {
           email: "",
           taxId: "",
         }}
-        validationSchema={validationSchema}
+        validationSchema={addValidationSchema}
         onSubmit={handleAddHotel}>
         <Form>
           <Row>
@@ -114,6 +99,7 @@ const HotelAdd = () => {
                 placeholder="Identificación Fiscal (NIT)"
               />
             </Col>
+            <ErrorAlert />
           </Row>
 
           {/* Submit Button */}
