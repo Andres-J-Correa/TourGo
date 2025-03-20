@@ -11,10 +11,13 @@ namespace TourGo.Models.Requests.Hotels
     public class RoomAddRequest : IModelIdentifier
     {
         public int Id { get; set; } // this is the hotel id
+
         [Required, StringLength(100)]
 		public string Name { get; set; }
+
         [Required, Range(1, 50)]
         public int Capacity { get; set; }
+
         [Required, StringLength(100)]
         public string Description { get; set; }
     }

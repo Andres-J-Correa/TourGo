@@ -15,7 +15,7 @@ export const useNavbarItems = () => {
           collapse: [
             {
               name: "Registra un alojamiento",
-              path: "/hotels/register",
+              path: "/hotels/add",
               capitalize: true,
             },
             {

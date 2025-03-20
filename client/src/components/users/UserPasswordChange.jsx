@@ -5,10 +5,11 @@ import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
 import DefaultHeader from "components/commonUI/headers/DefaultHeader";
 import AuthCard from "components/commonUI/forms/AuthCard";
-import { useUserPasswordChangeSchema } from "components/users/validationSchemas";
+import { userPasswordChangeSchema } from "components/users/validationSchemas";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
 import { changePassword, validateToken } from "services/userAuthService";
+import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import backgroundImage from "assets/images/password-reset-bg.jpg";
 import NoRecords404 from "components/commonUI/errors/NoRecords404";
 
@@ -22,7 +23,7 @@ function UserPasswordChange() {
 
   const navigate = useNavigate();
   const { t, getTranslatedErrorMessage } = useLanguage();
-  const validationSchema = useUserPasswordChangeSchema();
+  const validationSchema = userPasswordChangeSchema;
   const formRef = useRef(null);
 
   const handleSubmit = async (values) => {
@@ -80,8 +81,7 @@ function UserPasswordChange() {
               lg="6"
               md="8"
               sm="10"
-              xs="12"
-            >
+              xs="12">
               <Formik
                 initialValues={{
                   password: "",
@@ -89,8 +89,7 @@ function UserPasswordChange() {
                 }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
-                innerRef={formRef}
-              >
+                innerRef={formRef}>
                 <Form>
                   <CustomField
                     name="password"
@@ -105,13 +104,13 @@ function UserPasswordChange() {
                     className="form-control w-100"
                     placeholder={t("client.passwordChange.confirmPassword")}
                   />
+                  <ErrorAlert />
                   <div className="text-center">
                     <Button
                       type="submit"
                       size="lg"
                       disabled={loading}
-                      className="bg-gradient-success w-100 mt-3 mb-0"
-                    >
+                      className="bg-gradient-success w-100 mt-3 mb-0">
                       {loading ? (
                         <Spinner size="sm" />
                       ) : (
