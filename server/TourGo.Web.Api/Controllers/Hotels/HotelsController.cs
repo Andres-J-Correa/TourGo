@@ -194,7 +194,8 @@ namespace TourGo.Web.Api.Controllers.Hotels
             catch (Exception ex)
             {
                 code = 500;
-                response = new ErrorResponse(ex.Message);
+                response = new ErrorResponse();
+                Logger.LogError(ex.ToString());
             }
 
             return StatusCode(code, response);
