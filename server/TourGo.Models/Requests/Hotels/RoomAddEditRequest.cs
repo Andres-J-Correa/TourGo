@@ -8,9 +8,9 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Hotels
 {
-    public class RoomAddRequest : IModelIdentifier
+    public class RoomAddEditRequest : IModelIdentifier
     {
-        public int Id { get; set; } // this is the hotel id
+        public int Id { get; set; } // this is the hotel id when adding and room id when updating
 
         [Required, StringLength(100)]
 		public string Name { get; set; }

@@ -11,9 +11,9 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Hotels
 {
-    public class ExtraChargeAddRequest : IModelIdentifier
+    public class ExtraChargeAddEditRequest : IModelIdentifier
     {
-        public int Id { get; set; } // this is the hotel id
+        public int Id { get; set; } // this is the hotel id when adding and the charge id when updating
 
         [Required, StringLength(100)]
         public string Name { get; set; }

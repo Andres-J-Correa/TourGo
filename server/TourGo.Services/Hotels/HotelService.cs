@@ -51,7 +51,36 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public Hotel ? GetDetails(int id)
+        public void Update(HotelUpdateRequest model, int userId)
+        {
+
+            string proc = "hotels_update";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_name", model.Name);
+                param.AddWithValue("p_phone", model.Phone);
+                param.AddWithValue("p_address", model.Address);
+                param.AddWithValue("p_email", model.Email);
+                param.AddWithValue("p_taxId", model.TaxId);
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_hotelId", model.Id);
+            });
+
+        }
+
+        public void Delete(int id, int userId)
+        {
+            string proc = "hotels_delete";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_hotelId", id);
+            });
+        }
+
+        public Hotel? GetDetails(int id)
         {
             string proc = "hotels_select_details_by_id";
             Hotel ? hotel = null;

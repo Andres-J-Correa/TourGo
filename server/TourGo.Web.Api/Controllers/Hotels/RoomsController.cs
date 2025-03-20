@@ -4,6 +4,7 @@ using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services;
+using TourGo.Services.Hotels;
 using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
@@ -28,7 +29,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPost("hotel/{id:int}")]
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Create(RoomAddRequest model)
+        public ActionResult<ItemResponse<int>> Create(RoomAddEditRequest model)
         {
             ObjectResult result = null;
 
@@ -90,6 +91,53 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         }
 
+        [HttpPut("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> Update(RoomAddEditRequest model)
+        {
+            int code = 200;
+            BaseResponse response = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                _roomService.Update(model, userId);
+
+                response = new SuccessResponse();
+            }
+            catch (Exception ex)
+            {
+                code = 500;
+                response = new ErrorResponse();
+                Logger.LogError(ex.ToString());
+            }
+
+            return StatusCode(code, response);
+        }
+
+
+        [HttpDelete("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Delete)]
+        public ActionResult<SuccessResponse> Delete(int id)
+        {
+            int code = 200;
+            BaseResponse response = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                _roomService.Delete(id, userId);
+
+                response = new SuccessResponse();
+            }
+            catch (Exception ex)
+            {
+                code = 500;
+                response = new ErrorResponse(ex.Message);
+            }
+
+            return StatusCode(code, response);
+        }
 
 
     }
