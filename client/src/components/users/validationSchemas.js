@@ -1,79 +1,82 @@
 import * as Yup from "yup";
 import { isValidPhoneNumber } from "react-phone-number-input";
-import { useLanguage } from "contexts/LanguageContext";
 
-export const useUserSignInSchema = () => {
-  const { t } = useLanguage();
+export const userSignInSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Debe ingresar un correo electrónico válido.")
+    .max(100, "El correo debe tener máximo 100 caracteres.")
+    .required("El correo electrónico es obligatorio."),
+  password: Yup.string().required("La contraseña es obligatoria."),
+});
 
-  return Yup.object().shape({
-    email: Yup.string()
-      .email(t("yup.email"))
-      .max(100, t("yup.maxLength", { max: 100 }))
-      .required(t("yup.required")),
-    password: Yup.string().required(t("yup.required")),
-  });
-};
+export const userSignUpSchema = Yup.object().shape({
+  firstName: Yup.string()
+    .min(2, "El nombre debe tener mínimo 2 caracteres.")
+    .max(50, "El nombre debe tener máximo 50 caracteres.")
+    .required("El nombre es obligatorio."),
+  lastName: Yup.string()
+    .min(2, "El apellido debe tener mínimo 2 caracteres.")
+    .max(50, "El apellido debe tener máximo 50 caracteres.")
+    .required("El apellido es obligatorio."),
+  email: Yup.string()
+    .required("El correo electrónico es obligatorio.")
+    .email("Debe ingresar un correo electrónico válido.")
+    .max(100, "El correo debe tener máximo 100 caracteres."),
+  phone: Yup.string()
+    .required("El teléfono es obligatorio.")
+    .test(
+      "is-valid-phone",
+      "Debe ingresar un número de teléfono válido.",
+      (value) => isValidPhoneNumber(value)
+    ),
+  password: Yup.string()
+    .min(8, "La contraseña debe tener mínimo 8 caracteres.")
+    .max(50, "La contraseña debe tener máximo 50 caracteres.")
+    .matches(
+      /[a-z]/,
+      "La contraseña debe contener al menos una letra minúscula."
+    )
+    .matches(
+      /[A-Z]/,
+      "La contraseña debe contener al menos una letra mayúscula."
+    )
+    .matches(/\d/, "La contraseña debe contener al menos un número.")
+    .matches(
+      /[^A-Za-z\d]/,
+      "La contraseña debe contener al menos un carácter especial."
+    )
+    .required("La contraseña es obligatoria."),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Las contraseñas deben coincidir.")
+    .required("La confirmación de la contraseña es obligatoria."),
+});
 
-export const useUserSignUpSchema = () => {
-  const { t } = useLanguage();
+export const userPasswordResetSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Debe ingresar un correo electrónico válido.")
+    .max(100, "El correo debe tener máximo 100 caracteres.")
+    .required("El correo electrónico es obligatorio."),
+});
 
-  return Yup.object().shape({
-    firstName: Yup.string()
-      .min(2, t("yup.minLength", { min: 2 }))
-      .max(50, t("yup.maxLength", { max: 50 }))
-      .required(t("yup.required")),
-    lastName: Yup.string()
-      .min(2, t("yup.minLength", { min: 2 }))
-      .max(50, t("yup.maxLength", { max: 50 }))
-      .required(t("yup.required")),
-    email: Yup.string()
-      .required(t("yup.required"))
-      .email(t("yup.email"))
-      .max(100, t("yup.maxLength", { max: 100 })),
-    phone: Yup.string()
-      .required(t("yup.required"))
-      .test("is-valid-phone", t("yup.phone"), (value) =>
-        isValidPhoneNumber(value)
-      ),
-    password: Yup.string()
-      .min(8, t("yup.minLength", { min: 8 }))
-      .max(50, t("yup.maxLength", { max: 50 }))
-      .matches(/[a-z]/, t("yup.password.lowercase"))
-      .matches(/[A-Z]/, t("yup.password.uppercase"))
-      .matches(/\d/, t("yup.password.number"))
-      .matches(/[^A-Za-z\d]/, t("yup.password.special"))
-      .required(t("yup.required")),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], t("yup.confirmPassword"))
-      .required(t("yup.required")),
-  });
-};
-
-export const useUserPasswordResetSchema = () => {
-  const { t } = useLanguage();
-
-  return Yup.object().shape({
-    email: Yup.string()
-      .email(t("yup.email"))
-      .max(100, t("yup.maxLength", { max: 100 }))
-      .required(t("yup.required")),
-  });
-};
-
-export const useUserPasswordChangeSchema = () => {
-  const { t } = useLanguage();
-
-  return Yup.object().shape({
-    password: Yup.string()
-      .min(8, t("yup.minLength", { min: 8 }))
-      .max(50, t("yup.maxLength", { max: 50 }))
-      .matches(/[a-z]/, t("yup.password.lowercase"))
-      .matches(/[A-Z]/, t("yup.password.uppercase"))
-      .matches(/\d/, t("yup.password.number"))
-      .matches(/[^A-Za-z\d]/, t("yup.password.special"))
-      .required(t("yup.required")),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], t("yup.confirmPassword"))
-      .required(t("yup.required")),
-  });
-};
+export const userPasswordChangeSchema = Yup.object().shape({
+  password: Yup.string()
+    .min(8, "La contraseña debe tener mínimo 8 caracteres.")
+    .max(50, "La contraseña debe tener máximo 50 caracteres.")
+    .matches(
+      /[a-z]/,
+      "La contraseña debe contener al menos una letra minúscula."
+    )
+    .matches(
+      /[A-Z]/,
+      "La contraseña debe contener al menos una letra mayúscula."
+    )
+    .matches(/\d/, "La contraseña debe contener al menos un número.")
+    .matches(
+      /[^A-Za-z\d]/,
+      "La contraseña debe contener al menos un carácter especial."
+    )
+    .required("La contraseña es obligatoria."),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Las contraseñas deben coincidir.")
+    .required("La confirmación de la contraseña es obligatoria."),
+});

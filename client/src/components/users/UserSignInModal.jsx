@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { Formik, Form } from "formik";
 import { Button, Spinner } from "reactstrap";
 import CustomField from "components/commonUI/forms/CustomField";
-import { useUserSignInSchema } from "components/users/validationSchemas";
+import { userSignInSchema } from "components/users/validationSchemas";
 import { usersLogin } from "services/userAuthService";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
@@ -11,6 +11,7 @@ import PropTypes from "prop-types";
 import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
 import { useNavigate } from "react-router-dom";
+import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 
 function UserSignIn({
   toggle,
@@ -22,7 +23,7 @@ function UserSignIn({
   const { user } = useAppContext();
   const { t, getTranslatedErrorMessage } = useLanguage();
   const formRef = useRef(null);
-  const validationSchema = useUserSignInSchema();
+  const validationSchema = userSignInSchema;
   const navigate = useNavigate();
 
   const handleSubmit = async (values) => {
@@ -86,6 +87,7 @@ function UserSignIn({
             placeholder={t("client.login.password")}
             autoComplete="current-password"
           />
+          <ErrorAlert />
           <div className="text-end">
             <button
               type="button"

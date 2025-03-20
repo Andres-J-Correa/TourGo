@@ -9,8 +9,9 @@ import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 import CustomField from "components/commonUI/forms/CustomField";
 import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
+import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 
-import { useUserSignUpSchema } from "components/users/validationSchemas";
+import { userSignUpSchema } from "components/users/validationSchemas";
 import { useLanguage } from "contexts/LanguageContext";
 import { usersRegister } from "services/userAuthService";
 import { errorCodes } from "constants/errorCodes";
@@ -30,7 +31,7 @@ const initialValues = {
 
 function SignUpForm({ onSignIn, loading, setLoading }) {
   const { t, getTranslatedErrorMessage } = useLanguage();
-  const validationSchema = useUserSignUpSchema();
+  const validationSchema = userSignUpSchema;
 
   const formRef = useRef(null);
 
@@ -121,6 +122,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
           className="form-control"
           placeholder={t("client.register.confirmPassword")}
         />
+        <ErrorAlert />
         <div className="text-center">
           <Button
             type="submit"

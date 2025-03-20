@@ -6,10 +6,11 @@ import CustomField from "components/commonUI/forms/CustomField";
 import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
 
-import { useUserPasswordResetSchema } from "components/users/validationSchemas";
+import { userPasswordResetSchema } from "components/users/validationSchemas";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
 import { resetPassword } from "services/userAuthService";
+import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import PropTypes from "prop-types";
 
 function UserPasswordResetModal({
@@ -19,7 +20,7 @@ function UserPasswordResetModal({
   setLoading,
   redirectToLogin,
 }) {
-  const validationSchema = useUserPasswordResetSchema();
+  const validationSchema = userPasswordResetSchema;
 
   const { t, getTranslatedErrorMessage } = useLanguage();
 
@@ -58,21 +59,18 @@ function UserPasswordResetModal({
           <span
             className="text-success text-gradient font-weight-bold"
             onClick={onSignIn}
-            role="button"
-          >
+            role="button">
             {t("client.register.login")}?
           </span>
         </p>
-      }
-    >
+      }>
       <Formik
         initialValues={{
           email: "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
-        innerRef={formRef}
-      >
+        innerRef={formRef}>
         <Form>
           <CustomField
             name="email"
@@ -80,13 +78,13 @@ function UserPasswordResetModal({
             className="form-control"
             placeholder={t("client.passwordReset.email")}
           />
+          <ErrorAlert />
           <div className="text-center">
             <Button
               type="submit"
               size="lg"
               disabled={loading}
-              className="bg-gradient-success w-100 mt-3 mb-0"
-            >
+              className="bg-gradient-success w-100 mt-3 mb-0">
               {loading ? (
                 <Spinner size="sm" />
               ) : (

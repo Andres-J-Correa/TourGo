@@ -10,3 +10,16 @@
 .custom-error-message:hover {
   transform: translateY(-50%) scale(1.2);
 }
+
+.password-toggle-icon {
+  cursor: pointer;
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.2s ease-in-out;
+}
+
+.tooltip-icon > div {
+  z-index: 3000;
+}

@@ -25,7 +25,7 @@ const AuthCard = ({
         </CardHeader>
         <CardBody className="pb-0">{children}</CardBody>
         {footer && (
-          <CardFooter className="text-center pt-0 px-sm-4 px-1">
+          <CardFooter className="text-center mt-2 pt-0 px-sm-4 px-1">
             {footer}
           </CardFooter>
         )}
