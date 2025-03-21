@@ -155,7 +155,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Update)]
         public ActionResult<SuccessResponse> Update(HotelUpdateRequest model)
-        {
+ {
             int code = 200;
             BaseResponse response = null;
 

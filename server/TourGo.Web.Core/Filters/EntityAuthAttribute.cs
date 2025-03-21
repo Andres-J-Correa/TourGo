@@ -10,10 +10,10 @@ namespace TourGo.Web.Core.Filters
 {
     public class EntityAuthAttribute : TypeFilterAttribute
     {
-        public EntityAuthAttribute(EntityTypeEnum entityTypeId, EntityActionTypeEnum action)
+        public EntityAuthAttribute(EntityTypeEnum entityTypeId, EntityActionTypeEnum action, bool isBulk = false)
             : base(typeof(EntityAuthFilterImplementation))
         {
-            Arguments = new object[] { entityTypeId, action };
+            Arguments = new object[] { entityTypeId, action, isBulk };
         }
 
         private class EntityAuthFilterImplementation : IAsyncActionFilter
@@ -22,17 +22,20 @@ namespace TourGo.Web.Core.Filters
             private readonly ISecureEntities<int, int> _entityAuthService;
             private readonly EntityTypeEnum _entityTypeId;
             private readonly EntityActionTypeEnum _action;
+            private readonly bool _isBulk;
 
             public EntityAuthFilterImplementation(
                 IIdentityProvider<int> identityProvider,
                 ISecureEntities<int, int> entityAuthService,
                 EntityTypeEnum entityTypeId,
-                EntityActionTypeEnum action)
+                EntityActionTypeEnum action,
+                bool isBulk)
             {
                 _identityProvider = identityProvider;
                 _entityAuthService = entityAuthService;
                 _entityTypeId = entityTypeId;
                 _action = action;
+                _isBulk = isBulk;
             }
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -78,14 +81,14 @@ namespace TourGo.Web.Core.Filters
 
                 int userId = _identityProvider.GetCurrentUserId();
 
-                return _entityAuthService.IsAuthorized(userId, id, _action, _entityTypeId);
+                return _entityAuthService.IsAuthorized(userId, id, _action, _entityTypeId, _isBulk);
             }
 
             private void HandleUnauthorizedRequest(ActionExecutingContext context)
             {
                 var unauthorizedResponse = new ObjectResult(new { Message = "Unauthorized Access" })
                 {
-                    StatusCode = (int)HttpStatusCode.Unauthorized
+                    StatusCode = (int)HttpStatusCode.Forbidden
                 };
                 context.Result = unauthorizedResponse;
             }

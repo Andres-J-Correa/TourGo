@@ -22,7 +22,7 @@ const HotelsView = () => {
         setHotels(res.items);
       }
     } catch (error) {
-      if (error.response.status !== 404) {
+      if (error?.response?.status !== 404) {
         toast.error("Hubo un error al cargar los hoteles");
       }
     } finally {

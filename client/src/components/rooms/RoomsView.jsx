@@ -11,19 +11,31 @@ import {
   Spinner,
 } from "reactstrap";
 import { Formik, Form } from "formik";
-import { getByHotelId, add } from "services/roomService";
+import {
+  getByHotelId,
+  add,
+  updateById,
+  deleteById,
+} from "services/roomService";
 import CustomField from "components/commonUI/forms/CustomField";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import { toast } from "react-toastify";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import { addValidationSchema } from "./constants";
+import Swal from "sweetalert2";
 
 const RoomsView = () => {
   const [rooms, setRooms] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    name: "",
+    capacity: "",
+    description: "",
+  });
+  const [roomIdToDelete, setRoomIdToDelete] = useState(null);
 
   const { hotelId } = useParams();
 
@@ -33,23 +45,78 @@ const RoomsView = () => {
     { label: "Hotel", path: `/hotels/${hotelId}` },
   ];
 
-  const toggleForm = () => setShowForm((prev) => !prev);
+  const toggleForm = () => {
+    let isHiding = showForm;
+    setShowForm((prev) => !prev);
+    if (isHiding) {
+      setInitialValues({ name: "", capacity: "", description: "" });
+    }
+  };
 
   // Form Submission
-  const handleAddRoom = async (values) => {
+  const handleSubmit = async (values) => {
     try {
       setIsUploading(true);
-      const res = await add(values, hotelId);
-      if (res.isSuccessful && res.item > 0) {
-        setRooms((prev) => [...prev, { id: res.item, ...values }]);
-        setShowForm(false);
-        toast.success("Habitación agregada correctamente");
+      if (values.id) {
+        const res = await updateById(values, values.id);
+        if (res.isSuccessful) {
+          const index = rooms.findIndex((room) => room.id === values.id);
+          const newRooms = [...rooms];
+          newRooms[index] = values;
+          setRooms(newRooms);
+          setShowForm(false);
+          toast.success("Habitación actualizada correctamente");
+        }
+      } else {
+        const res = await add(values, hotelId);
+        if (res.isSuccessful && res.item > 0) {
+          setRooms((prev) => [...prev, { id: res.item, ...values }]);
+          setShowForm(false);
+          toast.success("Habitación agregada correctamente");
+        }
       }
     } catch (error) {
       toast.error("Hubo un error al agregar la habitación");
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleEditRoom = (room) => {
+    setInitialValues(room);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleDeleteRoom = async (id) => {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¡No podrás revertir esto!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          setIsUploading(true);
+          setRoomIdToDelete(id);
+          const res = await deleteById(id);
+          if (res.isSuccessful) {
+            const newRooms = rooms.filter((room) => room.id !== id);
+            setRooms(newRooms);
+            toast.success("Habitación eliminada correctamente");
+          }
+        } catch (error) {
+          toast.error("Hubo un error al eliminar la habitación");
+        } finally {
+          setIsUploading(false);
+          setRoomIdToDelete(null);
+        }
+      }
+    });
   };
 
   useEffect(() => {
@@ -61,7 +128,7 @@ const RoomsView = () => {
         }
       })
       .catch((err) => {
-        if (err.response.status !== 404) {
+        if (err?.response?.status !== 404) {
           toast.error("Hubo un error al cargar las habitaciones");
         }
       })
@@ -76,14 +143,17 @@ const RoomsView = () => {
       </Row>
       {/* Add Room Form */}
       {showForm && (
-        <Card className="mb-4 border-0 shadow-lg">
+        <Card className="border-0 shadow-lg">
           <CardBody className="p-3">
             <CardTitle tag="h5">Nueva Habitación</CardTitle>
             <Formik
-              initialValues={{ name: "", capacity: "", description: "" }}
+              initialValues={initialValues}
               validationSchema={addValidationSchema}
-              onSubmit={handleAddRoom}>
+              onSubmit={handleSubmit}
+              enableReinitialize>
               <Form>
+                <ErrorAlert />
+
                 <Row>
                   <Col md="3">
                     <CustomField
@@ -110,14 +180,15 @@ const RoomsView = () => {
                     />
                   </Col>
                   <Col md="3" className="align-content-center">
-                    <ErrorAlert />
                     <div className="text-center">
                       <Button
                         disabled={isUploading}
                         type="submit"
-                        className="btn bg-success text-white">
+                        className="btn bg-success text-white mb-3">
                         {isUploading ? (
                           <Spinner size="sm" color="light" />
+                        ) : initialValues.id ? (
+                          "Actualizar"
                         ) : (
                           "Agregar"
                         )}
@@ -136,7 +207,9 @@ const RoomsView = () => {
             onClick={toggleForm}
             disabled={isUploading}
             className={
-              showForm ? "btn bg-warning text-white" : "btn bg-dark text-white"
+              showForm
+                ? "btn bg-warning text-white my-4"
+                : "btn bg-dark text-white my-4"
             }>
             {showForm ? "Esconder Formulario" : "Agregar Habitación"}
           </Button>
@@ -158,8 +231,25 @@ const RoomsView = () => {
                     <strong>Descripción:</strong> {room.description}
                   </CardText>
                   <div className="d-flex justify-content-between mt-auto">
-                    <Button color="primary">Editar</Button>
-                    <Button color="danger">Eliminar</Button>
+                    <Button
+                      color="secondary"
+                      outline
+                      disabled={isUploading}
+                      onClick={() => handleEditRoom(room)}>
+                      Editar
+                    </Button>
+
+                    <Button
+                      color="danger"
+                      outline
+                      disabled={isUploading}
+                      onClick={() => handleDeleteRoom(room.id)}>
+                      {isUploading && roomIdToDelete === room.id ? (
+                        <Spinner size="sm" color="danger" />
+                      ) : (
+                        "Eliminar"
+                      )}
+                    </Button>
                   </div>
                 </CardBody>
               </Card>

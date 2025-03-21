@@ -52,3 +52,47 @@ export const add = async (payload, hotelId) => {
     return onGlobalError(error);
   }
 };
+
+/**
+ * @param {{name: string, typeId: number, amount: number}} payload
+ * @param {number} id
+ * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
+ */
+export const updateById = async (payload, id) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${api}/${id}`,
+    data: payload,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+/**
+ * @param {number} id
+ * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
+ */
+export const deleteById = async (id) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "DELETE",
+    url: `${api}/${id}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
