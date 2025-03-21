@@ -77,11 +77,12 @@ const ExtraChargesView = () => {
           toast.success("Cargo adicional actualizado correctamente");
         }
       } else {
-        const res = await add(values, hotelId);
+        const res = await add({ ...values, amount }, hotelId);
         if (res.isSuccessful && res.item > 0) {
           const charge = {
             id: res.item,
             ...values,
+            amount,
             type: { id: values.typeId },
           };
           setExtraCharges((prev) => [...prev, charge]);
@@ -97,42 +98,12 @@ const ExtraChargesView = () => {
   };
 
   const handleEditExtraCharge = async (charge) => {
-    const amount = charge.type.id === 1 ? charge.amount * 100 : charge.amount;
+    const amount =
+      Number(charge.type.id) === 1 ? charge.amount * 100 : charge.amount;
     setInitialValues({ ...charge, typeId: charge.type.id, amount });
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  /*  const handleDeleteRoom = async (id) => {
-      Swal.fire({
-        title: "¿Estás seguro?",
-        text: "¡No podrás revertir esto!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            setIsUploading(true);
-            setRoomIdToDelete(id);
-            const res = await deleteById(id);
-            if (res.isSuccessful) {
-              const newRooms = rooms.filter((room) => room.id !== id);
-              setRooms(newRooms);
-              toast.success("Habitación eliminada correctamente");
-            }
-          } catch (error) {
-            toast.error("Hubo un error al eliminar la habitación");
-          } finally {
-            setIsUploading(false);
-            setRoomIdToDelete(null);
-          }
-        }
-      });
-    }; */
 
   const handleDeleteExtraCharge = async (id) => {
     Swal.fire({
