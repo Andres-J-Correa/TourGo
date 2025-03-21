@@ -50,10 +50,10 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public void Update(ExtraChargeAddEditRequest model, int userId)
+        public int Update(ExtraChargeAddEditRequest model, int userId)
         {
-
-            string proc = "extra_charges_update";
+            int newId = 0;
+            string proc = "extra_charges_update_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -62,7 +62,17 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_amount", model.Amount);
                 param.AddWithValue("p_extraChargeId", model.Id);
                 param.AddWithValue("p_modifiedBy", userId);
+                MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
+                newIdOut.Direction = System.Data.ParameterDirection.Output;
+                param.Add(newIdOut);
+            }, (returnColl) =>
+            {
+                object newIdObj = returnColl["p_newId"].Value;
+
+                newId = int.TryParse(newIdObj.ToString(), out newId) ? newId : 0;
             });
+
+            return newId;
         }
         public void Delete(int id, int userId)
         {

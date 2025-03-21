@@ -69,9 +69,11 @@ const ExtraChargesView = () => {
 
       if (values.id) {
         const res = await updateById({ ...values, amount }, values.id);
-        if (res.isSuccessful) {
+        if (res.isSuccessful && res.item > 0) {
           const updatedCharges = extraCharges.map((charge) =>
-            charge.id === values.id ? { ...charge, ...values, amount } : charge
+            charge.id === values.id
+              ? { ...charge, ...values, amount, id: res.item }
+              : charge
           );
           setExtraCharges(updatedCharges);
           toast.success("Cargo adicional actualizado correctamente");

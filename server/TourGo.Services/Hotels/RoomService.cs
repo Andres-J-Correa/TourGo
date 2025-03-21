@@ -48,9 +48,10 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public void Update(RoomAddEditRequest model, int userId)
+        public int Update(RoomAddEditRequest model, int userId)
         {
-            string proc = "rooms_update";
+            string proc = "rooms_update_v2";
+            int newId = 0;
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -59,8 +60,17 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_description", model.Description);
                 param.AddWithValue("p_roomId", model.Id);
                 param.AddWithValue("p_modifiedBy", userId);
+                MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
+                newIdOut.Direction = ParameterDirection.Output;
+                param.Add(newIdOut);
+            }, (returnColl) =>
+            {
+                object newIdObj = returnColl["p_newId"].Value;
 
+                newId = int.TryParse(newIdObj.ToString(), out newId) ? newId : 0;
             });
+
+            return newId;
         }
 
         public void Delete(int id, int userId)

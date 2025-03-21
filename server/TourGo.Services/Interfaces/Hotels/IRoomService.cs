@@ -7,7 +7,7 @@ namespace TourGo.Services.Interfaces.Hotels
     {
         int Create(RoomAddEditRequest model, int userId);
         List<Room>? GetByHotel(int hotelId);
-        void Update(RoomAddEditRequest model, int userId);
+        int Update(RoomAddEditRequest model, int userId);
         void Delete(int id, int userId);
     }
 }

@@ -88,7 +88,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(ExtraChargeAddEditRequest model)
+        public ActionResult<ItemResponse<int>> Update(ExtraChargeAddEditRequest model)
         {
             int code = 200;
             BaseResponse response = null;
@@ -96,9 +96,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                _extraChargeService.Update(model, userId);
+                int id = _extraChargeService.Update(model, userId);
 
-                response = new SuccessResponse();
+                if (id == 0)
+                {
+                    throw new Exception("Failed to update extra charge");
+                }
+
+                response = new ItemResponse<int>() { Item = id };
             }
             catch (Exception ex)
             {

@@ -55,7 +55,7 @@ export const add = async (payload, hotelId) => {
 /**
  * @param {{name: string, description: string, capacity: number}} payload
  * @param {number} id
- * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
+ * @returns {Promise<{item: number, isSuccessful: boolean, transactionId: string}>}
  */
 export const updateById = async (payload, id) => {
   const config = {

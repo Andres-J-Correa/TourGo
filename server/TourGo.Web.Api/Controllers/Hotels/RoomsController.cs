@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MySqlX.XDevAPI.Common;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Hotels;
@@ -93,7 +94,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(RoomAddEditRequest model)
+        public ActionResult<ItemResponse<int>> Update(RoomAddEditRequest model)
         {
             int code = 200;
             BaseResponse response = null;
@@ -101,9 +102,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                _roomService.Update(model, userId);
+                int roomId = _roomService.Update(model, userId);
 
-                response = new SuccessResponse();
+                if (roomId == 0)
+                {
+                    throw new Exception("Failed to update room");
+                }
+
+                response = new ItemResponse<int> { Item = roomId };
             }
             catch (Exception ex)
             {

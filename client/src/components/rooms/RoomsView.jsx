@@ -59,10 +59,10 @@ const RoomsView = () => {
       setIsUploading(true);
       if (values.id) {
         const res = await updateById(values, values.id);
-        if (res.isSuccessful) {
+        if (res.isSuccessful && res.item > 0) {
           const index = rooms.findIndex((room) => room.id === values.id);
           const newRooms = [...rooms];
-          newRooms[index] = values;
+          newRooms[index] = { ...values, id: res.item };
           setRooms(newRooms);
           setShowForm(false);
           toast.success("Habitación actualizada correctamente");
