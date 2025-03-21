@@ -12,19 +12,31 @@ import {
   InputGroup,
 } from "reactstrap";
 import { Formik, Form } from "formik";
-import { getByHotelId, add } from "services/extraChargeService";
+import {
+  getByHotelId,
+  add,
+  updateById,
+  deleteById,
+} from "services/extraChargeService";
 import CustomField from "components/commonUI/forms/CustomField";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import { toast } from "react-toastify";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import { EXTRA_CHARGE_TYPES, addValidationSchema } from "./constants";
+import Swal from "sweetalert2";
 
 const ExtraChargesView = () => {
   const [extraCharges, setExtraCharges] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    name: "",
+    typeId: "",
+    amount: "",
+  });
+  const [chargeIdToDelete, setChargeIdToDelete] = useState(null);
 
   const { hotelId } = useParams();
 
@@ -34,7 +46,13 @@ const ExtraChargesView = () => {
     { label: "Hotel", path: `/hotels/${hotelId}` },
   ];
 
-  const toggleForm = () => setShowForm((prev) => !prev);
+  const toggleForm = () => {
+    let isHiding = showForm;
+    setShowForm((prev) => !prev);
+    if (isHiding) {
+      setInitialValues({ name: "", typeId: "", amount: "" });
+    }
+  };
 
   // Format Amounts
   const formatAmount = (amount, typeId) => {
@@ -43,22 +61,110 @@ const ExtraChargesView = () => {
   };
 
   // Form Submission
-  const handleAddExtraCharge = async (values) => {
+  const handleSubmit = async (values) => {
     try {
-      if (Number(values.typeId) === 1) values.amount = values.amount / 100;
+      const amount =
+        Number(values.typeId) === 1 ? values.amount / 100 : values.amount;
       setIsUploading(true);
-      const res = await add(values, hotelId);
-      if (res.isSuccessful && res.item > 0) {
-        const charge = { id: res.item, ...values, type: { id: values.typeId } };
-        setExtraCharges((prev) => [...prev, charge]);
-        setShowForm(false);
-        toast.success("Cargo adicional agregado correctamente");
+
+      if (values.id) {
+        const res = await updateById({ ...values, amount }, values.id);
+        if (res.isSuccessful) {
+          const updatedCharges = extraCharges.map((charge) =>
+            charge.id === values.id ? { ...charge, ...values, amount } : charge
+          );
+          setExtraCharges(updatedCharges);
+          toast.success("Cargo adicional actualizado correctamente");
+        }
+      } else {
+        const res = await add(values, hotelId);
+        if (res.isSuccessful && res.item > 0) {
+          const charge = {
+            id: res.item,
+            ...values,
+            type: { id: values.typeId },
+          };
+          setExtraCharges((prev) => [...prev, charge]);
+          toast.success("Cargo adicional agregado correctamente");
+        }
       }
+      setShowForm(false);
     } catch (error) {
       toast.error("Hubo un error al agregar el cargo adicional");
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleEditExtraCharge = async (charge) => {
+    const amount = charge.type.id === 1 ? charge.amount * 100 : charge.amount;
+    setInitialValues({ ...charge, typeId: charge.type.id, amount });
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  /*  const handleDeleteRoom = async (id) => {
+      Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            setIsUploading(true);
+            setRoomIdToDelete(id);
+            const res = await deleteById(id);
+            if (res.isSuccessful) {
+              const newRooms = rooms.filter((room) => room.id !== id);
+              setRooms(newRooms);
+              toast.success("Habitación eliminada correctamente");
+            }
+          } catch (error) {
+            toast.error("Hubo un error al eliminar la habitación");
+          } finally {
+            setIsUploading(false);
+            setRoomIdToDelete(null);
+          }
+        }
+      });
+    }; */
+
+  const handleDeleteExtraCharge = async (id) => {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¡No podrás revertir esto!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          setIsUploading(true);
+          setChargeIdToDelete(id);
+          const res = await deleteById(id);
+          if (res.isSuccessful) {
+            const newCharges = extraCharges.filter(
+              (charge) => charge.id !== id
+            );
+            setExtraCharges(newCharges);
+            toast.success("Cargo adicional eliminado correctamente");
+          }
+        } catch (error) {
+          toast.error("Hubo un error al eliminar el cargo adicional");
+        } finally {
+          setIsUploading(false);
+          setChargeIdToDelete(null);
+        }
+      }
+    });
   };
 
   useEffect(() => {
@@ -86,14 +192,16 @@ const ExtraChargesView = () => {
 
       {/* Add Extra Charge Form */}
       {showForm && (
-        <Card className="mb-4 border-0 shadow-lg">
+        <Card className="border-0 shadow-lg">
           <CardBody className="p-3">
             <CardTitle tag="h5">Nuevo Cargo Adicional</CardTitle>
             <Formik
-              initialValues={{ name: "", typeId: "", amount: "" }}
+              initialValues={initialValues}
               validationSchema={addValidationSchema}
-              onSubmit={handleAddExtraCharge}>
+              onSubmit={handleSubmit}
+              enableReinitialize>
               <Form>
+                <ErrorAlert />
                 <Row>
                   <Col md="4">
                     <CustomField
@@ -129,14 +237,15 @@ const ExtraChargesView = () => {
                   </Col>
 
                   <Col md="4" className="align-content-center">
-                    <ErrorAlert />
                     <div className="text-center">
                       <Button
                         disabled={isUploading}
                         type="submit"
-                        className="btn bg-success text-white">
+                        className="btn bg-success text-white mb-3">
                         {isUploading ? (
                           <Spinner size="sm" color="light" />
+                        ) : initialValues.id ? (
+                          "Actualizar"
                         ) : (
                           "Agregar"
                         )}
@@ -156,7 +265,9 @@ const ExtraChargesView = () => {
             onClick={toggleForm}
             disabled={isUploading}
             className={
-              showForm ? "btn bg-warning text-white" : "btn bg-dark text-white"
+              showForm
+                ? "btn bg-warning text-white my-4"
+                : "btn bg-dark text-white my-4"
             }>
             {showForm ? "Esconder Formulario" : "Agregar Cargo Adicional"}
           </Button>
@@ -188,8 +299,24 @@ const ExtraChargesView = () => {
                     }
                   </CardText>
                   <div className="d-flex justify-content-between mt-auto">
-                    <Button color="primary">Editar</Button>
-                    <Button color="danger">Eliminar</Button>
+                    <Button
+                      color="secondary"
+                      outline
+                      onClick={() => handleEditExtraCharge(charge)}
+                      disabled={isUploading}>
+                      Editar
+                    </Button>
+                    <Button
+                      color="danger"
+                      outline
+                      onClick={() => handleDeleteExtraCharge(charge.id)}
+                      disabled={isUploading}>
+                      {isUploading && chargeIdToDelete === charge.id ? (
+                        <Spinner size="sm" color="danger" />
+                      ) : (
+                        "Eliminar"
+                      )}
+                    </Button>
                   </div>
                 </CardBody>
               </Card>

@@ -83,9 +83,9 @@ const RoomsView = () => {
   };
 
   const handleEditRoom = (room) => {
-    setShowForm(true);
     setInitialValues(room);
-    window.scrollTo(0, 0);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDeleteRoom = async (id) => {
@@ -143,7 +143,7 @@ const RoomsView = () => {
       </Row>
       {/* Add Room Form */}
       {showForm && (
-        <Card className="mb-4 border-0 shadow-lg">
+        <Card className="border-0 shadow-lg">
           <CardBody className="p-3">
             <CardTitle tag="h5">Nueva Habitación</CardTitle>
             <Formik
@@ -152,6 +152,8 @@ const RoomsView = () => {
               onSubmit={handleSubmit}
               enableReinitialize>
               <Form>
+                <ErrorAlert />
+
                 <Row>
                   <Col md="3">
                     <CustomField
@@ -178,12 +180,11 @@ const RoomsView = () => {
                     />
                   </Col>
                   <Col md="3" className="align-content-center">
-                    <ErrorAlert />
                     <div className="text-center">
                       <Button
                         disabled={isUploading}
                         type="submit"
-                        className="btn bg-success text-white">
+                        className="btn bg-success text-white mb-3">
                         {isUploading ? (
                           <Spinner size="sm" color="light" />
                         ) : initialValues.id ? (
@@ -206,7 +207,9 @@ const RoomsView = () => {
             onClick={toggleForm}
             disabled={isUploading}
             className={
-              showForm ? "btn bg-warning text-white" : "btn bg-dark text-white"
+              showForm
+                ? "btn bg-warning text-white my-4"
+                : "btn bg-dark text-white my-4"
             }>
             {showForm ? "Esconder Formulario" : "Agregar Habitación"}
           </Button>
@@ -229,17 +232,20 @@ const RoomsView = () => {
                   </CardText>
                   <div className="d-flex justify-content-between mt-auto">
                     <Button
-                      color="primary"
+                      color="secondary"
+                      outline
+                      disabled={isUploading}
                       onClick={() => handleEditRoom(room)}>
                       Editar
                     </Button>
 
                     <Button
                       color="danger"
+                      outline
                       disabled={isUploading}
                       onClick={() => handleDeleteRoom(room.id)}>
                       {isUploading && roomIdToDelete === room.id ? (
-                        <Spinner size="sm" color="light" />
+                        <Spinner size="sm" color="danger" />
                       ) : (
                         "Eliminar"
                       )}
