@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,6 +13,7 @@ using TourGo.Models.Domain;
 using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Customers;
 using TourGo.Models.Domain.Invoices;
+using TourGo.Models.Requests.Bookings;
 using TourGo.Services.Interfaces.Bookings;
 
 namespace TourGo.Services.Bookings
@@ -90,6 +93,39 @@ namespace TourGo.Services.Bookings
             return pagedBookings;
         }
 
+        public int Add(BookingAddEditRequest model, int userId, int hotelId)
+        {
+            int newId = 0;
+
+            string proc = "bookings_insert";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
+            {
+                coll.AddWithValue("p_customerId", model.CustomerId);
+                coll.AddWithValue("p_externalBookingId", model.ExternalId);
+                coll.AddWithValue("p_bookingProviderId", model.BookingProviderId);
+                coll.AddWithValue("p_arrivalDate", model.ArrivalDate.ToString("yyyy-MM-dd"));
+                coll.AddWithValue("p_departureDate", model.DepartureDate.ToString("yyyy-MM-dd"));
+                coll.AddWithValue("p_eta", model.ETA.ToString("yyyy-MM-ddTHH:mm:ss"));
+                coll.AddWithValue("p_adultGuests", model.AdultGuests);
+                coll.AddWithValue("p_childGuests", model.ChildGuests);
+                coll.AddWithValue("p_notes", model.Notes);
+                coll.AddWithValue("p_modifiedBy", userId);
+                coll.AddWithValue("p_hotelId", hotelId);
+                coll.AddWithValue("p_externalComission", model.ExternalComission);
+                coll.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
+                coll.AddWithValue("p_extraChargesJson", JsonConvert.SerializeObject(model.ExtraCharges));
+
+                MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
+                newIdOut.Direction = ParameterDirection.Output;
+                coll.Add(newIdOut);
+            }, (returnColl) =>
+            {
+                object resultObj = returnColl["p_newId"].Value;
+                newId = Convert.ToInt32(resultObj);
+            });
+
+            return newId;
+        }
         private static BookingBase MapBookingBase(IDataReader reader, ref int index)
         {
             BookingBase booking = new BookingBase();

@@ -2,12 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using TourGo.Models;
 using TourGo.Models.Domain.Bookings;
+using TourGo.Models.Enums;
+using TourGo.Models.Requests.Bookings;
 using TourGo.Services;
 using TourGo.Services.Interfaces.Bookings;
 using TourGo.Web.Controllers;
+using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 
-namespace TourGo.Web.Api.Controllers
+namespace TourGo.Web.Api.Controllers.Bookings
 {
     [Route("api/bookings")]
     [ApiController]
@@ -37,12 +40,12 @@ namespace TourGo.Web.Api.Controllers
                 if (pagedBookings != null)
                 {
                     response = new ItemResponse<Paged<BookingBase>> { Item = pagedBookings };
-                }         
+                }
                 else
                 {
                     response = new ErrorResponse("No bookings found");
                     code = 404;
-                }              
+                }
             }
             catch (Exception ex)
             {
@@ -85,6 +88,39 @@ namespace TourGo.Web.Api.Controllers
 
             return StatusCode(code, response);
         }
+
+        [HttpPost("hotel/{id:int}")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Create)]
+        public ActionResult<ItemResponse<int>> Create(BookingAddEditRequest model)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                int newId = _bookingService.Add(model, userId, model.Id);
+
+                if (newId == 0)
+                {
+                    throw new Exception("Failed to add booking");
+                }
+
+                ItemResponse<int> response = new ItemResponse<int>() { Item = newId };
+
+                result = Created201(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+
 
     }
 }
