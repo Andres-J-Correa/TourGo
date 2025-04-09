@@ -4,9 +4,11 @@ using TourGo.Data;
 using TourGo.Data.Providers;
 using TourGo.Services;
 using TourGo.Services.Bookings;
+using TourGo.Services.Customers;
 using TourGo.Services.Email;
 using TourGo.Services.Hotels;
 using TourGo.Services.Interfaces.Bookings;
+using TourGo.Services.Interfaces.Customers;
 using TourGo.Services.Interfaces.Email;
 using TourGo.Services.Interfaces.Hotels;
 using TourGo.Services.Interfaces.Security;
@@ -71,6 +73,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IHotelService, HotelService>();
             services.AddSingleton<IRoomService, RoomService>();
             services.AddSingleton<IExtraChargeService, ExtraChargeService>();
+            services.AddSingleton<ICustomerService, CustomerService>();
 
             GetAllEntities().ForEach(tt =>
             {

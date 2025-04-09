@@ -12,7 +12,7 @@ namespace TourGo.Models.Enums
         Rooms = 2,
         Bookings = 3,
         Financials = 4,
-        Guests = 5,
+        Customers = 5,
         Charges = 6,
     }
 }
