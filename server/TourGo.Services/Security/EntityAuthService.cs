@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 
 namespace TourGo.Services.Security
 {
-    public class EntityAuthService : ISecureEntities<int, int>
+    public class EntityAuthService : ISecureEntities<int, object>
     {
         private readonly IMySqlDataProvider _dataProvider;
 
@@ -16,29 +16,34 @@ namespace TourGo.Services.Security
             _dataProvider = provider;
         }
 
-        public bool IsAuthorized(int userId, int entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType, bool isBulk)
+        public bool IsAuthorized(int userId, object entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType, bool isBulk)
         {
             bool isAuthorized = false;
 
-            string proc = $"entity_auth";
+            string proc = $"entity_auth_{entityType.ToString().ToLower()}";
 
-            _dataProvider.ExecuteNonQuery(proc, (col) =>
+            try
             {
-                col.AddWithValue("p_userId", userId);
-                col.AddWithValue("p_entityId", entityId);
-                col.AddWithValue("p_actionType", actionType.ToString().ToLower());
-                col.AddWithValue("p_isBulk", isBulk ? 1 : 0);
-                col.AddWithValue("p_resourceTypeId", (int)entityType);
+                _dataProvider.ExecuteNonQuery(proc, (col) =>
+                {
+                    col.AddWithValue("p_userId", userId);
+                    col.AddWithValue("p_entityId", entityId);
+                    col.AddWithValue("p_actionType", actionType.ToString().ToLower());
+                    col.AddWithValue("p_isBulk", isBulk ? 1 : 0);
 
-                MySqlParameter resultOut = new MySqlParameter("p_isAuthorized", MySqlDbType.Bit);
-                resultOut.Direction = ParameterDirection.Output;
-                col.Add(resultOut);
+                    MySqlParameter resultOut = new MySqlParameter("p_isAuthorized", MySqlDbType.Bit);
+                    resultOut.Direction = ParameterDirection.Output;
+                    col.Add(resultOut);
 
-            }, (returnColl) =>
+                }, (returnColl) =>
+                {
+                    object resultObj = returnColl["p_isAuthorized"].Value;
+                    isAuthorized = Convert.ToInt32(resultObj) == 1;
+                });
+            }
+            catch (Exception)
             {
-                object resultObj = returnColl["p_isAuthorized"].Value;
-                isAuthorized = Convert.ToInt32(resultObj) == 1;
-            });
+            }
 
             return isAuthorized;
         }

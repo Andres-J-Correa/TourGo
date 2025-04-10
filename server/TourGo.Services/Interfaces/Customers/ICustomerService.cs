@@ -6,6 +6,6 @@ namespace TourGo.Services.Interfaces.Customers
     public interface ICustomerService
     {
         int Add(CustomerAddEditRequest model, int userId);
-        Customer? GetByDocumentNumber(string documentNumber);
+        Customer? GetByDocumentNumber(string documentNumber, int userId, int hotelId);
     }
 }

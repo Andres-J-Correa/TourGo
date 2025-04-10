@@ -51,7 +51,7 @@ namespace TourGo.Services.Customers
             return newId;
         }
 
-        public Customer? GetByDocumentNumber(string documentNumber)
+        public Customer? GetByDocumentNumber(string documentNumber, int userId, int hotelId)
         {
             string proc = "customers_select_by_document_number";
             Customer customer = null;
@@ -59,6 +59,9 @@ namespace TourGo.Services.Customers
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
                 param.AddWithValue("p_documentNumber", documentNumber);
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_userId", userId);
+
             }, (IDataReader reader, short set) =>
             {
 

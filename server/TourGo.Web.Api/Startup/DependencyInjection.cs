@@ -69,7 +69,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IUserTokenService, UserTokenService>();
             services.AddSingleton<IUserAuthService, UserAuthService>();
             services.AddSingleton<IBookingService, BookingService>();
-            services.AddSingleton<ISecureEntities<int,int>, EntityAuthService>();
+            services.AddSingleton<ISecureEntities<int,object>, EntityAuthService>();
             services.AddSingleton<IHotelService, HotelService>();
             services.AddSingleton<IRoomService, RoomService>();
             services.AddSingleton<IExtraChargeService, ExtraChargeService>();

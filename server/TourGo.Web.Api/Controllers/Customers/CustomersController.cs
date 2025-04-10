@@ -27,16 +27,17 @@ namespace TourGo.Web.Api.Controllers.Customers
             _customerService = customerService;
         }
 
-        [HttpGet("document-number")]
-        //[EntityAuth(EntityTypeEnum.Customers,EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<Customer>> Get(CustomerGetRequest model) 
+        [HttpGet("hotel/{hotelId:int}/dn")]
+        //no need for entityAuth filter, handling auth inside the procedure
+        public ActionResult<ItemResponse<Customer>> Get([FromBody] string id, int hotelId) 
         {
             int iCode = 200;
             BaseResponse response = null;
 
             try
             {
-                Customer? customer = _customerService.GetByDocumentNumber(model.Id);
+                int userId = _webAuthService.GetCurrentUserId();
+                Customer? customer = _customerService.GetByDocumentNumber(id, userId, hotelId);
 
                 if (customer == null)
                 {
@@ -62,7 +63,7 @@ namespace TourGo.Web.Api.Controllers.Customers
 
 
         [HttpPost("hotel/{id:int}")]
-        //[EntityAuth(EntityTypeEnum.Customers, EntityActionTypeEnum.Create)]
+        [EntityAuth(EntityTypeEnum.Customers, EntityActionTypeEnum.Create)]
         public ActionResult<ItemResponse<int>> Add(CustomerAddEditRequest model)
         {
             ObjectResult result = null;
