@@ -12,8 +12,11 @@ using TourGo.Models;
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Customers;
+using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Invoices;
+using TourGo.Models.Domain.Users;
 using TourGo.Models.Requests.Bookings;
+using TourGo.Services.Customers;
 using TourGo.Services.Interfaces;
 
 namespace TourGo.Services.Hotels
@@ -27,70 +30,31 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider = dataProvider;
         }
 
-        public Paged<BookingBase>? GetBookingsByArrivalDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize, int userId, int hotelId)
+        public Booking? GetById(int id)
         {
-            Paged<BookingBase>? pagedBookings = null;
-            List<BookingBase>? bookings = null;
-            int totalCount = 0;
+            string proc = "bookings_select_details_by_id";
+            Booking? booking = null;
 
-            string proc = "bookings_select_byArrivalDate";
-            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
-                coll.AddWithValue("p_startDate", startDate.ToString("yyyy-MM-dd"));
-                coll.AddWithValue("p_endDate", endDate.ToString("yyyy-MM-dd"));
-                coll.AddWithValue("p_pageIndex", pageIndex);
-                coll.AddWithValue("p_pageSize", pageSize);
-                coll.AddWithValue("p_userId", userId);
-                coll.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_bookingId", id);
             }, (reader, set) =>
             {
                 int index = 0;
 
-                BookingBase booking = MapBookingBase(reader, ref index);
-                bookings ??= new List<BookingBase>();
-                bookings.Add(booking);
+                if (set == 0)
+                {
+                    booking = MapBookingBase(reader, ref index);
+                }
 
-                if (totalCount == 0)
-                    totalCount = reader.GetSafeInt32(index++);
+                if (set == 1 && booking != null)
+                {
+                    index = 0;
+                    booking.Customer = CustomerService.MapCustomer(reader, ref index);
+                }  
             });
 
-            if (bookings != null)
-                pagedBookings = new Paged<BookingBase>(bookings, pageIndex, pageSize, totalCount);
-
-            return pagedBookings;
-        }
-
-        public Paged<BookingBase>? GetBookingsByDepartureDate(DateOnly startDate, DateOnly endDate, int pageIndex, int pageSize, int userId, int hotelId)
-        {
-            Paged<BookingBase>? pagedBookings = null;
-            List<BookingBase>? bookings = null;
-            int totalCount = 0;
-
-            string proc = "bookings_select_byDepartureDate";
-            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
-            {
-                coll.AddWithValue("p_startDate", startDate.ToString("yyyy-MM-dd"));
-                coll.AddWithValue("p_endDate", endDate.ToString("yyyy-MM-dd"));
-                coll.AddWithValue("p_pageIndex", pageIndex);
-                coll.AddWithValue("p_pageSize", pageSize);
-                coll.AddWithValue("p_userId", userId);
-                coll.AddWithValue("p_hotelId", hotelId);
-            }, (reader, set) =>
-            {
-                int index = 0;
-
-                BookingBase booking = MapBookingBase(reader, ref index);
-                bookings ??= new List<BookingBase>();
-                bookings.Add(booking);
-
-                if (totalCount == 0)
-                    totalCount = reader.GetSafeInt32(index++);
-            });
-
-            if (bookings != null)
-                pagedBookings = new Paged<BookingBase>(bookings, pageIndex, pageSize, totalCount);
-
-            return pagedBookings;
+            return booking;
         }
 
         public int Add(BookingAddEditRequest model, int userId, int hotelId)
@@ -126,15 +90,65 @@ namespace TourGo.Services.Hotels
 
             return newId;
         }
-        private static BookingBase MapBookingBase(IDataReader reader, ref int index)
+
+        public List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId)
         {
-            BookingBase booking = new BookingBase();
+            string proc = "booking_extra_charges_select_by_booking_id";
+            List<ExtraCharge>? list = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_bookingId", bookingId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                list ??= new List<ExtraCharge>();
+                ExtraCharge extraCharge = ExtraChargeService.MapExtraCharge(reader, ref index);
+                list.Add(extraCharge);
+            });
+
+            return list;
+        }
+
+        public List<RoomBooking>? GetRoomBookingsByBookingId(int bookingId)
+        {
+            string proc = "room_bookings_select_by_booking_id";
+            List<RoomBooking>? list = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_bookingId", bookingId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                list ??= new List<RoomBooking>();
+                RoomBooking roomBooking = MapRoomBooking(reader, ref index);
+                list.Add(roomBooking);
+            });
+
+            return list;
+        }
+
+        private static RoomBooking MapRoomBooking(IDataReader reader, ref int index)
+        {
+            RoomBooking roomBooking = new RoomBooking();
+            roomBooking.Date = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
+            roomBooking.Room = new Room();
+            roomBooking.Room.Id = reader.GetSafeInt32(index++);
+            roomBooking.Room.Name = reader.GetSafeString(index++);
+            roomBooking.BookingId = reader.GetSafeInt32(index++);
+            roomBooking.Price = reader.GetSafeDecimal(index++);
+            return roomBooking;
+        }
+
+        private static Booking MapBookingBase(IDataReader reader, ref int index)
+        {
+            Booking booking = new Booking();
             booking.Id = reader.GetSafeInt32(index++);
-            booking.Customer = new Customer();
-            booking.Customer.Id = reader.GetSafeInt32(index++);
-            booking.Customer.FirstName = reader.GetSafeString(index++);
-            booking.Customer.LastName = reader.GetSafeString(index++);
             booking.ExternalId = reader.GetSafeString(index++);
+            booking.BookingProvider = new Lookup();
+            booking.BookingProvider.Id = reader.GetSafeInt32(index++);
+            booking.BookingProvider.Name = reader.GetSafeString(index++);
             booking.ArrivalDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
             booking.DepartureDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
             booking.ETA = reader.GetSafeUtcDateTime(index++);
@@ -144,14 +158,14 @@ namespace TourGo.Services.Hotels
             booking.Status.Id = reader.GetSafeInt32(index++);
             booking.Status.Name = reader.GetSafeString(index++);
             booking.Notes = reader.GetSafeString(index++);
+            booking.ExternalComission = reader.GetSafeDecimal(index++);
+            booking.Nights = reader.GetSafeInt32(index++);
+            booking.ModifiedBy = new UserBase();
+            booking.ModifiedBy.Id = reader.GetSafeInt32(index++);
+            booking.ModifiedBy.FirstName = reader.GetSafeString(index++);
+            booking.ModifiedBy.LastName = reader.GetSafeString(index++);
             booking.DateCreated = reader.GetSafeDateTime(index++);
             booking.DateModified = reader.GetSafeDateTime(index++);
-            booking.Invoices = new List<Invoice>();
-            Invoice activeInvoice = new Invoice();
-            activeInvoice.Subtotal = reader.GetSafeDecimal(index++);
-            activeInvoice.Charges = reader.GetSafeDecimal(index++);
-            activeInvoice.Paid = reader.GetSafeDecimal(index++);
-            booking.Invoices.Add(activeInvoice);
 
             return booking;
         }

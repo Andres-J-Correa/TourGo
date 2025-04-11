@@ -109,7 +109,7 @@ namespace TourGo.Services.Hotels
 
         }
 
-        private static ExtraCharge MapExtraCharge(IDataReader reader, ref int index)
+        public static ExtraCharge MapExtraCharge(IDataReader reader, ref int index)
         {
             ExtraCharge extraCharge = new ExtraCharge();
             extraCharge.Id = reader.GetSafeInt32(index++);

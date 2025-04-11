@@ -9,7 +9,7 @@ using TourGo.Models.Domain.Users;
 
 namespace TourGo.Models.Domain.Bookings
 {
-    public class BookingBase
+    public class Booking
     {
         public int Id { get; set; }
         public string? ExternalId { get; set; }
@@ -24,7 +24,9 @@ namespace TourGo.Models.Domain.Bookings
         public DateTime DateModified { get; set; }
         public UserBase? ModifiedBy { get; set; }
         public Customer? Customer { get; set; }
-        public List<Invoice>? Invoices { get; set; }
+        public Lookup? BookingProvider { get; set; }
+        public decimal ExternalComission { get; set; }
+        public int Nights { get; set; }
 
     }
 }

@@ -72,7 +72,7 @@ namespace TourGo.Services.Customers
             return customer;
         }
 
-        private static Customer MapCustomer(IDataReader reader, ref int index)
+        public static Customer MapCustomer(IDataReader reader, ref int index)
         {
             return new Customer
             {

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TourGo.Models;
 using TourGo.Models.Domain.Bookings;
+using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Bookings;
 using TourGo.Services;
@@ -23,70 +24,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
         {
             _bookingService = bookingService;
             _webAuthService = webAuthenticationService;
-        }
-
-        [HttpGet("arrivals/{hotelId:int}")]
-        //TODO ADD FILTER TO READ HOTEL DATA
-        public ActionResult<Paged<BookingBase>> GetBookingsByArrivalDate([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int pageIndex, [FromQuery] int pageSize, int hotelId)
-        {
-            int code = 200;
-            BaseResponse response;
-
-            try
-            {
-                int userId = _webAuthService.GetCurrentUserId();
-                Paged<BookingBase>? pagedBookings = _bookingService.GetBookingsByArrivalDate(startDate, endDate, pageIndex, pageSize, userId, hotelId);
-
-                if (pagedBookings != null)
-                {
-                    response = new ItemResponse<Paged<BookingBase>> { Item = pagedBookings };
-                }
-                else
-                {
-                    response = new ErrorResponse("No bookings found");
-                    code = 404;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex.Message);
-                code = 500;
-                response = new ErrorResponse();
-            }
-
-            return StatusCode(code, response);
-        }
-
-        [HttpGet("departures/{hotelId:int}")]
-        //TODO ADD FILTER TO READ HOTEL DATA
-        public ActionResult<Paged<BookingBase>> GetBookingsByDepartureDate([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, [FromQuery] int pageIndex, [FromQuery] int pageSize, int hotelId)
-        {
-            int code = 200;
-            BaseResponse response;
-
-            try
-            {
-                int userId = _webAuthService.GetCurrentUserId();
-                Paged<BookingBase>? pagedBookings = _bookingService.GetBookingsByDepartureDate(startDate, endDate, pageIndex, pageSize, userId, hotelId);
-
-                if (pagedBookings != null)
-                {
-                    response = new ItemResponse<Paged<BookingBase>> { Item = pagedBookings };
-                }
-                else
-                {
-                    response = new ErrorResponse("No bookings found");
-                    code = 404;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex.Message);
-                code = 500;
-                response = new ErrorResponse();
-            }
-
-            return StatusCode(code, response);
         }
 
         [HttpPost("hotel/{id:int}")]
@@ -120,7 +57,98 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
+        [HttpGet("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemResponse<Booking>> GetById(int id)
+        {
+            ObjectResult result = null;
 
+            try
+            {
+                Booking? booking = _bookingService.GetById(id);
+
+                if (booking == null)
+                {
+                    result = NotFound404(new ErrorResponse("Booking not found"));
+                }
+                else
+                {
+                    ItemResponse<Booking> response = new ItemResponse<Booking>() { Item = booking };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("{id:int}/extra-charges")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemResponse<List<ExtraCharge>>> GetExtraCharges(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<ExtraCharge>? extraCharges = _bookingService.GetExtraChargesByBookingId(id);
+
+                if (extraCharges == null)
+                {
+                    result = NotFound404(new ErrorResponse("No extra charges found"));
+                }
+                else
+                {
+                    ItemResponse<List<ExtraCharge>> response = new ItemResponse<List<ExtraCharge>>() { Item = extraCharges };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("{id:int}/room-bookings")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemResponse<List<RoomBooking>>> GetRoomBookings(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<RoomBooking>? roomBookings = _bookingService.GetRoomBookingsByBookingId(id);
+
+                if (roomBookings == null)
+                {
+                    result = NotFound404(new ErrorResponse("No room bookings found"));
+                }
+                else
+                {
+                    ItemResponse<List<RoomBooking>> response = new ItemResponse<List<RoomBooking>>() { Item = roomBookings };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
 
     }
 }
