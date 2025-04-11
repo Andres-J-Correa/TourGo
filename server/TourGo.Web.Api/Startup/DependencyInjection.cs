@@ -3,12 +3,11 @@ using sib_api_v3_sdk.Client;
 using TourGo.Data;
 using TourGo.Data.Providers;
 using TourGo.Services;
-using TourGo.Services.Bookings;
 using TourGo.Services.Customers;
 using TourGo.Services.Email;
+using TourGo.Services.Finances;
 using TourGo.Services.Hotels;
-using TourGo.Services.Interfaces.Bookings;
-using TourGo.Services.Interfaces.Customers;
+using TourGo.Services.Interfaces;
 using TourGo.Services.Interfaces.Email;
 using TourGo.Services.Interfaces.Hotels;
 using TourGo.Services.Interfaces.Security;
@@ -74,6 +73,8 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IRoomService, RoomService>();
             services.AddSingleton<IExtraChargeService, ExtraChargeService>();
             services.AddSingleton<ICustomerService, CustomerService>();
+            services.AddSingleton<ITransactionService, TransactionService>();
+            services.AddSingleton<IInvoiceService, InvoiceService>();
 
             GetAllEntities().ForEach(tt =>
             {

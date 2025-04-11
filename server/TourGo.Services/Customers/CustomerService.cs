@@ -10,7 +10,7 @@ using TourGo.Data.Providers;
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Customers;
 using TourGo.Models.Requests.Customers;
-using TourGo.Services.Interfaces.Customers;
+using TourGo.Services.Interfaces.Hotels;
 
 namespace TourGo.Services.Customers
 {

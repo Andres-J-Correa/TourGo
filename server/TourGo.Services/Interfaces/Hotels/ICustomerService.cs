@@ -1,7 +1,7 @@
 ﻿using TourGo.Models.Domain.Customers;
 using TourGo.Models.Requests.Customers;
 
-namespace TourGo.Services.Interfaces.Customers
+namespace TourGo.Services.Interfaces.Hotels
 {
     public interface ICustomerService
     {

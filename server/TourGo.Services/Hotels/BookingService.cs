@@ -14,9 +14,9 @@ using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Customers;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Requests.Bookings;
-using TourGo.Services.Interfaces.Bookings;
+using TourGo.Services.Interfaces;
 
-namespace TourGo.Services.Bookings
+namespace TourGo.Services.Hotels
 {
     public class BookingService : IBookingService
     {

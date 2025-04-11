@@ -4,12 +4,12 @@ using TourGo.Models.Domain.Customers;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Customers;
 using TourGo.Services;
-using TourGo.Services.Interfaces.Customers;
+using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 
-namespace TourGo.Web.Api.Controllers.Customers
+namespace TourGo.Web.Api.Controllers.Hotels
 {
     [Route("api/customers")]
     [ApiController]
@@ -19,8 +19,8 @@ namespace TourGo.Web.Api.Controllers.Customers
         private readonly ICustomerService _customerService;
 
         public CustomersController(
-            ILogger<CustomersController> logger, 
-            IWebAuthenticationService<int> webAuthenticationService, 
+            ILogger<CustomersController> logger,
+            IWebAuthenticationService<int> webAuthenticationService,
             ICustomerService customerService) : base(logger)
         {
             _webAuthService = webAuthenticationService;
@@ -29,7 +29,7 @@ namespace TourGo.Web.Api.Controllers.Customers
 
         [HttpGet("hotel/{hotelId:int}/dn")]
         //no need for entityAuth filter, handling auth inside the procedure
-        public ActionResult<ItemResponse<Customer>> Get([FromBody] string id, int hotelId) 
+        public ActionResult<ItemResponse<Customer>> Get([FromBody] string id, int hotelId)
         {
             int iCode = 200;
             BaseResponse response = null;
@@ -74,7 +74,7 @@ namespace TourGo.Web.Api.Controllers.Customers
 
                 int id = _customerService.Add(model, userId);
 
-                if(id == 0)
+                if (id == 0)
                 {
                     throw new Exception("Customer was not created");
                 }

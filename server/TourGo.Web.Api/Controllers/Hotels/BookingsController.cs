@@ -5,12 +5,12 @@ using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Bookings;
 using TourGo.Services;
-using TourGo.Services.Interfaces.Bookings;
+using TourGo.Services.Interfaces;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 
-namespace TourGo.Web.Api.Controllers.Bookings
+namespace TourGo.Web.Api.Controllers.Hotels
 {
     [Route("api/bookings")]
     [ApiController]

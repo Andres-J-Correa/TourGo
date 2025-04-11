@@ -2,7 +2,7 @@
 using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Requests.Bookings;
 
-namespace TourGo.Services.Interfaces.Bookings
+namespace TourGo.Services.Interfaces
 {
     public interface IBookingService
     {
