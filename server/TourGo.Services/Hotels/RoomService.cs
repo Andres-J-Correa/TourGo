@@ -22,7 +22,7 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Create(RoomAddEditRequest model, int userId)
+        public int Create(RoomAddUpdateRequest model, int userId)
         {
             string proc = "rooms_insert";
             int newId = 0;
@@ -48,7 +48,7 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public int Update(RoomAddEditRequest model, int userId)
+        public int Update(RoomAddUpdateRequest model, int userId)
         {
             string proc = "rooms_update_v2";
             int newId = 0;

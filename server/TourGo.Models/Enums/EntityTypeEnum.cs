@@ -14,5 +14,6 @@ namespace TourGo.Models.Enums
         Transactions = 4,
         Customers = 5,
         Charges = 6,
+        Invoices = 7,
     }
 }

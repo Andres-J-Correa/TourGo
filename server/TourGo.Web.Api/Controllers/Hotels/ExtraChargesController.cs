@@ -27,7 +27,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPost("hotel/{id:int}")]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Create(ExtraChargeAddEditRequest model)
+        public ActionResult<ItemResponse<int>> Create(ExtraChargeAddUpdateRequest model)
         {
             ObjectResult result = null;
 
@@ -88,7 +88,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Update)]
-        public ActionResult<ItemResponse<int>> Update(ExtraChargeAddEditRequest model)
+        public ActionResult<ItemResponse<int>> Update(ExtraChargeAddUpdateRequest model)
         {
             int code = 200;
             BaseResponse response = null;

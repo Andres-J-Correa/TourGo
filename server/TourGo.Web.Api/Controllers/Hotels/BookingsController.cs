@@ -28,7 +28,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPost("hotel/{id:int}")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Create(BookingAddEditRequest model)
+        public ActionResult<ItemResponse<int>> Create(BookingAddUpdateRequest model)
         {
             ObjectResult result = null;
 

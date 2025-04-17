@@ -8,7 +8,7 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Customers
 {
-    public class CustomerAddEditRequest: IModelIdentifier
+    public class CustomerAddUpdateRequest: IModelIdentifier
     {
         public int Id { get; set; }
 

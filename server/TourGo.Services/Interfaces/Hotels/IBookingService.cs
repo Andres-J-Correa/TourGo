@@ -7,7 +7,7 @@ namespace TourGo.Services.Interfaces
 {
     public interface IBookingService
     {
-        int Add(BookingAddEditRequest model, int userId, int hotelId);
+        int Add(BookingAddUpdateRequest model, int userId, int hotelId);
         Booking? GetById(int id);
         List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByBookingId(int bookingId);

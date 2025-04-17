@@ -57,7 +57,7 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
-        public int Add(BookingAddEditRequest model, int userId, int hotelId)
+        public int Add(BookingAddUpdateRequest model, int userId, int hotelId)
         {
             int newId = 0;
 

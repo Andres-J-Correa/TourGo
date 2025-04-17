@@ -9,7 +9,7 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Bookings
 {
-    public class BookingAddEditRequest: IModelIdentifier
+    public class BookingAddUpdateRequest: IModelIdentifier
     {
 		public int Id { get; set; }
 

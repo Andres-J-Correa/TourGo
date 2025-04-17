@@ -25,22 +25,22 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpPost("hotel/{id:int}")]
-        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<string>> Add(InvoiceAddRequest model)
+        [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Create)]
+        public ActionResult<ItemResponse<int>> Add(InvoiceAddRequest model)
         {
             ObjectResult result = null;
 
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                string? id = _invoiceService.Add(model, userId);
+                int id = _invoiceService.Add(model, userId);
 
-                if( string.IsNullOrEmpty(id) )
+                if (id == 0)
                 {
-                    throw new Exception("Invoice not created");
-                }              
-
-                ItemResponse<string> response = new ItemResponse<string> { Item = id };
+                    throw new Exception("Unable to add invoice. Please try again later.");
+                }
+     
+                ItemResponse<int> response = new ItemResponse<int> { Item = id };
                 result = Created201(response);
             }
             catch (Exception ex)
@@ -52,5 +52,30 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return result;
         }
+
+        [HttpPut("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> Update(InvoiceUpdateRequest model)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                _invoiceService.Update(model, userId);
+
+                SuccessResponse response = new SuccessResponse();
+                result = Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
     }
 }

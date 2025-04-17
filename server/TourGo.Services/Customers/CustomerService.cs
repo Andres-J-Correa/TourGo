@@ -23,7 +23,7 @@ namespace TourGo.Services.Customers
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Add(CustomerAddEditRequest model, int userId)
+        public int Add(CustomerAddUpdateRequest model, int userId)
         {
             string proc = "customers_insert";
             int newId = 0;

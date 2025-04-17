@@ -23,7 +23,7 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Create(ExtraChargeAddEditRequest model, int userId)
+        public int Create(ExtraChargeAddUpdateRequest model, int userId)
         {
 
             string proc = "extra_charges_insert";
@@ -50,7 +50,7 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public int Update(ExtraChargeAddEditRequest model, int userId)
+        public int Update(ExtraChargeAddUpdateRequest model, int userId)
         {
             int newId = 0;
             string proc = "extra_charges_update_v2";
