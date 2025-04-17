@@ -5,7 +5,11 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TourGo.Data;
 using TourGo.Data.Providers;
+using TourGo.Models.Domain;
+using TourGo.Models.Domain.Finances;
+using TourGo.Models.Domain.Users;
 using TourGo.Models.Requests.Finances;
 using TourGo.Services.Interfaces;
 
@@ -57,6 +61,48 @@ namespace TourGo.Services.Finances
             }));
 
             return newId;
+        }
+
+        public static Transaction MapTransaction(IDataReader reader, ref int index)
+        {
+            Transaction transaction = new();
+
+            transaction.Id = reader.GetSafeInt32(index++);
+            transaction.ParentId = reader.GetSafeInt32(index++);
+            transaction.Amount = reader.GetSafeDecimal(index++);
+            transaction.TransactionDate = reader.GetSafeDateTime(index++);
+            transaction.DateCreated = reader.GetSafeDateTime(index++);
+            transaction.CreatedBy = new UserBase();
+            transaction.CreatedBy.Id = reader.GetSafeInt32(index++);
+            transaction.CreatedBy.FirstName = reader.GetSafeString(index++);
+            transaction.CreatedBy.LastName = reader.GetSafeString(index++);
+            transaction.PaymentMethod = new Lookup();
+            transaction.PaymentMethod.Id = reader.GetSafeInt32(index++);
+            transaction.PaymentMethod.Name = reader.GetSafeString(index++);
+            transaction.Category = new Lookup();
+            transaction.Category.Id = reader.GetSafeInt32(index++);
+            transaction.Category.Name = reader.GetSafeString(index++);
+            transaction.Subcategory = new Lookup();
+            transaction.Subcategory.Id = reader.GetSafeInt32(index++);
+            transaction.Subcategory.Name = reader.GetSafeString(index++);
+            transaction.ReferenceNumber = reader.GetSafeString(index++);
+            transaction.Status = new Lookup();
+            transaction.Status.Id = reader.GetSafeInt32(index++);
+            transaction.Status.Name = reader.GetSafeString(index++);
+            transaction.DocumentUrl = reader.GetSafeString(index++);
+            transaction.Description = reader.GetSafeString(index++);
+            transaction.ApprovedBy = new UserBase();
+            transaction.ApprovedBy.Id = reader.GetSafeInt32(index++);
+            transaction.ApprovedBy.FirstName = reader.GetSafeString(index++);
+            transaction.ApprovedBy.LastName = reader.GetSafeString(index++);
+            transaction.CurrencyCode = reader.GetSafeString(index++);
+            transaction.HotelId = reader.GetSafeInt32(index++);
+            transaction.FinancePartner = new Lookup();
+            transaction.FinancePartner.Id = reader.GetSafeInt32(index++);
+            transaction.FinancePartner.Name = reader.GetSafeString(index++);
+            transaction.EntityId = reader.GetSafeInt32(index++);
+
+            return transaction;
         }
     }
 }

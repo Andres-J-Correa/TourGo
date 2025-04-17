@@ -15,7 +15,7 @@ namespace TourGo.Models.Requests.Bookings
 
 		[Required]
 		[Range(1, int.MaxValue)]
-		public int CustomerId { get; set; }
+		public int InvoiceId { get; set; }
 
 		[StringLength(100)]
 		public string ExternalId { get; set; }
@@ -41,8 +41,21 @@ namespace TourGo.Models.Requests.Bookings
 		[StringLength(1000)]
 		public string Notes { get; set; }
 
-		[Range(0, int.MaxValue)]
+		[Range(0, double.MaxValue)]
 		public decimal ExternalComission { get; set; }
+
+        [Required]
+        [Range(0.001, double.MaxValue)]
+        public decimal Subtotal { get; set; }
+
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal Charges { get; set; }
+
+        [Required]
+        [Range(0.001, double.MaxValue)]
+        public decimal Total { get; set; }
+
 		public List<RoomBookingsAddRequest>? RoomBookings { get; set; }
 		public List<BookingExtraChargesAddRequest>? ExtraCharges { get; set; }
     }

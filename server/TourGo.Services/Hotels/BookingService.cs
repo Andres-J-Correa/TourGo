@@ -12,11 +12,13 @@ using TourGo.Models;
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Customers;
+using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Requests.Bookings;
 using TourGo.Services.Customers;
+using TourGo.Services.Finances;
 using TourGo.Services.Interfaces;
 
 namespace TourGo.Services.Hotels
@@ -44,14 +46,22 @@ namespace TourGo.Services.Hotels
 
                 if (set == 0)
                 {
-                    booking = MapBookingBase(reader, ref index);
+                    booking = MapBooking(reader, ref index);
                 }
 
                 if (set == 1 && booking != null)
                 {
                     index = 0;
                     booking.Customer = CustomerService.MapCustomer(reader, ref index);
-                }  
+                }
+
+                if (set == 2 && booking != null)
+                {
+                    index = 0;
+                    Transaction transaction = TransactionService.MapTransaction(reader, ref index);
+                    booking.transactions ??= new List<Transaction>();
+                    booking.transactions.Add(transaction);
+                }
             });
 
             return booking;
@@ -64,7 +74,7 @@ namespace TourGo.Services.Hotels
             string proc = "bookings_insert";
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
-                coll.AddWithValue("p_customerId", model.CustomerId);
+                coll.AddWithValue("p_invoiceId", model.InvoiceId);
                 coll.AddWithValue("p_externalBookingId", model.ExternalId);
                 coll.AddWithValue("p_bookingProviderId", model.BookingProviderId);
                 coll.AddWithValue("p_arrivalDate", model.ArrivalDate.ToString("yyyy-MM-dd"));
@@ -78,6 +88,9 @@ namespace TourGo.Services.Hotels
                 coll.AddWithValue("p_externalComission", model.ExternalComission);
                 coll.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
                 coll.AddWithValue("p_extraChargesJson", JsonConvert.SerializeObject(model.ExtraCharges));
+                coll.AddWithValue("p_subtotal", model.Subtotal);
+                coll.AddWithValue("p_charges", model.Charges);
+                coll.AddWithValue("p_total", model.Total);
 
                 MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
                 newIdOut.Direction = ParameterDirection.Output;
@@ -141,7 +154,7 @@ namespace TourGo.Services.Hotels
             return roomBooking;
         }
 
-        private static Booking MapBookingBase(IDataReader reader, ref int index)
+        private static Booking MapBooking(IDataReader reader, ref int index)
         {
             Booking booking = new Booking();
             booking.Id = reader.GetSafeInt32(index++);
@@ -166,6 +179,10 @@ namespace TourGo.Services.Hotels
             booking.ModifiedBy.LastName = reader.GetSafeString(index++);
             booking.DateCreated = reader.GetSafeDateTime(index++);
             booking.DateModified = reader.GetSafeDateTime(index++);
+            booking.Total = reader.GetSafeDecimal(index++);
+            booking.Subtotal = reader.GetSafeDecimal(index++);
+            booking.Charges = reader.GetSafeDecimal(index++);
+            booking.InvoiceId = reader.GetSafeInt32(index++);
 
             return booking;
         }

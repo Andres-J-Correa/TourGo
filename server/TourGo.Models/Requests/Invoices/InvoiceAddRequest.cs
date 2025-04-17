@@ -24,15 +24,15 @@ namespace TourGo.Models.Requests.Invoices
         public string? Url { get; set; }
 
         [Required]
-        [Range(0.001, double.MaxValue)]
+        [Range(0, double.MaxValue)]
         public decimal Subtotal { get; set; }
 
         [Required]
-        [Range(0.001, double.MaxValue)]
+        [Range(0, double.MaxValue)]
         public decimal Paid { get; set; }
 
         [Required]
-        [Range(0.001, double.MaxValue)]
+        [Range(0, double.MaxValue)]
         public decimal Charges { get; set; }
 
         [Required]
