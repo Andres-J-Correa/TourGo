@@ -15,7 +15,7 @@ namespace TourGo.Models.Requests.Finances
         public int Id { get; set; }
 
         [Range(1, Int32.MaxValue)]
-        public int? InvoiceId { get; set; }
+        public int? EntityId { get; set; }
 
         [Range(1, Int32.MaxValue)]
         public int? ParentId { get; set; }
