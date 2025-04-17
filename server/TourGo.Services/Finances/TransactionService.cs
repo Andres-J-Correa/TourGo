@@ -27,7 +27,7 @@ namespace TourGo.Services.Finances
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
-                col.AddWithValue("p_bookingId", request.BookingId);
+                col.AddWithValue("p_invoiceId", request.InvoiceId > 0 ? request.InvoiceId : DBNull.Value);
                 col.AddWithValue("p_parentId", request.ParentId > 0 ? request.ParentId: DBNull.Value);
                 col.AddWithValue("p_amount", request.Amount);
                 col.AddWithValue("p_transactionDate", request.TransactionDate.ToString("yyyy-MM-dd"));

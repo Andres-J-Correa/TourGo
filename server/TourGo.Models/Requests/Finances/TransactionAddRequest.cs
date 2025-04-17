@@ -14,10 +14,11 @@ namespace TourGo.Models.Requests.Finances
     {
         public int Id { get; set; }
 
-        [Required]
         [Range(1, Int32.MaxValue)]
-        public int BookingId { get; set; }
-        public int ParentId { get; set; }
+        public int? InvoiceId { get; set; }
+
+        [Range(1, Int32.MaxValue)]
+        public int? ParentId { get; set; }
 
         [Required]
         [Range(0.001, double.MaxValue)]
