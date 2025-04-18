@@ -4,9 +4,13 @@ using TourGo.Models;
 using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Enums;
+using TourGo.Models.Enums.Invoices;
 using TourGo.Models.Requests.Bookings;
+using TourGo.Models.Requests.Invoices;
+using TourGo.Models.Responses;
 using TourGo.Services;
 using TourGo.Services.Interfaces;
+using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
@@ -20,7 +24,10 @@ namespace TourGo.Web.Api.Controllers.Hotels
         private readonly IBookingService _bookingService;
         private readonly IWebAuthenticationService<int> _webAuthService;
 
-        public BookingsController(ILogger<BookingsController> logger, IBookingService bookingService, IWebAuthenticationService<int> webAuthenticationService) : base(logger)
+        public BookingsController(ILogger<BookingsController> logger, 
+                                IBookingService bookingService, 
+                                IWebAuthenticationService<int> webAuthenticationService
+                                ) : base(logger)
         {
             _bookingService = bookingService;
             _webAuthService = webAuthenticationService;
@@ -28,7 +35,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPost("hotel/{id:int}")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Create(BookingAddUpdateRequest model)
+        public ActionResult<ItemResponse<BookingAddResponse>> Add(BookingAddUpdateRequest model)
         {
             ObjectResult result = null;
 
@@ -36,14 +43,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
                 int userId = _webAuthService.GetCurrentUserId();
 
-                int newId = _bookingService.Add(model, userId, model.Id);
+                BookingAddResponse? newBooking = _bookingService.Add(model, userId, model.Id);
 
-                if (newId == 0)
+                if (newBooking == null)
                 {
                     throw new Exception("Failed to add booking");
                 }
 
-                ItemResponse<int> response = new ItemResponse<int>() { Item = newId };
+                ItemResponse<BookingAddResponse> response = new ItemResponse<BookingAddResponse>() { Item = newBooking };
 
                 result = Created201(response);
             }

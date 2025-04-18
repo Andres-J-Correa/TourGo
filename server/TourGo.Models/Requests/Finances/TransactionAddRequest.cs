@@ -20,6 +20,9 @@ namespace TourGo.Models.Requests.Finances
         [Range(1, Int32.MaxValue)]
         public int? ParentId { get; set; }
 
+        [Range(1, Int32.MaxValue)]
+        public int? InvoiceId { get; set; }
+
         [Required]
         [Range(0.001, double.MaxValue)]
         public decimal Amount { get; set; }
@@ -41,7 +44,7 @@ namespace TourGo.Models.Requests.Finances
 
         [Required]
         [MinLength(2)]
-        public string ReferenceNumber { get; set; } = string.Empty;
+        public string ReferenceNumber { get; set; }
 
         [Required]
         [ValidEnum(typeof(TransactionStatusEnum))]
@@ -51,11 +54,10 @@ namespace TourGo.Models.Requests.Finances
 
         [Required]
         [MinLength(2)]
-        public string Description { get; set; } = string.Empty;
+        public string Description { get; set; }
 
-        [Required]
         [Iso4217Currency]
-        public string CurrencyCode { get; set; }
+        public string CurrencyCode { get; set; } = "COP"; // Default to COP
 
         [Range(1, Int32.MaxValue)]
         public int? FinancePartnerId { get; set; }

@@ -17,6 +17,7 @@ using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Requests.Bookings;
+using TourGo.Models.Responses;
 using TourGo.Services.Customers;
 using TourGo.Services.Finances;
 using TourGo.Services.Interfaces;
@@ -67,14 +68,14 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
-        public int Add(BookingAddUpdateRequest model, int userId, int hotelId)
+        public BookingAddResponse? Add(BookingAddUpdateRequest model, int userId, int hotelId)
         {
-            int newId = 0;
+            BookingAddResponse? response = null;
 
             string proc = "bookings_insert";
-            _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
+            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
-                coll.AddWithValue("p_invoiceId", model.InvoiceId);
+                coll.AddWithValue("p_customerId", model.CustomerId);
                 coll.AddWithValue("p_externalBookingId", model.ExternalId);
                 coll.AddWithValue("p_bookingProviderId", model.BookingProviderId);
                 coll.AddWithValue("p_arrivalDate", model.ArrivalDate.ToString("yyyy-MM-dd"));
@@ -92,16 +93,15 @@ namespace TourGo.Services.Hotels
                 coll.AddWithValue("p_charges", model.Charges);
                 coll.AddWithValue("p_total", model.Total);
 
-                MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
-                newIdOut.Direction = ParameterDirection.Output;
-                coll.Add(newIdOut);
-            }, (returnColl) =>
+            }, (reader, set) =>
             {
-                object resultObj = returnColl["p_newId"].Value;
-                newId = Convert.ToInt32(resultObj);
+                response = new BookingAddResponse();
+                int index = 0;
+                response.BookingId = reader.GetSafeInt32(index++);
+                response.InvoiceId = reader.GetSafeInt32(index++);
             });
 
-            return newId;
+            return response;
         }
 
         public List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId)

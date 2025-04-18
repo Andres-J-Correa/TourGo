@@ -33,6 +33,7 @@ namespace TourGo.Services.Finances
             {
                 col.AddWithValue("p_entityId", request.EntityId > 0 ? request.EntityId : DBNull.Value);
                 col.AddWithValue("p_parentId", request.ParentId > 0 ? request.ParentId: DBNull.Value);
+                col.AddWithValue("p_invoiceId", request.InvoiceId > 0 ? request.InvoiceId : DBNull.Value);
                 col.AddWithValue("p_amount", request.Amount);
                 col.AddWithValue("p_transactionDate", request.TransactionDate.ToString("yyyy-MM-dd"));
                 col.AddWithValue("p_paymentMethodId", request.PaymentMethodId);
@@ -40,7 +41,7 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_subcategoryId", request.SubcategoryId);
                 col.AddWithValue("p_referenceNumber", request.ReferenceNumber);
                 col.AddWithValue("p_statusId", request.StatusId);
-                col.AddWithValue("p_documentUrl", request.DocumentUrl);
+                col.AddWithValue("p_documentUrl", request.DocumentUrl?? (object)DBNull.Value);
                 col.AddWithValue("p_description", request.Description);
                 col.AddWithValue("p_currencyCode", request.CurrencyCode);
                 col.AddWithValue("p_financePartnerId", request.FinancePartnerId > 0 ? request.FinancePartnerId : DBNull.Value);
