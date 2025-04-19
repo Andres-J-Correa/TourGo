@@ -76,19 +76,19 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
                 coll.AddWithValue("p_customerId", model.CustomerId);
-                coll.AddWithValue("p_externalBookingId", model.ExternalId);
-                coll.AddWithValue("p_bookingProviderId", model.BookingProviderId);
+                coll.AddWithValue("p_externalBookingId", model.ExternalId ?? (object)DBNull.Value);
+                coll.AddWithValue("p_bookingProviderId", model.BookingProviderId > 0 ? model.BookingProviderId: DBNull.Value);
                 coll.AddWithValue("p_arrivalDate", model.ArrivalDate.ToString("yyyy-MM-dd"));
                 coll.AddWithValue("p_departureDate", model.DepartureDate.ToString("yyyy-MM-dd"));
-                coll.AddWithValue("p_eta", model.ETA.ToString("yyyy-MM-ddTHH:mm:ss"));
+                coll.AddWithValue("p_eta", model.ETA?.ToString("yyyy-MM-ddTHH:mm:ss") ?? (object)DBNull.Value);
                 coll.AddWithValue("p_adultGuests", model.AdultGuests);
-                coll.AddWithValue("p_childGuests", model.ChildGuests);
-                coll.AddWithValue("p_notes", model.Notes);
+                coll.AddWithValue("p_childGuests", model.ChildGuests > 0 ? model.ChildGuests : DBNull.Value);
+                coll.AddWithValue("p_notes", model.Notes ?? (object)DBNull.Value);
                 coll.AddWithValue("p_modifiedBy", userId);
                 coll.AddWithValue("p_hotelId", hotelId);
                 coll.AddWithValue("p_externalComission", model.ExternalCommission);
                 coll.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
-                coll.AddWithValue("p_extraChargesJson", JsonConvert.SerializeObject(model.ExtraCharges));
+                coll.AddWithValue("p_extraChargesJson", model.ExtraCharges?.Count > 0 ? JsonConvert.SerializeObject(model.ExtraCharges) : DBNull.Value);
                 coll.AddWithValue("p_subtotal", model.Subtotal);
                 coll.AddWithValue("p_charges", model.Charges);
                 coll.AddWithValue("p_total", model.Total);
