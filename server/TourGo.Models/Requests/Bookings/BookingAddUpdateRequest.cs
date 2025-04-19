@@ -47,7 +47,7 @@ namespace TourGo.Models.Requests.Bookings
 		public string Notes { get; set; }
 
 		[Range(0, double.MaxValue)]
-		public decimal ExternalComission { get; set; }
+		public decimal ExternalCommission { get; set; }
 
         [Required]
         [Range(0.001, double.MaxValue)]

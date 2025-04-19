@@ -26,13 +26,13 @@ namespace TourGo.Models.Domain.Bookings
         public UserBase? ModifiedBy { get; set; }
         public Customer? Customer { get; set; }
         public Lookup? BookingProvider { get; set; }
-        public decimal ExternalComission { get; set; }
+        public decimal ExternalCommission { get; set; }
         public int Nights { get; set; }
 
         public decimal Subtotal { get; set; }
         public decimal Charges { get; set; }
         public decimal Total { get; set; }
-        public List<Transaction>? transactions { get; set; }
+        public List<Transaction>? Transactions { get; set; }
         public int InvoiceId { get; set; }
 
     }

@@ -60,8 +60,8 @@ namespace TourGo.Services.Hotels
                 {
                     index = 0;
                     Transaction transaction = TransactionService.MapTransaction(reader, ref index);
-                    booking.transactions ??= new List<Transaction>();
-                    booking.transactions.Add(transaction);
+                    booking.Transactions ??= new List<Transaction>();
+                    booking.Transactions.Add(transaction);
                 }
             });
 
@@ -86,7 +86,7 @@ namespace TourGo.Services.Hotels
                 coll.AddWithValue("p_notes", model.Notes);
                 coll.AddWithValue("p_modifiedBy", userId);
                 coll.AddWithValue("p_hotelId", hotelId);
-                coll.AddWithValue("p_externalComission", model.ExternalComission);
+                coll.AddWithValue("p_externalComission", model.ExternalCommission);
                 coll.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
                 coll.AddWithValue("p_extraChargesJson", JsonConvert.SerializeObject(model.ExtraCharges));
                 coll.AddWithValue("p_subtotal", model.Subtotal);
@@ -171,7 +171,7 @@ namespace TourGo.Services.Hotels
             booking.Status.Id = reader.GetSafeInt32(index++);
             booking.Status.Name = reader.GetSafeString(index++);
             booking.Notes = reader.GetSafeString(index++);
-            booking.ExternalComission = reader.GetSafeDecimal(index++);
+            booking.ExternalCommission = reader.GetSafeDecimal(index++);
             booking.Nights = reader.GetSafeInt32(index++);
             booking.ModifiedBy = new UserBase();
             booking.ModifiedBy.Id = reader.GetSafeInt32(index++);
