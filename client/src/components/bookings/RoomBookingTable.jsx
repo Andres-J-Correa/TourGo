@@ -40,7 +40,7 @@ const RoomBookingTable = ({
   startDate = "2024-03-25",
   endDate = "2024-04-05",
   rooms = testRooms,
-  bookings = testBookings,
+  roomBookings = testBookings,
 }) => {
   const [selectedCells, setSelectedCells] = useState([]);
   const [isMultiSelect, setIsMultiSelect] = useState(false);
@@ -62,7 +62,7 @@ const RoomBookingTable = ({
 
   // Get a booking by date & roomId
   const getBooking = (date, roomId) => {
-    const day = bookings.find((b) => b.Date === date);
+    const day = roomBookings.find((b) => b.Date === date);
     return day
       ? day.Bookings.find((booking) => booking.RoomId === roomId)
       : null;
@@ -229,7 +229,7 @@ RoomBookingTable.propTypes = {
       Name: PropTypes.string.isRequired,
     })
   ).isRequired,
-  bookings: PropTypes.arrayOf(
+  roomBookings: PropTypes.arrayOf(
     PropTypes.shape({
       Date: PropTypes.string.isRequired,
       Bookings: PropTypes.arrayOf(

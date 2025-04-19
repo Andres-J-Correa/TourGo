@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Formik, Form } from "formik";
 import { toast } from "react-toastify";
@@ -25,8 +25,13 @@ import classnames from "classnames";
 import { isValidPhoneNumber } from "react-phone-number-input";
 
 import { getByDocumentNumber, add } from "services/customerService";
+// import { getRoomBookingsByDateRange } from "services/bookingService";
+import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
+import DatePickers from "components/commonUI/forms/DatePickers";
+
+const _logger = require("debug")("BookingForm");
 
 const tabs = [
   { id: 0, icon: faUser, name: "Cliente" },
@@ -67,6 +72,10 @@ const BookingForm = () => {
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [rooms, setRooms] = useState([]);
+  //   const [roomBookings, setRoomBookings] = useState([]);
+
+  _logger("rooms", rooms);
 
   const isStepComplete = {
     0: customer?.id > 0,
@@ -111,6 +120,34 @@ const BookingForm = () => {
       setLoading(false);
     }
   };
+
+  const onGetRoomsSuccess = (res) => {
+    if (res.isSuccessful) {
+      setRooms(res.items);
+    } else {
+      throw new Error("Error al cargar habitaciones");
+    }
+  };
+  const onGetRoomsError = () => {
+    toast.error("Error al cargar habitaciones");
+  };
+
+  //   const onGetBookingsSuccess = (res) => {
+  //     if (res.isSuccessful) {
+  //       setRoomBookings(res.items);
+  //     } else {
+  //       throw new Error("Error al cargar reservas");
+  //     }
+  //   };
+  //   const onGetBookingsError = () => {
+  //     toast.error("Error al cargar reservas");
+  //   };
+
+  useEffect(() => {
+    if (hotelId) {
+      getRoomsByHotelId(hotelId).then(onGetRoomsSuccess).catch(onGetRoomsError);
+    }
+  }, [hotelId]);
 
   return (
     <div className="container mt-4">
@@ -249,6 +286,7 @@ const BookingForm = () => {
 
         <TabPane tabId={1}>
           <h5>Habitación (step placeholder)</h5>
+          <DatePickers />
         </TabPane>
 
         <TabPane tabId={2}>

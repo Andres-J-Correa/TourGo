@@ -12,5 +12,6 @@ namespace TourGo.Services.Interfaces
         Booking? GetById(int id);
         List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByBookingId(int bookingId);
+        List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, int hotelId);
     }
 }

@@ -142,6 +142,27 @@ namespace TourGo.Services.Hotels
             return list;
         }
 
+        public List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, int hotelId)
+        {
+            string proc = "room_bookings_select_by_date_range";
+            List<RoomBooking>? list = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_startDate", startDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_endDate", endDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                list ??= new List<RoomBooking>();
+                RoomBooking roomBooking = MapRoomBooking(reader, ref index);
+                list.Add(roomBooking);
+            });
+
+            return list;
+        }
+
         private static RoomBooking MapRoomBooking(IDataReader reader, ref int index)
         {
             RoomBooking roomBooking = new RoomBooking();

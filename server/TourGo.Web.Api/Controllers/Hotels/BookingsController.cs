@@ -97,7 +97,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpGet("{id:int}/extra-charges")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<List<ExtraCharge>>> GetExtraCharges(int id)
+        public ActionResult<ItemsResponse<ExtraCharge>> GetExtraCharges(int id)
         {
             ObjectResult result = null;
 
@@ -111,7 +111,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 }
                 else
                 {
-                    ItemResponse<List<ExtraCharge>> response = new ItemResponse<List<ExtraCharge>>() { Item = extraCharges };
+                    ItemsResponse<ExtraCharge> response = new ItemsResponse<ExtraCharge>() { Items = extraCharges };
 
                     result = Ok200(response);
                 }
@@ -128,7 +128,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpGet("{id:int}/room-bookings")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<List<RoomBooking>>> GetRoomBookings(int id)
+        public ActionResult<ItemsResponse<RoomBooking>> GetRoomBookingsByBookingId(int id)
         {
             ObjectResult result = null;
 
@@ -142,7 +142,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 }
                 else
                 {
-                    ItemResponse<List<RoomBooking>> response = new ItemResponse<List<RoomBooking>>() { Item = roomBookings };
+                    ItemsResponse<RoomBooking> response = new ItemsResponse<RoomBooking>() { Items = roomBookings };
 
                     result = Ok200(response);
                 }
@@ -157,5 +157,35 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
+        [HttpGet("hotel/{id:int}/room-bookings")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<RoomBooking>> GetRoomBookingsByDateRange(int id, [FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<RoomBooking>? roomBookings = _bookingService.GetRoomBookingsByDateRange(startDate, endDate, id);
+
+                if (roomBookings == null)
+                {
+                    result = NotFound404(new ErrorResponse("No room bookings found"));
+                }
+                else
+                {
+                    ItemsResponse<RoomBooking> response = new ItemsResponse<RoomBooking>() { Items = roomBookings };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
     }
 }
