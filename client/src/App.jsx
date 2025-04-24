@@ -16,6 +16,10 @@ import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
+import dayjs from "dayjs";
+require("dayjs/locale/es"); // Import Spanish locale
+dayjs.locale("es");
+
 const App = () => {
   const [routes, setRoutes] = useState([]);
 

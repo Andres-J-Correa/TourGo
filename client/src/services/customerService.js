@@ -14,7 +14,9 @@ export const getByDocumentNumber = async (hotelId, documentNumber) => {
     },
     method: "POST",
     url: `${api}/hotel/${hotelId}/dn`,
-    data: documentNumber,
+    data: {
+      id: documentNumber,
+    },
   };
   try {
     const response = await axiosClient(config);

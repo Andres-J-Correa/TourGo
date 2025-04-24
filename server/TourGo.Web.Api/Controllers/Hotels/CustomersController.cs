@@ -29,7 +29,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPost("hotel/{hotelId:int}/dn")]
         //no need for entityAuth filter, handling auth inside the procedure
-        public ActionResult<ItemResponse<Customer>> Get([FromBody] string id, int hotelId)
+        public ActionResult<ItemResponse<Customer>> Get(CustomerGetRequest model, int hotelId)
         {
             int iCode = 200;
             BaseResponse response = null;
@@ -37,7 +37,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                Customer? customer = _customerService.GetByDocumentNumber(id, userId, hotelId);
+                Customer? customer = _customerService.GetByDocumentNumber(model.Id, userId, hotelId);
 
                 if (customer == null)
                 {

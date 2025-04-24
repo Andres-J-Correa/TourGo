@@ -1,75 +1,85 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
-
-const _logger = require("debug")("DatePickers");
 
 const DatePickers = ({
   startDate,
   endDate,
-  handleStartChange = (date) => _logger("handleStartChange", date),
-  handleEndChange = (date) => _logger("handleEndChange", date),
+  startDateName = "Fecha de inicio",
+  endDateName = "Fecha fin",
+  handleStartChange = () => {},
+  handleEndChange = () => {},
   maxDate,
+  isDisabled,
 }) => {
+  const [startDateState, setStartDateState] = useState(startDate);
+  const [endDateState, setEndDateState] = useState(endDate);
+
   const formatDate = (date) => (date ? dayjs(date).format("YYYY-MM-DD") : "");
 
   const handleStartInputChange = (e) => {
     const newDate = dayjs(e.target.value);
     if (newDate.isValid()) {
-      handleStartChange(newDate.toDate());
-      if (endDate && newDate.isAfter(dayjs(endDate))) {
-        handleEndChange(null);
+      handleStartChange(newDate.format("YYYY-MM-DD"));
+      setStartDateState(newDate.format("YYYY-MM-DD"));
+      if (endDateState && newDate.isAfter(dayjs(endDateState))) {
+        handleEndChange(newDate.add(1, "day").format("YYYY-MM-DD"));
+        setEndDateState(newDate.add(1, "day").format("YYYY-MM-DD"));
       }
     }
   };
 
   const handleEndInputChange = (e) => {
     const newDate = dayjs(e.target.value);
-    if (newDate.isValid() && dayjs(startDate).isBefore(newDate, "day")) {
-      handleEndChange(newDate.toDate());
+    if (newDate.isValid() && dayjs(startDateState).isBefore(newDate, "day")) {
+      handleEndChange(newDate.format("YYYY-MM-DD"));
+      setEndDateState(newDate.format("YYYY-MM-DD"));
     }
   };
 
   return (
-    <div className="d-flex align-items-center gap-3">
-      <div>
-        <label htmlFor="start-date" className="form-label mb-1">
-          Start Date
-        </label>
+    <div className="d-flex align-items-center gap-3 mb-3">
+      <div className="form-floating">
         <input
           id="start-date"
           type="date"
           className="form-control"
-          value={formatDate(startDate)}
+          value={formatDate(startDateState)}
           onChange={handleStartInputChange}
           max={maxDate ? formatDate(maxDate) : ""}
+          disabled={isDisabled}
         />
+        <label htmlFor="start-date" className="form-label text-body-secondary">
+          {startDateName}
+        </label>
       </div>
 
-      <div>
-        <label htmlFor="end-date" className="form-label mb-1">
-          End Date
-        </label>
+      <div className="form-floating">
         <input
           id="end-date"
           type="date"
           className="form-control"
-          value={formatDate(endDate)}
+          value={formatDate(endDateState)}
           onChange={handleEndInputChange}
-          min={startDate ? formatDate(startDate) : ""}
+          min={startDateState ? formatDate(startDateState) : ""}
           max={maxDate ? formatDate(maxDate) : ""}
-          disabled={!startDate}
+          disabled={!startDateState || isDisabled}
         />
+        <label htmlFor="end-date" className="form-label text-body-secondary">
+          {endDateName}
+        </label>
       </div>
     </div>
   );
 };
 
 DatePickers.propTypes = {
-  startDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)])
-    .isRequired,
+  startDate: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.instanceOf(Date),
+  ]),
   endDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
-  handleStartChange: PropTypes.func.isRequired,
+  handleStartChange: PropTypes.func,
   handleEndChange: PropTypes.func,
   maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };

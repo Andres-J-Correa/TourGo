@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Formik, Form } from "formik";
 import { toast } from "react-toastify";
@@ -13,31 +13,49 @@ import {
   NavLink,
   TabContent,
   TabPane,
+  Card,
+  CardBody,
+  CardTitle,
+  CardText,
+  FormGroup,
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
-  faBed,
-  faFileInvoice,
+  faFilePen,
   faCheckCircle,
+  faMoneyBill1Wave,
 } from "@fortawesome/free-solid-svg-icons";
 import classnames from "classnames";
 import { isValidPhoneNumber } from "react-phone-number-input";
 
 import { getByDocumentNumber, add } from "services/customerService";
-// import { getRoomBookingsByDateRange } from "services/bookingService";
+import {
+  getRoomBookingsByDateRange,
+  add as addBooking,
+} from "services/bookingService";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
+import { getByHotelId as getChargesByHotelId } from "services/extraChargeService";
+
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import DatePickers from "components/commonUI/forms/DatePickers";
+import Breadcrumb from "components/commonUI/Breadcrumb";
+import Alert from "components/commonUI/Alert";
+import RoomBookingTable from "components/bookings/RoomBookingTable";
+import PhoneInputField from "components/commonUI/forms/PhoneInputField";
+import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 
-const _logger = require("debug")("BookingForm");
+import dayjs from "dayjs";
+import Swal from "sweetalert2";
+var isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
+dayjs.extend(isSameOrBefore);
 
 const tabs = [
   { id: 0, icon: faUser, name: "Cliente" },
-  { id: 1, icon: faBed, name: "Habitación" },
-  { id: 2, icon: faFileInvoice, name: "Cobros" },
-  { id: 3, icon: faCheckCircle, name: "Confirmación" },
+  { id: 1, icon: faFilePen, name: "Informacion de la Reserva" },
+  { id: 3, icon: faMoneyBill1Wave, name: "Cobros" },
+  { id: 4, icon: faCheckCircle, name: "Confirmación" },
 ];
 
 const customerSchema = Yup.object().shape({
@@ -66,27 +84,126 @@ const customerSchema = Yup.object().shape({
     ),
 });
 
+const bookingSchema = Yup.object().shape({
+  customerId: Yup.number()
+    .required("El cliente es obligatorio")
+    .min(1, "El cliente es obligatorio"),
+
+  externalId: Yup.string()
+    .min(2, "La identificación externa debe tener al menos 2 caracteres")
+    .max(100, "La identificación externa no puede exceder los 100 caracteres")
+    .nullable(),
+
+  bookingProviderId: Yup.number()
+    .min(1, "Booking Provider ID must be a positive number")
+    .nullable(),
+
+  eta: Yup.date()
+    .nullable()
+    .typeError("Fecha y hora estimada de llegada no es válida"),
+
+  adultGuests: Yup.number()
+    .required("El número de personas es obligatorio")
+    .min(1, "El número de personas no puede ser menor a 1"),
+
+  childGuests: Yup.number()
+    .min(0, "El número de menores no puede ser negativo")
+    .nullable(),
+
+  notes: Yup.string().max(1000, "Las notas son demasiado largas").nullable(),
+
+  externalCommission: Yup.number()
+    .min(0, "La comision no puede ser negativa")
+    .nullable(),
+
+  roomBookings: Yup.array()
+    .of(
+      Yup.object().shape({
+        date: Yup.string().required(),
+        roomId: Yup.number().required(),
+        price: Yup.number().required(),
+      })
+    )
+    .test(
+      "all-dates-covered",
+      "Debes seleccionar al menos una habitación para cada noche de la reserva",
+      function (bookings) {
+        const start = this.options.context?.arrivalDate;
+        const end = this.options.context?.departureDate;
+
+        if (!start || !end || !Array.isArray(bookings)) return true; // fallback to pass
+
+        const expectedDates = [];
+        let current = dayjs(start);
+        const last = dayjs(end).subtract(1, "day");
+
+        while (current.isSameOrBefore(last)) {
+          expectedDates.push(current.format("YYYY-MM-DD"));
+          current = current.add(1, "day");
+        }
+
+        const bookedDates = new Set(bookings.map((b) => b.date));
+
+        const missingDate = expectedDates.find(
+          (date) => !bookedDates.has(date)
+        );
+        return !missingDate;
+      }
+    ),
+});
+
+const chargeTypeLabels = {
+  1: "Porcentaje",
+  2: "Diario",
+  3: "General",
+};
+
+const formatAmount = (amount, typeId) => {
+  if (typeId === 1) return `${(amount * 100).toFixed(0)}%`;
+  return `$${amount.toFixed(2)}`;
+};
+
 const BookingForm = () => {
   const { hotelId } = useParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [customer, setCustomer] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [creating, setCreating] = useState(false);
   const [rooms, setRooms] = useState([]);
-  //   const [roomBookings, setRoomBookings] = useState([]);
+  const [roomBookings, setRoomBookings] = useState([]);
+  const [dates, setDates] = useState({
+    start: null,
+    end: null,
+  });
+  const [isLoadingRoomBookings, setIsLoadingRoomBookings] = useState(false);
+  const [charges, setCharges] = useState([]);
+  const [selectedCharges, setSelectedCharges] = useState([]);
+  const [selectedRoomBookings, setSelectedRoomBookings] = useState([]);
+  const [totals, setTotals] = useState({
+    subtotal: 0,
+    charges: 0,
+    total: 0,
+  });
 
-  _logger("rooms", rooms);
+  const bookingFormRef = useRef(null);
+
+  const breadcrumbs = [
+    { label: "Inicio", path: "/" },
+    { label: "Hoteles", path: "/hotels" },
+    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: "Reservas", path: `/hotels/${hotelId}/bookings` },
+  ];
 
   const isStepComplete = {
     0: customer?.id > 0,
-    1: false,
+    1: Number(bookingFormRef?.current?.values?.id) > 0,
     2: false,
     3: false,
   };
 
   const handleDocumentSubmit = async (values) => {
     try {
-      setLoading(true);
+      setSubmitting(true);
       const res = await getByDocumentNumber(hotelId, values.documentNumber);
       if (res.item) {
         setCustomer(res.item);
@@ -100,13 +217,13 @@ const BookingForm = () => {
         toast.error("Error al buscar cliente");
       }
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   const handleCustomerCreate = async (values) => {
     try {
-      setLoading(true);
+      setSubmitting(true);
       const payload = { ...values };
       const res = await add(payload, hotelId);
       if (res.item > 0) {
@@ -117,8 +234,26 @@ const BookingForm = () => {
     } catch (err) {
       toast.error("Error al crear cliente");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
+  };
+
+  const toggleCharge = (charge) => {
+    setSelectedCharges((prev) => {
+      const exists = prev.some((c) => c.extraChargeId === charge.id);
+      if (exists) {
+        return prev.filter((c) => c.extraChargeId !== charge.id);
+      } else {
+        return [
+          ...prev,
+          {
+            extraChargeId: charge.id,
+            type: charge.type.id,
+            amount: charge.amount,
+          },
+        ];
+      }
+    });
   };
 
   const onGetRoomsSuccess = (res) => {
@@ -132,27 +267,131 @@ const BookingForm = () => {
     toast.error("Error al cargar habitaciones");
   };
 
-  //   const onGetBookingsSuccess = (res) => {
-  //     if (res.isSuccessful) {
-  //       setRoomBookings(res.items);
-  //     } else {
-  //       throw new Error("Error al cargar reservas");
-  //     }
-  //   };
-  //   const onGetBookingsError = () => {
-  //     toast.error("Error al cargar reservas");
-  //   };
+  const onGetBookingsSuccess = (res) => {
+    if (res.isSuccessful) {
+      setRoomBookings(res.items);
+    } else {
+      throw new Error("Error al cargar reservas");
+    }
+  };
+  const onGetBookingsError = (e) => {
+    if (e.response?.status === 404) {
+      setRoomBookings([]);
+    } else {
+      toast.error("Error al cargar reservas");
+    }
+  };
+
+  const onGetChargesSuccess = (res) => {
+    if (res.isSuccessful) {
+      setCharges(res.items);
+    }
+  };
+
+  const onGetChargesError = (e) => {
+    if (e.response?.status === 404) {
+      setCharges([]);
+    } else {
+      toast.error("Error al cargar cargos extras");
+    }
+  };
+
+  const handleBookingSubmit = async (values) => {
+    Swal.fire({
+      title: "¿Está seguro de que desea guardar la reserva?",
+      text: "Revise los datos antes de continuar.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, guardar",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          setSubmitting(true);
+          const res = await addBooking({ ...values }, hotelId);
+          if (res.isSuccessful) {
+            bookingFormRef?.current?.setFieldValue("id", res.item.bookingId);
+            toast.success("Reserva guardada con éxito");
+            setCurrentStep(3);
+          } else {
+            throw new Error("Error al guardar la reserva");
+          }
+        } catch (err) {
+          toast.error("Error al guardar la reserva");
+        } finally {
+          setSubmitting(false);
+        }
+      }
+    });
+  };
 
   useEffect(() => {
     if (hotelId) {
       getRoomsByHotelId(hotelId).then(onGetRoomsSuccess).catch(onGetRoomsError);
+      getChargesByHotelId(hotelId)
+        .then(onGetChargesSuccess)
+        .catch(onGetChargesError);
     }
   }, [hotelId]);
 
+  useEffect(() => {
+    const isValidDateRange = dayjs(dates.start).isBefore(dayjs(dates.end));
+    if (hotelId && isValidDateRange) {
+      setIsLoadingRoomBookings(true);
+      getRoomBookingsByDateRange(
+        hotelId,
+        dayjs(dates.start).format("YYYY-MM-DD"),
+        dayjs(dates.end).format("YYYY-MM-DD")
+      )
+        .then(onGetBookingsSuccess)
+        .catch(onGetBookingsError)
+        .finally(() => setIsLoadingRoomBookings(false));
+    }
+  }, [hotelId, dates.start, dates.end]);
+
+  useEffect(() => {
+    const subtotal = selectedRoomBookings.reduce((acc, booking) => {
+      return acc + (booking?.price || 0);
+    }, 0);
+
+    const chargesTotal = selectedCharges.reduce((acc, charge) => {
+      if (charge.type === 1) {
+        return acc + subtotal * charge.amount;
+      }
+      if (charge.type === 2) {
+        return acc + charge.amount * selectedRoomBookings.length;
+      }
+
+      return acc + charge.amount;
+    }, 0);
+
+    setTotals({
+      subtotal,
+      charges: chargesTotal,
+      total: subtotal + chargesTotal,
+    });
+  }, [selectedRoomBookings, selectedCharges]);
+
+  useEffect(() => {
+    if (bookingFormRef?.current) {
+      bookingFormRef.current.setFieldValue(
+        "roomBookings",
+        selectedRoomBookings
+      );
+      bookingFormRef.current.setFieldValue("extraCharges", selectedCharges);
+      bookingFormRef.current.setFieldValue("subtotal", totals.subtotal);
+      bookingFormRef.current.setFieldValue("charges", totals.charges);
+      bookingFormRef.current.setFieldValue("arrivalDate", dates.start);
+      bookingFormRef.current.setFieldValue("departureDate", dates.end);
+      bookingFormRef.current.setFieldValue("customerId", customer?.id);
+    }
+  }, [selectedRoomBookings, selectedCharges, totals, dates, customer]);
+
   return (
     <div className="container mt-4">
+      <Breadcrumb breadcrumbs={breadcrumbs} active="Nueva Reserva" />
       {/* Tabs Header */}
-      <Nav tabs className="mb-4 justify-content-between">
+      <Nav tabs className="mb-4 mt-4 justify-content-between">
         {tabs.map((tab, index) => (
           <NavItem key={tab.id}>
             <NavLink
@@ -170,6 +409,7 @@ const BookingForm = () => {
 
       {/* Step Content */}
       <TabContent activeTab={currentStep}>
+        <h4 className="mb-3">{tabs[currentStep].name} </h4>
         <TabPane tabId={0}>
           <Formik
             initialValues={{
@@ -206,17 +446,18 @@ const BookingForm = () => {
                       <CustomField
                         name="documentNumber"
                         placeholder="Documento de Identidad"
-                        className="form-control"
                         onChange={handleDocChange}
                         value={values.documentNumber}
+                        disabled={submitting}
+                        isRequired={true}
                       />
                     </Col>
                     <Col md="6" className="text-end">
                       <Button
                         type="submit"
-                        disabled={loading}
+                        disabled={submitting}
                         className="bg-gradient-success">
-                        {loading ? (
+                        {submitting ? (
                           <Spinner size="sm" />
                         ) : creating ? (
                           "Guardar Cliente"
@@ -234,35 +475,41 @@ const BookingForm = () => {
                           <CustomField
                             name="firstName"
                             placeholder="Nombre"
-                            className="form-control"
-                            disabled={!!customer?.id}
+                            disabled={!!customer?.id || submitting}
+                            isRequired={creating}
                           />
                         </Col>
                         <Col md="6">
                           <CustomField
                             name="lastName"
                             placeholder="Apellido"
-                            className="form-control"
-                            disabled={!!customer?.id}
+                            disabled={!!customer?.id || submitting}
+                            isRequired={creating}
                           />
                         </Col>
                       </Row>
                       <Row>
                         <Col md="6">
                           <CustomField
-                            name="phone"
-                            placeholder="Teléfono"
-                            className="form-control"
-                            disabled={!!customer?.id}
+                            name="email"
+                            placeholder="Correo Electrónico"
+                            disabled={!!customer?.id || submitting}
+                            isRequired={creating}
                           />
                         </Col>
                         <Col md="6">
-                          <CustomField
-                            name="email"
-                            placeholder="Correo Electrónico"
-                            className="form-control"
-                            disabled={!!customer?.id}
-                          />
+                          <FormGroup className="position-relative">
+                            <PhoneInputField
+                              name="phone"
+                              type="text"
+                              className="form-control d-flex"
+                              placeholder="Teléfono"
+                              autoComplete="tel"
+                              disabled={!!customer?.id || submitting}
+                              isRequired={creating}
+                            />
+                            <CustomErrorMessage name="phone" />
+                          </FormGroup>
                         </Col>
                       </Row>
                       <ErrorAlert />
@@ -271,7 +518,7 @@ const BookingForm = () => {
                           <Button
                             onClick={() => setCurrentStep(1)}
                             color="secondary"
-                            disabled={loading}>
+                            disabled={submitting}>
                             Siguiente
                           </Button>
                         )}
@@ -285,8 +532,205 @@ const BookingForm = () => {
         </TabPane>
 
         <TabPane tabId={1}>
-          <h5>Habitación (step placeholder)</h5>
-          <DatePickers />
+          <h5 className="mb-3">Seleccione las Fechas de la reserva</h5>
+          {dates.start &&
+            dayjs(dates.start).isBefore(dayjs().subtract(1, "day")) && (
+              <Alert
+                type="warning"
+                message="Estas seleccionando fechas pasadas, por favor verifica."
+              />
+            )}
+          <DatePickers
+            startDate={dates.start}
+            endDate={dates.end}
+            startDateName="Fecha de llegada"
+            endDateName="Fecha de salida"
+            handleStartChange={(value) =>
+              setDates((prev) => ({ ...prev, start: value }))
+            }
+            handleEndChange={(value) =>
+              setDates((prev) => ({ ...prev, end: value }))
+            }
+            isDisabled={submitting || isLoadingRoomBookings}
+          />
+
+          {dates.start && dates.end && (
+            <>
+              {isLoadingRoomBookings ? (
+                <div className="text-center">
+                  <Spinner color="dark" className="mt-3" />
+                  <h5 className="text-center">Cargando reservas...</h5>
+                </div>
+              ) : (
+                <RoomBookingTable
+                  startDate={dates.start}
+                  endDate={dates.end}
+                  rooms={rooms}
+                  roomBookings={roomBookings}
+                  setSelectedRoomBookings={setSelectedRoomBookings}
+                  isDisabled={submitting}
+                />
+              )}
+
+              <h5 className="mt-4 mb-3">Seleccione los cargos extras</h5>
+              {submitting ? (
+                <div className="alert alert-warning text-center" role="alert">
+                  <strong>Selección de cargos desactivada</strong>
+                  <p className="mb-0">
+                    No se puede seleccionar cargos en este momento.
+                  </p>
+                </div>
+              ) : (
+                <Row>
+                  {charges.map((charge) => {
+                    const isSelected = selectedCharges.some(
+                      (c) => c.extraChargeId === charge.id
+                    );
+
+                    return (
+                      <Col
+                        sm="6"
+                        md="4"
+                        lg="2"
+                        key={charge.id}
+                        className="mb-3">
+                        <Card
+                          onClick={() => toggleCharge(charge)}
+                          className={`h-100 cursor-pointer ${
+                            isSelected
+                              ? "border-success bg-success-subtle shadow-success"
+                              : ""
+                          }`}
+                          type="button">
+                          <CardBody>
+                            <CardTitle tag="h5" className="mb-2">
+                              {charge.name}
+                            </CardTitle>
+                            <CardText className="mb-1">
+                              <strong>Tipo:</strong>{" "}
+                              {chargeTypeLabels[charge.type?.id] || "N/A"}
+                            </CardText>
+                            <CardText>
+                              <strong>Monto:</strong>{" "}
+                              {formatAmount(charge.amount, charge.type?.id)}
+                            </CardText>
+                          </CardBody>
+                        </Card>
+                      </Col>
+                    );
+                  })}
+                </Row>
+              )}
+
+              <hr />
+              <Row className="mb-3">
+                <Col md="4">
+                  <strong className="fs-5 text">Subtotal:</strong>
+                  <span className="float-end">
+                    {totals.subtotal.toLocaleString("es-CO", {
+                      style: "currency",
+                      currency: "COP",
+                    })}
+                  </span>
+                </Col>
+                <Col md="4">
+                  <strong className="fs-5 text">Cargos:</strong>
+                  <span className="float-end">
+                    {totals.charges.toLocaleString("es-CO", {
+                      style: "currency",
+                      currency: "COP",
+                    })}
+                  </span>
+                </Col>
+                <Col md="4">
+                  <strong className="fs-5 text">Total:</strong>
+                  <span className="float-end">
+                    {totals.total.toLocaleString("es-CO", {
+                      style: "currency",
+                      currency: "COP",
+                    })}
+                  </span>
+                </Col>
+              </Row>
+              <hr />
+
+              <h5 className="mt-4 mb-3">Información adicional</h5>
+              <Formik
+                initialValues={{
+                  bookingProviderId: "1", //TODO add booking selector, currently hardcoded to 1 (Booking.com)
+                }}
+                onSubmit={handleBookingSubmit}
+                innerRef={bookingFormRef}
+                validationSchema={bookingSchema}
+                enableReinitialize>
+                <Form>
+                  <Row>
+                    <Col md="4">
+                      <CustomField
+                        name="adultGuests"
+                        type="number"
+                        placeholder="Número de Personas (5 años o más)"
+                        isRequired={true}
+                        disabled={submitting}
+                      />
+                    </Col>
+                    <Col md="4">
+                      <CustomField
+                        name="childGuests"
+                        type="number"
+                        placeholder="Número de Niños (0-4 años)"
+                        disabled={submitting}
+                      />
+                    </Col>
+                    <Col md="4">
+                      <CustomField
+                        name="eta"
+                        type="datetime-local"
+                        placeholder="Fecha y Hora estimada de llegada"
+                        disabled={submitting}
+                      />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col md="6">
+                      <CustomField
+                        name="externalId"
+                        type="text"
+                        placeholder="Identificación externa (Booking/Airbnb...)"
+                        disabled={submitting}
+                      />
+                    </Col>
+                    <Col md="6">
+                      <CustomField
+                        name="externalCommission"
+                        type="number"
+                        placeholder="Comision externa"
+                        step="0.01"
+                        disabled={submitting}
+                      />
+                    </Col>
+                  </Row>
+                  <CustomField
+                    as="textarea"
+                    name="notes"
+                    placeholder="Notas"
+                    disabled={submitting}
+                  />
+
+                  <ErrorAlert />
+
+                  <div className="text-center my-3">
+                    <Button
+                      type="submit"
+                      disabled={submitting}
+                      className="bg-gradient-success">
+                      {submitting ? <Spinner size="sm" /> : "Guardar Reserva"}
+                    </Button>
+                  </div>
+                </Form>
+              </Formik>
+            </>
+          )}
         </TabPane>
 
         <TabPane tabId={2}>
