@@ -55,6 +55,11 @@ const bookings = [
     path: "/hotels/:hotelId/bookings/new",
     component: lazy(() => import("components/bookings/BookingForm")),
   },
+  {
+    name: "editBooking",
+    path: "/hotels/:hotelId/bookings/:bookingId/edit",
+    component: lazy(() => import("components/bookings/BookingForm")),
+  },
 ];
 
 export const privateRoutes = [

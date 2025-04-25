@@ -2,6 +2,7 @@ import {
   onGlobalError,
   onGlobalSuccess,
   API_HOST_PREFIX,
+  replaceEmptyStringsWithNull,
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
@@ -35,7 +36,41 @@ export const add = async (payload, hotelId) => {
     },
     method: "POST",
     url: `${api}/hotel/${hotelId}`,
-    data: payload,
+    data: replaceEmptyStringsWithNull(payload),
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getById = async (bookingId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/${bookingId}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getChargesByBookingId = async (bookingId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/${bookingId}/extra-charges`,
   };
   try {
     const response = await axiosClient(config);

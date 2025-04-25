@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
 
@@ -14,6 +14,15 @@ const DatePickers = ({
 }) => {
   const [startDateState, setStartDateState] = useState(startDate);
   const [endDateState, setEndDateState] = useState(endDate);
+
+  // Sync internal state with props when they change
+  useEffect(() => {
+    setStartDateState(startDate);
+  }, [startDate]);
+
+  useEffect(() => {
+    setEndDateState(endDate);
+  }, [endDate]);
 
   const formatDate = (date) => (date ? dayjs(date).format("YYYY-MM-DD") : "");
 
@@ -82,6 +91,7 @@ DatePickers.propTypes = {
   handleStartChange: PropTypes.func,
   handleEndChange: PropTypes.func,
   maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+  isDisabled: PropTypes.bool,
 };
 
 export default React.memo(DatePickers);

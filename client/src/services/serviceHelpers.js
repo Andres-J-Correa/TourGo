@@ -21,4 +21,35 @@ const onGlobalError = (err) => {
 
 const API_HOST_PREFIX = process.env.REACT_APP_API_HOST_PREFIX;
 
-export { onGlobalError, onGlobalSuccess, API_HOST_PREFIX };
+function replaceEmptyStringsWithNull(data) {
+  // Handle null or non-object inputs
+  if (data === null || typeof data !== "object") {
+    return data;
+  }
+
+  // Create a new object to avoid mutating the original
+  const result = Array.isArray(data) ? [] : {};
+
+  // Iterate through all properties
+  for (const [key, value] of Object.entries(data)) {
+    if (value === "") {
+      // Replace empty string with null
+      result[key] = null;
+    } else if (typeof value === "object" && value !== null) {
+      // Recursively process nested objects or arrays
+      result[key] = replaceEmptyStringsWithNull(value);
+    } else {
+      // Copy other values as-is
+      result[key] = value;
+    }
+  }
+
+  return result;
+}
+
+export {
+  onGlobalError,
+  onGlobalSuccess,
+  API_HOST_PREFIX,
+  replaceEmptyStringsWithNull,
+};

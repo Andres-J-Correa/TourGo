@@ -16,7 +16,7 @@ namespace TourGo.Models.Domain.Bookings
         public string? ExternalId { get; set; }
         public DateOnly ArrivalDate { get; set; }
         public DateOnly DepartureDate { get; set; }
-        public DateTime ETA { get; set; }
+        public DateTime? ETA { get; set; }
         public int AdultGuests { get; set; }
         public int ChildGuests { get; set; }
         public Lookup? Status { get; set; }
@@ -28,7 +28,6 @@ namespace TourGo.Models.Domain.Bookings
         public Lookup? BookingProvider { get; set; }
         public decimal ExternalCommission { get; set; }
         public int Nights { get; set; }
-
         public decimal Subtotal { get; set; }
         public decimal Charges { get; set; }
         public decimal Total { get; set; }

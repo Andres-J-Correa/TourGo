@@ -2,15 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Formik, Form } from "formik";
 import { toast } from "react-toastify";
-import * as Yup from "yup";
 import {
   Button,
   Row,
   Col,
   Spinner,
-  Nav,
-  NavItem,
-  NavLink,
   TabContent,
   TabPane,
   Card,
@@ -19,20 +15,13 @@ import {
   CardText,
   FormGroup,
 } from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUser,
-  faFilePen,
-  faCheckCircle,
-  faMoneyBill1Wave,
-} from "@fortawesome/free-solid-svg-icons";
-import classnames from "classnames";
-import { isValidPhoneNumber } from "react-phone-number-input";
 
 import { getByDocumentNumber, add } from "services/customerService";
 import {
   getRoomBookingsByDateRange,
   add as addBooking,
+  getById as getBookingById,
+  getChargesByBookingId,
 } from "services/bookingService";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { getByHotelId as getChargesByHotelId } from "services/extraChargeService";
@@ -45,126 +34,24 @@ import Alert from "components/commonUI/Alert";
 import RoomBookingTable from "components/bookings/RoomBookingTable";
 import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
+import TabNavigation from "components/bookings/TabNavigation";
+
+import {
+  formatAmount,
+  chargeTypeLabels,
+  defaultBooking,
+  bookingSchema,
+  customerSchema,
+  bookingFormTabs as tabs,
+} from "./constants";
 
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 var isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
 dayjs.extend(isSameOrBefore);
 
-const tabs = [
-  { id: 0, icon: faUser, name: "Cliente" },
-  { id: 1, icon: faFilePen, name: "Informacion de la Reserva" },
-  { id: 3, icon: faMoneyBill1Wave, name: "Cobros" },
-  { id: 4, icon: faCheckCircle, name: "Confirmación" },
-];
-
-const customerSchema = Yup.object().shape({
-  documentNumber: Yup.string()
-    .min(2, "Documento muy corto")
-    .max(100, "Documento muy largo")
-    .required("Documento requerido"),
-  firstName: Yup.string()
-    .min(2, "El nombre debe tener mínimo 2 caracteres.")
-    .max(50, "El nombre debe tener máximo 50 caracteres.")
-    .required("El nombre es obligatorio."),
-  lastName: Yup.string()
-    .min(2, "El apellido debe tener mínimo 2 caracteres.")
-    .max(50, "El apellido debe tener máximo 50 caracteres.")
-    .required("El apellido es obligatorio."),
-  email: Yup.string()
-    .required("El correo electrónico es obligatorio.")
-    .email("Debe ingresar un correo electrónico válido.")
-    .max(100, "El correo debe tener máximo 100 caracteres."),
-  phone: Yup.string()
-    .required("El teléfono es obligatorio.")
-    .test(
-      "is-valid-phone",
-      "Debe ingresar un número de teléfono válido.",
-      (value) => isValidPhoneNumber(value)
-    ),
-});
-
-const bookingSchema = Yup.object().shape({
-  customerId: Yup.number()
-    .required("El cliente es obligatorio")
-    .min(1, "El cliente es obligatorio"),
-
-  externalId: Yup.string()
-    .min(2, "La identificación externa debe tener al menos 2 caracteres")
-    .max(100, "La identificación externa no puede exceder los 100 caracteres")
-    .nullable(),
-
-  bookingProviderId: Yup.number()
-    .min(1, "Booking Provider ID must be a positive number")
-    .nullable(),
-
-  eta: Yup.date()
-    .nullable()
-    .typeError("Fecha y hora estimada de llegada no es válida"),
-
-  adultGuests: Yup.number()
-    .required("El número de personas es obligatorio")
-    .min(1, "El número de personas no puede ser menor a 1"),
-
-  childGuests: Yup.number()
-    .min(0, "El número de menores no puede ser negativo")
-    .nullable(),
-
-  notes: Yup.string().max(1000, "Las notas son demasiado largas").nullable(),
-
-  externalCommission: Yup.number()
-    .min(0, "La comision no puede ser negativa")
-    .nullable(),
-
-  roomBookings: Yup.array()
-    .of(
-      Yup.object().shape({
-        date: Yup.string().required(),
-        roomId: Yup.number().required(),
-        price: Yup.number().required(),
-      })
-    )
-    .test(
-      "all-dates-covered",
-      "Debes seleccionar al menos una habitación para cada noche de la reserva",
-      function (bookings) {
-        const start = this.options.context?.arrivalDate;
-        const end = this.options.context?.departureDate;
-
-        if (!start || !end || !Array.isArray(bookings)) return true; // fallback to pass
-
-        const expectedDates = [];
-        let current = dayjs(start);
-        const last = dayjs(end).subtract(1, "day");
-
-        while (current.isSameOrBefore(last)) {
-          expectedDates.push(current.format("YYYY-MM-DD"));
-          current = current.add(1, "day");
-        }
-
-        const bookedDates = new Set(bookings.map((b) => b.date));
-
-        const missingDate = expectedDates.find(
-          (date) => !bookedDates.has(date)
-        );
-        return !missingDate;
-      }
-    ),
-});
-
-const chargeTypeLabels = {
-  1: "Porcentaje",
-  2: "Diario",
-  3: "General",
-};
-
-const formatAmount = (amount, typeId) => {
-  if (typeId === 1) return `${(amount * 100).toFixed(0)}%`;
-  return `$${amount.toFixed(2)}`;
-};
-
 const BookingForm = () => {
-  const { hotelId } = useParams();
+  const { hotelId, bookingId } = useParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [customer, setCustomer] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -184,6 +71,7 @@ const BookingForm = () => {
     charges: 0,
     total: 0,
   });
+  const [booking, setBooking] = useState({ ...defaultBooking });
 
   const bookingFormRef = useRef(null);
 
@@ -196,7 +84,7 @@ const BookingForm = () => {
 
   const isStepComplete = {
     0: customer?.id > 0,
-    1: Number(bookingFormRef?.current?.values?.id) > 0,
+    1: Number(booking.id) > 0,
     2: false,
     3: false,
   };
@@ -269,11 +157,12 @@ const BookingForm = () => {
 
   const onGetBookingsSuccess = (res) => {
     if (res.isSuccessful) {
-      setRoomBookings(res.items);
+      setRoomBookings(res.items.map((b) => ({ ...b, roomId: b.room.id })));
     } else {
       throw new Error("Error al cargar reservas");
     }
   };
+
   const onGetBookingsError = (e) => {
     if (e.response?.status === 404) {
       setRoomBookings([]);
@@ -293,6 +182,34 @@ const BookingForm = () => {
       setCharges([]);
     } else {
       toast.error("Error al cargar cargos extras");
+    }
+  };
+
+  const onGetBookingSuccess = (res) => {
+    if (res.isSuccessful) {
+      setBooking(res.item);
+    }
+  };
+
+  const onGetBookingError = (e) => {
+    if (e.response?.status === 404) {
+      setBooking({ ...defaultBooking });
+    } else {
+      toast.error("Error al cargar reserva");
+    }
+  };
+
+  const onGetBookingChargesSuccess = (res) => {
+    if (res.isSuccessful) {
+      setSelectedCharges(res.items.map((c) => ({ ...c, extraChargeId: c.id })));
+    }
+  };
+
+  const onGetBookingChargesError = (e) => {
+    if (e.response?.status === 404) {
+      setSelectedCharges([]);
+    } else {
+      toast.error("Error al cargar cargos extras de la reserva");
     }
   };
 
@@ -387,25 +304,67 @@ const BookingForm = () => {
     }
   }, [selectedRoomBookings, selectedCharges, totals, dates, customer]);
 
+  useEffect(() => {
+    if (booking.id) {
+      setDates({
+        start: booking.arrivalDate,
+        end: booking.departureDate,
+      });
+      setCustomer(booking.customer);
+
+      if (bookingFormRef?.current) {
+        bookingFormRef.current.setFieldValue("id", booking.id);
+        bookingFormRef.current.setFieldValue(
+          "customerId",
+          booking.customer.id || ""
+        );
+        bookingFormRef.current.setFieldValue(
+          "externalId",
+          booking.externalId || ""
+        );
+        bookingFormRef.current.setFieldValue("eta", booking.eta || "");
+        bookingFormRef.current.setFieldValue(
+          "adultGuests",
+          booking.adultGuests || ""
+        );
+        bookingFormRef.current.setFieldValue(
+          "childGuests",
+          booking.childGuests || ""
+        );
+        bookingFormRef.current.setFieldValue("notes", booking.notes || "");
+        bookingFormRef.current.setFieldValue(
+          "externalCommission",
+          booking.externalCommission || ""
+        );
+        bookingFormRef.current.setFieldValue(
+          "bookingProviderId",
+          booking.bookingProvider.id || ""
+        );
+      }
+    }
+  }, [booking]);
+
+  useEffect(() => {
+    if (bookingId) {
+      getBookingById(bookingId)
+        .then(onGetBookingSuccess)
+        .catch(onGetBookingError);
+
+      getChargesByBookingId(bookingId)
+        .then(onGetBookingChargesSuccess)
+        .catch(onGetBookingChargesError);
+    }
+  }, [bookingId]);
+
   return (
     <div className="container mt-4">
       <Breadcrumb breadcrumbs={breadcrumbs} active="Nueva Reserva" />
       {/* Tabs Header */}
-      <Nav tabs className="mb-4 mt-4 justify-content-between">
-        {tabs.map((tab, index) => (
-          <NavItem key={tab.id}>
-            <NavLink
-              className={classnames({ active: currentStep === tab.id })}
-              onClick={() => isStepComplete[tab.id] && setCurrentStep(tab.id)}
-              style={{
-                cursor: isStepComplete[tab.id] ? "pointer" : "not-allowed",
-              }}>
-              <FontAwesomeIcon icon={tab.icon} size="lg" />{" "}
-              <span className="d-none d-md-inline ms-2">{tab.name}</span>
-            </NavLink>
-          </NavItem>
-        ))}
-      </Nav>
+      <TabNavigation
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+        isStepComplete={isStepComplete}
+      />
 
       {/* Step Content */}
       <TabContent activeTab={currentStep}>
@@ -569,6 +528,7 @@ const BookingForm = () => {
                   roomBookings={roomBookings}
                   setSelectedRoomBookings={setSelectedRoomBookings}
                   isDisabled={submitting}
+                  bookingId={bookingId}
                 />
               )}
 
@@ -658,6 +618,12 @@ const BookingForm = () => {
               <Formik
                 initialValues={{
                   bookingProviderId: "1", //TODO add booking selector, currently hardcoded to 1 (Booking.com)
+                  adultGuests: "",
+                  childGuests: "",
+                  eta: "",
+                  externalId: "",
+                  externalCommission: "",
+                  notes: "",
                 }}
                 onSubmit={handleBookingSubmit}
                 innerRef={bookingFormRef}
@@ -729,6 +695,24 @@ const BookingForm = () => {
                   </div>
                 </Form>
               </Formik>
+              <div className="d-flex mt-3">
+                <Button
+                  onClick={() => setCurrentStep(0)}
+                  color="secondary"
+                  className="me-auto"
+                  disabled={submitting}>
+                  Anterior
+                </Button>
+                {booking?.id && (
+                  <Button
+                    onClick={() => setCurrentStep(2)}
+                    color="secondary"
+                    className="ms-auto"
+                    disabled={submitting}>
+                    Siguiente
+                  </Button>
+                )}
+              </div>
             </>
           )}
         </TabPane>

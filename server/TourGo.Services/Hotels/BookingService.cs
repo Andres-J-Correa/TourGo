@@ -68,7 +68,7 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
-        public BookingAddResponse? Add(BookingAddUpdateRequest model, int userId, int hotelId)
+        public BookingAddResponse? Add(BookingAddRequest model, int userId, int hotelId)
         {
             BookingAddResponse? response = null;
 
@@ -76,7 +76,7 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
                 coll.AddWithValue("p_customerId", model.CustomerId);
-                coll.AddWithValue("p_externalBookingId", model.ExternalId ?? (object)DBNull.Value);
+                coll.AddWithValue("p_externalBookingId", string.IsNullOrEmpty(model.ExternalId) ? (object)DBNull.Value : model.ExternalId);
                 coll.AddWithValue("p_bookingProviderId", model.BookingProviderId > 0 ? model.BookingProviderId: DBNull.Value);
                 coll.AddWithValue("p_arrivalDate", model.ArrivalDate.ToString("yyyy-MM-dd"));
                 coll.AddWithValue("p_departureDate", model.DepartureDate.ToString("yyyy-MM-dd"));
@@ -86,7 +86,7 @@ namespace TourGo.Services.Hotels
                 coll.AddWithValue("p_notes", model.Notes ?? (object)DBNull.Value);
                 coll.AddWithValue("p_modifiedBy", userId);
                 coll.AddWithValue("p_hotelId", hotelId);
-                coll.AddWithValue("p_externalComission", model.ExternalCommission);
+                coll.AddWithValue("p_externalComission", model.ExternalCommission > 0 ? model.ExternalCommission: 0);
                 coll.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
                 coll.AddWithValue("p_extraChargesJson", model.ExtraCharges?.Count > 0 ? JsonConvert.SerializeObject(model.ExtraCharges) : DBNull.Value);
                 coll.AddWithValue("p_subtotal", model.Subtotal);
@@ -185,7 +185,7 @@ namespace TourGo.Services.Hotels
             booking.BookingProvider.Name = reader.GetSafeString(index++);
             booking.ArrivalDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
             booking.DepartureDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
-            booking.ETA = reader.GetSafeUtcDateTime(index++);
+            booking.ETA = reader.GetSafeDateTimeNullable(index++);
             booking.AdultGuests = reader.GetSafeInt32(index++);
             booking.ChildGuests = reader.GetSafeInt32(index++);
             booking.Status = new Lookup();

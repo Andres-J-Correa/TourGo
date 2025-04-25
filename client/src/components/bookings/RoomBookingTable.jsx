@@ -24,8 +24,14 @@ const RoomBookingTable = ({
   roomBookings,
   setSelectedRoomBookings,
   isDisabled,
+  bookingId,
 }) => {
-  const [selectedCells, setSelectedCells] = useState([]);
+  const currentBookings =
+    roomBookings?.length > 0
+      ? roomBookings?.filter((b) => Number(b.bookingId) === Number(bookingId))
+      : [];
+
+  const [selectedCells, setSelectedCells] = useState([...currentBookings]);
   const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [price, setPrice] = useState("");
@@ -36,7 +42,10 @@ const RoomBookingTable = ({
   // 🔍 Booking lookup
   const getBooking = (date, roomId) =>
     roomBookings?.find(
-      (b) => b.date === date && Number(b.room.id) === Number(roomId)
+      (b) =>
+        b.date === date &&
+        Number(b.room.id) === Number(roomId) &&
+        Number(b.bookingId) !== Number(bookingId)
     );
 
   // 🎯 Cell click handler
@@ -192,6 +201,8 @@ const RoomBookingTable = ({
     );
   }, [selectedCells, setSelectedRoomBookings]);
 
+  useEffect(() => {});
+
   return (
     <Container fluid className="mt-4 px-0">
       {isDisabled ? (
@@ -295,7 +306,9 @@ const RoomBookingTable = ({
                         (c) => c.date === date && c.roomId === room.id
                       );
                       const selected = selectedCells.find(
-                        (c) => c.date === date && c.roomId === room.id
+                        (c) =>
+                          c.date === date &&
+                          (c.roomId === room.id || c.room?.id === room.id)
                       );
                       return (
                         <td

@@ -10,12 +10,9 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Bookings
 {
-    public class BookingAddUpdateRequest: IModelIdentifier
+    public class BookingAddRequest: IModelIdentifier
     {
 		public int Id { get; set; }
-
-		[Range(1, int.MaxValue)]
-		public int? InvoiceId { get; set; }
 
 		[Required]
 		[Range(1, int.MaxValue)]
@@ -47,7 +44,7 @@ namespace TourGo.Models.Requests.Bookings
 		public string? Notes { get; set; }
 
 		[Range(0, double.MaxValue)]
-		public decimal ExternalCommission { get; set; }
+		public decimal? ExternalCommission { get; set; }
 
         [Required]
         [Range(0.001, double.MaxValue)]
