@@ -13,10 +13,8 @@ import {
   CardBody,
   CardTitle,
   CardText,
-  FormGroup,
 } from "reactstrap";
 
-import { getByDocumentNumber, add } from "services/customerService";
 import {
   getRoomBookingsByDateRange,
   add as addBooking,
@@ -32,8 +30,6 @@ import DatePickers from "components/commonUI/forms/DatePickers";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import Alert from "components/commonUI/Alert";
 import RoomBookingTable from "components/bookings/RoomBookingTable";
-import PhoneInputField from "components/commonUI/forms/PhoneInputField";
-import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 import TabNavigation from "components/bookings/TabNavigation";
 
 import {
@@ -41,12 +37,12 @@ import {
   chargeTypeLabels,
   defaultBooking,
   bookingSchema,
-  customerSchema,
   bookingFormTabs as tabs,
 } from "./constants";
 
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import CustomerForm from "components/customers/CustomerForm";
 var isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
 dayjs.extend(isSameOrBefore);
 
@@ -87,43 +83,6 @@ const BookingForm = () => {
     1: Number(booking.id) > 0,
     2: false,
     3: false,
-  };
-
-  const handleDocumentSubmit = async (values) => {
-    try {
-      setSubmitting(true);
-      const res = await getByDocumentNumber(hotelId, values.documentNumber);
-      if (res.item) {
-        setCustomer(res.item);
-        toast.success("Cliente encontrado");
-      }
-    } catch (err) {
-      if (err.response?.status === 404) {
-        setCreating(true);
-        toast.info("Cliente no encontrado, por favor complete los datos");
-      } else {
-        toast.error("Error al buscar cliente");
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleCustomerCreate = async (values) => {
-    try {
-      setSubmitting(true);
-      const payload = { ...values };
-      const res = await add(payload, hotelId);
-      if (res.item > 0) {
-        setCustomer({ ...values, id: res.item });
-        setCreating(false);
-        toast.success("Cliente creado");
-      }
-    } catch (err) {
-      toast.error("Error al crear cliente");
-    } finally {
-      setSubmitting(false);
-    }
   };
 
   const toggleCharge = (charge) => {
@@ -359,135 +318,24 @@ const BookingForm = () => {
   return (
     <div className="container mt-4">
       <Breadcrumb breadcrumbs={breadcrumbs} active="Nueva Reserva" />
-      {/* Tabs Header */}
       <TabNavigation
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
         isStepComplete={isStepComplete}
       />
-
-      {/* Step Content */}
       <TabContent activeTab={currentStep}>
         <h4 className="mb-3">{tabs[currentStep].name} </h4>
         <TabPane tabId={0}>
-          <Formik
-            initialValues={{
-              documentNumber: customer?.documentNumber || "",
-              firstName: customer?.firstName || "",
-              lastName: customer?.lastName || "",
-              phone: customer?.phone || "",
-              email: customer?.email || "",
-            }}
-            validationSchema={creating && customerSchema}
-            onSubmit={creating ? handleCustomerCreate : handleDocumentSubmit}
-            enableReinitialize>
-            {({ values, setFieldValue }) => {
-              const handleDocChange = (e) => {
-                const docValue = e.target.value;
-                setFieldValue("documentNumber", docValue);
-                // If there was a customer loaded, and docNumber is changing, reset rest
-                if (customer?.id || creating) {
-                  setCustomer({
-                    documentNumber: docValue,
-                    firstName: "",
-                    lastName: "",
-                    phone: "",
-                    email: "",
-                  });
-                  setCreating(false);
-                }
-              };
-
-              return (
-                <Form>
-                  <Row className="mb-3">
-                    <Col md="6">
-                      <CustomField
-                        name="documentNumber"
-                        placeholder="Documento de Identidad"
-                        onChange={handleDocChange}
-                        value={values.documentNumber}
-                        disabled={submitting}
-                        isRequired={true}
-                      />
-                    </Col>
-                    <Col md="6" className="text-end">
-                      <Button
-                        type="submit"
-                        disabled={submitting}
-                        className="bg-gradient-success">
-                        {submitting ? (
-                          <Spinner size="sm" />
-                        ) : creating ? (
-                          "Guardar Cliente"
-                        ) : (
-                          "Buscar Cliente"
-                        )}
-                      </Button>
-                    </Col>
-                  </Row>
-
-                  {(creating || customer?.id) && (
-                    <>
-                      <Row>
-                        <Col md="6">
-                          <CustomField
-                            name="firstName"
-                            placeholder="Nombre"
-                            disabled={!!customer?.id || submitting}
-                            isRequired={creating}
-                          />
-                        </Col>
-                        <Col md="6">
-                          <CustomField
-                            name="lastName"
-                            placeholder="Apellido"
-                            disabled={!!customer?.id || submitting}
-                            isRequired={creating}
-                          />
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col md="6">
-                          <CustomField
-                            name="email"
-                            placeholder="Correo Electrónico"
-                            disabled={!!customer?.id || submitting}
-                            isRequired={creating}
-                          />
-                        </Col>
-                        <Col md="6">
-                          <FormGroup className="position-relative">
-                            <PhoneInputField
-                              name="phone"
-                              type="text"
-                              className="form-control d-flex"
-                              placeholder="Teléfono"
-                              autoComplete="tel"
-                              disabled={!!customer?.id || submitting}
-                              isRequired={creating}
-                            />
-                            <CustomErrorMessage name="phone" />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <ErrorAlert />
-                      <div className="text-end mt-3">
-                        {customer?.id && (
-                          <Button
-                            onClick={() => setCurrentStep(1)}
-                            color="secondary"
-                            disabled={submitting}>
-                            Siguiente
-                          </Button>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </Form>
-              );
-            }}
-          </Formik>
+          <CustomerForm
+            customer={customer}
+            setCustomer={setCustomer}
+            setCurrentStep={setCurrentStep}
+            submitting={submitting}
+            setCreating={setCreating}
+            setSubmitting={setSubmitting}
+            hotelId={hotelId}
+            creating={creating}
+          />
         </TabPane>
 
         <TabPane tabId={1}>
