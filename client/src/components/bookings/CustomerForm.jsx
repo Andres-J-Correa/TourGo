@@ -145,6 +145,7 @@ function CustomerForm({
                       placeholder="Correo Electrónico"
                       disabled={!!customer?.id || submitting}
                       isRequired={creating}
+                      autoComplete="email"
                     />
                   </Col>
                   <Col md="6">
@@ -185,10 +186,8 @@ function CustomerForm({
 export default CustomerForm;
 
 CustomerForm.propTypes = {
-  customer: PropTypes.object.isRequired,
+  customer: PropTypes.object,
   setCustomer: PropTypes.func.isRequired,
-  handleDocumentSubmit: PropTypes.func.isRequired,
-  handleCustomerCreate: PropTypes.func.isRequired,
   setCurrentStep: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,
   setCreating: PropTypes.func.isRequired,

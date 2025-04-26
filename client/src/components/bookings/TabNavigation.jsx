@@ -38,5 +38,10 @@ export default TabNavigation;
 TabNavigation.propTypes = {
   currentStep: PropTypes.number.isRequired,
   setCurrentStep: PropTypes.func.isRequired,
-  isStepComplete: PropTypes.arrayOf(PropTypes.bool).isRequired,
+  isStepComplete: PropTypes.shape({
+    0: PropTypes.bool.isRequired,
+    1: PropTypes.bool.isRequired,
+    2: PropTypes.bool.isRequired,
+    3: PropTypes.bool.isRequired,
+  }),
 };

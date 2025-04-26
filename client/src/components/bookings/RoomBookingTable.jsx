@@ -1,5 +1,5 @@
 // 🧠 Required imports (same as before)
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import classNames from "classnames";
@@ -26,12 +26,15 @@ const RoomBookingTable = ({
   isDisabled,
   bookingId,
 }) => {
-  const currentBookings =
-    roomBookings?.length > 0
-      ? roomBookings?.filter((b) => Number(b.bookingId) === Number(bookingId))
-      : [];
+  const currentBookings = useMemo(
+    () =>
+      roomBookings?.length > 0
+        ? roomBookings?.filter((b) => Number(b.bookingId) === Number(bookingId))
+        : [],
+    [roomBookings, bookingId]
+  );
 
-  const [selectedCells, setSelectedCells] = useState([...currentBookings]);
+  const [selectedCells, setSelectedCells] = useState([]);
   const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [price, setPrice] = useState("");
@@ -201,7 +204,11 @@ const RoomBookingTable = ({
     );
   }, [selectedCells, setSelectedRoomBookings]);
 
-  useEffect(() => {});
+  useEffect(() => {
+    if (currentBookings?.length > 0) {
+      setSelectedCells([...currentBookings]);
+    }
+  }, [currentBookings]);
 
   return (
     <Container fluid className="mt-4 px-0">

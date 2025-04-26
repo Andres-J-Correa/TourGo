@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAll } from "services/hotelService";
 import { Container, Row, Col, Card } from "reactstrap";
-import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import { toast } from "react-toastify";
 import "./hotelsview.css";
@@ -41,22 +41,19 @@ const HotelsView = () => {
   return (
     <Container className="mt-4">
       <Breadcrumb breadcrumbs={breadcrumbs} active="Hoteles" />
-      {isLoading ? (
-        <SimpleLoader />
-      ) : (
-        <Row>
-          {hotels.map((hotel) => (
-            <Col key={hotel.id} xs="12" sm="6" md="4" lg="3" className="mb-3">
-              <Card
-                className="p-3 text-center hotel-card shadow bg-dark text-white"
-                onClick={() => handleCardClick(hotel.id)}
-                role="button">
-                {hotel.name}
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
+      <LoadingOverlay isVisible={isLoading} message="Cargando..." />
+      <Row>
+        {hotels.map((hotel) => (
+          <Col key={hotel.id} xs="12" sm="6" md="4" lg="3" className="mb-3">
+            <Card
+              className="p-3 text-center hotel-card shadow bg-dark text-white"
+              onClick={() => handleCardClick(hotel.id)}
+              role="button">
+              {hotel.name}
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </Container>
   );
 };

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import DatePicker from "react-datepicker";
 import dayjs from "dayjs";
+import "react-datepicker/dist/react-datepicker.css";
+import "./DatePickers.css"; // Custom styles for the date picker
 
 const DatePickers = ({
   startDate,
@@ -12,71 +15,77 @@ const DatePickers = ({
   maxDate,
   isDisabled,
 }) => {
-  const [startDateState, setStartDateState] = useState(startDate);
-  const [endDateState, setEndDateState] = useState(endDate);
+  const parseDate = (date) => {
+    if (!date) return null;
+    return typeof date === "string" ? dayjs(date).toDate() : date;
+  };
 
-  // Sync internal state with props when they change
+  const [startDateState, setStartDateState] = useState(parseDate(startDate));
+  const [endDateState, setEndDateState] = useState(parseDate(endDate));
+
+  // Sync local state when props change
   useEffect(() => {
-    setStartDateState(startDate);
+    setStartDateState(parseDate(startDate));
   }, [startDate]);
 
   useEffect(() => {
-    setEndDateState(endDate);
+    setEndDateState(parseDate(endDate));
   }, [endDate]);
 
-  const formatDate = (date) => (date ? dayjs(date).format("YYYY-MM-DD") : "");
-
-  const handleStartInputChange = (e) => {
-    const newDate = dayjs(e.target.value);
-    if (newDate.isValid()) {
-      handleStartChange(newDate.format("YYYY-MM-DD"));
-      setStartDateState(newDate.format("YYYY-MM-DD"));
-      if (endDateState && newDate.isAfter(dayjs(endDateState))) {
-        handleEndChange(newDate.add(1, "day").format("YYYY-MM-DD"));
-        setEndDateState(newDate.add(1, "day").format("YYYY-MM-DD"));
+  const onStartDateChange = (date) => {
+    if (date) {
+      setStartDateState(date);
+      handleStartChange(dayjs(date).format("YYYY-MM-DD"));
+      if (endDateState && dayjs(date).isAfter(dayjs(endDateState))) {
+        const newEndDate = dayjs(date).add(1, "day").toDate();
+        setEndDateState(newEndDate);
+        handleEndChange(dayjs(newEndDate).format("YYYY-MM-DD"));
       }
     }
   };
 
-  const handleEndInputChange = (e) => {
-    const newDate = dayjs(e.target.value);
-    if (newDate.isValid() && dayjs(startDateState).isBefore(newDate, "day")) {
-      handleEndChange(newDate.format("YYYY-MM-DD"));
-      setEndDateState(newDate.format("YYYY-MM-DD"));
+  const onEndDateChange = (date) => {
+    if (date && startDateState && dayjs(date).isAfter(dayjs(startDateState))) {
+      setEndDateState(date);
+      handleEndChange(dayjs(date).format("YYYY-MM-DD"));
     }
   };
 
   return (
     <div className="d-flex align-items-center gap-3 mb-3">
-      <div className="form-floating">
-        <input
-          id="start-date"
-          type="date"
-          className="form-control"
-          value={formatDate(startDateState)}
-          onChange={handleStartInputChange}
-          max={maxDate ? formatDate(maxDate) : ""}
-          disabled={isDisabled}
-        />
-        <label htmlFor="start-date" className="form-label text-body-secondary">
+      <div>
+        <label htmlFor="start-date" className="form-label w-100">
           {startDateName}
         </label>
+        <DatePicker
+          id="start-date"
+          selected={startDateState}
+          onChange={onStartDateChange}
+          dateFormat="yyyy-MM-dd"
+          maxDate={parseDate(maxDate)}
+          disabled={isDisabled}
+          className="form-control"
+          placeholderText={startDateName}
+          popperClassName="custom-datepicker"
+        />
       </div>
 
-      <div className="form-floating">
-        <input
-          id="end-date"
-          type="date"
-          className="form-control"
-          value={formatDate(endDateState)}
-          onChange={handleEndInputChange}
-          min={startDateState ? formatDate(startDateState) : ""}
-          max={maxDate ? formatDate(maxDate) : ""}
-          disabled={!startDateState || isDisabled}
-        />
-        <label htmlFor="end-date" className="form-label text-body-secondary">
+      <div>
+        <label htmlFor="end-date" className="form-label w-100">
           {endDateName}
         </label>
+        <DatePicker
+          id="end-date"
+          selected={endDateState}
+          onChange={onEndDateChange}
+          dateFormat="yyyy-MM-dd"
+          minDate={startDateState}
+          maxDate={parseDate(maxDate)}
+          disabled={!startDateState || isDisabled}
+          className="form-control"
+          placeholderText={endDateName}
+          popperClassName="custom-datepicker"
+        />
       </div>
     </div>
   );
