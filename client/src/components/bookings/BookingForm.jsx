@@ -79,32 +79,15 @@ function BookingForm({
 
   const isLoading = isLoadingBookings || isLoadingCharges || isLoadingRooms;
 
-  const handleDateChange = (field) => (value, approved) => {
-    return new Promise((resolve, reject) => {
-      debugger;
-      if (selectedRoomBookings.length > 0 && !approved) {
-        Swal.fire({
-          title: "Cambiar las fechas eliminará las celdas seleccionadas.",
-          text: "¿Está seguro de que desea continuar?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Sí, cambiar",
-          cancelButtonText: "Cancelar",
-        })
-          .then((result) => {
-            if (result.isConfirmed) {
-              setDates((prev) => ({ ...prev, [field]: value }));
-              setSelectedRoomBookings([]);
-              resolve(true); // success
-            } else {
-              resolve(false); // user canceled
-            }
-          })
-          .catch(reject); // in case Swal throws an error
-      } else {
-        setDates((prev) => ({ ...prev, [field]: value }));
-        resolve(true);
+  const handleDateChange = (field) => (value) => {
+    setDates((prev) => {
+      const newState = { ...prev };
+      if (field === "start" && value && dayjs(value).isAfter(dayjs(prev.end))) {
+        const newEndDate = dayjs(value).add(1, "day").toDate();
+        newState.end = dayjs(newEndDate).format("YYYY-MM-DD");
       }
+
+      return { ...newState, [field]: value };
     });
   };
 
@@ -155,9 +138,6 @@ function BookingForm({
               id: res.item.bookingId,
               invoiceId: res.item.invoiceId,
             }));
-            setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
-              ...values,
-            });
             toast.success("Reserva guardada con éxito");
             setCurrentStep(2);
           } else {
@@ -195,8 +175,9 @@ function BookingForm({
         text: "Los cambios no guardados se perderán.",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, continuar",
+        confirmButtonText: "Sí, descartar cambios",
         cancelButtonText: "Cancelar",
+        confirmButtonColor: "red",
       }).then((result) => {
         if (result.isConfirmed) {
           resetFormToPrevious();
@@ -312,6 +293,14 @@ function BookingForm({
     }
   }, [roomBookings, bookingFormInitialValues]);
 
+  useEffect(() => {
+    if (bookingFormRef?.current) {
+      bookingFormRef.current.setFieldValue("roomBookings", [
+        ...selectedRoomBookings,
+      ]);
+    }
+  }, [selectedRoomBookings]);
+
   return (
     <>
       <LoadingOverlay isVisible={isLoading} message="Cargando información." />
@@ -319,6 +308,8 @@ function BookingForm({
         dates={dates}
         onDateChange={handleDateChange}
         isDisabled={submitting || isLoadingBookings}
+        selectedRoomBookings={selectedRoomBookings}
+        setSelectedRoomBookings={setSelectedRoomBookings}
       />
       {dates.start && dates.end && (
         <>

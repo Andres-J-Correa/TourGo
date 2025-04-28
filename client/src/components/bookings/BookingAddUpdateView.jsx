@@ -66,7 +66,7 @@ const BookingAddUpdateView = () => {
     }
   }, [bookingId]);
   return (
-    <div className="container mt-4">
+    <div className="container my-4">
       <LoadingOverlay
         isVisible={submitting || isLoading}
         message={isLoading ? "Cargando información" : "procesando..."}

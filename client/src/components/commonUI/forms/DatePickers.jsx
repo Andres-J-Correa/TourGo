@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import DatePicker from "react-datepicker";
 import dayjs from "dayjs";
@@ -20,36 +20,15 @@ const DatePickers = ({
     return typeof date === "string" ? dayjs(date).toDate() : date;
   };
 
-  const [startDateState, setStartDateState] = useState(parseDate(startDate));
-  const [endDateState, setEndDateState] = useState(parseDate(endDate));
-
-  // Sync local state when props change
-  useEffect(() => {
-    setStartDateState(parseDate(startDate));
-  }, [startDate]);
-
-  useEffect(() => {
-    setEndDateState(parseDate(endDate));
-  }, [endDate]);
-
-  const onStartDateChange = async (date) => {
+  const onStartDateChange = (date) => {
     if (date) {
-      const proceed = await handleStartChange(dayjs(date).format("YYYY-MM-DD"));
-      if (!proceed) return; // If the parent component doesn't want to proceed, exit early
-      setStartDateState(date);
-      if (endDateState && dayjs(date).isAfter(dayjs(endDateState))) {
-        const newEndDate = dayjs(date).add(1, "day").toDate();
-        setEndDateState(newEndDate);
-        handleEndChange(dayjs(newEndDate).format("YYYY-MM-DD"), true);
-      }
+      handleStartChange(dayjs(date).format("YYYY-MM-DD"));
     }
   };
 
-  const onEndDateChange = async (date) => {
-    if (date && startDateState && dayjs(date).isAfter(dayjs(startDateState))) {
-      const proceed = await handleEndChange(dayjs(date).format("YYYY-MM-DD"));
-      if (!proceed) return; // If the parent component doesn't want to proceed, exit early
-      setEndDateState(date);
+  const onEndDateChange = (date) => {
+    if (date) {
+      handleEndChange(dayjs(date).format("YYYY-MM-DD"));
     }
   };
 
@@ -61,7 +40,7 @@ const DatePickers = ({
         </label>
         <DatePicker
           id="start-date"
-          selected={startDateState}
+          selected={startDate}
           onChange={onStartDateChange}
           dateFormat="yyyy-MM-dd"
           maxDate={parseDate(maxDate)}
@@ -69,6 +48,7 @@ const DatePickers = ({
           className="form-control"
           placeholderText={startDateName}
           popperClassName="custom-datepicker"
+          autoComplete="off"
         />
       </div>
 
@@ -78,15 +58,16 @@ const DatePickers = ({
         </label>
         <DatePicker
           id="end-date"
-          selected={endDateState}
+          selected={endDate}
           onChange={onEndDateChange}
           dateFormat="yyyy-MM-dd"
-          minDate={startDateState}
+          minDate={dayjs(startDate).add(1, "day")}
           maxDate={parseDate(maxDate)}
-          disabled={!startDateState || isDisabled}
+          disabled={!startDate || isDisabled}
           className="form-control"
           placeholderText={endDateName}
           popperClassName="custom-datepicker"
+          autoComplete="off"
         />
       </div>
     </div>

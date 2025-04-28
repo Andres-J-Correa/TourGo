@@ -35,10 +35,6 @@ export const customerSchema = Yup.object().shape({
 });
 
 export const bookingSchema = Yup.object().shape({
-  customerId: Yup.number()
-    .required("El cliente es obligatorio")
-    .min(1, "El cliente es obligatorio"),
-
   externalId: Yup.string()
     .min(2, "La identificación externa debe tener al menos 2 caracteres")
     .max(100, "La identificación externa no puede exceder los 100 caracteres")
