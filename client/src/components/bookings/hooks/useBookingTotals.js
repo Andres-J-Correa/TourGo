@@ -10,11 +10,11 @@ export default function useBookingTotals(
     }, 0);
 
     const chargesTotal = selectedCharges.reduce((acc, charge) => {
-      if (charge.type === 1) {
+      if (charge.type.id === 1) {
         // Percentage of subtotal
         return acc + subtotal * charge.amount;
       }
-      if (charge.type === 2) {
+      if (charge.type.id === 2) {
         // Per booking
         return acc + charge.amount * selectedRoomBookings.length;
       }

@@ -100,6 +100,7 @@ const BookingAddUpdateView = () => {
             customer={customer}
             booking={booking}
             setBooking={setBooking}
+            setCustomer={setCustomer}
           />
         </TabPane>
         <TabPane tabId={2}>

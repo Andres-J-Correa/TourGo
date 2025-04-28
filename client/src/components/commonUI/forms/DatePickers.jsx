@@ -32,22 +32,24 @@ const DatePickers = ({
     setEndDateState(parseDate(endDate));
   }, [endDate]);
 
-  const onStartDateChange = (date) => {
+  const onStartDateChange = async (date) => {
     if (date) {
+      const proceed = await handleStartChange(dayjs(date).format("YYYY-MM-DD"));
+      if (!proceed) return; // If the parent component doesn't want to proceed, exit early
       setStartDateState(date);
-      handleStartChange(dayjs(date).format("YYYY-MM-DD"));
       if (endDateState && dayjs(date).isAfter(dayjs(endDateState))) {
         const newEndDate = dayjs(date).add(1, "day").toDate();
         setEndDateState(newEndDate);
-        handleEndChange(dayjs(newEndDate).format("YYYY-MM-DD"));
+        handleEndChange(dayjs(newEndDate).format("YYYY-MM-DD"), true);
       }
     }
   };
 
-  const onEndDateChange = (date) => {
+  const onEndDateChange = async (date) => {
     if (date && startDateState && dayjs(date).isAfter(dayjs(startDateState))) {
+      const proceed = await handleEndChange(dayjs(date).format("YYYY-MM-DD"));
+      if (!proceed) return; // If the parent component doesn't want to proceed, exit early
       setEndDateState(date);
-      handleEndChange(dayjs(date).format("YYYY-MM-DD"));
     }
   };
 

@@ -1,5 +1,5 @@
 // 🧠 Required imports (same as before)
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import classNames from "classnames";
@@ -23,24 +23,16 @@ const RoomBookingTable = ({
   rooms,
   roomBookings,
   setSelectedRoomBookings,
-  isDisabled,
+  selectedRoomBookings,
   bookingId,
 }) => {
-  const currentBookings = useMemo(
-    () =>
-      roomBookings?.length > 0
-        ? roomBookings?.filter((b) => Number(b.bookingId) === Number(bookingId))
-        : [],
-    [roomBookings, bookingId]
-  );
-
-  const [selectedCells, setSelectedCells] = useState([]);
   const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [price, setPrice] = useState("");
   const [currentSelection, setCurrentSelection] = useState([]);
   const [lastSelection, setLastSelection] = useState([]);
   const [dates, setDates] = useState([]);
+  const [isCtrlKeyPressed, setIsCtrlKeyPressed] = useState(false);
 
   // 🔍 Booking lookup
   const getBooking = (date, roomId) =>
@@ -56,7 +48,7 @@ const RoomBookingTable = ({
     const isPreBooked = getBooking(date, roomId);
     if (isPreBooked) return;
 
-    const alreadySelected = selectedCells.find(
+    const alreadySelected = selectedRoomBookings.find(
       (c) => c.date === date && c.roomId === roomId
     );
 
@@ -97,7 +89,7 @@ const RoomBookingTable = ({
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        setSelectedCells((prev) =>
+        setSelectedRoomBookings((prev) =>
           prev.filter(
             (cell) =>
               !cellsToDeselect.some(
@@ -115,7 +107,7 @@ const RoomBookingTable = ({
         ...cell,
         price: parseFloat(price),
       }));
-      setSelectedCells((prev) => [...prev, ...newSelections]);
+      setSelectedRoomBookings((prev) => [...prev, ...newSelections]);
       setLastSelection(newSelections);
       setCurrentSelection([]);
       setPrice("");
@@ -127,7 +119,7 @@ const RoomBookingTable = ({
   };
 
   // 🔄 Utility buttons
-  const toggleModal = () => setModalOpen(!modalOpen);
+  const toggleModal = () => setModalOpen((prev) => !prev);
   const clearSelection = () => {
     Swal.fire({
       title: "¿Desea borrar toda la selección?",
@@ -138,7 +130,7 @@ const RoomBookingTable = ({
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        setSelectedCells([]);
+        setSelectedRoomBookings([]);
         setLastSelection([]);
         setCurrentSelection([]);
         setPrice("");
@@ -155,7 +147,7 @@ const RoomBookingTable = ({
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        setSelectedCells((prev) =>
+        setSelectedRoomBookings((prev) =>
           prev.filter(
             (cell) =>
               !lastSelection?.some(
@@ -198,185 +190,193 @@ const RoomBookingTable = ({
     setDates(dateList);
   }, [startDate, endDate]);
 
+  // 🆕 Ctrl key handler for multi-select
   useEffect(() => {
-    setSelectedRoomBookings(
-      selectedCells.map((cell) => ({ ...cell, price: cell.price }))
-    );
-  }, [selectedCells, setSelectedRoomBookings]);
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && !isMultiSelect) {
+        setIsMultiSelect(true);
+        setIsCtrlKeyPressed(true);
+      }
+    };
 
-  useEffect(() => {
-    if (currentBookings?.length > 0) {
-      setSelectedCells([...currentBookings]);
-    }
-  }, [currentBookings]);
+    const handleKeyUp = (event) => {
+      if (!event.ctrlKey && isMultiSelect && isCtrlKeyPressed) {
+        if (currentSelection.length > 0) {
+          toggleModal();
+        } else {
+          setIsMultiSelect(false);
+        }
+      }
+      setIsCtrlKeyPressed(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [isMultiSelect, currentSelection, isCtrlKeyPressed]);
 
   return (
     <Container fluid className="mt-4 px-0">
-      {isDisabled ? (
-        <div className="alert alert-warning text-center" role="alert">
-          <strong>Selección de habitaciones desactivada</strong>
-          <p className="mb-0">
-            No se puede seleccionar habitaciones en este momento.
-          </p>
-        </div>
-      ) : (
-        <>
-          <h5>Seleccione las habitaciones y fechas</h5>
-          <p className="text-muted fw-bold bg-light p-2 rounded">
-            Haga clic en las celdas para seleccionar habitaciones y fechas.
-            Puede seleccionar varias celdas oprimiendo el botón{" "}
-            <span style={{ color: "blue" }}>"Activar Multi-Selección"</span>, o
-            presionando la tecla "Ctrl" mientras hace clic en las celdas.
-          </p>
-          <Row className="mb-3">
-            <Col>
-              <button
-                className={classNames({
-                  "btn-outline-danger": isMultiSelect,
-                  "btn-primary": !isMultiSelect,
-                  btn: true,
-                })}
-                onClick={handleActivateMultiSelect}>
-                {isMultiSelect
-                  ? "Cancelar Multi-Selección"
-                  : "Activar Multi-Selección"}
-              </button>
-              {isMultiSelect && currentSelection.length > 0 && (
+      <>
+        <h5>Seleccione las habitaciones y fechas</h5>
+        <p className="text-muted fw-bold bg-light p-2 rounded">
+          Haga clic en las celdas para seleccionar habitaciones y fechas. Puede
+          seleccionar varias celdas oprimiendo el botón{" "}
+          <span style={{ color: "blue" }}>"Activar Multi-Selección"</span>, o
+          presionando la tecla "Ctrl" mientras hace clic en las celdas.
+        </p>
+        <Row className="mb-3">
+          <Col>
+            <button
+              className={classNames({
+                "btn-outline-danger": isMultiSelect,
+                "btn-primary": !isMultiSelect,
+                btn: true,
+              })}
+              onClick={handleActivateMultiSelect}
+              disabled={isCtrlKeyPressed}>
+              {isMultiSelect
+                ? "Cancelar Multi-Selección"
+                : "Activar Multi-Selección"}
+            </button>
+            {isMultiSelect &&
+              !isCtrlKeyPressed &&
+              currentSelection.length > 0 && (
                 <Button color="success" className="ms-2" onClick={toggleModal}>
                   Finalizar Selección
                 </Button>
               )}
-            </Col>
-            <Col className="text-end">
-              {lastSelection.length > 0 && (
-                <Button color="secondary" className="ms-2" onClick={undoLast}>
-                  Deshacer Última Selección
-                </Button>
-              )}
-              {selectedCells.length > 0 && (
-                <Button
-                  color="warning"
-                  className="ms-2"
-                  onClick={clearSelection}>
-                  Borrar Todo
-                </Button>
-              )}
-            </Col>
-          </Row>
+          </Col>
+          <Col className="text-end">
+            {lastSelection.length > 0 && (
+              <Button color="secondary" className="ms-2" onClick={undoLast}>
+                Deshacer Última Selección
+              </Button>
+            )}
+            {selectedRoomBookings.length > 0 && (
+              <Button color="warning" className="ms-2" onClick={clearSelection}>
+                Borrar Todo
+              </Button>
+            )}
+          </Col>
+        </Row>
 
-          <div
-            style={{
-              overflow: "auto",
-              maxHeight: "600px",
-              position: "relative",
-            }}>
-            <Table bordered className="table-fixed">
-              <thead className="sticky-top bg-white" style={{ zIndex: 2 }}>
-                <tr>
+        <div
+          style={{
+            overflow: "auto",
+            maxHeight: "600px",
+            position: "relative",
+          }}>
+          <Table bordered className="table-fixed">
+            <thead className="sticky-top bg-white" style={{ zIndex: 2 }}>
+              <tr>
+                <th
+                  style={{
+                    width: "150px",
+                    position: "sticky",
+                    left: 0,
+                    background: "#fff",
+                    textAlign: "center",
+                  }}>
+                  Fecha
+                </th>
+                {rooms.map((room) => (
                   <th
+                    key={room.id}
+                    className="text-center"
+                    style={{ minWidth: "120px" }}>
+                    {room.name}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {dates.map((date) => (
+                <tr key={date}>
+                  <td
                     style={{
-                      width: "150px",
+                      width: "200px",
+                      fontWeight: "bold",
                       position: "sticky",
                       left: 0,
-                      background: "#fff",
+                      background: "#f8f9fa",
                       textAlign: "center",
                     }}>
-                    Fecha
-                  </th>
-                  {rooms.map((room) => (
-                    <th
-                      key={room.id}
-                      className="text-center"
-                      style={{ minWidth: "120px" }}>
-                      {room.name}
-                    </th>
-                  ))}
+                    {dayjs(date).format("ddd DD - MMM - YYYY")}
+                  </td>
+                  {rooms.map((room) => {
+                    const booking = getBooking(date, room.id);
+                    const currentSelected = currentSelection.find(
+                      (c) => c.date === date && c.roomId === room.id
+                    );
+                    const selected = selectedRoomBookings.find(
+                      (c) =>
+                        c.date === date &&
+                        (c.roomId === room.id || c.room?.id === room.id)
+                    );
+                    return (
+                      <td
+                        key={room.id}
+                        className={`text-center ${
+                          booking
+                            ? "bg-secondary text-white"
+                            : selected
+                            ? "bg-warning"
+                            : currentSelected
+                            ? "bg-success text-white"
+                            : ""
+                        }`}
+                        style={{
+                          cursor: booking ? "not-allowed" : "pointer",
+                          minWidth: "120px",
+                        }}
+                        onClick={() => handleCellClick(date, room.id)}>
+                        {booking
+                          ? `$${booking.price.toFixed(2)}`
+                          : selected?.price
+                          ? `$${selected.price.toFixed(2)}`
+                          : currentSelected?.roomId
+                          ? "seleccionado"
+                          : "➕"}
+                      </td>
+                    );
+                  })}
                 </tr>
-              </thead>
-              <tbody>
-                {dates.map((date) => (
-                  <tr key={date}>
-                    <td
-                      style={{
-                        width: "200px",
-                        fontWeight: "bold",
-                        position: "sticky",
-                        left: 0,
-                        background: "#f8f9fa",
-                        textAlign: "center",
-                      }}>
-                      {dayjs(date).format("ddd DD - MMM - YYYY")}
-                    </td>
-                    {rooms.map((room) => {
-                      const booking = getBooking(date, room.id);
-                      const currentSelected = currentSelection.find(
-                        (c) => c.date === date && c.roomId === room.id
-                      );
-                      const selected = selectedCells.find(
-                        (c) =>
-                          c.date === date &&
-                          (c.roomId === room.id || c.room?.id === room.id)
-                      );
-                      return (
-                        <td
-                          key={room.id}
-                          className={`text-center ${
-                            booking
-                              ? "bg-secondary text-white"
-                              : selected
-                              ? "bg-warning"
-                              : currentSelected
-                              ? "bg-success text-white"
-                              : ""
-                          }`}
-                          style={{
-                            cursor: booking ? "not-allowed" : "pointer",
-                            minWidth: "120px",
-                          }}
-                          onClick={() => handleCellClick(date, room.id)}>
-                          {booking
-                            ? `$${booking.price.toFixed(2)}`
-                            : selected?.price
-                            ? `$${selected.price.toFixed(2)}`
-                            : currentSelected?.roomId
-                            ? "seleccionado"
-                            : "➕"}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </div>
+              ))}
+            </tbody>
+          </Table>
+        </div>
 
-          {/* 💬 Modal */}
-          <Modal isOpen={modalOpen} toggle={toggleModal} backdrop="static">
-            <ModalHeader toggle={toggleModal}>Ingresar Precio</ModalHeader>
-            <ModalBody>
-              <Input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="Ingrese el precio"
-                min="0"
-                step="0.01"
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                color="primary"
-                onClick={handlePriceSubmit}
-                disabled={!price}>
-                Guardar
-              </Button>
-              <Button color="secondary" onClick={handlePriceCancel}>
-                Cancelar
-              </Button>
-            </ModalFooter>
-          </Modal>
-        </>
-      )}
+        {/* 💬 Modal */}
+        <Modal isOpen={modalOpen} toggle={toggleModal} backdrop="static">
+          <ModalHeader toggle={toggleModal}>Ingresar Precio</ModalHeader>
+          <ModalBody>
+            <Input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="Ingrese el precio"
+              min="0"
+              step="0.01"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="primary"
+              onClick={handlePriceSubmit}
+              disabled={!price}>
+              Guardar
+            </Button>
+            <Button color="secondary" onClick={handlePriceCancel}>
+              Cancelar
+            </Button>
+          </ModalFooter>
+        </Modal>
+      </>
     </Container>
   );
 };
@@ -398,10 +398,19 @@ RoomBookingTable.propTypes = {
         id: PropTypes.number.isRequired,
         name: PropTypes.string.isRequired,
       }),
-      bookingId: PropTypes.number.isRequired,
+      bookingId: PropTypes.number,
       price: PropTypes.number.isRequired,
     })
   ).isRequired,
+  setSelectedRoomBookings: PropTypes.func.isRequired,
+  selectedRoomBookings: PropTypes.arrayOf(
+    PropTypes.shape({
+      date: PropTypes.string.isRequired,
+      roomId: PropTypes.number.isRequired,
+      price: PropTypes.number,
+    })
+  ).isRequired,
+  bookingId: PropTypes.number.isRequired,
 };
 
 export default RoomBookingTable;

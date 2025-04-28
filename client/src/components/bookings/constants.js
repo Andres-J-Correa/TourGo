@@ -135,7 +135,7 @@ export const defaultBooking = {
   },
   externalCommission: 0,
   nights: 0,
-  subotal: 0,
+  subtotal: 0,
   charges: 0,
   total: 0,
   invoiceId: 0,
@@ -151,6 +151,24 @@ export const bookingDefaultInitialValues = {
   notes: "",
 };
 
+export const sanitizeBooking = (booking) => {
+  const sanitizedBooking = { ...booking };
+  sanitizedBooking.bookingProviderId =
+    sanitizedBooking.bookingProvider?.id ||
+    sanitizedBooking.bookingProviderId ||
+    "1";
+  sanitizedBooking.externalId = sanitizedBooking.externalId || "";
+  sanitizedBooking.eta = sanitizedBooking.eta || "";
+  sanitizedBooking.externalCommission =
+    sanitizedBooking.externalCommission || "";
+  sanitizedBooking.notes = sanitizedBooking.notes || "";
+  sanitizedBooking.childGuests = sanitizedBooking.childGuests || "";
+  sanitizedBooking.adultGuests = sanitizedBooking.adultGuests || "";
+  sanitizedBooking.customerId = booking.customer?.id || booking.customerId;
+
+  return sanitizedBooking;
+};
+
 export const bookingFormTabs = [
   { id: 0, icon: faUser, name: "Cliente" },
   { id: 1, icon: faFilePen, name: "Informacion de la Reserva" },
@@ -161,4 +179,112 @@ export const bookingFormTabs = [
 export const formatAmount = (amount, typeId) => {
   if (typeId === 1) return `${(amount * 100).toFixed(0)}%`;
   return `$${amount.toFixed(2)}`;
+};
+
+export const deepCompareBooking = (obj1, obj2) => {
+  const keysToCompare = [
+    "customerId",
+    "externalId",
+    "bookingProviderId",
+    "arrivalDate",
+    "departureDate",
+    "eta",
+    "adultGuests",
+    "childGuests",
+    "notes",
+    "externalCommission",
+    "subtotal",
+    "charges",
+    "extraCharges",
+    "roomBookings",
+  ];
+
+  const forceNumericFields = new Set([
+    "customerId",
+    "bookingProviderId",
+    "adultGuests",
+    "childGuests",
+    "externalCommission",
+  ]);
+
+  function areValuesEqual(val1, val2, key) {
+    if (val1 == null && val2 == null) return true; // Treat null and undefined as equal
+
+    if (val1 === "" && val2 === "") return true; // Treat empty strings as equal
+    if ((val1 == null && val2 === "") || (val1 === "" && val2 == null))
+      return true; // Treat null and empty strings as equal
+
+    if (forceNumericFields.has(key)) {
+      // Force both sides to numbers
+      const num1 = Number(val1);
+      const num2 = Number(val2);
+      return Math.abs(num1 - num2) < 0.001;
+    }
+
+    if (typeof val1 === "number" && typeof val2 === "number") {
+      return Math.abs(val1 - val2) < 0.001; // 3 decimal precision
+    }
+
+    return val1 === val2;
+  }
+
+  function compareArrays(arr1, arr2, compareFn) {
+    if (!Array.isArray(arr1) && !Array.isArray(arr2)) return true;
+    if (!Array.isArray(arr1) || !Array.isArray(arr2)) return false;
+    if (arr1.length !== arr2.length) return false;
+    for (let i = 0; i < arr1.length; i++) {
+      if (!compareFn(arr1[i], arr2[i])) return false;
+    }
+    return true;
+  }
+
+  function compareExtraCharges(c1, c2) {
+    return areValuesEqual(
+      c1?.extraChargeId,
+      c2?.extraChargeId,
+      "extraChargeId"
+    );
+  }
+
+  function compareRoomBookings(r1, r2) {
+    return (
+      areValuesEqual(r1?.roomId, r2?.roomId, "roomId") &&
+      areValuesEqual(r1?.date, r2?.date, "date") &&
+      areValuesEqual(r1?.price, r2?.price, "price")
+    );
+  }
+
+  for (const key of keysToCompare) {
+    if (key === "extraCharges") {
+      if (
+        !compareArrays(
+          obj1?.extraCharges,
+          obj2?.extraCharges,
+          compareExtraCharges
+        )
+      ) {
+        return false;
+      }
+    } else if (key === "roomBookings") {
+      if (
+        !compareArrays(
+          obj1?.roomBookings,
+          obj2?.roomBookings,
+          compareRoomBookings
+        )
+      ) {
+        return false;
+      }
+    } else {
+      if (!areValuesEqual(obj1?.[key], obj2?.[key], key)) {
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
+export const LOCAL_STORAGE_FORM_KEYS = {
+  PREVIOUS: "previousBookingForm",
+  CURRENT: "currentBookingForm",
 };
