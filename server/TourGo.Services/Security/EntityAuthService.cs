@@ -43,6 +43,12 @@ namespace TourGo.Services.Security
             }
             catch (Exception)
             {
+                isAuthorized = false;
+            }
+
+            if (!isAuthorized)
+            {
+                Console.WriteLine("what?");
             }
 
             return isAuthorized;

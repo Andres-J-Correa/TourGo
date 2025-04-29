@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "reactstrap";
 import { toast } from "react-toastify";
@@ -34,6 +40,8 @@ import dayjs from "dayjs";
 import useBookingFormData from "./hooks/useBookingFormData";
 import useBookingTotals from "./hooks/useBookingTotals";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
+
+const _logger = require("debug")("bookingform");
 
 function BookingForm({
   submitting,
@@ -89,7 +97,13 @@ function BookingForm({
     }
   };
 
-  const isSameDate = (date1, date2) => dayjs(date1).isSame(dayjs(date2), "day");
+  const isSameDate = (date1, date2) => {
+    const isValidDates = dayjs(date1).isValid() && dayjs(date1).isValid();
+    if (isValidDates) {
+      return dayjs(date1).isSame(dayjs(date2), "day");
+    }
+    return false;
+  };
 
   const isLoading = isLoadingBookings || isLoadingCharges || isLoadingRooms;
 
@@ -186,6 +200,38 @@ function BookingForm({
     }
   };
 
+  const autoCompleteForm = useCallback(
+    (formData) => {
+      if (bookingFormRef.current) {
+        bookingFormRef.current.setValues((prev) => ({
+          ...prev,
+          ...formData,
+        }));
+      }
+
+      if (formData.extraCharges?.length > 0) {
+        setSelectedCharges(formData.extraCharges);
+      }
+
+      if (formData.roomBookings?.length > 0) {
+        setSelectedRoomBookings(formData.roomBookings);
+      }
+
+      const isDateStartValid = dayjs(formData.arrivalDate).isValid();
+      const isEndDateValid = dayjs(formData.departureDate).isValid();
+
+      if (isDateStartValid || isEndDateValid) {
+        setDates({
+          start: isDateStartValid ? formData.arrivalDate : null,
+          end: isEndDateValid ? formData.departureDate : null,
+        });
+      }
+
+      setCustomer(formData.customer);
+    },
+    [setCustomer]
+  );
+
   const handleNextClick = () => {
     if (formChanged()) {
       Swal.fire({
@@ -245,7 +291,7 @@ function BookingForm({
       const isSameEndDate = isSameDate(dates.end, booking.departureDate);
       const isSameDates = isSameStartDate && isSameEndDate;
 
-      if (isSameDates && bookingId)
+      if (isSameDates)
         setSelectedRoomBookings(
           roomBookings?.length > 0
             ? roomBookings?.filter(
@@ -254,7 +300,7 @@ function BookingForm({
             : []
         );
     }
-  }, [booking, roomBookings, dates, bookingId]);
+  }, [booking, roomBookings, dates]);
 
   useEffect(() => {
     if (bookingId) {
@@ -263,8 +309,43 @@ function BookingForm({
         .catch(onGetBookingChargesError);
     } else {
       removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
+      const currentForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT);
+      const emptyFormData = {
+        customerId: "",
+        arrivalDate: null,
+        departureDate: null,
+        roomBookings: [],
+        extraCharges: [],
+        subtotal: 0,
+        charges: 0,
+      };
+      if (
+        currentForm &&
+        !currentForm.id &&
+        !deepCompareBooking(
+          emptyFormData,
+          currentForm,
+          currentFormKeysToCompare
+        )
+      ) {
+        Swal.fire({
+          title: "¿Recuperar información?",
+          text: "Realizaste cambios anteriormente que no se guardaron, ¿deseas recuperarlos?",
+          icon: "info",
+          showCancelButton: true,
+          confirmButtonText: "Sí, recuperar",
+          cancelButtonText: "Cancelar",
+          confirmButtonColor: "red",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            autoCompleteForm(currentForm);
+          }
+        });
+      } else {
+        removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
+      }
     }
-  }, [bookingId]);
+  }, [bookingId, autoCompleteForm]);
 
   useEffect(() => {
     const newFormData = {
@@ -275,6 +356,7 @@ function BookingForm({
       extraCharges: [...selectedCharges],
       subtotal: totals.subtotal,
       charges: totals.charges,
+      customer: { ...customer },
     };
 
     const previousForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
@@ -282,8 +364,8 @@ function BookingForm({
 
     const shouldUpdateCurrentForm =
       !isLoading &&
-      (!booking?.id ||
-        (booking?.id &&
+      (!bookingFormInitialValues?.id ||
+        (bookingFormInitialValues?.id &&
           !currentForm &&
           !deepCompareBooking(
             previousForm,
@@ -298,11 +380,15 @@ function BookingForm({
       });
     }
 
-    if (bookingFormRef?.current) {
-      bookingFormRef.current.setValues((prev) => ({
-        ...prev,
-        ...newFormData,
-      }));
+    if (!isLoading && bookingFormRef?.current) {
+      bookingFormRef.current.setValues((prev) => {
+        _logger("prev", prev);
+        _logger("initialValues", bookingFormRef.current.initialValues);
+        return {
+          ...prev,
+          ...newFormData,
+        };
+      });
     }
   }, [
     selectedRoomBookings,
@@ -310,8 +396,9 @@ function BookingForm({
     totals,
     dates,
     customer,
-    booking?.id,
+    bookingFormInitialValues?.id,
     isLoading,
+    bookingFormRef,
   ]);
 
   useEffect(() => {
@@ -335,6 +422,8 @@ function BookingForm({
     }
   }, [roomBookings, bookingFormInitialValues, bookingCharges]);
 
+  useEffect(() => {}, []);
+
   return (
     <>
       <LoadingOverlay isVisible={isLoading} message="Cargando información." />
@@ -345,55 +434,53 @@ function BookingForm({
         selectedRoomBookings={selectedRoomBookings}
         setSelectedRoomBookings={setSelectedRoomBookings}
       />
-      {dates.start && dates.end && (
-        <>
-          <RoomBookingTable
-            startDate={dates.start}
-            endDate={dates.end}
-            rooms={rooms}
-            roomBookings={roomBookings}
-            setSelectedRoomBookings={setSelectedRoomBookings}
-            selectedRoomBookings={selectedRoomBookings}
-            bookingId={booking?.id}
-          />
+      <>
+        <RoomBookingTable
+          startDate={dates.start}
+          endDate={dates.end}
+          rooms={rooms}
+          roomBookings={roomBookings}
+          setSelectedRoomBookings={setSelectedRoomBookings}
+          selectedRoomBookings={selectedRoomBookings}
+          bookingId={booking?.id}
+        />
 
-          <h5 className="mt-4 mb-3">Seleccione los cargos extras</h5>
-          <ExtraChargesSelector
-            charges={charges}
-            selectedCharges={selectedCharges}
-            toggleCharge={toggleCharge}
-            submitting={submitting}
-          />
+        <h5 className="mt-4 mb-3">Seleccione los cargos extras</h5>
+        <ExtraChargesSelector
+          charges={charges}
+          selectedCharges={selectedCharges}
+          toggleCharge={toggleCharge}
+          submitting={submitting}
+        />
 
-          <TotalsDisplay totals={totals} />
+        <TotalsDisplay totals={totals} />
 
-          <AdditionalInfoForm
-            initialValues={bookingFormInitialValues}
-            onSubmit={handleBookingSubmit}
-            validationSchema={bookingSchema}
-            submitting={submitting}
-            innerRef={bookingFormRef}
-          />
-          <div className="d-flex mt-3">
+        <AdditionalInfoForm
+          initialValues={bookingFormInitialValues}
+          onSubmit={handleBookingSubmit}
+          validationSchema={bookingSchema}
+          submitting={submitting}
+          innerRef={bookingFormRef}
+        />
+        <div className="d-flex mt-3">
+          <Button
+            onClick={() => setCurrentStep(0)}
+            color="secondary"
+            className="me-auto"
+            disabled={submitting}>
+            Anterior
+          </Button>
+          {booking?.id && (
             <Button
-              onClick={() => setCurrentStep(0)}
+              onClick={handleNextClick}
               color="secondary"
-              className="me-auto"
+              className="ms-auto"
               disabled={submitting}>
-              Anterior
+              Siguiente
             </Button>
-            {booking?.id && (
-              <Button
-                onClick={handleNextClick}
-                color="secondary"
-                className="ms-auto"
-                disabled={submitting}>
-                Siguiente
-              </Button>
-            )}
-          </div>
-        </>
-      )}
+          )}
+        </div>
+      </>
     </>
   );
 }
