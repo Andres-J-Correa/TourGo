@@ -6,7 +6,11 @@ import {
   setLocalStorageForm,
   getLocalStorageForm,
 } from "utils/localStorageHelper";
-import { LOCAL_STORAGE_FORM_KEYS } from "components/bookings/constants";
+import {
+  LOCAL_STORAGE_FORM_KEYS,
+  bookingKeysToCompare,
+  deepCompareBooking,
+} from "components/bookings/constants";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import dayjs from "dayjs";
@@ -37,6 +41,22 @@ function AdditionalInfoForm({
             [e.target.name]: e.target.value,
           });
         };
+
+        const isUpdate = Boolean(initialValues?.id);
+        let formChanged = false;
+
+        if (isUpdate) {
+          const previousForm = getLocalStorageForm(
+            LOCAL_STORAGE_FORM_KEYS.PREVIOUS
+          );
+          formChanged = deepCompareBooking(
+            values,
+            previousForm,
+            bookingKeysToCompare
+          );
+        }
+
+        const isSubmitDisabled = submitting || (isUpdate && formChanged);
 
         return (
           <Form>
@@ -112,7 +132,7 @@ function AdditionalInfoForm({
             <div className="text-center my-3">
               <Button
                 type="submit"
-                disabled={submitting}
+                disabled={isSubmitDisabled}
                 className="bg-gradient-success">
                 {submitting ? <Spinner size="sm" /> : "Guardar Reserva"}
               </Button>

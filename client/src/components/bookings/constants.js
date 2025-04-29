@@ -177,24 +177,34 @@ export const formatAmount = (amount, typeId) => {
   return `$${amount.toFixed(2)}`;
 };
 
-export const deepCompareBooking = (obj1, obj2) => {
-  const keysToCompare = [
-    "customerId",
-    "externalId",
-    "bookingProviderId",
-    "arrivalDate",
-    "departureDate",
-    "eta",
-    "adultGuests",
-    "childGuests",
-    "notes",
-    "externalCommission",
-    "subtotal",
-    "charges",
-    "extraCharges",
-    "roomBookings",
-  ];
+export const bookingKeysToCompare = [
+  "customerId",
+  "externalId",
+  "bookingProviderId",
+  "arrivalDate",
+  "departureDate",
+  "eta",
+  "adultGuests",
+  "childGuests",
+  "notes",
+  "externalCommission",
+  "subtotal",
+  "charges",
+  "extraCharges",
+  "roomBookings",
+];
 
+export const currentFormKeysToCompare = [
+  "roomBookings",
+  "extraCharges",
+  "subtotal",
+  "charges",
+  "arrivalDate",
+  "departureDate",
+  "customerId",
+];
+
+export const deepCompareBooking = (obj1, obj2, keysToCompare) => {
   const forceNumericFields = new Set([
     "customerId",
     "bookingProviderId",

@@ -19,10 +19,13 @@ import {
   LOCAL_STORAGE_FORM_KEYS,
   deepCompareBooking,
   sanitizeBooking,
+  bookingKeysToCompare,
+  currentFormKeysToCompare,
 } from "components/bookings/constants";
 import {
   setLocalStorageForm,
   getLocalStorageForm,
+  removeItemFromLocalStorage,
 } from "utils/localStorageHelper";
 
 import Swal from "sweetalert2";
@@ -48,6 +51,7 @@ function BookingForm({
   });
   const [selectedCharges, setSelectedCharges] = useState([]);
   const [selectedRoomBookings, setSelectedRoomBookings] = useState([]);
+  const [bookingCharges, setBookingCharges] = useState([]);
 
   const {
     rooms,
@@ -72,10 +76,20 @@ function BookingForm({
   );
 
   const formChanged = () => {
-    const currentForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT);
-    const previousForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
-    return !deepCompareBooking(currentForm, previousForm);
+    if (bookingFormRef?.current) {
+      const currentForm = { ...bookingFormRef.current.values };
+      const previousForm = getLocalStorageForm(
+        LOCAL_STORAGE_FORM_KEYS.PREVIOUS
+      );
+      return !deepCompareBooking(
+        currentForm,
+        previousForm,
+        bookingKeysToCompare
+      );
+    }
   };
+
+  const isSameDate = (date1, date2) => dayjs(date1).isSame(dayjs(date2), "day");
 
   const isLoading = isLoadingBookings || isLoadingCharges || isLoadingRooms;
 
@@ -120,24 +134,19 @@ function BookingForm({
       if (result.isConfirmed) {
         try {
           setSubmitting(true);
-          const payload = {
-            ...values,
-            roomBookings: [...selectedRoomBookings],
-            extraCharges: [...selectedCharges],
-            subtotal: totals.subtotal,
-            charges: totals.charges,
-            arrivalDate: dates.start,
-            departureDate: dates.end,
-            customerId: customer?.id,
-          };
-          const res = await addBooking(payload, hotelId);
+          const res = await addBooking(values, hotelId);
           if (res.isSuccessful) {
             setBooking((prev) => ({
               ...prev,
               ...values,
               id: res.item.bookingId,
               invoiceId: res.item.invoiceId,
+              customer,
             }));
+            setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
+              ...values,
+            });
+            removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
             toast.success("Reserva guardada con éxito");
             setCurrentStep(2);
           } else {
@@ -160,11 +169,20 @@ function BookingForm({
       );
       setSelectedCharges(previousForm.extraCharges || []);
       setSelectedRoomBookings(previousForm.roomBookings || []);
-      setDates({
-        start: previousForm.arrivalDate,
-        end: previousForm.departureDate,
-      });
+
+      const isSameStartDate = isSameDate(dates.start, previousForm.arrivalDate);
+      const isSameEndDate = isSameDate(dates.end, previousForm.departureDate);
+      const isSameDates = isSameStartDate && isSameEndDate;
+
+      if (!isSameDates) {
+        setDates({
+          start: previousForm.arrivalDate,
+          end: previousForm.departureDate,
+        });
+      }
+
       setCustomer(bookingFormInitialValues.customer);
+      removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
     }
   };
 
@@ -196,16 +214,7 @@ function BookingForm({
         extraChargeId: c.id,
       }));
 
-      setSelectedCharges(mappedCharges);
-
-      const previousForm = getLocalStorageForm(
-        LOCAL_STORAGE_FORM_KEYS.PREVIOUS
-      );
-
-      setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
-        ...previousForm,
-        extraCharges: mappedCharges,
-      });
+      setBookingCharges(mappedCharges);
     }
   };
 
@@ -218,6 +227,12 @@ function BookingForm({
   };
 
   useEffect(() => {
+    if (bookingCharges.length > 0) {
+      setSelectedCharges(bookingCharges);
+    }
+  }, [bookingCharges]);
+
+  useEffect(() => {
     if (booking.id > 0) {
       if (!dates.start && !dates.end) {
         setDates({
@@ -226,14 +241,11 @@ function BookingForm({
         });
       }
 
-      const isSameDate = (date1, date2) =>
-        dayjs(date1).isSame(dayjs(date2), "day");
-
       const isSameStartDate = isSameDate(dates.start, booking.arrivalDate);
       const isSameEndDate = isSameDate(dates.end, booking.departureDate);
       const isSameDates = isSameStartDate && isSameEndDate;
 
-      if (isSameDates)
+      if (isSameDates && bookingId)
         setSelectedRoomBookings(
           roomBookings?.length > 0
             ? roomBookings?.filter(
@@ -242,32 +254,65 @@ function BookingForm({
             : []
         );
     }
-  }, [booking, roomBookings, dates]);
+  }, [booking, roomBookings, dates, bookingId]);
 
   useEffect(() => {
     if (bookingId) {
       getChargesByBookingId(bookingId)
         .then(onGetBookingChargesSuccess)
         .catch(onGetBookingChargesError);
+    } else {
+      removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
     }
   }, [bookingId]);
 
   useEffect(() => {
     const newFormData = {
+      customerId: customer?.id,
+      arrivalDate: dates.start,
+      departureDate: dates.end,
       roomBookings: [...selectedRoomBookings],
       extraCharges: [...selectedCharges],
       subtotal: totals.subtotal,
       charges: totals.charges,
-      arrivalDate: dates.start,
-      departureDate: dates.end,
-      customerId: customer?.id,
     };
+
+    const previousForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
     const currentForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT);
-    setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT, {
-      ...currentForm,
-      ...newFormData,
-    });
-  }, [selectedRoomBookings, selectedCharges, totals, dates, customer]);
+
+    const shouldUpdateCurrentForm =
+      !isLoading &&
+      (!booking?.id ||
+        (booking?.id &&
+          !currentForm &&
+          !deepCompareBooking(
+            previousForm,
+            newFormData,
+            currentFormKeysToCompare
+          )));
+
+    if (shouldUpdateCurrentForm) {
+      setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT, {
+        ...currentForm,
+        ...newFormData,
+      });
+    }
+
+    if (bookingFormRef?.current) {
+      bookingFormRef.current.setValues((prev) => ({
+        ...prev,
+        ...newFormData,
+      }));
+    }
+  }, [
+    selectedRoomBookings,
+    selectedCharges,
+    totals,
+    dates,
+    customer,
+    booking?.id,
+    isLoading,
+  ]);
 
   useEffect(() => {
     if (
@@ -278,28 +323,17 @@ function BookingForm({
       const currentRoomBookings = roomBookings.filter(
         (b) => b.bookingId === bookingFormInitialValues?.id
       );
-      const previousForm = getLocalStorageForm(
-        LOCAL_STORAGE_FORM_KEYS.PREVIOUS
-      );
+
       setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
         ...bookingFormInitialValues,
-        ...previousForm,
-        roomBookings: currentRoomBookings,
-      });
-      setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT, {
-        ...bookingFormInitialValues,
+        extraCharges:
+          bookingCharges.length > 0
+            ? [...bookingCharges]
+            : bookingFormInitialValues.extraCharges,
         roomBookings: currentRoomBookings,
       });
     }
-  }, [roomBookings, bookingFormInitialValues]);
-
-  useEffect(() => {
-    if (bookingFormRef?.current) {
-      bookingFormRef.current.setFieldValue("roomBookings", [
-        ...selectedRoomBookings,
-      ]);
-    }
-  }, [selectedRoomBookings]);
+  }, [roomBookings, bookingFormInitialValues, bookingCharges]);
 
   return (
     <>
