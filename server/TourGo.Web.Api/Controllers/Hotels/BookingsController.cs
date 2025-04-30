@@ -102,7 +102,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                throw new Exception("test");
                 Booking? booking = _bookingService.GetById(id);
 
                 if (booking == null)
