@@ -32,11 +32,11 @@ namespace TourGo.Web.StartUp
 
         public static void UseSinglePageApplication(IApplicationBuilder app)
         {
-            app.UseSpa(spa =>
-            {
+            //app.UseSpa(spa =>
+            //{
 
-                spa.Options.SourcePath = "ClientApp";
-            });
+            //    spa.Options.SourcePath = "ClientApp";
+            //});
         }
     }
 }

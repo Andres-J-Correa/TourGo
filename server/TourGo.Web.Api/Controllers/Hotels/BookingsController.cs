@@ -15,6 +15,7 @@ using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
+using TourGo.Web.Api.Extensions;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -24,14 +25,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
     {
         private readonly IBookingService _bookingService;
         private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IErrorLoggingService _errorLoggingService;
 
         public BookingsController(ILogger<BookingsController> logger, 
                                 IBookingService bookingService, 
-                                IWebAuthenticationService<int> webAuthenticationService
-                                ) : base(logger)
+                                IWebAuthenticationService<int> webAuthenticationService,
+                                IErrorLoggingService errorLoggingService) : base(logger)
         {
             _bookingService = bookingService;
             _webAuthService = webAuthenticationService;
+            _errorLoggingService = errorLoggingService;
         }
 
         [HttpPost("hotel/{id:int}")]
@@ -57,7 +60,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -83,7 +86,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -99,6 +102,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
+                throw new Exception("test");
                 Booking? booking = _bookingService.GetById(id);
 
                 if (booking == null)
@@ -114,7 +118,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -145,7 +149,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -176,7 +180,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -207,7 +211,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -238,7 +242,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }

@@ -26,7 +26,7 @@ namespace TourGo.Models.Requests.Users
         [Required, ValidEnum(typeof(AuthProviderEnum))]
         public int AuthProvider { get; set; }
 
-        [Required, ValidEnum(typeof(UserRoleEnum))]
-        public int Role { get; set; }
+        [ValidEnum(typeof(UserRoleEnum))]
+        public int Role { get; set; } = 2;
     }
 }

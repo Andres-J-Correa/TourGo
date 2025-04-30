@@ -75,6 +75,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<ICustomerService, CustomerService>();
             services.AddSingleton<ITransactionService, TransactionService>();
             services.AddSingleton<IInvoiceService, InvoiceService>();
+            services.AddSingleton<IErrorLoggingService, ErrorLoggingService>();
 
             GetAllEntities().ForEach(tt =>
             {

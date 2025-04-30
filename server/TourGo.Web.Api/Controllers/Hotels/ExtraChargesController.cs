@@ -9,6 +9,8 @@ using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
+using TourGo.Web.Api.Extensions;
+using TourGo.Services.Interfaces;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -18,11 +20,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
     {
         private readonly IWebAuthenticationService<int> _webAuthService;
         private readonly IExtraChargeService _extraChargeService;
+        private readonly IErrorLoggingService _errorLoggingService;
 
-        public ExtraChargesController(ILogger<ExtraChargesController> logger, IWebAuthenticationService<int> webAuthenticationService, IExtraChargeService extraChargeService) : base(logger)
+        public ExtraChargesController(ILogger<ExtraChargesController> logger,
+            IWebAuthenticationService<int> webAuthenticationService,
+            IExtraChargeService extraChargeService,
+            IErrorLoggingService errorLoggingService) : base(logger)
         {
             _webAuthService = webAuthenticationService;
             _extraChargeService = extraChargeService;
+            _errorLoggingService = errorLoggingService;
         }
 
         [HttpPost("hotel/{id:int}")]
@@ -46,7 +53,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
 
                 result = StatusCode(500, response);
@@ -80,7 +87,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
                 code = 500;
                 response = new ErrorResponse();
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
             }
 
             return StatusCode(code, response);
@@ -109,7 +116,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
                 code = 500;
                 response = new ErrorResponse();
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
             }
 
             return StatusCode(code, response);
@@ -134,7 +141,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
                 code = 500;
                 response = new ErrorResponse();
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
             }
 
             return StatusCode(code, response);
