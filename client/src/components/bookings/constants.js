@@ -5,8 +5,11 @@ import {
   faMoneyBill1Wave,
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
-import dayjs from "dayjs";
 import { isValidPhoneNumber } from "react-phone-number-input";
+import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+dayjs.extend(isSameOrBefore);
 
 export const customerSchema = Yup.object().shape({
   documentNumber: Yup.string()

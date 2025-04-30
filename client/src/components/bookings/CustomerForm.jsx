@@ -74,7 +74,7 @@ function CustomerForm({
         phone: customer?.phone || "",
         email: customer?.email || "",
       }}
-      validationSchema={creating && customerSchema}
+      validationSchema={creating ? customerSchema : undefined}
       onSubmit={creating ? handleCustomerCreate : handleDocumentSubmit}
       enableReinitialize>
       {({ values, setFieldValue }) => {

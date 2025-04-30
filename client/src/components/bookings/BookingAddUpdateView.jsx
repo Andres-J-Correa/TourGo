@@ -10,14 +10,9 @@ import { getById as getBookingById } from "services/bookingService";
 
 import { bookingFormTabs as tabs, defaultBooking } from "./constants";
 
-import dayjs from "dayjs";
 import CustomerForm from "components/bookings/CustomerForm";
-//import BookingForm from "components/bookings/BookingForm";
-import BookingForm from "./BookingForm";
+import BookingForm from "components/bookings/BookingForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
-
-var isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
-dayjs.extend(isSameOrBefore);
 
 const BookingAddUpdateView = () => {
   const { hotelId, bookingId } = useParams();
