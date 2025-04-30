@@ -18,7 +18,7 @@ import {
   deleteById,
 } from "services/roomService";
 import CustomField from "components/commonUI/forms/CustomField";
-import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import { toast } from "react-toastify";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
@@ -216,47 +216,44 @@ const RoomsView = () => {
         </Col>
       </Row>
       {/* Room Cards Display */}
-      {isLoading ? (
-        <SimpleLoader />
-      ) : (
-        <Row>
-          {rooms.map((room) => (
-            <Col md="3" key={room.id} className="mb-4">
-              <Card className="h-100 d-flex flex-column">
-                <CardBody className="d-flex flex-column">
-                  <CardTitle tag="h5">{room.name}</CardTitle>
-                  <CardText className="flex-grow-1">
-                    <strong>Capacidad:</strong> {room.capacity} personas
-                    <br />
-                    <strong>Descripción:</strong> {room.description}
-                  </CardText>
-                  <div className="d-flex justify-content-between mt-auto">
-                    <Button
-                      color="secondary"
-                      outline
-                      disabled={isUploading}
-                      onClick={() => handleEditRoom(room)}>
-                      Editar
-                    </Button>
+      <LoadingOverlay isVisible={isLoading} message="Cargando..." />
+      <Row>
+        {rooms.map((room) => (
+          <Col md="3" key={room.id} className="mb-4">
+            <Card className="h-100 d-flex flex-column">
+              <CardBody className="d-flex flex-column">
+                <CardTitle tag="h5">{room.name}</CardTitle>
+                <CardText className="flex-grow-1">
+                  <strong>Capacidad:</strong> {room.capacity} personas
+                  <br />
+                  <strong>Descripción:</strong> {room.description}
+                </CardText>
+                <div className="d-flex justify-content-between mt-auto">
+                  <Button
+                    color="secondary"
+                    outline
+                    disabled={isUploading}
+                    onClick={() => handleEditRoom(room)}>
+                    Editar
+                  </Button>
 
-                    <Button
-                      color="danger"
-                      outline
-                      disabled={isUploading}
-                      onClick={() => handleDeleteRoom(room.id)}>
-                      {isUploading && roomIdToDelete === room.id ? (
-                        <Spinner size="sm" color="danger" />
-                      ) : (
-                        "Eliminar"
-                      )}
-                    </Button>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
+                  <Button
+                    color="danger"
+                    outline
+                    disabled={isUploading}
+                    onClick={() => handleDeleteRoom(room.id)}>
+                    {isUploading && roomIdToDelete === room.id ? (
+                      <Spinner size="sm" color="danger" />
+                    ) : (
+                      "Eliminar"
+                    )}
+                  </Button>
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </div>
   );
 };

@@ -19,7 +19,7 @@ import {
   deleteById,
 } from "services/extraChargeService";
 import CustomField from "components/commonUI/forms/CustomField";
-import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import { toast } from "react-toastify";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
@@ -248,55 +248,49 @@ const ExtraChargesView = () => {
       </Row>
 
       {/* Extra Charges Cards Display */}
-      {isLoading ? (
-        <SimpleLoader />
-      ) : (
-        <Row>
-          {extraCharges.map((charge) => (
-            <Col md="3" key={charge.id} className="mb-4">
-              <Card className="h-100 d-flex flex-column">
-                <CardBody className="d-flex flex-column">
-                  <CardTitle tag="h5">{charge.name}</CardTitle>
-                  <CardText className="flex-grow-1">
-                    <strong>Monto:</strong>{" "}
-                    {formatAmount(
-                      Number(charge.amount),
-                      Number(charge.type?.id)
+      <LoadingOverlay isVisible={isLoading} message="Cargando" />
+      <Row>
+        {extraCharges.map((charge) => (
+          <Col md="3" key={charge.id} className="mb-4">
+            <Card className="h-100 d-flex flex-column">
+              <CardBody className="d-flex flex-column">
+                <CardTitle tag="h5">{charge.name}</CardTitle>
+                <CardText className="flex-grow-1">
+                  <strong>Monto:</strong>{" "}
+                  {formatAmount(Number(charge.amount), Number(charge.type?.id))}
+                  <br />
+                  <strong>Tipo:</strong>{" "}
+                  {
+                    EXTRA_CHARGE_TYPES.find(
+                      (type) => Number(type.value) === Number(charge.type?.id)
+                    )?.label
+                  }
+                </CardText>
+                <div className="d-flex justify-content-between mt-auto">
+                  <Button
+                    color="secondary"
+                    outline
+                    onClick={() => handleEditExtraCharge(charge)}
+                    disabled={isUploading}>
+                    Editar
+                  </Button>
+                  <Button
+                    color="danger"
+                    outline
+                    onClick={() => handleDeleteExtraCharge(charge.id)}
+                    disabled={isUploading}>
+                    {isUploading && chargeIdToDelete === charge.id ? (
+                      <Spinner size="sm" color="danger" />
+                    ) : (
+                      "Eliminar"
                     )}
-                    <br />
-                    <strong>Tipo:</strong>{" "}
-                    {
-                      EXTRA_CHARGE_TYPES.find(
-                        (type) => Number(type.value) === Number(charge.type?.id)
-                      )?.label
-                    }
-                  </CardText>
-                  <div className="d-flex justify-content-between mt-auto">
-                    <Button
-                      color="secondary"
-                      outline
-                      onClick={() => handleEditExtraCharge(charge)}
-                      disabled={isUploading}>
-                      Editar
-                    </Button>
-                    <Button
-                      color="danger"
-                      outline
-                      onClick={() => handleDeleteExtraCharge(charge.id)}
-                      disabled={isUploading}>
-                      {isUploading && chargeIdToDelete === charge.id ? (
-                        <Spinner size="sm" color="danger" />
-                      ) : (
-                        "Eliminar"
-                      )}
-                    </Button>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
+                  </Button>
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </div>
   );
 };

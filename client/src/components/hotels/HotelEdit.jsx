@@ -4,7 +4,7 @@ import { Button, Row, Col, Spinner } from "reactstrap";
 import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
 import { getDetailsById, updateById, deleteById } from "services/hotelService";
-import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumbs from "components/commonUI/Breadcrumb";
 import { addValidationSchema } from "./constants";
 import { toast } from "react-toastify";
@@ -119,133 +119,130 @@ const HotelEdit = () => {
       <Breadcrumbs breadcrumbs={breadcrumbs} active="Editar" />
       <h1 className="display-6 mb-4">Detalles del Hotel</h1>
 
-      {isLoading ? (
-        <SimpleLoader />
-      ) : (
-        <div>
-          {" "}
-          {/* Form for Editable Fields */}
-          <Formik
-            initialValues={{
-              name: hotel?.name,
-              phone: hotel?.phone,
-              address: hotel?.address,
-              email: hotel?.email,
-              taxId: hotel?.taxId,
-            }}
-            validationSchema={addValidationSchema}
-            onSubmit={handleSubmit}
-            enableReinitialize>
-            {({ resetForm }) => (
-              <Form>
-                <Row>
-                  <Col md="6">
-                    <CustomField
-                      name="name"
-                      type="text"
-                      placeholder="Nombre del Hotel"
-                      className="form-control"
-                      disabled={!isEditing || isUploading}
-                    />
-                  </Col>
+      <LoadingOverlay isVisible={isLoading} message="Cargando..." />
+      <div>
+        {" "}
+        {/* Form for Editable Fields */}
+        <Formik
+          initialValues={{
+            name: hotel?.name,
+            phone: hotel?.phone,
+            address: hotel?.address,
+            email: hotel?.email,
+            taxId: hotel?.taxId,
+          }}
+          validationSchema={addValidationSchema}
+          onSubmit={handleSubmit}
+          enableReinitialize>
+          {({ resetForm }) => (
+            <Form>
+              <Row>
+                <Col md="6">
+                  <CustomField
+                    name="name"
+                    type="text"
+                    placeholder="Nombre del Hotel"
+                    className="form-control"
+                    disabled={!isEditing || isUploading}
+                  />
+                </Col>
 
-                  <Col md="6">
-                    <CustomField
-                      name="phone"
-                      type="text"
-                      placeholder="Teléfono"
-                      className="form-control"
-                      disabled={!isEditing || isUploading}
-                    />
-                  </Col>
+                <Col md="6">
+                  <CustomField
+                    name="phone"
+                    type="text"
+                    placeholder="Teléfono"
+                    className="form-control"
+                    disabled={!isEditing || isUploading}
+                  />
+                </Col>
 
-                  <Col md="6">
-                    <CustomField
-                      name="address"
-                      type="text"
-                      placeholder="Dirección"
-                      className="form-control"
-                      disabled={!isEditing || isUploading}
-                    />
-                  </Col>
+                <Col md="6">
+                  <CustomField
+                    name="address"
+                    type="text"
+                    placeholder="Dirección"
+                    className="form-control"
+                    disabled={!isEditing || isUploading}
+                  />
+                </Col>
 
-                  <Col md="6">
-                    <CustomField
-                      name="email"
-                      type="email"
-                      placeholder="Correo Electrónico"
-                      className="form-control"
-                      disabled={!isEditing || isUploading}
-                    />
-                  </Col>
+                <Col md="6">
+                  <CustomField
+                    name="email"
+                    type="email"
+                    placeholder="Correo Electrónico"
+                    className="form-control"
+                    disabled={!isEditing || isUploading}
+                  />
+                </Col>
 
-                  <Col md="6">
-                    <CustomField
-                      name="taxId"
-                      type="text"
-                      placeholder="Identificación Fiscal (NIT)"
-                      className="form-control"
-                      disabled={!isEditing || isUploading}
-                    />
-                  </Col>
-                </Row>
+                <Col md="6">
+                  <CustomField
+                    name="taxId"
+                    type="text"
+                    placeholder="Identificación Fiscal (NIT)"
+                    className="form-control"
+                    disabled={!isEditing || isUploading}
+                  />
+                </Col>
+              </Row>
 
-                {/* Action Buttons */}
-                <div className="mt-3">
-                  {isEditing && (
-                    <>
-                      <Button
-                        type="submit"
-                        className="me-2 bg-success text-white"
-                        disabled={isUploading}>
-                        {isUploading ? <Spinner size="sm" /> : "Guardar"}
-                      </Button>
-                      <Button
-                        type="button"
-                        className="me-2 bg-secondary text-white"
-                        disabled={isUploading}
-                        onClick={() => handleCancel(resetForm)}>
-                        Cancelar
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </Form>
-            )}
-          </Formik>
-          {!isEditing && (
-            <>
-              <Button
-                className="bg-dark text-white"
-                type="button"
-                disabled={isUploading}
-                onClick={() => setIsEditing(true)}>
-                Editar
-              </Button>
-              <Button
-                className="ms-2 bg-danger text-white"
-                type="button"
-                onClick={handleDelete}
-                disabled={isUploading}>
-                {isUploading ? <Spinner size="sm" /> : "Eliminar Hotel"}
-              </Button>
-            </>
+              {/* Action Buttons */}
+              <div className="mt-3">
+                {isEditing && (
+                  <>
+                    <Button
+                      type="submit"
+                      className="me-2 bg-success text-white"
+                      disabled={isUploading}>
+                      {isUploading ? <Spinner size="sm" /> : "Guardar"}
+                    </Button>
+                    <Button
+                      type="button"
+                      className="me-2 bg-secondary text-white"
+                      disabled={isUploading}
+                      onClick={() => handleCancel(resetForm)}>
+                      Cancelar
+                    </Button>
+                  </>
+                )}
+              </div>
+            </Form>
           )}
-          {/* Hotel Info (Read-only Fields) */}
-          <Row className="mb-3">
-            <Col md="6">
-              <strong>Fecha de creación:</strong>{" "}
-              {new Date(hotel?.dateCreated).toLocaleDateString()}
-            </Col>
-            <Col md="6">
-              <strong>Propietario:</strong>{" "}
-              {hotel?.owner
-                ? `${hotel.owner.firstName} ${hotel.owner.lastName}`
-                : "N/A"}
-            </Col>
-          </Row>
-        </div>
-      )}
+        </Formik>
+        {!isEditing && (
+          <>
+            <Button
+              className="bg-dark text-white"
+              type="button"
+              disabled={isUploading}
+              onClick={() => setIsEditing(true)}>
+              Editar
+            </Button>
+            <Button
+              className="ms-2 bg-danger text-white"
+              type="button"
+              onClick={handleDelete}
+              disabled={isUploading}>
+              {isUploading ? <Spinner size="sm" /> : "Eliminar Hotel"}
+            </Button>
+          </>
+        )}
+        {/* Hotel Info (Read-only Fields) */}
+        <Row className="mb-3">
+          <Col md="6">
+            <strong>Fecha de creación:</strong>{" "}
+            {new Date(hotel?.dateCreated).toLocaleDateString()}
+          </Col>
+          <Col md="6">
+            <strong>Propietario:</strong>{" "}
+            {hotel?.owner
+              ? `${hotel.owner.firstName} ${hotel.owner.lastName}`
+              : "N/A"}
+          </Col>
+        </Row>
+      </div>
     </div>
   );
 };

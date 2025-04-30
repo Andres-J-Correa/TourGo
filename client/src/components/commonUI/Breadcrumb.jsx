@@ -34,7 +34,7 @@ Breadcrumb.propTypes = {
       label: PropTypes.string.isRequired,
       path: PropTypes.string,
     })
-  ).isRequired,
+  ),
   active: PropTypes.string.isRequired,
 };
 

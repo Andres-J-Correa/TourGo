@@ -82,6 +82,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
               type="text"
               className="form-control"
               placeholder={t("client.register.firstName")}
+              isRequired={true}
             />
           </Col>
           <Col md={6} sm={12}>
@@ -90,6 +91,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
               type="text"
               className="form-control"
               placeholder={t("client.register.lastName")}
+              isRequired={true}
             />
           </Col>
         </Row>
@@ -98,6 +100,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
           type="email"
           className="form-control"
           placeholder={t("client.register.email")}
+          isRequired={true}
         />
         <FormGroup className="position-relative">
           <PhoneInputField
@@ -106,6 +109,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
             className="form-control d-flex"
             placeholder={t("client.register.phone")}
             autoComplete="tel"
+            isRequired={true}
           />
           <CustomErrorMessage name="phone" />
         </FormGroup>

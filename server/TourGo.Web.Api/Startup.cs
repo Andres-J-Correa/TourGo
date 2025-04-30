@@ -1,5 +1,6 @@
 ﻿using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Config.Emails;
+using TourGo.Web.Api.Middleware;
 using TourGo.Web.Core;
 using TourGo.Web.StartUp;
 
@@ -36,12 +37,15 @@ namespace TourGo.Web.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseMiddleware<ErrorLoggingMiddleware>();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseRouting();
+
+
 
             Cors.Configure(app, env);
             Authentication.Configure(app, env);

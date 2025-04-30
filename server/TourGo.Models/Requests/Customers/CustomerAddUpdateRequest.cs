@@ -13,11 +13,11 @@ namespace TourGo.Models.Requests.Customers
         public int Id { get; set; }
 
         [Required]
-        [StringLength(100)]
+        [StringLength(100, MinimumLength = 2)]
 		public string FirstName { get; set; }
 
         [Required]
-        [StringLength(100)]
+        [StringLength(100, MinimumLength = 2)]
         public string LastName { get; set; }
 
         [Required]
@@ -30,7 +30,7 @@ namespace TourGo.Models.Requests.Customers
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100)]
+        [StringLength(100, MinimumLength = 2)]
         public string DocumentNumber { get; set; }
     }
 }

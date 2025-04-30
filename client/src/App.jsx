@@ -4,6 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 
 import NavbarContainer from "components/commonUI/navbars/NavbarContainer";
 import GlobalErrorHandler from "components/commonUI/errors/GlobalErrorHandler";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
 import { useAppContext } from "./contexts/GlobalAppContext";
 
@@ -15,6 +16,15 @@ import "react-toastify/dist/ReactToastify.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+
+import { setDefaultLocale, registerLocale } from "react-datepicker";
+import { es } from "date-fns/locale/es";
+
+import dayjs from "dayjs";
+require("dayjs/locale/es"); // Import Spanish locale
+dayjs.locale("es");
+registerLocale("es", es);
+setDefaultLocale("es");
 
 const App = () => {
   const [routes, setRoutes] = useState([]);
@@ -42,7 +52,8 @@ const App = () => {
 
   return (
     <HelmetProvider>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense
+        fallback={<LoadingOverlay isVisible={true} message="cargando" />}>
         <GlobalErrorHandler>
           <NavbarContainer />
           <Routes>{routes}</Routes>

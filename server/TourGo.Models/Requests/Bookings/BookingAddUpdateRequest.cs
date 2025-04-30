@@ -14,18 +14,15 @@ namespace TourGo.Models.Requests.Bookings
     {
 		public int Id { get; set; }
 
-		[Range(1, int.MaxValue)]
-		public int? InvoiceId { get; set; }
-
 		[Required]
 		[Range(1, int.MaxValue)]
 		public int CustomerId { get; set; }
 
-		[StringLength(100)]
-		public string ExternalId { get; set; }
+		[StringLength(100, MinimumLength = 2)]
+		public string? ExternalId { get; set; }
 
 		[Range(1, int.MaxValue)]
-		public int BookingProviderId { get; set; }
+		public int? BookingProviderId { get; set; }
 
 		[Required]
 		[DateRange("DepartureDate", ErrorMessage = "Start date must be before the end date.")]
@@ -34,20 +31,20 @@ namespace TourGo.Models.Requests.Bookings
 		[Required]
 		public DateOnly DepartureDate { get; set; }
 
-		public DateTime ETA { get; set; }
+		public DateTime? ETA { get; set; }
 
 		[Required]
 		[Range(1, int.MaxValue)]
 		public int AdultGuests { get; set; }
 
 		[Range(0, int.MaxValue)]
-		public int ChildGuests { get; set; }
+		public int? ChildGuests { get; set; }
 
 		[StringLength(1000)]
-		public string Notes { get; set; }
+		public string? Notes { get; set; }
 
 		[Range(0, double.MaxValue)]
-		public decimal ExternalCommission { get; set; }
+		public decimal? ExternalCommission { get; set; }
 
         [Required]
         [Range(0.001, double.MaxValue)]
@@ -61,7 +58,7 @@ namespace TourGo.Models.Requests.Bookings
         public decimal Total => Subtotal + Charges;
 
 		[Required]
-        public List<RoomBookingsAddRequest>? RoomBookings { get; set; }
+        public List<RoomBookingsAddRequest> RoomBookings { get; set; }
 
 		public List<BookingExtraChargesAddRequest>? ExtraCharges { get; set; }
     }

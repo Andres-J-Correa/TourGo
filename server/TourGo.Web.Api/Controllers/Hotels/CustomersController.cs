@@ -8,6 +8,8 @@ using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
+using TourGo.Web.Api.Extensions;
+using TourGo.Services.Interfaces;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -17,19 +19,22 @@ namespace TourGo.Web.Api.Controllers.Hotels
     {
         private readonly IWebAuthenticationService<int> _webAuthService;
         private readonly ICustomerService _customerService;
+        private readonly IErrorLoggingService _errorLoggingService;
 
         public CustomersController(
             ILogger<CustomersController> logger,
             IWebAuthenticationService<int> webAuthenticationService,
-            ICustomerService customerService) : base(logger)
+            ICustomerService customerService,
+            IErrorLoggingService errorLoggingService) : base(logger)
         {
             _webAuthService = webAuthenticationService;
             _customerService = customerService;
+            _errorLoggingService = errorLoggingService;
         }
 
-        [HttpGet("hotel/{hotelId:int}/dn")]
+        [HttpPost("hotel/{hotelId:int}/dn")]
         //no need for entityAuth filter, handling auth inside the procedure
-        public ActionResult<ItemResponse<Customer>> Get([FromBody] string id, int hotelId)
+        public ActionResult<ItemResponse<Customer>> Get(CustomerGetRequest model, int hotelId)
         {
             int iCode = 200;
             BaseResponse response = null;
@@ -37,7 +42,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                Customer? customer = _customerService.GetByDocumentNumber(id, userId, hotelId);
+                Customer? customer = _customerService.GetByDocumentNumber(model.Id, userId, hotelId);
 
                 if (customer == null)
                 {
@@ -53,7 +58,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
 
                 iCode = 500;
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 response = new ErrorResponse();
             }
 
@@ -85,7 +90,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }

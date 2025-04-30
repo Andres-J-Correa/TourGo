@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TourGo.Models;
+using TourGo.Models.Domain;
 using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Enums;
@@ -14,6 +15,7 @@ using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
+using TourGo.Web.Api.Extensions;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -23,14 +25,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
     {
         private readonly IBookingService _bookingService;
         private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IErrorLoggingService _errorLoggingService;
 
         public BookingsController(ILogger<BookingsController> logger, 
                                 IBookingService bookingService, 
-                                IWebAuthenticationService<int> webAuthenticationService
-                                ) : base(logger)
+                                IWebAuthenticationService<int> webAuthenticationService,
+                                IErrorLoggingService errorLoggingService) : base(logger)
         {
             _bookingService = bookingService;
             _webAuthService = webAuthenticationService;
+            _errorLoggingService = errorLoggingService;
         }
 
         [HttpPost("hotel/{id:int}")]
@@ -56,7 +60,33 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPut("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> Update(BookingAddUpdateRequest model)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.Update(model, userId);
+
+                SuccessResponse response = new SuccessResponse();
+
+                result = Ok200(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -72,6 +102,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
+                throw new Exception("test");
                 Booking? booking = _bookingService.GetById(id);
 
                 if (booking == null)
@@ -87,7 +118,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -97,7 +128,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpGet("{id:int}/extra-charges")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<List<ExtraCharge>>> GetExtraCharges(int id)
+        public ActionResult<ItemsResponse<ExtraCharge>> GetExtraCharges(int id)
         {
             ObjectResult result = null;
 
@@ -111,14 +142,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 }
                 else
                 {
-                    ItemResponse<List<ExtraCharge>> response = new ItemResponse<List<ExtraCharge>>() { Item = extraCharges };
+                    ItemsResponse<ExtraCharge> response = new ItemsResponse<ExtraCharge>() { Items = extraCharges };
 
                     result = Ok200(response);
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -128,7 +159,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpGet("{id:int}/room-bookings")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<List<RoomBooking>>> GetRoomBookings(int id)
+        public ActionResult<ItemsResponse<RoomBooking>> GetRoomBookingsByBookingId(int id)
         {
             ObjectResult result = null;
 
@@ -142,14 +173,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 }
                 else
                 {
-                    ItemResponse<List<RoomBooking>> response = new ItemResponse<List<RoomBooking>>() { Item = roomBookings };
+                    ItemsResponse<RoomBooking> response = new ItemsResponse<RoomBooking>() { Items = roomBookings };
 
                     result = Ok200(response);
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -157,5 +188,66 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
+        [HttpGet("hotel/{id:int}/room-bookings")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<RoomBooking>> GetRoomBookingsByDateRange(int id, [FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<RoomBooking>? roomBookings = _bookingService.GetRoomBookingsByDateRange(startDate, endDate, id);
+
+                if (roomBookings == null)
+                {
+                    result = NotFound404(new ErrorResponse("No room bookings found"));
+                }
+                else
+                {
+                    ItemsResponse<RoomBooking> response = new ItemsResponse<RoomBooking>() { Items = roomBookings };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("hotel/{id:int}/providers")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<Lookup>> GetBookingProvidersByHotelId(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<Lookup>? providers = _bookingService.GetBookingProviders(id);
+
+                if (providers == null)
+                {
+                    result = NotFound404(new ErrorResponse("No providers found"));
+                }
+                else
+                {
+                    ItemsResponse<Lookup> response = new ItemsResponse<Lookup>() { Items = providers };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
     }
 }
