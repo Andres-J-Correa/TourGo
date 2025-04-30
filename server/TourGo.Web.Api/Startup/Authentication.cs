@@ -34,7 +34,7 @@ namespace TourGo.Web.StartUp
             cookie.HttpOnly = true;
             cookie.Path = "/";
             cookie.SameSite = SameSiteMode.None;
-            cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            cookie.SecurePolicy = CookieSecurePolicy.Always;
             cookie.MaxAge = TimeSpan.FromDays(security.CookieDays);
 
             // If you don't want the cookie to be automatically authenticated and assigned to
