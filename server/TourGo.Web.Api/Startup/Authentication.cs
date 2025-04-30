@@ -29,6 +29,7 @@ namespace TourGo.Web.StartUp
             configuration.GetSection("JsonWebTokenConfig").Bind(jsonWebTokenConfig);
 
             CookieBuilder cookie = new CookieBuilder();
+            cookie.Domain = security.AppDomain;
             cookie.Name = security.CookieName;
             cookie.HttpOnly = true;
             cookie.Path = "/";

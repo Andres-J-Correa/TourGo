@@ -8,17 +8,16 @@ namespace TourGo.Web.StartUp
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllCors", builder =>
+                options.AddPolicy("AllowSpecificOrigins", builder =>
                 {
                     builder
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials()
-                    .SetIsOriginAllowedToAllowWildcardSubdomains()
-                    .SetIsOriginAllowed(delegate (string requestingOrigin)
-                     {
-                         return true;
-                     }).Build();
+                        .WithOrigins(
+                            "http://localhost:3000",          // React dev server
+                            "https://tourgo.site"        // Production frontend
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
 
@@ -32,7 +31,7 @@ namespace TourGo.Web.StartUp
 
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors("AllowAllCors");
+            app.UseCors("AllowSpecificOrigins");
         }
     }
 }
