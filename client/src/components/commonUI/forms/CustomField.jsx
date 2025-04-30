@@ -29,8 +29,9 @@ const CustomField = ({ isRequired, ...props }) => {
         {...props}
         type={inputType}
         className={`form-control ${props.className || ""}`}
-        placeholder={props.placeholder}
-      />
+        placeholder={props.placeholder}>
+        {props.children}
+      </Field>
       <Label for={props.name} className="text-body-secondary">
         {props.placeholder}
       </Label>

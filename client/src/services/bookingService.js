@@ -80,3 +80,42 @@ export const getChargesByBookingId = async (bookingId) => {
     return onGlobalError(error);
   }
 };
+
+/**
+ * @param {number} id
+ * @returns {Promise<{id: number, name: string}>}
+ */
+export const getBookingProvidersByHotelId = async (id) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/hotel/${id}/providers`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const update = async (payload) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${api}/${payload.id}`,
+    data: replaceEmptyStringsWithNull(payload),
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

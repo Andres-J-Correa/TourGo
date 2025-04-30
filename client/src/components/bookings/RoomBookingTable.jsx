@@ -9,11 +9,11 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   Input,
   Container,
   Row,
   Col,
+  Form,
 } from "reactstrap";
 import Swal from "sweetalert2";
 
@@ -188,6 +188,7 @@ const RoomBookingTable = ({
       current = current.add(1, "day");
     }
     setDates(dateList);
+    setCurrentSelection([]);
   }, [startDate, endDate]);
 
   // 🆕 Ctrl key handler for multi-select
@@ -232,6 +233,7 @@ const RoomBookingTable = ({
         <Row className="mb-3">
           <Col>
             <button
+              type="button"
               className={classNames({
                 "btn-outline-danger": isMultiSelect,
                 "btn-primary": !isMultiSelect,
@@ -246,19 +248,31 @@ const RoomBookingTable = ({
             {isMultiSelect &&
               !isCtrlKeyPressed &&
               currentSelection.length > 0 && (
-                <Button color="success" className="ms-2" onClick={toggleModal}>
+                <Button
+                  type="button"
+                  color="success"
+                  className="ms-2"
+                  onClick={toggleModal}>
                   Finalizar Selección
                 </Button>
               )}
           </Col>
           <Col className="text-end">
             {lastSelection.length > 0 && (
-              <Button color="secondary" className="ms-2" onClick={undoLast}>
+              <Button
+                type="button"
+                color="secondary"
+                className="ms-2"
+                onClick={undoLast}>
                 Deshacer Última Selección
               </Button>
             )}
             {selectedRoomBookings.length > 0 && (
-              <Button color="warning" className="ms-2" onClick={clearSelection}>
+              <Button
+                type="button"
+                color="warning"
+                className="ms-2"
+                onClick={clearSelection}>
                 Borrar Todo
               </Button>
             )}
@@ -352,29 +366,44 @@ const RoomBookingTable = ({
         </div>
 
         {/* 💬 Modal */}
-        <Modal isOpen={modalOpen} toggle={toggleModal} backdrop="static">
+        <Modal
+          isOpen={modalOpen}
+          toggle={toggleModal}
+          backdrop="static"
+          autoFocus={false}>
           <ModalHeader toggle={toggleModal}>Ingresar Precio</ModalHeader>
           <ModalBody>
-            <Input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Ingrese el precio"
-              min="0"
-              step="0.01"
-            />
+            <Form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handlePriceSubmit();
+              }}>
+              <Input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="Ingrese el precio"
+                min="0"
+                step="0.01"
+                autoFocus={true}
+              />
+              <div className="d-flex justify-content-end mt-3">
+                <Button
+                  className="me-2"
+                  color="primary"
+                  type="submit"
+                  disabled={!price}>
+                  Guardar
+                </Button>
+                <Button
+                  type="button"
+                  color="secondary"
+                  onClick={handlePriceCancel}>
+                  Cancelar
+                </Button>
+              </div>
+            </Form>
           </ModalBody>
-          <ModalFooter>
-            <Button
-              color="primary"
-              onClick={handlePriceSubmit}
-              disabled={!price}>
-              Guardar
-            </Button>
-            <Button color="secondary" onClick={handlePriceCancel}>
-              Cancelar
-            </Button>
-          </ModalFooter>
         </Modal>
       </>
     </Container>
@@ -383,8 +412,8 @@ const RoomBookingTable = ({
 
 // 🧾 PropTypes
 RoomBookingTable.propTypes = {
-  startDate: PropTypes.string.isRequired,
-  endDate: PropTypes.string.isRequired,
+  startDate: PropTypes.string,
+  endDate: PropTypes.string,
   rooms: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -410,7 +439,7 @@ RoomBookingTable.propTypes = {
       price: PropTypes.number,
     })
   ).isRequired,
-  bookingId: PropTypes.number.isRequired,
+  bookingId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default RoomBookingTable;

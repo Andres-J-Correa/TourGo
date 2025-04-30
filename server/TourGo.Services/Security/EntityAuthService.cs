@@ -4,16 +4,19 @@ using TourGo.Data.Providers;
 using TourGo.Models.Enums;
 using TourGo.Services.Interfaces.Security;
 using MySql.Data.MySqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace TourGo.Services.Security
 {
     public class EntityAuthService : ISecureEntities<int, object>
     {
         private readonly IMySqlDataProvider _dataProvider;
+        private readonly ILogger<EntityAuthService> _logger;
 
-        public EntityAuthService(IMySqlDataProvider provider)
+        public EntityAuthService(IMySqlDataProvider provider, ILogger<EntityAuthService> logger)
         {
             _dataProvider = provider;
+            _logger = logger;
         }
 
         public bool IsAuthorized(int userId, object entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType, bool isBulk)
@@ -41,14 +44,9 @@ namespace TourGo.Services.Security
                     isAuthorized = Convert.ToInt32(resultObj) == 1;
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                isAuthorized = false;
-            }
-
-            if (!isAuthorized)
-            {
-                Console.WriteLine("what?");
+                _logger.LogError(ex.Message);
             }
 
             return isAuthorized;

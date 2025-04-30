@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TourGo.Models;
+using TourGo.Models.Domain;
 using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Enums;
@@ -35,7 +36,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPost("hotel/{id:int}")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<BookingAddResponse>> Add(BookingAddRequest model)
+        public ActionResult<ItemResponse<BookingAddResponse>> Add(BookingAddUpdateRequest model)
         {
             ObjectResult result = null;
 
@@ -53,6 +54,32 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 ItemResponse<BookingAddResponse> response = new ItemResponse<BookingAddResponse>() { Item = newBooking };
 
                 result = Created201(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPut("{id:int}")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> Update(BookingAddUpdateRequest model)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.Update(model, userId);
+
+                SuccessResponse response = new SuccessResponse();
+
+                result = Ok200(response);
             }
             catch (Exception ex)
             {
@@ -174,6 +201,37 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 else
                 {
                     ItemsResponse<RoomBooking> response = new ItemsResponse<RoomBooking>() { Items = roomBookings };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("hotel/{id:int}/providers")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<Lookup>> GetBookingProvidersByHotelId(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<Lookup>? providers = _bookingService.GetBookingProviders(id);
+
+                if (providers == null)
+                {
+                    result = NotFound404(new ErrorResponse("No providers found"));
+                }
+                else
+                {
+                    ItemsResponse<Lookup> response = new ItemsResponse<Lookup>() { Items = providers };
 
                     result = Ok200(response);
                 }

@@ -12,7 +12,8 @@ import { bookingFormTabs as tabs, defaultBooking } from "./constants";
 
 import dayjs from "dayjs";
 import CustomerForm from "components/bookings/CustomerForm";
-import BookingForm from "components/bookings/BookingForm";
+//import BookingForm from "components/bookings/BookingForm";
+import BookingForm from "./BookingForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
 var isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
@@ -90,17 +91,19 @@ const BookingAddUpdateView = () => {
             setSubmitting={setSubmitting}
             hotelId={hotelId}
             creating={creating}
+            booking={booking}
           />
         </TabPane>
         <TabPane tabId={1}>
           <BookingForm
             setCurrentStep={setCurrentStep}
             submitting={submitting}
-            setSubmitting={setSubmitting}
             customer={customer}
             booking={booking}
             setBooking={setBooking}
             setCustomer={setCustomer}
+            hotelId={hotelId}
+            bookingId={bookingId}
           />
         </TabPane>
         <TabPane tabId={2}>

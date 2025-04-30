@@ -1,101 +1,91 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  useCallback,
-} from "react";
-import { useParams } from "react-router-dom";
-import { Button } from "reactstrap";
-import { toast } from "react-toastify";
+import React, { useState, useEffect, useCallback } from "react";
 
 import RoomBookingTable from "components/bookings/RoomBookingTable";
 import ExtraChargesSelector from "components/bookings/ExtraChargesSelector";
 import TotalsDisplay from "components/bookings/TotalsDisplay";
 import DateSelector from "components/bookings/DateSelector";
 import AdditionalInfoForm from "components/bookings/AdditionalInfoForm";
-
-import {
-  getChargesByBookingId,
-  add as addBooking,
-} from "services/bookingService";
-import {
-  bookingSchema,
-  bookingDefaultInitialValues,
-  LOCAL_STORAGE_FORM_KEYS,
-  deepCompareBooking,
-  sanitizeBooking,
-  bookingKeysToCompare,
-  currentFormKeysToCompare,
-} from "components/bookings/constants";
-import {
-  setLocalStorageForm,
-  getLocalStorageForm,
-  removeItemFromLocalStorage,
-} from "utils/localStorageHelper";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
+import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
+import { Form, withFormik } from "formik";
+import { Button, Spinner } from "reactstrap";
 import dayjs from "dayjs";
+import classNames from "classnames";
+
+import {
+  add as addBooking,
+  update as updateBooking,
+} from "services/bookingService";
+import {
+  setLocalStorageForm,
+  removeItemFromLocalStorage,
+  getLocalStorageForm,
+} from "utils/localStorageHelper";
+import {
+  sanitizeBooking,
+  bookingDefaultInitialValues,
+  bookingSchema,
+  LOCAL_STORAGE_FORM_KEYS,
+  deepCompareBooking,
+  bookingKeysToCompare,
+  currentFormKeysToCompare,
+} from "./constants";
 
 import useBookingFormData from "./hooks/useBookingFormData";
 import useBookingTotals from "./hooks/useBookingTotals";
-import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
-const _logger = require("debug")("bookingform");
+const emptyFormData = {
+  customerId: "",
+  arrivalDate: null,
+  departureDate: null,
+  roomBookings: [],
+  extraCharges: [],
+  subtotal: 0,
+  charges: 0,
+};
 
 function BookingForm({
   submitting,
   customer,
-  setSubmitting,
   setCurrentStep,
   booking,
-  setBooking,
   setCustomer,
+  hotelId,
+  bookingId,
+  //formik props
+  values,
+  setValues,
+  resetForm,
+  isSubmitting,
+  initialValues,
 }) {
-  const { hotelId, bookingId } = useParams();
   const [dates, setDates] = useState({
     start: null,
     end: null,
   });
   const [selectedCharges, setSelectedCharges] = useState([]);
   const [selectedRoomBookings, setSelectedRoomBookings] = useState([]);
-  const [bookingCharges, setBookingCharges] = useState([]);
 
   const {
     rooms,
     charges,
     roomBookings,
+    bookingCharges,
     isLoadingBookings,
-    isLoadingCharges,
-    isLoadingRooms,
-  } = useBookingFormData(hotelId, dates);
+    isLoadingHotelData,
+    isLoadingBookingCharges,
+  } = useBookingFormData(hotelId, dates, bookingId);
+
   const totals = useBookingTotals(selectedRoomBookings, selectedCharges);
 
-  const bookingFormRef = useRef(null);
-
-  const bookingFormInitialValues = useMemo(
-    () =>
-      booking?.id
-        ? {
-            ...sanitizeBooking(booking),
-          }
-        : { ...bookingDefaultInitialValues },
-    [booking]
-  );
-
-  const formChanged = () => {
-    if (bookingFormRef?.current) {
-      const currentForm = { ...bookingFormRef.current.values };
-      const previousForm = getLocalStorageForm(
-        LOCAL_STORAGE_FORM_KEYS.PREVIOUS
-      );
-      return !deepCompareBooking(
-        currentForm,
-        previousForm,
-        bookingKeysToCompare
-      );
-    }
-  };
+  const isLoading =
+    isLoadingBookings ||
+    isLoadingHotelData ||
+    isLoadingBookingCharges ||
+    isSubmitting;
 
   const isSameDate = (date1, date2) => {
     const isValidDates = dayjs(date1).isValid() && dayjs(date1).isValid();
@@ -105,109 +95,42 @@ function BookingForm({
     return false;
   };
 
-  const isLoading = isLoadingBookings || isLoadingCharges || isLoadingRooms;
-
-  const handleDateChange = (field) => (value) => {
-    setDates((prev) => {
-      const newState = { ...prev };
-      if (field === "start" && value && dayjs(value).isAfter(dayjs(prev.end))) {
-        const newEndDate = dayjs(value).add(1, "day").toDate();
-        newState.end = dayjs(newEndDate).format("YYYY-MM-DD");
-      }
-
-      return { ...newState, [field]: value };
-    });
+  const formChanged = () => {
+    const currentForm = { ...values };
+    const previousForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
+    return !deepCompareBooking(currentForm, previousForm, bookingKeysToCompare);
   };
 
-  const toggleCharge = (charge) => {
-    setSelectedCharges((prev) => {
-      const exists = prev.some((c) => c.extraChargeId === charge.id);
-      if (exists) {
-        return prev.filter((c) => c.extraChargeId !== charge.id);
-      } else {
-        return [
-          ...prev,
-          {
-            ...charge,
-            extraChargeId: charge.id,
-          },
-        ];
-      }
-    });
-  };
-
-  const handleBookingSubmit = async (values) => {
-    Swal.fire({
-      title: "¿Está seguro de que desea guardar la reserva?",
-      text: "Revise los datos antes de continuar.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          setSubmitting(true);
-          const res = await addBooking(values, hotelId);
-          if (res.isSuccessful) {
-            setBooking((prev) => ({
-              ...prev,
-              ...values,
-              id: res.item.bookingId,
-              invoiceId: res.item.invoiceId,
-              customer,
-            }));
-            setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
-              ...values,
-            });
-            removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
-            toast.success("Reserva guardada con éxito");
-            setCurrentStep(2);
-          } else {
-            throw new Error("Error al guardar la reserva");
-          }
-        } catch (err) {
-          toast.error("Error al guardar la reserva");
-        } finally {
-          setSubmitting(false);
-        }
-      }
-    });
-  };
+  const isSubmitDisabled =
+    submitting || isSubmitting || (Boolean(values?.id) && !formChanged());
 
   const resetFormToPrevious = () => {
-    if (bookingFormRef.current) {
-      bookingFormRef.current.resetForm(bookingFormInitialValues);
-      const previousForm = getLocalStorageForm(
-        LOCAL_STORAGE_FORM_KEYS.PREVIOUS
-      );
-      setSelectedCharges(previousForm.extraCharges || []);
-      setSelectedRoomBookings(previousForm.roomBookings || []);
+    resetForm();
+    const previousForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
+    setSelectedCharges(previousForm.extraCharges || []);
+    setSelectedRoomBookings(previousForm.roomBookings || []);
 
-      const isSameStartDate = isSameDate(dates.start, previousForm.arrivalDate);
-      const isSameEndDate = isSameDate(dates.end, previousForm.departureDate);
-      const isSameDates = isSameStartDate && isSameEndDate;
+    const isSameStartDate = isSameDate(dates.start, previousForm.arrivalDate);
+    const isSameEndDate = isSameDate(dates.end, previousForm.departureDate);
+    const isSameDates = isSameStartDate && isSameEndDate;
 
-      if (!isSameDates) {
-        setDates({
-          start: previousForm.arrivalDate,
-          end: previousForm.departureDate,
-        });
-      }
-
-      setCustomer(bookingFormInitialValues.customer);
-      removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
+    if (!isSameDates) {
+      setDates({
+        start: previousForm.arrivalDate,
+        end: previousForm.departureDate,
+      });
     }
+
+    setCustomer(booking.customer);
+    removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
   };
 
   const autoCompleteForm = useCallback(
     (formData) => {
-      if (bookingFormRef.current) {
-        bookingFormRef.current.setValues((prev) => ({
-          ...prev,
-          ...formData,
-        }));
-      }
+      setValues((prev) => ({
+        ...prev,
+        ...formData,
+      }));
 
       if (formData.extraCharges?.length > 0) {
         setSelectedCharges(formData.extraCharges);
@@ -229,8 +152,36 @@ function BookingForm({
 
       setCustomer(formData.customer);
     },
-    [setCustomer]
+    [setCustomer, setValues]
   );
+
+  const handleDateChange = (field) => (value) => {
+    setDates((prev) => {
+      const newState = { ...prev };
+      if (field === "start" && value && dayjs(value).isAfter(dayjs(prev.end))) {
+        const newEndDate = dayjs(value).add(1, "day").format("YYYY-MM-DD");
+        newState.end = newEndDate;
+      }
+      return { ...newState, [field]: value };
+    });
+  };
+
+  const toggleCharge = (charge) => {
+    setSelectedCharges((prev) => {
+      const exists = prev.some((c) => c.extraChargeId === charge.id);
+      if (exists) {
+        return prev.filter((c) => c.extraChargeId !== charge.id);
+      } else {
+        return [
+          ...prev,
+          {
+            ...charge,
+            extraChargeId: charge.id,
+          },
+        ];
+      }
+    });
+  };
 
   const handleNextClick = () => {
     if (formChanged()) {
@@ -253,31 +204,6 @@ function BookingForm({
     }
   };
 
-  const onGetBookingChargesSuccess = (res) => {
-    if (res.isSuccessful) {
-      const mappedCharges = res.items.map((c) => ({
-        ...c,
-        extraChargeId: c.id,
-      }));
-
-      setBookingCharges(mappedCharges);
-    }
-  };
-
-  const onGetBookingChargesError = (e) => {
-    if (e.response?.status === 404) {
-      setSelectedCharges([]);
-    } else {
-      toast.error("Error al cargar cargos extras de la reserva");
-    }
-  };
-
-  useEffect(() => {
-    if (bookingCharges.length > 0) {
-      setSelectedCharges(bookingCharges);
-    }
-  }, [bookingCharges]);
-
   useEffect(() => {
     if (booking.id > 0) {
       if (!dates.start && !dates.end) {
@@ -291,61 +217,36 @@ function BookingForm({
       const isSameEndDate = isSameDate(dates.end, booking.departureDate);
       const isSameDates = isSameStartDate && isSameEndDate;
 
-      if (isSameDates)
-        setSelectedRoomBookings(
-          roomBookings?.length > 0
-            ? roomBookings?.filter(
-                (b) => Number(b.bookingId) === Number(booking.id)
-              )
-            : []
-        );
-    }
-  }, [booking, roomBookings, dates]);
+      const fetchedRoomBookings = roomBookings?.filter(
+        (b) => Number(b.bookingId) === Number(booking.id)
+      );
+      const existingRoomBookings = initialValues.roomBookings;
 
-  useEffect(() => {
-    if (bookingId) {
-      getChargesByBookingId(bookingId)
-        .then(onGetBookingChargesSuccess)
-        .catch(onGetBookingChargesError);
-    } else {
-      removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
-      const currentForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT);
-      const emptyFormData = {
-        customerId: "",
-        arrivalDate: null,
-        departureDate: null,
-        roomBookings: [],
-        extraCharges: [],
-        subtotal: 0,
-        charges: 0,
-      };
-      if (
-        currentForm &&
-        !currentForm.id &&
-        !deepCompareBooking(
-          emptyFormData,
-          currentForm,
-          currentFormKeysToCompare
-        )
-      ) {
-        Swal.fire({
-          title: "¿Recuperar información?",
-          text: "Realizaste cambios anteriormente que no se guardaron, ¿deseas recuperarlos?",
-          icon: "info",
-          showCancelButton: true,
-          confirmButtonText: "Sí, recuperar",
-          cancelButtonText: "Cancelar",
-          confirmButtonColor: "red",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            autoCompleteForm(currentForm);
-          }
-        });
-      } else {
-        removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
+      const currentRoomBookings =
+        existingRoomBookings?.length > 0
+          ? existingRoomBookings
+          : fetchedRoomBookings?.length > 0
+          ? fetchedRoomBookings
+          : [];
+
+      if (isSameDates && currentRoomBookings.length > 0) {
+        setSelectedRoomBookings([...currentRoomBookings]);
       }
+
+      let currentExtraCharges =
+        initialValues.extraCharges?.length > 0
+          ? initialValues.extraCharges
+          : bookingCharges?.length > 0
+          ? bookingCharges
+          : [];
+
+      setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
+        ...sanitizeBooking(booking),
+        extraCharges: currentExtraCharges,
+        roomBookings: currentRoomBookings,
+      });
     }
-  }, [bookingId, autoCompleteForm]);
+  }, [booking, roomBookings, dates, bookingCharges, initialValues]);
 
   useEffect(() => {
     const newFormData = {
@@ -357,21 +258,36 @@ function BookingForm({
       subtotal: totals.subtotal,
       charges: totals.charges,
       customer: { ...customer },
+      id: values?.id,
     };
 
     const previousForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
     const currentForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT);
 
+    const hasNoId = !values?.id;
+    const shouldCompare = values?.id && !currentForm;
+    const isDifferentFromPrevious = !deepCompareBooking(
+      previousForm,
+      newFormData,
+      currentFormKeysToCompare
+    );
+    const isNotEmpty = !deepCompareBooking(
+      newFormData,
+      emptyFormData,
+      currentFormKeysToCompare
+    );
+
+    const isDifferentFromCurrentFormik = !deepCompareBooking(
+      { ...values },
+      newFormData,
+      currentFormKeysToCompare
+    );
+
     const shouldUpdateCurrentForm =
       !isLoading &&
-      (!bookingFormInitialValues?.id ||
-        (bookingFormInitialValues?.id &&
-          !currentForm &&
-          !deepCompareBooking(
-            previousForm,
-            newFormData,
-            currentFormKeysToCompare
-          )));
+      isNotEmpty &&
+      isDifferentFromCurrentFormik &&
+      (hasNoId || (shouldCompare && isDifferentFromPrevious));
 
     if (shouldUpdateCurrentForm) {
       setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT, {
@@ -380,49 +296,63 @@ function BookingForm({
       });
     }
 
-    if (!isLoading && bookingFormRef?.current) {
-      bookingFormRef.current.setValues((prev) => {
-        _logger("prev", prev);
-        _logger("initialValues", bookingFormRef.current.initialValues);
-        return {
-          ...prev,
-          ...newFormData,
-        };
-      });
+    if (isDifferentFromCurrentFormik) {
+      setValues((prev) => ({ ...prev, ...newFormData }));
     }
   }, [
-    selectedRoomBookings,
-    selectedCharges,
-    totals,
-    dates,
+    values,
     customer,
-    bookingFormInitialValues?.id,
+    dates,
+    selectedCharges,
+    selectedRoomBookings,
+    totals,
     isLoading,
-    bookingFormRef,
+    setValues,
   ]);
 
   useEffect(() => {
-    if (
-      bookingFormInitialValues?.id &&
-      roomBookings.length > 0 &&
-      roomBookings.some((b) => b.bookingId === bookingFormInitialValues?.id)
-    ) {
-      const currentRoomBookings = roomBookings.filter(
-        (b) => b.bookingId === bookingFormInitialValues?.id
+    if (bookingCharges.length > 0) {
+      setSelectedCharges(bookingCharges);
+    }
+  }, [bookingCharges]);
+
+  useEffect(() => {
+    if (!bookingId) {
+      removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
+      const currentForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT);
+      const emptyBooking = {
+        ...emptyFormData,
+        ...bookingDefaultInitialValues,
+      };
+
+      const isNotEmptyBooking = !deepCompareBooking(
+        emptyBooking,
+        currentForm,
+        bookingKeysToCompare
       );
 
-      setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
-        ...bookingFormInitialValues,
-        extraCharges:
-          bookingCharges.length > 0
-            ? [...bookingCharges]
-            : bookingFormInitialValues.extraCharges,
-        roomBookings: currentRoomBookings,
-      });
+      if (currentForm && !currentForm.id && isNotEmptyBooking) {
+        Swal.fire({
+          title: "¿Recuperar información?",
+          text: "Realizaste cambios anteriormente que no se guardaron, ¿deseas recuperarlos?",
+          icon: "info",
+          showDenyButton: true,
+          confirmButtonText: "Sí, recuperar",
+          denyButtonText: "No, descartar",
+          confirmButtonColor: "green",
+          denyButtonColor: "red",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            autoCompleteForm(currentForm);
+          } else if (result.isDenied) {
+            removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
+          }
+        });
+      } else {
+        removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
+      }
     }
-  }, [roomBookings, bookingFormInitialValues, bookingCharges]);
-
-  useEffect(() => {}, []);
+  }, [bookingId, autoCompleteForm]);
 
   return (
     <>
@@ -430,11 +360,14 @@ function BookingForm({
       <DateSelector
         dates={dates}
         onDateChange={handleDateChange}
-        isDisabled={submitting || isLoadingBookings}
+        isDisabled={submitting || isLoadingBookings || isSubmitting}
         selectedRoomBookings={selectedRoomBookings}
         setSelectedRoomBookings={setSelectedRoomBookings}
       />
-      <>
+      <div
+        className={classNames({
+          "d-none": !dates.start || !dates.end,
+        })}>
         <RoomBookingTable
           startDate={dates.start}
           endDate={dates.end}
@@ -442,7 +375,7 @@ function BookingForm({
           roomBookings={roomBookings}
           setSelectedRoomBookings={setSelectedRoomBookings}
           selectedRoomBookings={selectedRoomBookings}
-          bookingId={booking?.id}
+          bookingId={bookingId}
         />
 
         <h5 className="mt-4 mb-3">Seleccione los cargos extras</h5>
@@ -450,39 +383,106 @@ function BookingForm({
           charges={charges}
           selectedCharges={selectedCharges}
           toggleCharge={toggleCharge}
-          submitting={submitting}
+          submitting={submitting || isSubmitting}
         />
 
         <TotalsDisplay totals={totals} />
-
-        <AdditionalInfoForm
-          initialValues={bookingFormInitialValues}
-          onSubmit={handleBookingSubmit}
-          validationSchema={bookingSchema}
-          submitting={submitting}
-          innerRef={bookingFormRef}
-        />
-        <div className="d-flex mt-3">
-          <Button
-            onClick={() => setCurrentStep(0)}
-            color="secondary"
-            className="me-auto"
-            disabled={submitting}>
-            Anterior
-          </Button>
-          {booking?.id && (
+        <Form>
+          <AdditionalInfoForm
+            hotelId={hotelId}
+            submitting={submitting || isSubmitting}
+          />
+          <ErrorAlert />
+          <div className="text-center my-3">
             <Button
-              onClick={handleNextClick}
-              color="secondary"
-              className="ms-auto"
-              disabled={submitting}>
-              Siguiente
+              type="submit"
+              disabled={isSubmitDisabled}
+              className="bg-gradient-success">
+              {isSubmitting ? <Spinner size="sm" /> : "Guardar Reserva"}
             </Button>
-          )}
-        </div>
-      </>
+          </div>
+        </Form>
+      </div>
+      <div className="d-flex mt-4">
+        <Button
+          type="button"
+          onClick={() => setCurrentStep(0)}
+          color="secondary"
+          className="me-auto"
+          disabled={submitting || isSubmitting}>
+          Anterior
+        </Button>
+        {booking?.id && (
+          <Button
+            type="button"
+            onClick={handleNextClick}
+            color="secondary"
+            className="ms-auto"
+            disabled={submitting || isSubmitting}>
+            Siguiente
+          </Button>
+        )}
+      </div>
     </>
   );
 }
 
-export default BookingForm;
+export default withFormik({
+  mapPropsToValues: ({ booking }) =>
+    booking?.id
+      ? { ...sanitizeBooking(booking) }
+      : { ...bookingDefaultInitialValues },
+  validationSchema: bookingSchema,
+  enableReinitialize: true,
+  handleSubmit: async (values, { props, setSubmitting }) => {
+    const { hotelId, customer, setBooking, setCurrentStep } = props;
+
+    const result = await Swal.fire({
+      title: "¿Está seguro de que desea guardar la reserva?",
+      text: "Revise los datos antes de continuar.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, guardar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) {
+      setSubmitting(false);
+      return;
+    }
+
+    try {
+      let res = null;
+      if (values.id) {
+        res = await updateBooking(values);
+      } else {
+        res = await addBooking(values, hotelId);
+      }
+
+      if (res.isSuccessful) {
+        if (values.id) {
+          setBooking({
+            ...values,
+            customer,
+          });
+        } else {
+          setBooking({
+            ...values,
+            id: res.item.bookingId,
+            invoiceId: res.item.invoiceId,
+            customer,
+          });
+        }
+
+        setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, { ...values });
+        removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
+        toast.success("Reserva guardada con éxito");
+        setCurrentStep(2);
+      } else {
+        throw new Error("Error al guardar la reserva");
+      }
+    } catch (err) {
+      toast.error("Error al guardar la reserva");
+    }
+  },
+})(BookingForm);

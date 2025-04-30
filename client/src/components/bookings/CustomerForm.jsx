@@ -22,7 +22,10 @@ function CustomerForm({
   setSubmitting,
   hotelId,
   creating = false,
+  booking,
 }) {
+  const isUpdate = booking?.id > 0;
+
   const handleDocumentSubmit = async (values) => {
     try {
       setSubmitting(true);
@@ -34,7 +37,9 @@ function CustomerForm({
     } catch (err) {
       if (err.response?.status === 404) {
         setCreating(true);
-        toast.info("Cliente no encontrado, por favor complete los datos");
+        toast.info("Cliente no encontrado, por favor complete los datos", {
+          autoClose: 3000,
+        });
       } else {
         toast.error("Error al buscar cliente");
       }
@@ -98,14 +103,14 @@ function CustomerForm({
                   placeholder="Documento de Identidad"
                   onChange={handleDocChange}
                   value={values.documentNumber}
-                  disabled={submitting}
+                  disabled={submitting || isUpdate}
                   isRequired={true}
                 />
               </Col>
               <Col md="6" className="text-end">
                 <Button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || isUpdate}
                   className="bg-gradient-success">
                   {submitting ? (
                     <Spinner size="sm" />
