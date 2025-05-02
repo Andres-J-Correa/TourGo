@@ -84,7 +84,7 @@ export const bookingSchema = Yup.object().shape({
       const nights = endDate.diff(startDate, "day"); // Calculate number of nights
       return missingDate
         ? this.createError({
-            message: `Debe elegir una habitación para cada una de las ${nights} noches seleccionadas.`,
+            message: `Debe elegir al menos una habitación para cada una de las ${nights} noches seleccionadas.`,
           })
         : true;
     }),
