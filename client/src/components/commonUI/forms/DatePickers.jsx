@@ -17,18 +17,26 @@ const DatePickers = ({
 }) => {
   const parseDate = (date) => {
     if (!date) return null;
-    return typeof date === "string" ? dayjs(date).toDate() : date;
+    if (!dayjs(date).isValid()) return null;
+
+    const day = dayjs(date).get("date");
+    const month = dayjs(date).get("month") + 1;
+    const year = dayjs(date).get("year");
+    const formattedDate = `${year}-${month < 10 ? "0" + month : month}-${
+      day < 10 ? "0" + day : day
+    }`;
+    return formattedDate;
   };
 
   const onStartDateChange = (date) => {
     if (date) {
-      handleStartChange(dayjs(date).format("YYYY-MM-DD"));
+      handleStartChange(parseDate(date));
     }
   };
 
   const onEndDateChange = (date) => {
     if (date) {
-      handleEndChange(dayjs(date).format("YYYY-MM-DD"));
+      handleEndChange(parseDate(date));
     }
   };
 
@@ -61,7 +69,7 @@ const DatePickers = ({
           selected={endDate}
           onChange={onEndDateChange}
           dateFormat="yyyy-MM-dd"
-          minDate={dayjs(startDate).add(1, "day")}
+          minDate={startDate ? dayjs(startDate).add(1, "day").toDate() : null}
           maxDate={parseDate(maxDate)}
           disabled={!startDate || isDisabled}
           className="form-control"

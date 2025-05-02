@@ -60,32 +60,34 @@ export const bookingSchema = Yup.object().shape({
         price: Yup.number().required(),
       })
     )
-    .test(
-      "all-dates-covered",
-      "Debes seleccionar al menos una habitación para cada noche de la reserva",
-      function (bookings) {
-        const start = this.options.context?.arrivalDate;
-        const end = this.options.context?.departureDate;
+    .test("all-dates-covered", function (bookings) {
+      const start = this.options.context?.arrivalDate;
+      const end = this.options.context?.departureDate;
 
-        if (!start || !end || !Array.isArray(bookings)) return true; // fallback to pass
+      if (!start || !end || !Array.isArray(bookings)) return true; // fallback to pass
 
-        const expectedDates = [];
-        let current = dayjs(start);
-        const last = dayjs(end).subtract(1, "day");
+      const expectedDates = [];
+      let current = dayjs(start);
+      const last = dayjs(end).subtract(1, "day");
 
-        while (current.isSameOrBefore(last)) {
-          expectedDates.push(current.format("YYYY-MM-DD"));
-          current = current.add(1, "day");
-        }
-
-        const bookedDates = new Set(bookings.map((b) => b.date));
-
-        const missingDate = expectedDates.find(
-          (date) => !bookedDates.has(date)
-        );
-        return !missingDate;
+      while (current.isSameOrBefore(last)) {
+        expectedDates.push(current.format("YYYY-MM-DD"));
+        current = current.add(1, "day");
       }
-    ),
+
+      const startDate = dayjs(start);
+      const endDate = dayjs(end);
+      const bookedDates = new Set(bookings.map((b) => b.date));
+
+      const missingDate = expectedDates.find((date) => !bookedDates.has(date));
+
+      const nights = endDate.diff(startDate, "day"); // Calculate number of nights
+      return missingDate
+        ? this.createError({
+            message: `Debe elegir una habitación para cada una de las ${nights} noches seleccionadas.`,
+          })
+        : true;
+    }),
   bookingProviderId: Yup.number()
     .min(0, "El proveedor de reservas debe ser valido")
     .nullable(),

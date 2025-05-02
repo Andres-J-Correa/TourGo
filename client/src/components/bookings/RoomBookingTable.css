@@ -1,0 +1,28 @@
+.booking-table-cell-container {
+  min-width: 120px;
+  max-width: 120px;
+}
+
+.booking-table-cell-text {
+  display: inline-block; /* Ensures transform works properly */
+  transition: transform 0.3s ease; /* Smooth transition */
+}
+
+.booking-table-cell-container:hover {
+  background-color: var(
+    --bs-info-bg-subtle
+  ); /* Change background color on hover */
+}
+
+.booking-table-cell-container:hover .booking-table-cell-text {
+  transform: scale(1.1); /* Scales child to 1.1 on parent hover */
+}
+
+.date-row-label {
+  width: 200px;
+  font-weight: bold;
+  position: sticky;
+  left: 0;
+  background: #f8f9fa;
+  text-align: center;
+}

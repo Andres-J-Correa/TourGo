@@ -78,3 +78,11 @@
 .calendar-day.empty {
   background: transparent;
 }
+
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.custom-datepicker-input {
+  height: 58px;
+}

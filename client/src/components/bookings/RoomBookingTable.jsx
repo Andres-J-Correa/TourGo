@@ -16,6 +16,7 @@ import {
   Form,
 } from "reactstrap";
 import Swal from "sweetalert2";
+import "./RoomBookingTable.css"; // Custom styles for the table
 
 const RoomBookingTable = ({
   startDate,
@@ -176,6 +177,47 @@ const RoomBookingTable = ({
     setIsMultiSelect((prev) => !prev);
   };
 
+  const handleRoomHeaderClick = (roomId) => {
+    // Get all available (not booked or selected) dates for this room
+    const availableDates = dates.filter((date) => {
+      const isAlreadyBooked = getBooking(date, roomId);
+      const isAlreadySelected = selectedRoomBookings.some(
+        (s) => s.date === date && s.roomId === roomId
+      );
+      return !isAlreadyBooked && !isAlreadySelected;
+    });
+
+    // Build a list of those date+roomId pairs
+    const roomCells = availableDates.map((date) => ({ date, roomId }));
+
+    // Check how many of those are already in currentSelection
+    const allAlreadyInSelection = roomCells.every((cell) =>
+      currentSelection.some(
+        (sel) => sel.date === cell.date && sel.roomId === cell.roomId
+      )
+    );
+
+    if (allAlreadyInSelection) {
+      // Deselect them
+      setCurrentSelection((prev) =>
+        prev.filter(
+          (sel) => sel.roomId !== roomId || !availableDates.includes(sel.date)
+        )
+      );
+    } else {
+      // Add missing ones
+      const newCells = roomCells.filter(
+        (cell) =>
+          !currentSelection.some(
+            (sel) => sel.date === cell.date && sel.roomId === cell.roomId
+          )
+      );
+      setCurrentSelection((prev) => [...prev, ...newCells]);
+    }
+
+    setIsMultiSelect(true);
+  };
+
   // 🔁 Date range
   useEffect(() => {
     const dateList = [];
@@ -224,12 +266,19 @@ const RoomBookingTable = ({
     <Container fluid className="mt-4 px-0">
       <>
         <h5>Seleccione las habitaciones y fechas</h5>
-        <p className="text-muted fw-bold bg-light p-2 rounded">
-          Haga clic en las celdas para seleccionar habitaciones y fechas. Puede
-          seleccionar varias celdas oprimiendo el botón{" "}
-          <span style={{ color: "blue" }}>"Activar Multi-Selección"</span>, o
-          presionando la tecla "Ctrl" mientras hace clic en las celdas.
-        </p>
+        <div className="bg-light p-2 rounded mb-3">
+          <p className="text-muted fw-bold">
+            Haga clic en las celdas para seleccionar habitaciones y fechas.
+            Puede seleccionar varias celdas oprimiendo el botón{" "}
+            <span className="text-info">"Activar Multi-Selección"</span>, o
+            presionando la tecla "Ctrl" mientras hace clic en las celdas.
+          </p>
+          <p className="fw-bold text-info">
+            ℹ️ Debe seleccionar al menos una habitación para cada una de las
+            noches en el rango de fechas.
+          </p>
+        </div>
+
         <Row className="mb-3">
           <Col>
             <button
@@ -288,22 +337,14 @@ const RoomBookingTable = ({
           <Table bordered className="table-fixed">
             <thead className="sticky-top bg-white" style={{ zIndex: 2 }}>
               <tr>
-                <th
-                  style={{
-                    width: "150px",
-                    position: "sticky",
-                    left: 0,
-                    background: "#fff",
-                    textAlign: "center",
-                  }}>
-                  Fecha
-                </th>
+                <th className="date-row-label">Fecha</th>
                 {rooms.map((room) => (
                   <th
                     key={room.id}
-                    className="text-center"
-                    style={{ minWidth: "120px" }}>
-                    {room.name}
+                    className="text-center align-middle booking-table-cell-container"
+                    role="button"
+                    onClick={() => handleRoomHeaderClick(room.id)}>
+                    <span className="booking-table-cell-text">{room.name}</span>
                   </th>
                 ))}
               </tr>
@@ -311,15 +352,7 @@ const RoomBookingTable = ({
             <tbody>
               {dates.map((date) => (
                 <tr key={date}>
-                  <td
-                    style={{
-                      width: "200px",
-                      fontWeight: "bold",
-                      position: "sticky",
-                      left: 0,
-                      background: "#f8f9fa",
-                      textAlign: "center",
-                    }}>
+                  <td className="date-row-label">
                     {dayjs(date).format("ddd DD - MMM - YYYY")}
                   </td>
                   {rooms.map((room) => {
@@ -335,7 +368,7 @@ const RoomBookingTable = ({
                     return (
                       <td
                         key={room.id}
-                        className={`text-center ${
+                        className={`text-center booking-table-cell-container ${
                           booking
                             ? "bg-secondary text-white"
                             : selected
@@ -346,16 +379,17 @@ const RoomBookingTable = ({
                         }`}
                         style={{
                           cursor: booking ? "not-allowed" : "pointer",
-                          minWidth: "120px",
                         }}
                         onClick={() => handleCellClick(date, room.id)}>
-                        {booking
-                          ? `$${booking.price.toFixed(2)}`
-                          : selected?.price
-                          ? `$${selected.price.toFixed(2)}`
-                          : currentSelected?.roomId
-                          ? "seleccionado"
-                          : "➕"}
+                        {booking ? (
+                          `$${booking.price.toFixed(2)}`
+                        ) : selected?.price ? (
+                          `$${selected.price.toFixed(2)}`
+                        ) : currentSelected?.roomId ? (
+                          "seleccionado"
+                        ) : (
+                          <span className="booking-table-cell-text">➕</span>
+                        )}
                       </td>
                     );
                   })}
@@ -371,7 +405,7 @@ const RoomBookingTable = ({
           toggle={toggleModal}
           backdrop="static"
           autoFocus={false}>
-          <ModalHeader toggle={toggleModal}>Ingresar Precio</ModalHeader>
+          <ModalHeader>Ingresar Precio</ModalHeader>
           <ModalBody>
             <Form
               onSubmit={(e) => {
