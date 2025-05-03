@@ -55,6 +55,10 @@ const App = () => {
       <Suspense
         fallback={<LoadingOverlay isVisible={true} message="cargando" />}>
         <GlobalErrorHandler>
+          <LoadingOverlay
+            isVisible={user.isLoading}
+            message="cargando usuario"
+          />
           <NavbarContainer />
           <Routes>{routes}</Routes>
         </GlobalErrorHandler>

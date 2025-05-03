@@ -18,6 +18,7 @@ const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState({ ...defaultUser });
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
 
   const navigate = useNavigate();
 
@@ -27,11 +28,17 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const contextValue = {
-    user: { current: currentUser, set: setCurrentUser, logout },
+    user: {
+      current: currentUser,
+      set: setCurrentUser,
+      logout,
+      isLoading: isLoadingUser,
+    },
   };
 
   useEffect(() => {
     if (!currentUser.isAuthenticated) {
+      setIsLoadingUser(true);
       getCurrentUser()
         .then((data) => {
           const { item } = data;
@@ -49,6 +56,9 @@ export const AppContextProvider = ({ children }) => {
           if (currentUser.isAuthenticated) {
             setCurrentUser({ ...defaultUser });
           }
+        })
+        .finally(() => {
+          setIsLoadingUser(false);
         });
     }
   }, [currentUser.isAuthenticated, navigate]);

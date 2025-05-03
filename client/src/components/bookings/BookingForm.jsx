@@ -341,6 +341,7 @@ function BookingForm({
           denyButtonText: "No, descartar",
           confirmButtonColor: "green",
           denyButtonColor: "red",
+          allowOutsideClick: false,
         }).then((result) => {
           if (result.isConfirmed) {
             autoCompleteForm(currentForm);
