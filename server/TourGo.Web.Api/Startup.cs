@@ -17,6 +17,7 @@ namespace TourGo.Web.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
             ConfigureAppSettings(services);
             DependencyInjection.ConfigureServices(services, Configuration);
             Cors.ConfigureServices(services);
@@ -33,6 +34,7 @@ namespace TourGo.Web.Api
             services.Configure<BrevoConfig>(Configuration.GetSection("BrevoConfig"));
             services.Configure<EmailConfig>(Configuration.GetSection("EmailConfig"));
             services.Configure<AuthConfig>(Configuration.GetSection("AuthConfig"));
+            services.Configure<AWSS3Config>(Configuration.GetSection("AWSS3Config"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

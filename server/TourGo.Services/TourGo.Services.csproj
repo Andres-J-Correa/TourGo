@@ -11,8 +11,9 @@
 	</ItemGroup>
 	
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="4.0.0.1" />
     <PackageReference Include="BCrypt-Core" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.4" />
     <PackageReference Include="sib_api_v3_sdk" Version="4.0.2" />
   </ItemGroup>
 

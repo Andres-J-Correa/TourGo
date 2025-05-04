@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,17 +15,19 @@ namespace TourGo.Models.Requests.Finances
     {
         public int Id { get; set; }
 
+        [Required]
         [Range(1, Int32.MaxValue)]
-        public int? EntityId { get; set; }
+        public int EntityId { get; set; }
 
         [Range(1, Int32.MaxValue)]
         public int? ParentId { get; set; }
 
+        [Required]
         [Range(1, Int32.MaxValue)]
-        public int? InvoiceId { get; set; }
+        public int InvoiceId { get; set; }
 
         [Required]
-        [Range(0.001, double.MaxValue)]
+        [Range(double.MinValue, double.MaxValue)]
         public decimal Amount { get; set; }
 
         [Required]
@@ -38,19 +41,15 @@ namespace TourGo.Models.Requests.Finances
         [ValidEnum(typeof(TransactionCategoryEnum))]
         public int CategoryId { get; set; }
 
-        [Required]
         [Range(1, Int32.MaxValue)]
-        public int SubcategoryId { get; set; }
+        public int? SubcategoryId { get; set; }
 
         [Required]
         [MinLength(2)]
-        public string ReferenceNumber { get; set; }
+        public string ReferenceNumber { get; set; } = string.Empty;
 
-        [Required]
         [ValidEnum(typeof(TransactionStatusEnum))]
-        public int StatusId { get; set; }
-
-        public string? DocumentUrl { get; set; }
+        public int StatusId { get; set; } = 2; // Default to Completed
 
         [Required]
         [MinLength(2)]
