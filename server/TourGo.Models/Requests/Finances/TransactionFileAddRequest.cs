@@ -20,6 +20,6 @@ namespace TourGo.Models.Requests.Finances
 
         [Required]
         [ValidEnum(typeof(TransactionCategoryEnum))]
-        public int Category { get; set; }
+        public int CategoryId { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 // components/bookings/TotalsDisplay.jsx
 import React from "react";
 import { Row, Col } from "reactstrap";
+import { formatCurrency } from "utils/currencyHelper";
 import PropTypes from "prop-types";
 
 const TotalsDisplay = ({ totals }) => {
@@ -11,28 +12,19 @@ const TotalsDisplay = ({ totals }) => {
         <Col md="4">
           <strong className="fs-5 text">Subtotal:</strong>
           <span className="float-end mt-1">
-            {totals.subtotal.toLocaleString("es-CO", {
-              style: "currency",
-              currency: "COP",
-            })}
+            {formatCurrency(totals.subtotal, "COP")}
           </span>
         </Col>
         <Col md="4">
           <strong className="fs-5 text">Cargos:</strong>
           <span className="float-end mt-1">
-            {totals.charges.toLocaleString("es-CO", {
-              style: "currency",
-              currency: "COP",
-            })}
+            {formatCurrency(totals.charges, "COP")}
           </span>
         </Col>
         <Col md="4">
           <strong className="fs-5 text">Total:</strong>
           <span className="float-end mt-1">
-            {totals.total.toLocaleString("es-CO", {
-              style: "currency",
-              currency: "COP",
-            })}
+            {formatCurrency(totals.total, "COP")}
           </span>
         </Col>
       </Row>

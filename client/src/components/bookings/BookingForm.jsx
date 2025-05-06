@@ -14,6 +14,8 @@ import { Form, withFormik } from "formik";
 import { Button, Spinner } from "reactstrap";
 import dayjs from "dayjs";
 import classNames from "classnames";
+import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
   add as addBooking,
@@ -358,6 +360,28 @@ function BookingForm({
   return (
     <>
       <LoadingOverlay isVisible={isLoading} message="Cargando información." />
+      <div className="d-flex mb-4">
+        <Button
+          type="button"
+          onClick={() => setCurrentStep(0)}
+          color="secondary"
+          className="me-auto"
+          disabled={submitting || isSubmitting}>
+          <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+          Anterior
+        </Button>
+        {booking?.id && (
+          <Button
+            type="button"
+            onClick={handleNextClick}
+            color="secondary"
+            className="ms-auto"
+            disabled={submitting || isSubmitting}>
+            Siguiente
+            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+          </Button>
+        )}
+      </div>
       <DateSelector
         dates={dates}
         onDateChange={handleDateChange}
@@ -404,26 +428,6 @@ function BookingForm({
           </div>
         </Form>
       </div>
-      <div className="d-flex mt-4">
-        <Button
-          type="button"
-          onClick={() => setCurrentStep(0)}
-          color="secondary"
-          className="me-auto"
-          disabled={submitting || isSubmitting}>
-          Anterior
-        </Button>
-        {booking?.id && (
-          <Button
-            type="button"
-            onClick={handleNextClick}
-            color="secondary"
-            className="ms-auto"
-            disabled={submitting || isSubmitting}>
-            Siguiente
-          </Button>
-        )}
-      </div>
     </>
   );
 }
@@ -464,6 +468,7 @@ export default withFormik({
         if (values.id) {
           setBooking({
             ...values,
+            total: Number(values.charges) + Number(values.subtotal),
             customer,
           });
         } else {
@@ -471,6 +476,7 @@ export default withFormik({
             ...values,
             id: res.item.bookingId,
             invoiceId: res.item.invoiceId,
+            total: Number(values.charges) + Number(values.subtotal),
             customer,
           });
         }

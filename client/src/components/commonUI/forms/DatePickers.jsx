@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import DatePicker from "react-datepicker";
 import dayjs from "dayjs";
+import { getDate } from "utils/dateHelper";
 import "react-datepicker/dist/react-datepicker.css";
 import "./DatePickers.css"; // Custom styles for the date picker
 
@@ -15,28 +16,15 @@ const DatePickers = ({
   maxDate,
   isDisabled,
 }) => {
-  const parseDate = (date) => {
-    if (!date) return null;
-    if (!dayjs(date).isValid()) return null;
-
-    const day = dayjs(date).get("date");
-    const month = dayjs(date).get("month") + 1;
-    const year = dayjs(date).get("year");
-    const formattedDate = `${year}-${month < 10 ? "0" + month : month}-${
-      day < 10 ? "0" + day : day
-    }`;
-    return formattedDate;
-  };
-
   const onStartDateChange = (date) => {
     if (date) {
-      handleStartChange(parseDate(date));
+      handleStartChange(getDate(date));
     }
   };
 
   const onEndDateChange = (date) => {
     if (date) {
-      handleEndChange(parseDate(date));
+      handleEndChange(getDate(date));
     }
   };
 
@@ -51,7 +39,7 @@ const DatePickers = ({
           selected={startDate}
           onChange={onStartDateChange}
           dateFormat="yyyy-MM-dd"
-          maxDate={parseDate(maxDate)}
+          maxDate={getDate(maxDate)}
           disabled={isDisabled}
           className="form-control"
           placeholderText={startDateName}
@@ -70,7 +58,7 @@ const DatePickers = ({
           onChange={onEndDateChange}
           dateFormat="yyyy-MM-dd"
           minDate={startDate ? dayjs(startDate).add(1, "day").toDate() : null}
-          maxDate={parseDate(maxDate)}
+          maxDate={getDate(maxDate)}
           disabled={!startDate || isDisabled}
           className="form-control"
           placeholderText={endDateName}

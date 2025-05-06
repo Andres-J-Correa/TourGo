@@ -117,7 +117,16 @@ namespace TourGo.Services.Finances
             return fileKey;
         }
 
-        public string GetFolderName (TransactionCategoryEnum category)
+        public string GetFileKey(TransactionFileAddRequest model)
+        {
+            string folder = GetFolderName((TransactionCategoryEnum)model.CategoryId);
+            string fileExtension = Path.GetExtension(model.File.FileName).ToLower();
+            string date = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            string fileKey = $"{folder}/transaction-{model.Id}-date-{date}{fileExtension}";
+            return fileKey;
+        }
+
+        private string GetFolderName (TransactionCategoryEnum category)
         {
             switch (category)
             {
@@ -169,6 +178,7 @@ namespace TourGo.Services.Finances
             transaction.FinancePartner.Id = reader.GetSafeInt32(index++);
             transaction.FinancePartner.Name = reader.GetSafeString(index++);
             transaction.EntityId = reader.GetSafeInt32(index++);
+            transaction.HasDocumentUrl = reader.GetSafeBool(index++);
 
             return transaction;
         }

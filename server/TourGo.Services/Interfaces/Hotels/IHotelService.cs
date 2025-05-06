@@ -1,4 +1,5 @@
 ﻿using TourGo.Models.Domain;
+using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Requests.Hotels;
 
@@ -12,5 +13,8 @@ namespace TourGo.Services.Interfaces.Hotels
         Lookup? GetMinimal(int id);
         void Update(HotelUpdateRequest model, int userId);
         void Delete(int id, int userId);
+        List<Lookup>? GetPaymentMethods(int hotelId);
+        List<Lookup>? GetFinancePartners(int hotelId);
+        List<TransactionSubcategory>? GetTransactionSubcategories(int hotelId);
     }
 }

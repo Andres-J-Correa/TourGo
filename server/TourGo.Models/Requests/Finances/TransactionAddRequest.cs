@@ -51,9 +51,8 @@ namespace TourGo.Models.Requests.Finances
         [ValidEnum(typeof(TransactionStatusEnum))]
         public int StatusId { get; set; } = 2; // Default to Completed
 
-        [Required]
-        [MinLength(2)]
-        public string Description { get; set; }
+        [StringLength(500,MinimumLength = 2)]
+        public string? Description { get; set; }
 
         [Iso4217Currency]
         public string CurrencyCode { get; set; } = "COP"; // Default to COP

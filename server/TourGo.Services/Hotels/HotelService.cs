@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TourGo.Data;
 using TourGo.Data.Providers;
 using TourGo.Models.Domain;
+using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Requests.Hotels;
@@ -152,6 +153,73 @@ namespace TourGo.Services.Hotels
             });
 
             return hotels;
+        }
+
+        public List<Lookup>? GetPaymentMethods(int hotelId)
+        {
+            string proc = "payment_methods_select_by_hotel_id";
+            List<Lookup>? paymentMethods = null;
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                Lookup paymentMethod = new();
+                paymentMethod.Id = reader.GetSafeInt32(index++);
+                paymentMethod.Name = reader.GetSafeString(index++);
+
+                paymentMethods ??= new List<Lookup>();
+
+                paymentMethods.Add(paymentMethod);
+            });
+
+            return paymentMethods;
+        }
+
+        public List<Lookup>? GetFinancePartners(int hotelId)
+        {
+            string proc = "finance_partners_select_by_hotel_id";
+            List<Lookup>? financePartners = null;
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                Lookup financePartner = new();
+                financePartner.Id = reader.GetSafeInt32(index++);
+                financePartner.Name = reader.GetSafeString(index++);
+
+                financePartners ??= new List<Lookup>();
+
+                financePartners.Add(financePartner);
+            });
+
+            return financePartners;
+        }
+
+        public List<TransactionSubcategory>? GetTransactionSubcategories(int hotelId)
+        {
+            string proc = "transaction_subcategories_select_by_hotel_id";
+            List<TransactionSubcategory>? transactionSubcategories = null;
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                TransactionSubcategory transactionSubcategory = new();
+                transactionSubcategory.Id = reader.GetSafeInt32(index++);
+                transactionSubcategory.Name = reader.GetSafeString(index++);
+                transactionSubcategory.CategoryId = reader.GetSafeInt32(index++);
+
+                transactionSubcategories ??= new List<TransactionSubcategory>();
+
+                transactionSubcategories.Add(transactionSubcategory);
+            });
+
+            return transactionSubcategories;
         }
 
         private static Hotel MapHotel(IDataReader reader, ref int index)

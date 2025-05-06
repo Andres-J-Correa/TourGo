@@ -12,7 +12,7 @@ using TourGo.Web.Api.Extensions;
 using TourGo.Models.Requests;
 using TourGo.Models.Enums.Transactions;
 using Microsoft.Extensions.Caching.Memory;
-using TourGo.Web.Api.Extensions;
+using TourGo.Models.Domain;
 
 namespace TourGo.Web.Api.Controllers.Finances
 {
@@ -71,7 +71,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpGet("hotel/{id:int}/entity/{entityId:int}")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk:true)]
-        public ActionResult<ItemResponse<List<Transaction>>> GetByEntityId(int entityId, int id)
+        public ActionResult<ItemsResponse<Transaction>> GetByEntityId(int entityId, int id)
         {
             ObjectResult result = null;
 
@@ -84,7 +84,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                     result = NotFound("No transactions found for the given entity ID.");
                 } else
                 {
-                    ItemResponse<List<Transaction>> response = new ItemResponse<List<Transaction>> { Item = transactions };
+                    ItemsResponse<Transaction> response = new ItemsResponse<Transaction> { Items = transactions };
                     result = Ok(response);
                 }
             }
@@ -150,26 +150,23 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpPut("{id:int}/document-url")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
-        public ActionResult<ItemResponse<string>> UpdateDocumentUrl([FromForm] TransactionFileAddRequest model)
+        public ActionResult<SuccessResponse> UpdateDocumentUrl([FromForm] TransactionFileAddRequest model)
         {
             ObjectResult result = null;
 
             try
             {
-                if(model.File.Length == 0)
+                if (model.File.Length == 0)
                 {
                     return BadRequest("File is empty");
                 }
 
-                string folder = _transactionService.GetFolderName((TransactionCategoryEnum)model.Category);
-                string fileExtension = Path.GetExtension(model.File.FileName).ToLower();
-                string date = DateTime.UtcNow.ToString("yyyy-MM-dd");
-                string fileKey = $"{folder}/transaction-{model.Id}-date-{date}{fileExtension}";
+                string fileKey = _transactionService.GetFileKey(model);
 
                 _fileService.Upload(model.File, AWSS3BucketEnum.TransactionsFiles, fileKey);
                 _transactionService.UpdateDocumentUrl(model.Id, fileKey);
 
-                ItemResponse<string> response = new ItemResponse<string> { Item = fileKey };
+                SuccessResponse response = new SuccessResponse();
                 result = Ok(response);
             }
             catch (Exception ex)

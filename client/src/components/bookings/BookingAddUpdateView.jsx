@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { TabContent, TabPane } from "reactstrap";
+import { TabContent, TabPane, Button } from "reactstrap";
+import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import TabNavigation from "components/bookings/TabNavigation";
@@ -13,6 +15,7 @@ import { bookingFormTabs as tabs, defaultBooking } from "./constants";
 import CustomerForm from "components/bookings/CustomerForm";
 import BookingForm from "components/bookings/BookingForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
+import EntityTransactionsView from "components/transactions/EntityTransactionsView";
 
 const BookingAddUpdateView = () => {
   const { hotelId, bookingId } = useParams();
@@ -33,7 +36,7 @@ const BookingAddUpdateView = () => {
   const isStepComplete = {
     0: customer?.id > 0,
     1: Number(booking.id) > 0,
-    2: false,
+    2: booking?.transactions?.length > 0,
     3: false,
   };
 
@@ -102,7 +105,34 @@ const BookingAddUpdateView = () => {
           />
         </TabPane>
         <TabPane tabId={2}>
-          <h5>Cobros (step placeholder)</h5>
+          <div className="d-flex mb-4">
+            <Button
+              type="button"
+              onClick={() => setCurrentStep(1)}
+              color="secondary"
+              className="me-auto"
+              disabled={submitting}>
+              <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+              Anterior
+            </Button>
+            {isStepComplete[2] && (
+              <Button
+                type="button"
+                onClick={() => setCurrentStep(3)}
+                color="secondary"
+                className="ms-auto"
+                disabled={submitting}>
+                Siguiente
+                <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+              </Button>
+            )}
+          </div>
+          <EntityTransactionsView
+            hotelId={hotelId}
+            submitting={submitting}
+            entity={booking}
+            setEntity={setBooking}
+          />
         </TabPane>
         <TabPane tabId={3}>
           <h5>Confirmación (step placeholder)</h5>
