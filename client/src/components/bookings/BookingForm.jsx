@@ -190,14 +190,23 @@ function BookingForm({
         title: "¿Está seguro de que desea continuar?",
         text: "Los cambios no guardados se perderán.",
         icon: "warning",
-        showCancelButton: true,
+        showDenyButton: true,
         confirmButtonText: "Sí, descartar cambios",
-        cancelButtonText: "Cancelar",
+        denyButtonText: "No, ir a guardar",
         confirmButtonColor: "red",
+        reverseButtons: true,
+        denyButtonColor: "green",
       }).then((result) => {
         if (result.isConfirmed) {
           resetFormToPrevious();
           setCurrentStep(2);
+        } else if (result.isDenied) {
+          setTimeout(() => {
+            window.scrollTo({
+              top: document.body.scrollHeight,
+              behavior: "smooth",
+            });
+          }, 200);
         }
       });
     } else {

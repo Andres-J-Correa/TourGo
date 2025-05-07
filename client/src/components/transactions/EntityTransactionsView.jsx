@@ -74,8 +74,10 @@ const EntityTransactionsView = ({ hotelId, submitting, entity, setEntity }) => {
       text: "¿Deseas continuar sin adjuntar un comprobante?",
       showCancelButton: true,
       confirmButtonText: "Sí, continuar",
+      confirmButtonColor: "red",
       cancelButtonText: "No, adjuntar comprobante",
       reverseButtons: true,
+      cancelButtonColor: "green",
     });
   };
 
