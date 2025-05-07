@@ -9,7 +9,6 @@ import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 
 import Swal from "sweetalert2";
-import { toast } from "react-toastify";
 import { Form, withFormik } from "formik";
 import { Button, Spinner } from "reactstrap";
 import dayjs from "dayjs";
@@ -457,6 +456,13 @@ export default withFormik({
     }
 
     try {
+      Swal.fire({
+        title: "Guardando reserva",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
       let res = null;
       if (values.id) {
         res = await updateBooking(values);
@@ -464,32 +470,43 @@ export default withFormik({
         res = await addBooking(values, hotelId);
       }
 
+      Swal.close(); // Close loading
+
       if (res.isSuccessful) {
-        if (values.id) {
-          setBooking({
-            ...values,
-            total: Number(values.charges) + Number(values.subtotal),
-            customer,
-          });
-        } else {
-          setBooking({
-            ...values,
-            id: res.item.bookingId,
-            invoiceId: res.item.invoiceId,
-            total: Number(values.charges) + Number(values.subtotal),
-            customer,
-          });
-        }
+        setBooking({
+          ...values,
+          ...(values.id
+            ? {}
+            : { id: res.item.bookingId, invoiceId: res.item.invoiceId }),
+          total: Number(values.charges) + Number(values.subtotal),
+          customer,
+        });
 
         setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, { ...values });
         removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
-        toast.success("Reserva guardada con éxito");
-        setCurrentStep(2);
+
+        setTimeout(() => {
+          setCurrentStep(2);
+        }, 1500);
+
+        await Swal.fire({
+          icon: "success",
+          title: "Reserva guardada",
+          text: "La reserva se guardó correctamente.",
+          timer: 1500,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+        });
       } else {
         throw new Error("Error al guardar la reserva");
       }
     } catch (err) {
-      toast.error("Error al guardar la reserva");
+      Swal.close(); // Close loading
+      await Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo guardar la reserva, intente nuevamente.",
+      });
     }
   },
 })(BookingForm);

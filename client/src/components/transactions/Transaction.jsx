@@ -123,7 +123,7 @@ function Transaction({ txn, updateHasDocumentUrl }) {
   };
 
   return (
-    <Row className="mb-3 justify-content-center">
+    <Row className="mb-1 justify-content-center">
       <LoadingOverlay isVisible={isLoading} />
       <Card className={cardClass}>
         <CardHeader onClick={toggleExpanded} className={cardHeaderClass}>
