@@ -5,6 +5,7 @@ using TourGo.Data.Providers;
 using TourGo.Services;
 using TourGo.Services.Customers;
 using TourGo.Services.Email;
+using TourGo.Services.Files;
 using TourGo.Services.Finances;
 using TourGo.Services.Hotels;
 using TourGo.Services.Interfaces;
@@ -76,6 +77,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<ITransactionService, TransactionService>();
             services.AddSingleton<IInvoiceService, InvoiceService>();
             services.AddSingleton<IErrorLoggingService, ErrorLoggingService>();
+            services.AddSingleton<IFileService, FileService>();
 
             GetAllEntities().ForEach(tt =>
             {

@@ -10,6 +10,7 @@ using TourGo.Data.Providers;
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Users;
+using TourGo.Models.Enums.Transactions;
 using TourGo.Models.Requests.Finances;
 using TourGo.Services.Interfaces;
 
@@ -41,7 +42,6 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_subcategoryId", request.SubcategoryId);
                 col.AddWithValue("p_referenceNumber", request.ReferenceNumber);
                 col.AddWithValue("p_statusId", request.StatusId);
-                col.AddWithValue("p_documentUrl", request.DocumentUrl?? (object)DBNull.Value);
                 col.AddWithValue("p_description", request.Description);
                 col.AddWithValue("p_currencyCode", request.CurrencyCode);
                 col.AddWithValue("p_financePartnerId", request.FinancePartnerId > 0 ? request.FinancePartnerId : DBNull.Value);
@@ -62,6 +62,83 @@ namespace TourGo.Services.Finances
             }));
 
             return newId;
+        }
+
+        public List<Transaction>? GetByEntityId (int entityId)
+        {
+
+            string proc = "transactions_select_by_entity_id";
+            List<Transaction> transactions = null;
+
+            _dataProvider.ExecuteCmd(proc, (col) =>
+            {
+                col.AddWithValue("p_id", entityId);
+            }, (reader, returnCol) =>
+            {
+                int index = 0;
+
+                Transaction transaction = MapTransaction(reader, ref index);
+
+                transactions ??= new List<Transaction>();
+
+                transactions.Add(transaction);
+            });
+
+            return transactions;
+        }
+
+        public void UpdateDocumentUrl (int transactionId, string fileKey)
+        {
+
+           string proc = "transactions_update_by_id_document_url";
+
+            _dataProvider.ExecuteNonQuery(proc, (col) =>
+            {
+                col.AddWithValue("p_id", transactionId);
+                col.AddWithValue("p_documentUrl", fileKey);
+            });
+        }
+
+        public string? GetSupportDocumentUrl (int transactionId)
+        {
+            string proc = "transactions_select_document_url_by_id";
+            string? fileKey = null;
+
+            _dataProvider.ExecuteCmd(proc, (col) =>
+            {
+                col.AddWithValue("p_id", transactionId);
+            }, (reader, returnCol) =>
+            {
+                int index = 0;
+
+                fileKey = reader.GetSafeString(index++);
+            });
+
+            return fileKey;
+        }
+
+        public string GetFileKey(TransactionFileAddRequest model)
+        {
+            string folder = GetFolderName((TransactionCategoryEnum)model.CategoryId);
+            string fileExtension = Path.GetExtension(model.File.FileName).ToLower();
+            string date = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            string fileKey = $"{folder}/transaction-{model.Id}-date-{date}{fileExtension}";
+            return fileKey;
+        }
+
+        private string GetFolderName (TransactionCategoryEnum category)
+        {
+            switch (category)
+            {
+                case TransactionCategoryEnum.Income:
+                    return "payments-received";
+                case TransactionCategoryEnum.Expense:
+                    return "payments-made";
+                case TransactionCategoryEnum.Adjustments:
+                    return "adjustments";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(category), category, null);
+            }
         }
 
         public static Transaction MapTransaction(IDataReader reader, ref int index)
@@ -90,7 +167,6 @@ namespace TourGo.Services.Finances
             transaction.Status = new Lookup();
             transaction.Status.Id = reader.GetSafeInt32(index++);
             transaction.Status.Name = reader.GetSafeString(index++);
-            transaction.DocumentUrl = reader.GetSafeString(index++);
             transaction.Description = reader.GetSafeString(index++);
             transaction.ApprovedBy = new UserBase();
             transaction.ApprovedBy.Id = reader.GetSafeInt32(index++);
@@ -102,6 +178,7 @@ namespace TourGo.Services.Finances
             transaction.FinancePartner.Id = reader.GetSafeInt32(index++);
             transaction.FinancePartner.Name = reader.GetSafeString(index++);
             transaction.EntityId = reader.GetSafeInt32(index++);
+            transaction.HasDocumentUrl = reader.GetSafeBool(index++);
 
             return transaction;
         }

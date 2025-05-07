@@ -12,6 +12,8 @@ using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 using TourGo.Web.Api.Extensions;
 using TourGo.Services.Interfaces;
+using TourGo.Models.Domain.Finances;
+using TourGo.Services.Finances;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -208,10 +210,95 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return StatusCode(code, response);
         }
 
+        [HttpGet("{id:int}/payment-methods")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemsResponse<Lookup>> GetPaymentMethods(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<Lookup>? paymentMethods = _hotelService.GetPaymentMethods(id);
+
+                if (paymentMethods == null)
+                {
+                    result = NotFound("No payment methods found for the given hotel ID.");
+                }
+                else
+                {
+                    ItemsResponse<Lookup> response = new ItemsResponse<Lookup> { Items = paymentMethods };
+                    result = Ok(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("{id:int}/finance-partners")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemsResponse<Lookup>> GetFinancePartners(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<Lookup>? financePartners = _hotelService.GetFinancePartners(id);
+
+                if (financePartners == null)
+                {
+                    result = NotFound("No finance partners found for the given hotel ID.");
+                }
+                else
+                {
+                    ItemsResponse<Lookup> response = new ItemsResponse<Lookup> { Items = financePartners };
+                    result = Ok(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("{id:int}/transaction-subcategories")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemsResponse<TransactionSubcategory>> GetTransactionSubcategories(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<TransactionSubcategory>? transactionSubcategories = _hotelService.GetTransactionSubcategories(id);
+
+                if (transactionSubcategories == null)
+                {
+                    result = NotFound("No transaction subcategories found for the given hotel ID.");
+                }
+                else
+                {
+                    ItemsResponse<TransactionSubcategory> response = new ItemsResponse<TransactionSubcategory> { Items = transactionSubcategories };
+                    result = Ok(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
 
     }
-
-
-
-
 }

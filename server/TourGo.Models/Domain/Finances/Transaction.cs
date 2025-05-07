@@ -20,13 +20,13 @@ namespace TourGo.Models.Domain.Finances
         public Lookup? Subcategory { get; set; }
         public string? ReferenceNumber { get; set; }
         public Lookup? Status { get; set; }
-        public string? DocumentUrl { get; set; }
         public string? Description { get; set; }
         public UserBase? ApprovedBy { get; set; }
         public string? CurrencyCode { get; set;}
         public int HotelId { get ;set;}
         public Lookup? FinancePartner{get ;set;}
         public int EntityId { get; set; } 
+        public bool HasDocumentUrl { get; set; }
 
     }
 }

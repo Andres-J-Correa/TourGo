@@ -195,7 +195,7 @@ export const sanitizeBooking = (booking) => {
 export const bookingFormTabs = [
   { id: 0, icon: faUser, name: "Cliente" },
   { id: 1, icon: faFilePen, name: "Informacion de la Reserva" },
-  { id: 2, icon: faMoneyBill1Wave, name: "Cobros" },
+  { id: 2, icon: faMoneyBill1Wave, name: "Transacciones" },
   { id: 3, icon: faCheckCircle, name: "Confirmación" },
 ];
 

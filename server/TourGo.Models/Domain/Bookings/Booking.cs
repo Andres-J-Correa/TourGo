@@ -10,9 +10,8 @@ using TourGo.Models.Domain.Users;
 
 namespace TourGo.Models.Domain.Bookings
 {
-    public class Booking
+    public class Booking : EntityBase
     {
-        public int Id { get; set; }
         public string? ExternalId { get; set; }
         public DateOnly ArrivalDate { get; set; }
         public DateOnly DepartureDate { get; set; }
@@ -24,15 +23,8 @@ namespace TourGo.Models.Domain.Bookings
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
         public UserBase? ModifiedBy { get; set; }
-        public Customer? Customer { get; set; }
         public Lookup? BookingProvider { get; set; }
         public decimal ExternalCommission { get; set; }
         public int Nights { get; set; }
-        public decimal Subtotal { get; set; }
-        public decimal Charges { get; set; }
-        public decimal Total { get; set; }
-        public List<Transaction>? Transactions { get; set; }
-        public int InvoiceId { get; set; }
-
     }
 }
