@@ -249,14 +249,7 @@ function BookingForm({
         roomBookings: currentRoomBookings,
       });
     }
-  }, [
-    booking,
-    roomBookings,
-    dates,
-    bookingCharges,
-    initialValues,
-    bookingRoomBookings,
-  ]);
+  }, [booking, dates, bookingCharges, initialValues, bookingRoomBookings]);
 
   useEffect(() => {
     const newFormData = {
