@@ -75,16 +75,17 @@ export const bookingSchema = Yup.object().shape({
         current = current.add(1, "day");
       }
 
-      const startDate = dayjs(start);
-      const endDate = dayjs(end);
       const bookedDates = new Set(bookings.map((b) => b.date));
 
-      const missingDate = expectedDates.find((date) => !bookedDates.has(date));
+      const missingDates = expectedDates.filter(
+        (date) => !bookedDates.has(date)
+      );
 
-      const nights = endDate.diff(startDate, "day"); // Calculate number of nights
-      return missingDate
+      return missingDates.length > 0
         ? this.createError({
-            message: `Debe elegir al menos una habitación para cada una de las ${nights} noches seleccionadas.`,
+            message: `Falta reservar en las fechas: ${missingDates
+              .map((date) => dayjs(date).format("DD/MM/YYYY"))
+              .join(", ")}`,
           })
         : true;
     }),

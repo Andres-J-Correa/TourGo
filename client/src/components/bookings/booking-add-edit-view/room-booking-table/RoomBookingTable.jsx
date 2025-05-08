@@ -39,7 +39,7 @@ const RoomBookingTable = ({
 
   const prevAndNextDays = useMemo(() => {
     const start = dayjs(startDate).subtract(1, "day").format("YYYY-MM-DD");
-    const end = dayjs(endDate).add(1, "day").format("YYYY-MM-DD");
+    const end = dayjs(endDate).format("YYYY-MM-DD");
     return { start, end };
   }, [startDate, endDate]);
 
@@ -346,6 +346,13 @@ const RoomBookingTable = ({
         </Row>
 
         <div className="bookings-table-container">
+          <Row>
+            <Col className="text-center text-dark fw-bold">
+              {`Reservando: ${dayjs(startDate).format("DD/MM/YYYY")} - ${dayjs(
+                endDate
+              ).format("DD/MM/YYYY")} (${dates.length} noches)`}
+            </Col>
+          </Row>
           <Table bordered className="table-fixed">
             <thead className="sticky-top">
               <tr>

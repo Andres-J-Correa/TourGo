@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarPlus, faBan } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarPlus } from "@fortawesome/free-solid-svg-icons";
 
 const BookingCell = ({
   date,
@@ -20,11 +20,7 @@ const BookingCell = ({
     } else if (currentSelected?.roomId) {
       return "seleccionado";
     } else if (disabled) {
-      return (
-        <span className="text-white">
-          <FontAwesomeIcon icon={faBan} />
-        </span>
-      );
+      return <span className="text-white fw-medium">Libre</span>;
     } else {
       return (
         <span className="booking-table-cell-text text-secondary">
