@@ -43,7 +43,7 @@ const RoomCard = ({ room, bookingNights, extraCharges }) => {
             </div>
           ))}
 
-          <hr className="my-2" />
+          <hr className="mt-1" />
 
           <div className="line-item line-total">
             <span className="line-label">Total</span>

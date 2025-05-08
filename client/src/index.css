@@ -513,7 +513,6 @@ button:not(:disabled),
   margin-right: var(--bs-navbar-brand-margin-end);
   font-size: var(--bs-navbar-brand-font-size);
   color: var(--bs-navbar-brand-color);
-  background-color: var(--bs-navbar-background-color);
   white-space: nowrap;
 }
 .navbar-brand:hover,
@@ -1324,8 +1323,12 @@ hr.horizontal.dark {
 .cursor-pointer {
   cursor: pointer;
 }
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
 .navbar {
   box-shadow: 0 2px 12px #00000029;
+  background-color: var(--bs-navbar-background-color);
 }
 
 .navbar .nav-link {

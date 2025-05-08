@@ -32,15 +32,18 @@ const ReservationSummary = ({
         </Row>
 
         <hr />
-
-        <Row>
-          <Col>
-            <strong>Notas:</strong>
-            <p>{bookingData.notes}</p>
-          </Col>
-        </Row>
-
-        <hr />
+        {bookingData.notes && (
+          <>
+            {" "}
+            <Row>
+              <Col>
+                <strong>Notas:</strong>
+                <p>{bookingData.notes}</p>
+              </Col>
+            </Row>
+            <hr />
+          </>
+        )}
 
         <BookingFinancials bookingData={bookingData} />
 

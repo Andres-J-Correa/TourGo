@@ -62,8 +62,8 @@ export default function useBookingFormData(hotelId, dates) {
     setIsLoadingBookings(true);
     getRoomBookingsByDateRange(
       hotelId,
-      dayjs(dates.start).format("YYYY-MM-DD"),
-      dayjs(dates.end).format("YYYY-MM-DD")
+      dayjs(dates.start).subtract(1, "day").format("YYYY-MM-DD"),
+      dayjs(dates.end).add(1, "").format("YYYY-MM-DD")
     )
       .then(onGetRoomBookingsSuccess)
       .catch(onGetRoomBookingsError)

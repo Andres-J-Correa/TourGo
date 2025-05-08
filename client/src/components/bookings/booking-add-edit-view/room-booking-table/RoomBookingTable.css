@@ -26,3 +26,9 @@
   background: #f8f9fa;
   text-align: center;
 }
+
+.bookings-table-container {
+  overflow: "auto";
+  max-height: "600px";
+  position: "relative";
+}

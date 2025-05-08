@@ -5,6 +5,7 @@ import { formatPhoneNumber } from "utils/phoneHelper";
 const CustomerInfo = ({ customer }) => (
   <>
     <h5>Cliente</h5>
+    <hr className="mb-1 mt-0" />
     <Row>
       <Col md={7}>
         <Row>

@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 const BookingDetails = ({ bookingData }) => (
   <>
     <h5>Detalles</h5>
+    <hr className="mb-1 mt-0" />
     <Row>
       <Col md={4}>
         <Row>
