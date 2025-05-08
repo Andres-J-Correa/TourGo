@@ -11,7 +11,7 @@ import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomField from "components/commonUI/forms/CustomField";
 import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
-import { customerSchema } from "./constants";
+import { customerSchema } from "components/bookings/constants";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 

@@ -477,14 +477,15 @@ button:not(:disabled),
   --bs-navbar-padding-x: 1rem;
   --bs-navbar-padding-y: 0.5rem;
   --bs-navbar-color: #344767;
-  --bs-navbar-hover-color: rgba(52, 71, 103, 0.7);
+  --bs-navbar-hover-color: #7b809a;
   --bs-navbar-disabled-color: rgba(52, 71, 103, 0.3);
   --bs-navbar-active-color: rgba(52, 71, 103, 0.9);
   --bs-navbar-brand-padding-y: 0.40625rem;
   --bs-navbar-brand-margin-end: 1rem;
   --bs-navbar-brand-font-size: 1.5rem;
-  --bs-navbar-brand-color: rgba(52, 71, 103, 0.9);
-  --bs-navbar-brand-hover-color: rgba(52, 71, 103, 0.9);
+  --bs-navbar-brand-color: #fff;
+  --bs-navbar-background-color: rgba(52, 71, 103, 0.9);
+  --bs-navbar-brand-hover-color: #7b809a;
   --bs-navbar-nav-link-padding-x: 0.5rem;
   --bs-navbar-toggler-padding-y: 0.25rem;
   --bs-navbar-toggler-padding-x: 0.75rem;
@@ -512,6 +513,7 @@ button:not(:disabled),
   margin-right: var(--bs-navbar-brand-margin-end);
   font-size: var(--bs-navbar-brand-font-size);
   color: var(--bs-navbar-brand-color);
+  background-color: var(--bs-navbar-background-color);
   white-space: nowrap;
 }
 .navbar-brand:hover,
@@ -1327,7 +1329,7 @@ hr.horizontal.dark {
 }
 
 .navbar .nav-link {
-  color: #344767;
+  color: #fff;
   padding: 0.5rem 1rem;
   font-weight: 400;
   font-size: 0.875rem;

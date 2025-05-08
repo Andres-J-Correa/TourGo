@@ -1,7 +1,7 @@
 // components/bookings/ExtraChargesSelector.jsx
 import React from "react";
 import { Row, Col, Card, CardBody, CardTitle, CardText } from "reactstrap";
-import { chargeTypeLabels, formatAmount } from "./constants";
+import { chargeTypeLabels, formatAmount } from "../constants";
 import PropTypes from "prop-types";
 import "./ExtraChargesSelector.css"; // Assuming you have some CSS for styling
 

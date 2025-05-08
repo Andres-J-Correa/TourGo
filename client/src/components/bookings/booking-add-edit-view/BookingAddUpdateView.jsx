@@ -5,15 +5,15 @@ import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Breadcrumb from "components/commonUI/Breadcrumb";
-import TabNavigation from "components/bookings/TabNavigation";
+import TabNavigation from "components/bookings/booking-add-edit-view/TabNavigation";
 
 import { toast } from "react-toastify";
 import { getById as getBookingById } from "services/bookingService";
 
-import { bookingFormTabs as tabs, defaultBooking } from "./constants";
+import { bookingFormTabs as tabs, defaultBooking } from "../constants";
 
-import CustomerForm from "components/bookings/CustomerForm";
-import BookingForm from "components/bookings/BookingForm";
+import CustomerForm from "components/bookings/booking-add-edit-view/CustomerForm";
+import BookingForm from "components/bookings/booking-add-edit-view/BookingForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import EntityTransactionsView from "components/transactions/EntityTransactionsView";
 import BookingSummary from "components/bookings/booking-summary/BookingSummary";

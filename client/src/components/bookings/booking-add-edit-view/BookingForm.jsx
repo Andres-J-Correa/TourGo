@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 
-import RoomBookingTable from "components/bookings/RoomBookingTable";
-import ExtraChargesSelector from "components/bookings/ExtraChargesSelector";
-import TotalsDisplay from "components/bookings/TotalsDisplay";
-import DateSelector from "components/bookings/DateSelector";
-import AdditionalInfoForm from "components/bookings/AdditionalInfoForm";
+import RoomBookingTable from "components/bookings/booking-add-edit-view/RoomBookingTable";
+import ExtraChargesSelector from "components/bookings/booking-add-edit-view/ExtraChargesSelector";
+import TotalsDisplay from "components/bookings/booking-add-edit-view/TotalsDisplay";
+import DateSelector from "components/bookings/booking-add-edit-view/DateSelector";
+import AdditionalInfoForm from "components/bookings/booking-add-edit-view/AdditionalInfoForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 
@@ -33,7 +33,7 @@ import {
   deepCompareBooking,
   bookingKeysToCompare,
   currentFormKeysToCompare,
-} from "./constants";
+} from "components/bookings/constants";
 
 import useBookingFormData from "./hooks/useBookingFormData";
 import useBookingTotals from "./hooks/useBookingTotals";

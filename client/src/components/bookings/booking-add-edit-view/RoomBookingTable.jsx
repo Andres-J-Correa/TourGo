@@ -15,6 +15,8 @@ import {
   Col,
   Form,
 } from "reactstrap";
+import { faCalendarPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
 import "./RoomBookingTable.css"; // Custom styles for the table
 
@@ -342,13 +344,13 @@ const RoomBookingTable = ({
             position: "relative",
           }}>
           <Table bordered className="table-fixed">
-            <thead className="sticky-top bg-white" style={{ zIndex: 2 }}>
+            <thead className="sticky-top" style={{ zIndex: 2 }}>
               <tr>
-                <th className="date-row-label">Fecha</th>
+                <th className="date-row-label text-bg-dark">Fecha</th>
                 {rooms.map((room) => (
                   <th
                     key={room.id}
-                    className="text-center align-middle booking-table-cell-container"
+                    className="text-center align-middle booking-table-cell-container text-bg-dark"
                     role="button"
                     onClick={() => handleRoomHeaderClick(room)}>
                     <span className="booking-table-cell-text">{room.name}</span>
@@ -359,7 +361,7 @@ const RoomBookingTable = ({
             <tbody>
               {dates.map((date) => (
                 <tr key={date}>
-                  <td className="date-row-label">
+                  <td className="date-row-label text-bg-light">
                     {dayjs(date).format("ddd DD - MMM - YYYY")}
                   </td>
                   {rooms.map((room) => {
@@ -379,7 +381,7 @@ const RoomBookingTable = ({
                           booking
                             ? "bg-secondary text-white"
                             : selected
-                            ? "bg-warning"
+                            ? "bg-success-subtle text-success-emphasis"
                             : currentSelected
                             ? "bg-success text-white"
                             : ""
@@ -395,7 +397,9 @@ const RoomBookingTable = ({
                         ) : currentSelected?.roomId ? (
                           "seleccionado"
                         ) : (
-                          <span className="booking-table-cell-text">➕</span>
+                          <span className="booking-table-cell-text text-secondary">
+                            <FontAwesomeIcon icon={faCalendarPlus} />
+                          </span>
                         )}
                       </td>
                     );

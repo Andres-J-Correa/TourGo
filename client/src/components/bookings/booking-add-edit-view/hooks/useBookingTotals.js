@@ -18,6 +18,14 @@ export default function useBookingTotals(
         // Per booking
         return acc + charge.amount * selectedRoomBookings.length;
       }
+      if (charge.type.id === 3) {
+        // per room
+        const selectedRooms = new Set(
+          selectedRoomBookings.map((booking) => booking.roomId)
+        );
+        return acc + charge.amount * selectedRooms.size;
+      }
+      // Default case: treat as fixed amount
       // Fixed amount
       return acc + charge.amount;
     }, 0);

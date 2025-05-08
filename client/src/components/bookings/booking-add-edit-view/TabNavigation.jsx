@@ -2,7 +2,7 @@ import { Nav, NavItem, NavLink } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classnames from "classnames";
 import PropTypes from "prop-types";
-import { bookingFormTabs as tabs } from "./constants";
+import { bookingFormTabs as tabs } from "components/bookings/constants";
 
 const TabNavigation = ({ currentStep, setCurrentStep, isStepComplete }) => {
   return (
@@ -10,7 +10,10 @@ const TabNavigation = ({ currentStep, setCurrentStep, isStepComplete }) => {
       {tabs.map((tab, index) => (
         <NavItem key={tab.id}>
           <NavLink
-            className={classnames({ active: currentStep === tab.id })}
+            className={classnames({
+              "text-dark": currentStep !== tab.id,
+              "bg-dark text-white active": currentStep === tab.id,
+            })}
             onClick={() => {
               if (tab.id > 0) {
                 isStepComplete[tab.id - 1] && setCurrentStep(tab.id);
