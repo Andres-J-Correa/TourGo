@@ -62,6 +62,8 @@ function BookingForm({
   resetForm,
   isSubmitting,
   initialValues,
+  bookingCharges,
+  bookingRoomBookings,
 }) {
   const [dates, setDates] = useState({
     start: null,
@@ -74,19 +76,13 @@ function BookingForm({
     rooms,
     charges,
     roomBookings,
-    bookingCharges,
     isLoadingBookings,
     isLoadingHotelData,
-    isLoadingBookingCharges,
-  } = useBookingFormData(hotelId, dates, bookingId);
+  } = useBookingFormData(hotelId, dates);
 
   const totals = useBookingTotals(selectedRoomBookings, selectedCharges);
 
-  const isLoading =
-    isLoadingBookings ||
-    isLoadingHotelData ||
-    isLoadingBookingCharges ||
-    isSubmitting;
+  const isLoading = isLoadingBookings || isLoadingHotelData || isSubmitting;
 
   const isSameDate = (date1, date2) => {
     const isValidDates = dayjs(date1).isValid() && dayjs(date1).isValid();
@@ -227,16 +223,13 @@ function BookingForm({
       const isSameEndDate = isSameDate(dates.end, booking.departureDate);
       const isSameDates = isSameStartDate && isSameEndDate;
 
-      const fetchedRoomBookings = roomBookings?.filter(
-        (b) => Number(b.bookingId) === Number(booking.id)
-      );
       const existingRoomBookings = initialValues.roomBookings;
 
       const currentRoomBookings =
         existingRoomBookings?.length > 0
           ? existingRoomBookings
-          : fetchedRoomBookings?.length > 0
-          ? fetchedRoomBookings
+          : bookingRoomBookings?.length > 0
+          ? bookingRoomBookings
           : [];
 
       if (isSameDates && currentRoomBookings.length > 0) {
@@ -256,7 +249,14 @@ function BookingForm({
         roomBookings: currentRoomBookings,
       });
     }
-  }, [booking, roomBookings, dates, bookingCharges, initialValues]);
+  }, [
+    booking,
+    roomBookings,
+    dates,
+    bookingCharges,
+    initialValues,
+    bookingRoomBookings,
+  ]);
 
   useEffect(() => {
     const newFormData = {
@@ -489,6 +489,15 @@ export default withFormik({
             : { id: res.item.bookingId, invoiceId: res.item.invoiceId }),
           total: Number(values.charges) + Number(values.subtotal),
           customer,
+          roomBookings: [...values.roomBookings],
+          extraCharges: [...values.extraCharges],
+          nights: dayjs(values.departureDate).diff(
+            dayjs(values.arrivalDate),
+            "day"
+          ),
+          status: {
+            id: 1,
+          },
         });
 
         setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, { ...values });

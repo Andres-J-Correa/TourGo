@@ -45,28 +45,31 @@ const RoomBookingTable = ({
     );
 
   // 🎯 Cell click handler
-  const handleCellClick = (date, roomId) => {
-    const isPreBooked = getBooking(date, roomId);
+  const handleCellClick = (date, room) => {
+    const isPreBooked = getBooking(date, room.id);
     if (isPreBooked) return;
 
     const alreadySelected = selectedRoomBookings.find(
-      (c) => c.date === date && c.roomId === roomId
+      (c) => c.date === date && c.roomId === room.id
     );
 
     const isInCurrentSelection = currentSelection.find(
-      (c) => c.date === date && c.roomId === roomId
+      (c) => c.date === date && c.roomId === room.id
     );
 
     if (isInCurrentSelection) {
       setCurrentSelection((prev) =>
-        prev.filter((c) => c.date !== date || c.roomId !== roomId)
+        prev.filter((c) => c.date !== date || c.roomId !== room.id)
       );
     } else if (!alreadySelected) {
-      setCurrentSelection((prev) => [...prev, { date, roomId }]);
+      setCurrentSelection((prev) => [
+        ...prev,
+        { date, roomId: room.id, room: { ...room } },
+      ]);
     }
 
     if (alreadySelected) {
-      confirmDeselection([{ date, roomId }], false);
+      confirmDeselection([{ date, roomId: room.id }], false);
       return;
     }
 
@@ -177,18 +180,22 @@ const RoomBookingTable = ({
     setIsMultiSelect((prev) => !prev);
   };
 
-  const handleRoomHeaderClick = (roomId) => {
+  const handleRoomHeaderClick = (room) => {
     // Get all available (not booked or selected) dates for this room
     const availableDates = dates.filter((date) => {
-      const isAlreadyBooked = getBooking(date, roomId);
+      const isAlreadyBooked = getBooking(date, room.id);
       const isAlreadySelected = selectedRoomBookings.some(
-        (s) => s.date === date && s.roomId === roomId
+        (s) => s.date === date && s.roomId === room.id
       );
       return !isAlreadyBooked && !isAlreadySelected;
     });
 
     // Build a list of those date+roomId pairs
-    const roomCells = availableDates.map((date) => ({ date, roomId }));
+    const roomCells = availableDates.map((date) => ({
+      date,
+      roomId: room.id,
+      room: { ...room },
+    }));
 
     // Check how many of those are already in currentSelection
     const allAlreadyInSelection = roomCells.every((cell) =>
@@ -201,7 +208,7 @@ const RoomBookingTable = ({
       // Deselect them
       setCurrentSelection((prev) =>
         prev.filter(
-          (sel) => sel.roomId !== roomId || !availableDates.includes(sel.date)
+          (sel) => sel.roomId !== room.id || !availableDates.includes(sel.date)
         )
       );
     } else {
@@ -343,7 +350,7 @@ const RoomBookingTable = ({
                     key={room.id}
                     className="text-center align-middle booking-table-cell-container"
                     role="button"
-                    onClick={() => handleRoomHeaderClick(room.id)}>
+                    onClick={() => handleRoomHeaderClick(room)}>
                     <span className="booking-table-cell-text">{room.name}</span>
                   </th>
                 ))}
@@ -380,7 +387,7 @@ const RoomBookingTable = ({
                         style={{
                           cursor: booking ? "not-allowed" : "pointer",
                         }}
-                        onClick={() => handleCellClick(date, room.id)}>
+                        onClick={() => handleCellClick(date, room)}>
                         {booking ? (
                           `$${booking.price.toFixed(2)}`
                         ) : selected?.price ? (

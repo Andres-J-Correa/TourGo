@@ -119,3 +119,20 @@ export const update = async (payload) => {
     return onGlobalError(error);
   }
 };
+
+export const getRoomBookingsByBookingId = async (bookingId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/${bookingId}/room-bookings`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

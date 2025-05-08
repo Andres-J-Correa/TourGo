@@ -16,9 +16,19 @@ import CustomerForm from "components/bookings/CustomerForm";
 import BookingForm from "components/bookings/BookingForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import EntityTransactionsView from "components/transactions/EntityTransactionsView";
+import BookingSummary from "components/bookings/booking-summary/BookingSummary";
+
+import useBookingData from "./hooks/useBookingData";
 
 const BookingAddUpdateView = () => {
   const { hotelId, bookingId } = useParams();
+  const breadcrumbs = [
+    { label: "Inicio", path: "/" },
+    { label: "Hoteles", path: "/hotels" },
+    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: "Reservas", path: `/hotels/${hotelId}/bookings` },
+  ];
+
   const [currentStep, setCurrentStep] = useState(0);
   const [customer, setCustomer] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -26,12 +36,8 @@ const BookingAddUpdateView = () => {
   const [booking, setBooking] = useState({ ...defaultBooking });
   const [isLoading, setIsLoading] = useState(false);
 
-  const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
-    { label: "Reservas", path: `/hotels/${hotelId}/bookings` },
-  ];
+  const { isLoadingBookingData, bookingCharges, bookingRoomBookings } =
+    useBookingData(bookingId);
 
   const isStepComplete = {
     0: customer?.id > 0,
@@ -67,8 +73,12 @@ const BookingAddUpdateView = () => {
   return (
     <div className="container my-4">
       <LoadingOverlay
-        isVisible={submitting || isLoading}
-        message={isLoading ? "Cargando información" : "procesando..."}
+        isVisible={submitting || isLoading || isLoadingBookingData}
+        message={
+          isLoading || isLoadingBookingData
+            ? "Cargando información"
+            : "procesando..."
+        }
       />
 
       <Breadcrumb breadcrumbs={breadcrumbs} active="Nueva Reserva" />
@@ -102,6 +112,8 @@ const BookingAddUpdateView = () => {
             setCustomer={setCustomer}
             hotelId={hotelId}
             bookingId={bookingId}
+            bookingCharges={bookingCharges}
+            bookingRoomBookings={bookingRoomBookings}
           />
         </TabPane>
         <TabPane tabId={2}>
@@ -135,7 +147,22 @@ const BookingAddUpdateView = () => {
           />
         </TabPane>
         <TabPane tabId={3}>
-          <h5>Confirmación (step placeholder)</h5>
+          <div className="d-flex mb-4">
+            <Button
+              type="button"
+              onClick={() => setCurrentStep(2)}
+              color="secondary"
+              className="me-auto"
+              disabled={submitting}>
+              <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+              Anterior
+            </Button>
+          </div>
+          <BookingSummary
+            bookingData={booking}
+            roomBookings={booking?.roomBookings ?? bookingRoomBookings}
+            extraCharges={booking?.extraCharges ?? bookingCharges}
+          />
         </TabPane>
       </TabContent>
     </div>
