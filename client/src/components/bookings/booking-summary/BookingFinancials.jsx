@@ -1,6 +1,7 @@
 import React from "react";
 import { Row, Col } from "reactstrap";
 import { formatCurrency } from "utils/currencyHelper";
+import classNames from "classnames";
 
 const BookingFinancials = ({ bookingData }) => {
   const { transactions, subtotal, charges, total } = bookingData;
@@ -25,7 +26,10 @@ const BookingFinancials = ({ bookingData }) => {
           <strong>Total Pagado:</strong> {formatCurrency(totalPaid, "COP")}
         </Col>
         <Col md={4}>
-          <strong>Saldo:</strong> {formatCurrency(balance, "COP")}
+          <strong>Saldo:</strong>{" "}
+          <span className={classNames({ "text-danger": balance < 0 })}>
+            {formatCurrency(balance, "COP")}
+          </span>
         </Col>
       </Row>
     </>
