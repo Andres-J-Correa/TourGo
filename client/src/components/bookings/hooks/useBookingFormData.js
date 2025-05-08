@@ -3,34 +3,15 @@ import { useState, useEffect } from "react";
 import { getRoomBookingsByDateRange } from "services/bookingService";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { getByHotelId as getChargesByHotelId } from "services/extraChargeService";
-import { getChargesByBookingId } from "services/bookingService";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 
-export default function useBookingFormData(hotelId, dates, bookingId) {
+export default function useBookingFormData(hotelId, dates) {
   const [rooms, setRooms] = useState([]);
   const [charges, setCharges] = useState([]);
   const [roomBookings, setRoomBookings] = useState([]);
   const [isLoadingBookings, setIsLoadingBookings] = useState(false);
   const [isLoadingHotelData, setIsLoadingHotelData] = useState(false);
-  const [bookingCharges, setBookingCharges] = useState([]);
-  const [isLoadingBookingCharges, setIsLoadingBookingCharges] = useState(false);
-
-  const onGetBookingChargesSuccess = (res) => {
-    if (res.isSuccessful) {
-      const mappedCharges = res.items.map((c) => ({
-        ...c,
-        extraChargeId: c.id,
-      }));
-
-      setBookingCharges(mappedCharges);
-    }
-  };
-
-  const onGetBookingChargesError = (e) => {
-    e.response?.status !== 404 &&
-      toast.error("Error al cargar cargos extras de la reserva");
-  };
 
   const onGetRoomBookingsSuccess = (res) =>
     res.items?.length > 0
@@ -89,23 +70,11 @@ export default function useBookingFormData(hotelId, dates, bookingId) {
       .finally(() => setIsLoadingBookings(false));
   }, [hotelId, dates]);
 
-  useEffect(() => {
-    if (bookingId) {
-      setIsLoadingBookingCharges(true);
-      getChargesByBookingId(bookingId)
-        .then(onGetBookingChargesSuccess)
-        .catch(onGetBookingChargesError)
-        .finally(() => setIsLoadingBookingCharges(false));
-    }
-  }, [bookingId]);
-
   return {
     rooms,
     charges,
     roomBookings,
-    bookingCharges,
     isLoadingHotelData,
     isLoadingBookings,
-    isLoadingBookingCharges,
   };
 }

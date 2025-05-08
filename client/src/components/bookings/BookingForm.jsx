@@ -62,6 +62,8 @@ function BookingForm({
   resetForm,
   isSubmitting,
   initialValues,
+  bookingCharges,
+  bookingRoomBookings,
 }) {
   const [dates, setDates] = useState({
     start: null,
@@ -74,19 +76,13 @@ function BookingForm({
     rooms,
     charges,
     roomBookings,
-    bookingCharges,
     isLoadingBookings,
     isLoadingHotelData,
-    isLoadingBookingCharges,
-  } = useBookingFormData(hotelId, dates, bookingId);
+  } = useBookingFormData(hotelId, dates);
 
   const totals = useBookingTotals(selectedRoomBookings, selectedCharges);
 
-  const isLoading =
-    isLoadingBookings ||
-    isLoadingHotelData ||
-    isLoadingBookingCharges ||
-    isSubmitting;
+  const isLoading = isLoadingBookings || isLoadingHotelData || isSubmitting;
 
   const isSameDate = (date1, date2) => {
     const isValidDates = dayjs(date1).isValid() && dayjs(date1).isValid();
@@ -190,14 +186,23 @@ function BookingForm({
         title: "¿Está seguro de que desea continuar?",
         text: "Los cambios no guardados se perderán.",
         icon: "warning",
-        showCancelButton: true,
+        showDenyButton: true,
         confirmButtonText: "Sí, descartar cambios",
-        cancelButtonText: "Cancelar",
+        denyButtonText: "No, ir a guardar",
         confirmButtonColor: "red",
+        reverseButtons: true,
+        denyButtonColor: "green",
       }).then((result) => {
         if (result.isConfirmed) {
           resetFormToPrevious();
           setCurrentStep(2);
+        } else if (result.isDenied) {
+          setTimeout(() => {
+            window.scrollTo({
+              top: document.body.scrollHeight,
+              behavior: "smooth",
+            });
+          }, 200);
         }
       });
     } else {
@@ -218,16 +223,13 @@ function BookingForm({
       const isSameEndDate = isSameDate(dates.end, booking.departureDate);
       const isSameDates = isSameStartDate && isSameEndDate;
 
-      const fetchedRoomBookings = roomBookings?.filter(
-        (b) => Number(b.bookingId) === Number(booking.id)
-      );
       const existingRoomBookings = initialValues.roomBookings;
 
       const currentRoomBookings =
         existingRoomBookings?.length > 0
           ? existingRoomBookings
-          : fetchedRoomBookings?.length > 0
-          ? fetchedRoomBookings
+          : bookingRoomBookings?.length > 0
+          ? bookingRoomBookings
           : [];
 
       if (isSameDates && currentRoomBookings.length > 0) {
@@ -247,7 +249,7 @@ function BookingForm({
         roomBookings: currentRoomBookings,
       });
     }
-  }, [booking, roomBookings, dates, bookingCharges, initialValues]);
+  }, [booking, dates, bookingCharges, initialValues, bookingRoomBookings]);
 
   useEffect(() => {
     const newFormData = {
@@ -480,6 +482,15 @@ export default withFormik({
             : { id: res.item.bookingId, invoiceId: res.item.invoiceId }),
           total: Number(values.charges) + Number(values.subtotal),
           customer,
+          roomBookings: [...values.roomBookings],
+          extraCharges: [...values.extraCharges],
+          nights: dayjs(values.departureDate).diff(
+            dayjs(values.arrivalDate),
+            "day"
+          ),
+          status: {
+            id: 1,
+          },
         });
 
         setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, { ...values });

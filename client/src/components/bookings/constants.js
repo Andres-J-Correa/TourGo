@@ -196,7 +196,7 @@ export const bookingFormTabs = [
   { id: 0, icon: faUser, name: "Cliente" },
   { id: 1, icon: faFilePen, name: "Informacion de la Reserva" },
   { id: 2, icon: faMoneyBill1Wave, name: "Transacciones" },
-  { id: 3, icon: faCheckCircle, name: "Confirmación" },
+  { id: 3, icon: faCheckCircle, name: "Resumen" },
 ];
 
 export const formatAmount = (amount, typeId) => {
@@ -326,4 +326,11 @@ export const deepCompareBooking = (obj1, obj2, keysToCompare) => {
 export const LOCAL_STORAGE_FORM_KEYS = {
   PREVIOUS: "previousBookingForm",
   CURRENT: "currentBookingForm",
+};
+
+export const bookingStatuses = {
+  1: "Activo",
+  2: "Cancelado",
+  3: "Completado",
+  4: "No Show",
 };
