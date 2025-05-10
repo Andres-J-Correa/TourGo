@@ -23,8 +23,9 @@ export const transactionAddValidationSchema = Yup.object({
   categoryId: Yup.number().required("La categoría es requerida"),
   subcategoryId: Yup.number().nullable(),
   referenceNumber: Yup.string()
-    .min(2)
-    .required("El número de referencia es requerido"),
+    .min(2, "El número de referencia debe tener al menos 2 caracteres")
+    .max(100, "El número de referencia no puede exceder los 100 caracteres")
+    .nullable(),
   description: Yup.string().min(2).max(500),
 });
 

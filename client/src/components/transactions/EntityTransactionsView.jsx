@@ -334,7 +334,6 @@ const EntityTransactionsView = ({ hotelId, submitting, entity, setEntity }) => {
                     name="referenceNumber"
                     className="form-control"
                     placeholder="Número de Referencia"
-                    isRequired={true}
                   />
                 </Col>
               </Row>

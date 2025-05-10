@@ -11,24 +11,24 @@ const CustomerInfo = ({ customer }) => (
         <Row>
           <strong>Nombre:</strong>
           <p className="mb-0">
-            {customer.firstName} {customer.lastName}
+            {customer?.firstName} {customer?.lastName}
           </p>
         </Row>
         <Row>
           <strong>Email:</strong>
-          <p className="mb-0">{customer.email}</p>
+          <p className="mb-0">{customer?.email}</p>
         </Row>
       </Col>
       <Col md={5}>
         <Row>
           {" "}
           <strong>Documento:</strong>
-          <p className="mb-0">{customer.documentNumber}</p>
+          <p className="mb-0">{customer?.documentNumber}</p>
         </Row>
         <Row>
           {" "}
           <strong>Teléfono:</strong>
-          <p className="mb-0">{formatPhoneNumber(customer.phone)}</p>
+          <p className="mb-0">{formatPhoneNumber(customer?.phone)}</p>
         </Row>
       </Col>
     </Row>

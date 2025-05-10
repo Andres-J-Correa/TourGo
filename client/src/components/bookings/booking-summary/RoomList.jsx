@@ -10,7 +10,7 @@ const RoomList = ({ rooms, bookingData, extraCharges }) => (
         <Col key={`${room.roomName}-${idx}`} md={4} className="d-flex">
           <RoomCard
             room={room}
-            bookingNights={bookingData.nights}
+            bookingNights={bookingData?.nights}
             extraCharges={extraCharges}
           />
         </Col>

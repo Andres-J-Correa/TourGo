@@ -8,6 +8,7 @@ import {
 import { isValidPhoneNumber } from "react-phone-number-input";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { formatCurrency } from "utils/currencyHelper";
 
 dayjs.extend(isSameOrBefore);
 
@@ -181,6 +182,8 @@ export const sanitizeBooking = (booking) => {
     sanitizedBooking.bookingProvider?.id ||
     sanitizedBooking.bookingProviderId ||
     "";
+  sanitizedBooking.bookingProviderName =
+    sanitizedBooking.bookingProvider?.name || "";
   sanitizedBooking.externalId = sanitizedBooking.externalId || "";
   sanitizedBooking.eta = sanitizedBooking.eta || "";
   sanitizedBooking.externalCommission =
@@ -335,3 +338,34 @@ export const bookingStatuses = {
   3: "Completado",
   4: "No Show",
 };
+
+export const columns = [
+  {
+    Header: "Nombre",
+    accessor: "firstName",
+  },
+  {
+    Header: "Apellido",
+    accessor: "lastName",
+  },
+  {
+    Header: "Llegada",
+    accessor: "arrivalDate",
+    Cell: ({ value }) => dayjs(value).format("DD/MM/YYYY"),
+  },
+  {
+    Header: "Salida",
+    accessor: "departureDate",
+    Cell: ({ value }) => dayjs(value).format("DD/MM/YYYY"),
+  },
+  {
+    Header: "Total",
+    accessor: "total",
+    Cell: ({ value }) => `${formatCurrency(value, "COP")}`,
+  },
+  {
+    Header: "Saldo",
+    accessor: "balanceDue",
+    Cell: ({ value }) => `${formatCurrency(value, "COP")}`,
+  },
+];

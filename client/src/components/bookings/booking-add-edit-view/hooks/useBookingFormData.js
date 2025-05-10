@@ -1,6 +1,9 @@
 // hooks/useBookingFormData.js
 import { useState, useEffect } from "react";
-import { getRoomBookingsByDateRange } from "services/bookingService";
+import {
+  getRoomBookingsByDateRange,
+  getBookingProvidersByHotelId,
+} from "services/bookingService";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { getByHotelId as getChargesByHotelId } from "services/extraChargeService";
 import { toast } from "react-toastify";
@@ -12,6 +15,7 @@ export default function useBookingFormData(hotelId, dates) {
   const [roomBookings, setRoomBookings] = useState([]);
   const [isLoadingBookings, setIsLoadingBookings] = useState(false);
   const [isLoadingHotelData, setIsLoadingHotelData] = useState(false);
+  const [bookingProviderOptions, setBookingProviderOptions] = useState([]);
 
   const onGetRoomBookingsSuccess = (res) =>
     res.items?.length > 0
@@ -29,8 +33,9 @@ export default function useBookingFormData(hotelId, dates) {
     Promise.allSettled([
       getRoomsByHotelId(hotelId),
       getChargesByHotelId(hotelId),
+      getBookingProvidersByHotelId(hotelId),
     ])
-      .then(([roomsResult, chargesResult]) => {
+      .then(([roomsResult, chargesResult, bookingProvidersResult]) => {
         if (roomsResult.status === "fulfilled") {
           setRooms(roomsResult.value.items || []);
         } else if (roomsResult.reason?.response?.status !== 404) {
@@ -41,6 +46,12 @@ export default function useBookingFormData(hotelId, dates) {
           setCharges(chargesResult.value.items || []);
         } else if (chargesResult.reason?.response?.status !== 404) {
           toast.error("Error al cargar cargos extras");
+        }
+
+        if (bookingProvidersResult.status === "fulfilled") {
+          setBookingProviderOptions(bookingProvidersResult.value.items || []);
+        } else if (bookingProvidersResult.reason?.response?.status !== 404) {
+          toast.error("Error al cargar proveedores de reservas");
         }
       })
       .finally(() => {
@@ -74,6 +85,7 @@ export default function useBookingFormData(hotelId, dates) {
     rooms,
     charges,
     roomBookings,
+    bookingProviderOptions,
     isLoadingHotelData,
     isLoadingBookings,
   };

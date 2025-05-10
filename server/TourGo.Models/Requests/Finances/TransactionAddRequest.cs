@@ -44,9 +44,8 @@ namespace TourGo.Models.Requests.Finances
         [Range(1, Int32.MaxValue)]
         public int? SubcategoryId { get; set; }
 
-        [Required]
         [MinLength(2)]
-        public string ReferenceNumber { get; set; } = string.Empty;
+        public string? ReferenceNumber { get; set; }
 
         [ValidEnum(typeof(TransactionStatusEnum))]
         public int StatusId { get; set; } = 2; // Default to Completed

@@ -76,6 +76,7 @@ function BookingForm({
     rooms,
     charges,
     roomBookings,
+    bookingProviderOptions,
     isLoadingBookings,
     isLoadingHotelData,
   } = useBookingFormData(hotelId, dates);
@@ -415,7 +416,7 @@ function BookingForm({
         <TotalsDisplay totals={totals} />
         <Form>
           <AdditionalInfoForm
-            hotelId={hotelId}
+            bookingProviderOptions={bookingProviderOptions}
             submitting={submitting || isSubmitting}
           />
           <ErrorAlert />
@@ -490,6 +491,10 @@ export default withFormik({
           ),
           status: {
             id: 1,
+          },
+          bookingProvider: {
+            id: values.bookingProviderId,
+            name: values.bookingProviderName,
           },
         });
 

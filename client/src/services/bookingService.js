@@ -64,6 +64,38 @@ export const getById = async (bookingId) => {
   }
 };
 
+export const getPagedMinimalBookingsByDateRange = async (
+  hotelId,
+  startDate,
+  endDate,
+  pageIndex,
+  pageSize,
+  isArrivalDate,
+  sortColumn,
+  sortDirection,
+  firstName = "",
+  lastName = ""
+) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url:
+      `${api}/hotel/${hotelId}/date-range?` +
+      `startDate=${startDate}&endDate=${endDate}&pageIndex=${pageIndex}` +
+      `&pageSize=${pageSize}&isArrivalDate=${isArrivalDate}&sortColumn=${sortColumn}` +
+      `&sortDirection=${sortDirection}&firstName=${firstName}&lastName=${lastName}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
 export const getChargesByBookingId = async (bookingId) => {
   const config = {
     headers: {

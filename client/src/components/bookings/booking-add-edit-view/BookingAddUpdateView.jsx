@@ -81,7 +81,10 @@ const BookingAddUpdateView = () => {
         }
       />
 
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Nueva Reserva" />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={bookingId ? "Editar Reserva" : "Nueva Reserva"}
+      />
       <TabNavigation
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}

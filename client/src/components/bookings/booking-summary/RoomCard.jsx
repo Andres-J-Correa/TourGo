@@ -3,7 +3,7 @@ import { Card, CardBody, ListGroup, ListGroupItem } from "reactstrap";
 import { formatCurrency } from "utils/currencyHelper";
 import dayjs from "dayjs";
 import { calculateRoomCharges } from "./helpers";
-import "./RoomCard.css";
+import "./BookingSummary.css";
 
 const RoomCard = ({ room, bookingNights, extraCharges }) => {
   const subtotal = room.segments.reduce((sum, seg) => sum + seg.price, 0);
