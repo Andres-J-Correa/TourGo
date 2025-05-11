@@ -1,7 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Spinner, Container } from "reactstrap";
-import { useNavigate, useParams } from "react-router-dom";
-import { useTable, useSortBy, usePagination } from "react-table";
+import { useParams } from "react-router-dom";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  flexRender,
+} from "@tanstack/react-table";
 import { getPagedMinimalBookingsByDateRange } from "services/bookingService";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import Pagination from "components/commonUI/Pagination";
@@ -13,10 +19,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
-import { isEqual } from "lodash";
 import classNames from "classnames";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
-import { columns } from "components/bookings/constants";
+import { bookingsTableColumns } from "components/bookings/constants";
 import TableFilters from "components/bookings/bookings-view/BookingFilters";
 
 const defaultData = {
@@ -29,7 +34,6 @@ const defaultData = {
 
 const BookingsView = () => {
   const { hotelId } = useParams();
-  const navigate = useNavigate();
   const [data, setData] = useState({ ...defaultData });
   const [loading, setLoading] = useState(false);
   const [customerNameInputs, setCustomerNameInputs] = useState({
@@ -63,29 +67,42 @@ const BookingsView = () => {
     { label: "Hotel", path: `/hotels/${hotelId}` },
   ];
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    prepareRow,
-    rows,
-    state: { sortBy },
-  } = useTable(
-    {
-      columns,
-      data: data.items,
-      manualPagination: true,
-      manualSortBy: true,
-      pageCount: data.totalPages,
-      initialState: {
+  const columns = useMemo(() => bookingsTableColumns, []);
+
+  const table = useReactTable({
+    data: data.items,
+    columns,
+    manualPagination: true,
+    manualSorting: true,
+    pageCount: data.totalPages,
+    defaultColumn: {
+      width: "auto",
+    },
+    state: {
+      pagination: {
         pageIndex: paginationData.pageIndex,
         pageSize: paginationData.pageSize,
-        sortBy: paginationData.sortBy,
       },
+      sorting: paginationData.sortBy.map((s) => ({
+        id: s.id,
+        desc: s.desc,
+      })),
     },
-    useSortBy,
-    usePagination
-  );
+    onSortingChange: (updater) => {
+      const sortArray =
+        typeof updater === "function"
+          ? updater(paginationData.sortBy)
+          : updater;
+      setPaginationData((prev) => ({
+        ...prev,
+        sortBy: sortArray,
+        pageIndex: 0,
+      }));
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
 
   const handleDateChange = (field) => (date) => {
     setPaginationData((prev) => ({
@@ -163,15 +180,6 @@ const BookingsView = () => {
   }, [hotelId, paginationData]);
 
   useEffect(() => {
-    if (!isEqual(paginationData.sortBy, sortBy)) {
-      setPaginationData((prev) => ({
-        ...prev,
-        sortBy: sortBy,
-      }));
-    }
-  }, [sortBy, paginationData.sortBy]);
-
-  useEffect(() => {
     const handler = setTimeout(() => {
       if (
         customerNameInputs.firstName !==
@@ -189,7 +197,6 @@ const BookingsView = () => {
         }));
       }
     }, 500);
-
     return () => clearTimeout(handler);
   }, [customerNameInputs, paginationData.customerNameFilters]);
 
@@ -220,86 +227,70 @@ const BookingsView = () => {
             de {data.totalCount} reservas
           </span>
 
-          <table
-            {...getTableProps()}
-            className="table table-bordered table-hover table-striped mb-1">
+          <table className="table table-bordered table-hover table-striped mb-1">
             <thead>
-              {headerGroups.map((headerGroup) => {
-                const headerGroupProps = headerGroup.getHeaderGroupProps();
-                return (
-                  <tr {...headerGroupProps} key={headerGroupProps.key}>
-                    {headerGroup.headers.map((column) => {
-                      const columnProps = column.getHeaderProps(
-                        column.getSortByToggleProps()
-                      );
-                      return (
-                        <th
-                          {...columnProps}
-                          key={columnProps.key}
-                          className="text-bg-dark text-center">
-                          {column.render("Header")}
-                          <span className="float-end">
-                            {column.isSorted ? (
-                              column.isSortedDesc ? (
-                                <FontAwesomeIcon icon={faArrowDownWideShort} />
-                              ) : (
-                                <FontAwesomeIcon icon={faArrowUpShortWide} />
-                              )
-                            ) : (
-                              <FontAwesomeIcon icon={faSort} />
-                            )}
-                          </span>
-                        </th>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      onClick={header.column.getToggleSortingHandler()}
+                      className="text-bg-dark text-center"
+                      style={{
+                        cursor: header.column.getCanSort()
+                          ? "pointer"
+                          : "default",
+                      }}>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                      <span className="float-end">
+                        {{
+                          asc: <FontAwesomeIcon icon={faArrowUpShortWide} />,
+                          desc: <FontAwesomeIcon icon={faArrowDownWideShort} />,
+                        }[header.column.getIsSorted()] ||
+                        header.column.getCanSort() ? (
+                          <FontAwesomeIcon icon={faSort} />
+                        ) : (
+                          ""
+                        )}
+                      </span>
+                    </th>
+                  ))}
+                </tr>
+              ))}
             </thead>
-            <tbody {...getTableBodyProps()}>
+            <tbody>
               {loading ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center">
                     <Spinner size="sm" /> Cargando...
                   </td>
                 </tr>
-              ) : rows.length === 0 ? (
+              ) : table.getRowModel().rows.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center">
                     No hay reservas
                   </td>
                 </tr>
               ) : (
-                rows.map((row) => {
-                  prepareRow(row);
-                  const rowProps = row.getRowProps();
-                  return (
-                    <tr
-                      {...rowProps}
-                      key={rowProps.key}
-                      onClick={() =>
-                        navigate(
-                          `/hotels/${hotelId}/bookings/${row.original.id}`
-                        )
-                      }
-                      style={{ cursor: "pointer" }}>
-                      {row.cells.map((cell) => {
-                        const cellProps = cell.getCellProps();
-                        return (
-                          <td
-                            {...cellProps}
-                            key={cellProps.key}
-                            className="text-center">
-                            {cell.render("Cell")}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })
+                table.getRowModel().rows.map((row) => (
+                  <tr key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="text-center">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
+
           <p
             className={classNames("mb-0 text-center text-dark", {
               invisible: data.items.length === 0 || loading,

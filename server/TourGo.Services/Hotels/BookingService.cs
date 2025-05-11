@@ -39,7 +39,7 @@ namespace TourGo.Services.Hotels
                 "Total",
                 "BalanceDue",
                 "FirstName",
-                "LastName"
+                "LastName",
             };
         }
 
@@ -113,6 +113,7 @@ namespace TourGo.Services.Hotels
                 booking.BalanceDue = reader.GetSafeDecimal(index++);
                 booking.FirstName = reader.GetSafeString(index++);
                 booking.LastName = reader.GetSafeString(index++);
+                booking.HotelId = hotelId;
 
                 if(totalCount == 0)
                 {

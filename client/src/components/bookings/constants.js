@@ -9,6 +9,7 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { formatCurrency } from "utils/currencyHelper";
+import { Link } from "react-router-dom";
 
 dayjs.extend(isSameOrBefore);
 
@@ -339,33 +340,50 @@ export const bookingStatuses = {
   4: "No Show",
 };
 
-export const columns = [
+export const bookingsTableColumns = [
   {
-    Header: "Nombre",
-    accessor: "firstName",
+    header: "ID",
+    accessorKey: "id",
+    enableSorting: false,
+    cell: ({ row }) => (
+      <Link to={`/hotels/${row.original.hotelId}/bookings/${row.original.id}`}>
+        {row.getValue("id")}
+      </Link>
+    ),
   },
   {
-    Header: "Apellido",
-    accessor: "lastName",
+    header: "Nombre",
+    accessorKey: "firstName",
   },
   {
-    Header: "Llegada",
-    accessor: "arrivalDate",
-    Cell: ({ value }) => dayjs(value).format("DD/MM/YYYY"),
+    header: "Apellido",
+    accessorKey: "lastName",
   },
   {
-    Header: "Salida",
-    accessor: "departureDate",
-    Cell: ({ value }) => dayjs(value).format("DD/MM/YYYY"),
+    header: "Llegada",
+    accessorKey: "arrivalDate",
+    cell: ({ getValue }) => dayjs(getValue()).format("DD/MM/YYYY"),
   },
   {
-    Header: "Total",
-    accessor: "total",
-    Cell: ({ value }) => `${formatCurrency(value, "COP")}`,
+    header: "Salida",
+    accessorKey: "departureDate",
+    cell: ({ getValue }) => dayjs(getValue()).format("DD/MM/YYYY"),
   },
   {
-    Header: "Saldo",
-    accessor: "balanceDue",
-    Cell: ({ value }) => `${formatCurrency(value, "COP")}`,
+    header: "Total",
+    accessorKey: "total",
+    cell: ({ getValue }) => formatCurrency(getValue(), "COP"),
+  },
+  {
+    header: "Saldo",
+    accessorKey: "balanceDue",
+    cell: ({ getValue }) => formatCurrency(getValue(), "COP"),
+  },
+  {
+    header: "ID externa",
+    accessorKey: "externalId",
+    maxSize: 150,
+    size: 150,
+    enableSorting: false,
   },
 ];
