@@ -67,7 +67,6 @@ export const AppContextProvider = ({ children }) => {
           if (currentUser.isAuthenticated) {
             setCurrentUser({ ...defaultUser });
           }
-          toast.error("Error al cargar el usuario");
         })
         .finally(() => {
           setIsLoadingUser(false);
