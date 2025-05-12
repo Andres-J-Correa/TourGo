@@ -38,13 +38,16 @@ const DatePickers = ({
           id="start-date"
           selected={startDate}
           onChange={onStartDateChange}
-          dateFormat="yyyy-MM-dd"
+          dateFormat="dd-MM-yyyy"
           maxDate={getDate(maxDate)}
           disabled={isDisabled}
           className="form-control"
           placeholderText={startDateName}
           popperClassName="custom-datepicker"
           autoComplete="off"
+          showYearDropdown={true}
+          showMonthDropdown={true}
+          dropdownMode="select"
         />
       </div>
 
@@ -56,7 +59,7 @@ const DatePickers = ({
           id="end-date"
           selected={endDate}
           onChange={onEndDateChange}
-          dateFormat="yyyy-MM-dd"
+          dateFormat="dd-MM-yyyy"
           minDate={startDate ? dayjs(startDate).add(1, "day").toDate() : null}
           maxDate={getDate(maxDate)}
           disabled={!startDate || isDisabled}
@@ -64,6 +67,9 @@ const DatePickers = ({
           placeholderText={endDateName}
           popperClassName="custom-datepicker"
           autoComplete="off"
+          showYearDropdown={true}
+          showMonthDropdown={true}
+          dropdownMode="select"
         />
       </div>
     </div>

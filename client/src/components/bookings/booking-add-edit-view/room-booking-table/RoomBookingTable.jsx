@@ -1,5 +1,5 @@
 // 🧠 Required imports (same as before)
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import classNames from "classnames";
@@ -15,9 +15,9 @@ import {
   Col,
   Form,
 } from "reactstrap";
-import { faCalendarPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
+import BookingRow from "./BookingRow";
+import RoomHeader from "./RoomHeader";
 import "./RoomBookingTable.css"; // Custom styles for the table
 
 const RoomBookingTable = ({
@@ -37,6 +37,12 @@ const RoomBookingTable = ({
   const [dates, setDates] = useState([]);
   const [isCtrlKeyPressed, setIsCtrlKeyPressed] = useState(false);
 
+  const prevAndNextDays = useMemo(() => {
+    const start = dayjs(startDate).subtract(1, "day").format("YYYY-MM-DD");
+    const end = dayjs(endDate).format("YYYY-MM-DD");
+    return { start, end };
+  }, [startDate, endDate]);
+
   // 🔍 Booking lookup
   const getBooking = (date, roomId) =>
     roomBookings?.find(
@@ -47,7 +53,9 @@ const RoomBookingTable = ({
     );
 
   // 🎯 Cell click handler
-  const handleCellClick = (date, room) => {
+  const handleCellClick = (date, room, disabled) => {
+    if (disabled) return;
+
     const isPreBooked = getBooking(date, room.id);
     if (isPreBooked) return;
 
@@ -337,75 +345,57 @@ const RoomBookingTable = ({
           </Col>
         </Row>
 
-        <div
-          style={{
-            overflow: "auto",
-            maxHeight: "600px",
-            position: "relative",
-          }}>
+        <div className="bookings-table-container">
+          <Row>
+            <Col className="text-center text-dark fw-bold">
+              {`Reservando: ${dayjs(startDate).format("DD/MM/YYYY")} - ${dayjs(
+                endDate
+              ).format("DD/MM/YYYY")} (${dates.length} noches)`}
+            </Col>
+          </Row>
           <Table bordered className="table-fixed">
-            <thead className="sticky-top" style={{ zIndex: 2 }}>
+            <thead className="sticky-top">
               <tr>
                 <th className="date-row-label text-bg-dark">Fecha</th>
                 {rooms.map((room) => (
-                  <th
+                  <RoomHeader
                     key={room.id}
-                    className="text-center align-middle booking-table-cell-container text-bg-dark"
-                    role="button"
-                    onClick={() => handleRoomHeaderClick(room)}>
-                    <span className="booking-table-cell-text">{room.name}</span>
-                  </th>
+                    room={room}
+                    onRoomHeaderClick={handleRoomHeaderClick}
+                  />
                 ))}
               </tr>
             </thead>
             <tbody>
+              <BookingRow
+                date={prevAndNextDays.start}
+                rooms={rooms}
+                getBooking={getBooking}
+                currentSelection={currentSelection}
+                selectedRoomBookings={selectedRoomBookings}
+                onCellClick={handleCellClick}
+                disabled={true}
+              />
               {dates.map((date) => (
-                <tr key={date}>
-                  <td className="date-row-label text-bg-light">
-                    {dayjs(date).format("ddd DD - MMM - YYYY")}
-                  </td>
-                  {rooms.map((room) => {
-                    const booking = getBooking(date, room.id);
-                    const currentSelected = currentSelection.find(
-                      (c) => c.date === date && c.roomId === room.id
-                    );
-                    const selected = selectedRoomBookings.find(
-                      (c) =>
-                        c.date === date &&
-                        (c.roomId === room.id || c.room?.id === room.id)
-                    );
-                    return (
-                      <td
-                        key={room.id}
-                        className={`text-center booking-table-cell-container ${
-                          booking
-                            ? "bg-secondary text-white"
-                            : selected
-                            ? "bg-success-subtle text-success-emphasis"
-                            : currentSelected
-                            ? "bg-success text-white"
-                            : ""
-                        }`}
-                        style={{
-                          cursor: booking ? "not-allowed" : "pointer",
-                        }}
-                        onClick={() => handleCellClick(date, room)}>
-                        {booking ? (
-                          `$${booking.price.toFixed(2)}`
-                        ) : selected?.price ? (
-                          `$${selected.price.toFixed(2)}`
-                        ) : currentSelected?.roomId ? (
-                          "seleccionado"
-                        ) : (
-                          <span className="booking-table-cell-text text-secondary">
-                            <FontAwesomeIcon icon={faCalendarPlus} />
-                          </span>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
+                <BookingRow
+                  key={`${date}-date-row`}
+                  date={date}
+                  rooms={rooms}
+                  getBooking={getBooking}
+                  currentSelection={currentSelection}
+                  selectedRoomBookings={selectedRoomBookings}
+                  onCellClick={handleCellClick}
+                />
               ))}
+              <BookingRow
+                date={prevAndNextDays.end}
+                rooms={rooms}
+                getBooking={getBooking}
+                currentSelection={currentSelection}
+                selectedRoomBookings={selectedRoomBookings}
+                onCellClick={handleCellClick}
+                disabled={true}
+              />
             </tbody>
           </Table>
         </div>

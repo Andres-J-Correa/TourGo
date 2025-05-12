@@ -28,6 +28,7 @@ namespace TourGo.Services.Hotels
     {
         private readonly IMySqlDataProvider _mySqlDataProvider;
 
+
         public BookingService(IMySqlDataProvider dataProvider)
         {
             _mySqlDataProvider = dataProvider;
@@ -68,6 +69,65 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
+        public Paged<BookingMinimal>? GetPaginatedByDateRange(int hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
+                                                            string sortColumn, string sortDirection, DateOnly? startDate, DateOnly? endDate,
+                                                            string? firstName, string? lastName, string? bookingExternalId)
+        {
+            string proc = "bookings_select_minimal_by_date_range_paginated";
+            Paged<BookingMinimal>? paged = null;
+            List<BookingMinimal>? bookings = null;
+            int totalCount = 0;
+
+            BookingSortColumns.TryGetValue(sortColumn, out var mappedColumn);
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_pageIndex", pageIndex);
+                param.AddWithValue("p_pageSize", pageSize);
+                param.AddWithValue("p_sortColumn", mappedColumn);
+                param.AddWithValue("p_sortDirection", sortDirection);
+                param.AddWithValue("p_startDate", startDate?.ToString("yyyy-MM-dd") ?? (object)DBNull.Value);
+                param.AddWithValue("p_endDate", endDate?.ToString("yyyy-MM-dd") ?? (object)DBNull.Value);
+                param.AddWithValue("p_isArrivalDate", isArrivalDate.HasValue ? (isArrivalDate.Value ? 1 : 0) : DBNull.Value);
+                param.AddWithValue("p_firstName", string.IsNullOrWhiteSpace(firstName) ? DBNull.Value : firstName);
+                param.AddWithValue("p_lastName", string.IsNullOrWhiteSpace(lastName) ? DBNull.Value : lastName);
+                param.AddWithValue("p_externalBookingId", string.IsNullOrWhiteSpace(bookingExternalId) ? DBNull.Value : bookingExternalId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                BookingMinimal booking = new BookingMinimal();
+                booking.Id = reader.GetSafeInt32(index++);
+                booking.ExternalBookingId = reader.GetSafeString(index++);
+                booking.ArrivalDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
+                booking.DepartureDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
+                booking.Total = reader.GetSafeDecimal(index++);
+                booking.BalanceDue = reader.GetSafeDecimal(index++);
+                booking.FirstName = reader.GetSafeString(index++);
+                booking.LastName = reader.GetSafeString(index++);
+                booking.HotelId = hotelId;
+
+                if(totalCount == 0)
+                {
+                    totalCount = reader.GetSafeInt32(index++);
+                }
+
+                bookings ??= new List<BookingMinimal>();
+                bookings.Add(booking);
+            });
+
+            if(bookings != null)
+            {
+                paged = new Paged<BookingMinimal>(
+                    bookings,
+                    pageIndex,
+                    pageSize,
+                    totalCount
+                );
+            }
+
+            return paged;
+        }
         public BookingAddResponse? Add(BookingAddUpdateRequest model, int userId, int hotelId)
         {
             BookingAddResponse? response = null;
@@ -211,6 +271,17 @@ namespace TourGo.Services.Hotels
             return providers;
         }
 
+        public bool IsValidSortDirection(string? direction)
+        {
+            return string.Equals(direction, "ASC", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(direction, "DESC", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool IsValidSortColumn(string? column)
+        {
+            return !string.IsNullOrWhiteSpace(column) && BookingSortColumns.ContainsKey(column);
+        }
+
         private static RoomBooking MapRoomBooking(IDataReader reader, ref int index)
         {
             RoomBooking roomBooking = new RoomBooking();
@@ -255,5 +326,17 @@ namespace TourGo.Services.Hotels
 
             return booking;
         }
+
+        private readonly Dictionary<string, string> BookingSortColumns = new(StringComparer.OrdinalIgnoreCase)
+            {
+                {"Id", "b.Id"},
+                {"ArrivalDate", "b.ArrivalDate"},
+                {"DepartureDate", "b.DepartureDate"},
+                {"Total", "b.Total"},
+                {"BalanceDue", "i.BalanceDue"},
+                {"FirstName", "c.FirstName"},
+                {"LastName", "c.LastName"},
+                {"ExternalBookingId", "b.ExternalBookingId"},
+            };
     }
 }

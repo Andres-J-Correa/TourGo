@@ -27,8 +27,8 @@ namespace TourGo.Web.Api.Controllers.Hotels
         private readonly IWebAuthenticationService<int> _webAuthService;
         private readonly IErrorLoggingService _errorLoggingService;
 
-        public BookingsController(ILogger<BookingsController> logger, 
-                                IBookingService bookingService, 
+        public BookingsController(ILogger<BookingsController> logger,
+                                IBookingService bookingService,
                                 IWebAuthenticationService<int> webAuthenticationService,
                                 IErrorLoggingService errorLoggingService) : base(logger)
         {
@@ -111,6 +111,54 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 else
                 {
                     ItemResponse<Booking> response = new ItemResponse<Booking>() { Item = booking };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("hotel/{id:int}/date-range")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemResponse<Paged<BookingMinimal>>> GetPaginatedByDateRange(int id, [FromQuery] int pageIndex, [FromQuery] int pageSize, [FromQuery] bool isArrivalDate,
+                                                                                        [FromQuery] string sortColumn, [FromQuery] string sortDirection,
+                                                                                        [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate,
+                                                                                        [FromQuery]string? firstName, [FromQuery] string? lastName,
+                                                                                        [FromQuery] string? externalBookingId)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                if (!_bookingService.IsValidSortColumn(sortColumn))
+                {
+                    return BadRequest(new ErrorResponse($"Invalid sort column: {sortColumn}"));
+                }
+
+                if (!_bookingService.IsValidSortDirection(sortDirection))
+                {
+                    return BadRequest(new ErrorResponse($"Invalid sort direction: {sortDirection}"));
+                }
+
+                Paged<BookingMinimal>? bookings = _bookingService.GetPaginatedByDateRange(
+                    id, pageIndex, pageSize, isArrivalDate, sortColumn, sortDirection, startDate, endDate,
+                    firstName, lastName, externalBookingId);
+                    
+
+                if (bookings == null)
+                {
+                    result = NotFound404(new ErrorResponse("No bookings found"));
+                }
+                else
+                {
+                    ItemResponse<Paged<BookingMinimal>> response = new ItemResponse<Paged<BookingMinimal>>() { Item = bookings };
 
                     result = Ok200(response);
                 }

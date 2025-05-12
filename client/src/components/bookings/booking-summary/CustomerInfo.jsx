@@ -5,29 +5,30 @@ import { formatPhoneNumber } from "utils/phoneHelper";
 const CustomerInfo = ({ customer }) => (
   <>
     <h5>Cliente</h5>
+    <hr className="mb-1 mt-0" />
     <Row>
       <Col md={7}>
         <Row>
           <strong>Nombre:</strong>
-          <p className="mb-0">
-            {customer.firstName} {customer.lastName}
+          <p>
+            {customer?.firstName} {customer?.lastName}
           </p>
         </Row>
         <Row>
           <strong>Email:</strong>
-          <p className="mb-0">{customer.email}</p>
+          <p>{customer?.email}</p>
         </Row>
       </Col>
       <Col md={5}>
         <Row>
           {" "}
           <strong>Documento:</strong>
-          <p className="mb-0">{customer.documentNumber}</p>
+          <p>{customer?.documentNumber}</p>
         </Row>
         <Row>
           {" "}
           <strong>Teléfono:</strong>
-          <p className="mb-0">{formatPhoneNumber(customer.phone)}</p>
+          <p>{formatPhoneNumber(customer?.phone)}</p>
         </Row>
       </Col>
     </Row>

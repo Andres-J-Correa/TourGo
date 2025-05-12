@@ -8,6 +8,8 @@ import {
 import { isValidPhoneNumber } from "react-phone-number-input";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { formatCurrency } from "utils/currencyHelper";
+import { Link } from "react-router-dom";
 
 dayjs.extend(isSameOrBefore);
 
@@ -35,6 +37,13 @@ export const customerSchema = Yup.object().shape({
       "Debe ingresar un número de teléfono válido.",
       (value) => isValidPhoneNumber(value)
     ),
+});
+
+export const searchCustomerSchema = Yup.object().shape({
+  documentNumber: Yup.string()
+    .min(2, "Documento muy corto")
+    .max(100, "Documento muy largo")
+    .required("Documento requerido"),
 });
 
 export const bookingSchema = Yup.object().shape({
@@ -75,16 +84,17 @@ export const bookingSchema = Yup.object().shape({
         current = current.add(1, "day");
       }
 
-      const startDate = dayjs(start);
-      const endDate = dayjs(end);
       const bookedDates = new Set(bookings.map((b) => b.date));
 
-      const missingDate = expectedDates.find((date) => !bookedDates.has(date));
+      const missingDates = expectedDates.filter(
+        (date) => !bookedDates.has(date)
+      );
 
-      const nights = endDate.diff(startDate, "day"); // Calculate number of nights
-      return missingDate
+      return missingDates.length > 0
         ? this.createError({
-            message: `Debe elegir al menos una habitación para cada una de las ${nights} noches seleccionadas.`,
+            message: `Falta reservar en las fechas: ${missingDates
+              .map((date) => dayjs(date).format("DD/MM/YYYY"))
+              .join(", ")}`,
           })
         : true;
     }),
@@ -180,6 +190,8 @@ export const sanitizeBooking = (booking) => {
     sanitizedBooking.bookingProvider?.id ||
     sanitizedBooking.bookingProviderId ||
     "";
+  sanitizedBooking.bookingProviderName =
+    sanitizedBooking.bookingProvider?.name || "";
   sanitizedBooking.externalId = sanitizedBooking.externalId || "";
   sanitizedBooking.eta = sanitizedBooking.eta || "";
   sanitizedBooking.externalCommission =
@@ -334,3 +346,49 @@ export const bookingStatuses = {
   3: "Completado",
   4: "No Show",
 };
+
+export const bookingsTableColumns = [
+  {
+    header: "ID",
+    accessorKey: "id",
+    cell: ({ row }) => (
+      <Link to={`/hotels/${row.original.hotelId}/bookings/${row.original.id}`}>
+        {row.getValue("id")}
+      </Link>
+    ),
+  },
+  {
+    header: "Nombre",
+    accessorKey: "firstName",
+  },
+  {
+    header: "Apellido",
+    accessorKey: "lastName",
+  },
+  {
+    header: "Llegada",
+    accessorKey: "arrivalDate",
+    cell: ({ getValue }) => dayjs(getValue()).format("DD/MM/YYYY"),
+  },
+  {
+    header: "Salida",
+    accessorKey: "departureDate",
+    cell: ({ getValue }) => dayjs(getValue()).format("DD/MM/YYYY"),
+  },
+  {
+    header: "Total",
+    accessorKey: "total",
+    cell: ({ getValue }) => formatCurrency(getValue(), "COP"),
+  },
+  {
+    header: "Saldo",
+    accessorKey: "balanceDue",
+    cell: ({ getValue }) => formatCurrency(getValue(), "COP"),
+  },
+  {
+    header: "ID externa",
+    accessorKey: "externalBookingId",
+    maxSize: 150,
+    size: 150,
+  },
+];

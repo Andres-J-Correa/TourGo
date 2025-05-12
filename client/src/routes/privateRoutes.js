@@ -48,7 +48,9 @@ const bookings = [
   {
     name: "bookingsView",
     path: "/hotels/:hotelId/bookings",
-    component: lazy(() => import("components/bookings/BookingsView")),
+    component: lazy(() =>
+      import("components/bookings/bookings-view/BookingsView")
+    ),
   },
   {
     name: "newBooking",
@@ -63,6 +65,11 @@ const bookings = [
     component: lazy(() =>
       import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
     ),
+  },
+  {
+    name: "viewBooking",
+    path: "/hotels/:hotelId/bookings/:bookingId",
+    component: lazy(() => import("components/bookings/BookingView")),
   },
 ];
 

@@ -25,8 +25,8 @@ const CustomDateTimePicker = ({ isRequired, ...props }) => {
         selected={field.value ? new Date(field.value) : null}
         onChange={props.onChange || handleChange}
         showTimeSelect
-        timeFormat="HH:mm"
-        dateFormat="yyyy/MM/dd HH:mm"
+        timeFormat="h:mm aa"
+        dateFormat="dd/MM/yyyy - h:mm aa"
         placeholderText={props.placeholder}
         className={`form-control custom-datepicker-input ${
           props.className || ""

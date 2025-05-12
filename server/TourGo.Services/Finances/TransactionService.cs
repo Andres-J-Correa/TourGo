@@ -40,7 +40,7 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_paymentMethodId", request.PaymentMethodId);
                 col.AddWithValue("p_categoryId", request.CategoryId);
                 col.AddWithValue("p_subcategoryId", request.SubcategoryId);
-                col.AddWithValue("p_referenceNumber", request.ReferenceNumber);
+                col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(request.ReferenceNumber) ? DBNull.Value : request.ReferenceNumber);
                 col.AddWithValue("p_statusId", request.StatusId);
                 col.AddWithValue("p_description", request.Description);
                 col.AddWithValue("p_currencyCode", request.CurrencyCode);

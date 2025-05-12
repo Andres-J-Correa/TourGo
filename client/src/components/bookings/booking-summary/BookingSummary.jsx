@@ -12,17 +12,17 @@ const ReservationSummary = ({
   roomBookings = [],
   extraCharges = [],
 }) => {
-  const { customer } = bookingData;
+  const { customer } = bookingData || {};
   const groupedRooms = groupRoomBookings(roomBookings);
 
   return (
     <Card className="mb-4 bg-body-tertiary shadow">
       <CardHeader tag="h4" className="text-bg-dark">
-        Resumen de Reserva
+        Información de Reserva
       </CardHeader>
       <CardBody className="text-dark">
         <Row>
-          <Col className="border-end">
+          <Col xs={12} md={5} className="border-end">
             <CustomerInfo customer={customer} />
           </Col>
 
@@ -32,15 +32,18 @@ const ReservationSummary = ({
         </Row>
 
         <hr />
-
-        <Row>
-          <Col>
-            <strong>Notas:</strong>
-            <p>{bookingData.notes}</p>
-          </Col>
-        </Row>
-
-        <hr />
+        {bookingData?.notes && (
+          <>
+            {" "}
+            <Row>
+              <Col>
+                <strong>Notas:</strong>
+                <p>{bookingData?.notes}</p>
+              </Col>
+            </Row>
+            <hr />
+          </>
+        )}
 
         <BookingFinancials bookingData={bookingData} />
 

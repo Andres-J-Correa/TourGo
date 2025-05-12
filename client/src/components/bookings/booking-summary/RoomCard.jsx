@@ -3,7 +3,7 @@ import { Card, CardBody, ListGroup, ListGroupItem } from "reactstrap";
 import { formatCurrency } from "utils/currencyHelper";
 import dayjs from "dayjs";
 import { calculateRoomCharges } from "./helpers";
-import "./RoomCard.css";
+import "./BookingSummary.css";
 
 const RoomCard = ({ room, bookingNights, extraCharges }) => {
   const subtotal = room.segments.reduce((sum, seg) => sum + seg.price, 0);
@@ -43,7 +43,7 @@ const RoomCard = ({ room, bookingNights, extraCharges }) => {
             </div>
           ))}
 
-          <hr className="my-2" />
+          <hr className="mt-1" />
 
           <div className="line-item line-total">
             <span className="line-label">Total</span>

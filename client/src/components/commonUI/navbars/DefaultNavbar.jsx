@@ -65,7 +65,7 @@ function DefaultNavbar({
 
   return (
     <div>
-      <Navbar expand="lg" className="blur shadow p-2 z-3">
+      <Navbar expand="lg" className="shadow p-2 z-3">
         <NavbarBrand className="font-weight-bolder ms-sm-3" href="/">
           {brand}
         </NavbarBrand>

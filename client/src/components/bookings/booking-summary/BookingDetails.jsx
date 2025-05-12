@@ -6,40 +6,54 @@ import dayjs from "dayjs";
 const BookingDetails = ({ bookingData }) => (
   <>
     <h5>Detalles</h5>
+    <hr className="mb-1 mt-0" />
     <Row>
-      <Col md={4}>
+      <Col md={3}>
         <Row>
           <strong>Llegada (Check-in):</strong>
-          <p className="mb-0">
-            {dayjs(bookingData.arrivalDate).format("DD/MM/YYYY")}
-          </p>
+          <p>{dayjs(bookingData?.arrivalDate).format("DD/MM/YYYY")}</p>
         </Row>
         <Row>
           <strong>Salida (Check-out):</strong>
-          <p className="mb-0">
-            {dayjs(bookingData.departureDate).format("DD/MM/YYYY")}
-          </p>
+          <p>{dayjs(bookingData?.departureDate).format("DD/MM/YYYY")}</p>
         </Row>
       </Col>
       <Col>
         <Row>
-          <Col md={4}>
-            <strong>Noches:</strong>{" "}
-            <p className="mb-0">{bookingData.nights}</p>
+          <Col md={5}>
+            <strong>Día y Hora de Llegada:</strong>{" "}
+            <p>
+              {bookingData?.eta
+                ? dayjs(bookingData?.eta).format("DD/MM/YYYY - h:mm a")
+                : "-"}
+            </p>
           </Col>
-          <Col md={4}>
-            <strong>Adultos:</strong>{" "}
-            <p className="mb-0">{bookingData.adultGuests}</p>
-          </Col>
-          <Col md={4}>
-            <strong>Niños:</strong>{" "}
-            <p className="mb-0">{bookingData.childGuests}</p>
+          <Col>
+            <strong>Identificación externa</strong>
+            <p>{bookingData?.externalId ? bookingData?.externalId : "-"}</p>
           </Col>
         </Row>
         <Row>
-          <Col md={12}>
+          <Col>
+            <strong>Proveedor</strong>
+            <p>
+              {bookingData?.bookingProvider?.name
+                ? bookingData?.bookingProvider.name
+                : "-"}
+            </p>
+          </Col>
+          <Col md="auto">
             <strong>Estado:</strong>{" "}
-            <p className="mb-0">{bookingStatuses[bookingData.status?.id]}</p>
+            <p>{bookingStatuses[bookingData?.status?.id]}</p>
+          </Col>
+          <Col md="auto">
+            <strong>Noches:</strong> <p>{bookingData?.nights}</p>
+          </Col>
+          <Col md="auto">
+            <strong>Adultos:</strong> <p>{bookingData?.adultGuests}</p>
+          </Col>
+          <Col md="auto">
+            <strong>Niños:</strong> <p>{bookingData?.childGuests}</p>
           </Col>
         </Row>
       </Col>

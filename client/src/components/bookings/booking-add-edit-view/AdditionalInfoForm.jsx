@@ -4,15 +4,14 @@ import { Row, Col } from "reactstrap";
 
 import { setLocalStorageForm } from "utils/localStorageHelper";
 import { LOCAL_STORAGE_FORM_KEYS } from "components/bookings/constants";
-import { getBookingProvidersByHotelId } from "services/bookingService";
 import CustomField from "components/commonUI/forms/CustomField";
 import DateTimePicker from "components/commonUI/forms/DateTimePicker";
 
 import dayjs from "dayjs";
-import { toast } from "react-toastify";
 
-function AdditionalInfoForm({ submitting, hotelId }) {
-  const [bookingProviderOptions, setBookingProviderOptions] = useState([]);
+function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
+  const [mappedBookingProviderOptions, setMappedBookingProviderOptions] =
+    useState([]);
   const { setFieldValue, values } = useFormikContext();
 
   const handleInputChange = (e, fieldName) => {
@@ -33,30 +32,28 @@ function AdditionalInfoForm({ submitting, hotelId }) {
     });
   };
 
-  const onGetBookingProvidersSuccess = (res) => {
-    if (res.isSuccessful) {
-      const options = res.items.map((p) => (
-        <option key={`booking-provider-${p.id}`} value={p.id}>
-          {p.name}
-        </option>
-      ));
-      setBookingProviderOptions(options);
-    }
-  };
+  const handleBookingProviderChange = (e) => {
+    const selectedOption = e.target.options[e.target.selectedIndex];
+    const selectedValue = e.target.value;
+    const selectedName = selectedOption.getAttribute("data-name");
 
-  const onGetBookingProvidersError = (err) => {
-    if (err.response?.status !== 404) {
-      toast.error("Error al cargar los proveedores de reservas.");
-    }
+    setFieldValue("bookingProviderId", selectedValue); // Update Formik state
+    setFieldValue("bookingProviderName", selectedName); // Update Formik state
   };
 
   useEffect(() => {
-    if (hotelId) {
-      getBookingProvidersByHotelId(hotelId)
-        .then(onGetBookingProvidersSuccess)
-        .catch(onGetBookingProvidersError);
+    if (bookingProviderOptions.length > 0) {
+      const options = bookingProviderOptions.map((p) => (
+        <option
+          key={`booking-provider-${p.id}`}
+          value={p.id}
+          data-name={p.name}>
+          {p.name}
+        </option>
+      ));
+      setMappedBookingProviderOptions(options);
     }
-  }, [hotelId]);
+  }, [bookingProviderOptions]);
 
   return (
     <>
@@ -98,9 +95,9 @@ function AdditionalInfoForm({ submitting, hotelId }) {
             className="form-select"
             placeholder="Proveedor de reservas (Booking/Airbnb...)"
             disabled={submitting}
-            onChange={(e) => handleInputChange(e, "bookingProviderId")}>
+            onChange={handleBookingProviderChange}>
             <option value="">Sin Proveedor</option>
-            {bookingProviderOptions}
+            {mappedBookingProviderOptions}
           </CustomField>
         </Col>
         <Col md="4">

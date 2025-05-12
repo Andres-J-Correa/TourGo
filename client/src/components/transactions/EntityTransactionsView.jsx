@@ -35,6 +35,8 @@ const EntityTransactionsView = ({ hotelId, submitting, entity, setEntity }) => {
 
   const paid = entity?.transactions?.reduce((acc, txn) => acc + txn.amount, 0);
 
+  const balance = entity?.total - (isNaN(paid) ? 0 : paid);
+
   const { user } = useAppContext();
 
   const initialValues = {
@@ -251,8 +253,11 @@ const EntityTransactionsView = ({ hotelId, submitting, entity, setEntity }) => {
           </Col>
           <Col md={4}>
             <strong className="fs-5 text">Saldo:</strong>
-            <span className="float-end mt-1">
-              {formatCurrency(entity.total - (isNaN(paid) ? 0 : paid), "COP")}
+            <span
+              className={classNames("float-end mt-1", {
+                "text-danger": balance < 0,
+              })}>
+              {formatCurrency(balance, "COP")}
             </span>
           </Col>
         </Row>
@@ -329,7 +334,6 @@ const EntityTransactionsView = ({ hotelId, submitting, entity, setEntity }) => {
                     name="referenceNumber"
                     className="form-control"
                     placeholder="Número de Referencia"
-                    isRequired={true}
                   />
                 </Col>
               </Row>
