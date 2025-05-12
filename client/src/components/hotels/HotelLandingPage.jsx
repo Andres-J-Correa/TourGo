@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Row, Col, Table, Card } from "reactstrap";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { faEdit, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Breadcrumb from "components/commonUI/Breadcrumb";
-import { getMinimalById } from "services/hotelService";
-import { toast } from "react-toastify";
+import { useAppContext } from "contexts/GlobalAppContext";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
 // Sample data for demonstration
 const reservationsToday = [
@@ -50,31 +50,18 @@ const breadcrumbs = [
 ];
 
 const HotelLandingPage = () => {
-  const [hotel, setHotel] = useState({});
   const { hotelId } = useParams();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    getMinimalById(hotelId)
-      .then((res) => {
-        if (res.isSuccessful) {
-          setHotel(res.item);
-        }
-      })
-      .catch((error) => {
-        if (error?.response?.status !== 404) {
-          toast.error("Hubo un error al cargar el hotel");
-        }
-      });
-  }, [hotelId]);
+  const { hotel } = useAppContext();
 
   return (
     <div className="container mt-4">
+      <LoadingOverlay isVisible={hotel.isLoading} />
       <Breadcrumb breadcrumbs={breadcrumbs} active="Hotel" />
       {/* Header with Hotel Name and Edit Button */}
       <Row className="align-items-center mb-3">
         <Col>
-          <h1 className="display-4">{hotel.name}</h1>
+          <h1 className="display-4">{hotel.current.name}</h1>
         </Col>
         <Col className="text-end">
           <Link
@@ -84,50 +71,6 @@ const HotelLandingPage = () => {
             <FontAwesomeIcon icon={faEdit} size="lg" />
           </Link>
         </Col>
-      </Row>
-
-      {/* Navigation Buttons */}
-      <Row className="mb-3">
-        <Link
-          className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${hotelId}/bookings/new`}>
-          <FontAwesomeIcon icon={faPlus} /> Nueva Reserva
-        </Link>
-        <Link
-          className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${hotelId}/bookings`}>
-          Reservas
-        </Link>
-        <Link
-          className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${hotelId}/calendar`}>
-          Calendario
-        </Link>
-        <Link
-          className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${hotelId}/rooms`}>
-          Habitaciones
-        </Link>
-        <Link
-          className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${hotelId}/customers`}>
-          Clientes
-        </Link>
-        <Link
-          className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${hotelId}/staff`}>
-          Empleados
-        </Link>
-        <Link
-          className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${hotelId}/finances`}>
-          Finanzas
-        </Link>
-        <Link
-          className="w-auto me-2 btn btn-outline-dark"
-          to={`/hotels/${hotelId}/extra-charges`}>
-          Cargos Extra
-        </Link>
       </Row>
 
       {/* Panel with Reservations */}

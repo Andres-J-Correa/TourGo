@@ -3,7 +3,12 @@ import { Link, NavLink } from "react-router-dom";
 import HoverDropdown from "./HoverDropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
+import {
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  NavItem,
+} from "reactstrap";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import "./navbaritem.css";
@@ -75,7 +80,9 @@ const NavbarItem = React.memo(({ navItem }) => {
           }
         )}
         title={navItem?.name?.length > 20 ? navItem.name : undefined}>
-        {navItem.icon}
+        {navItem.icon && (
+          <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
+        )}
         {navItem.name.length > 25
           ? `${navItem.name.substring(0, 20)}...`
           : navItem.name}
@@ -95,19 +102,24 @@ const NavbarItem = React.memo(({ navItem }) => {
   );
 
   // Render a link if the nav item has a path property
-  const renderNavLink = () => (
-    <NavLink
-      to={navItem.path}
-      className={classNames("nav-link nav-action-item", {
-        "text-uppercase": navItem.uppercase,
-        "text-capitalize": navItem.capitalize,
-      })}>
-      {navItem.icon && (
-        <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
-      )}
-      {navItem.name}
-    </NavLink>
-  );
+  const renderNavLink = () => {
+    return (
+      <NavLink
+        to={navItem.path}
+        className={classNames("nav-link nav-action-item", {
+          "text-uppercase": navItem.uppercase,
+          "text-capitalize": navItem.capitalize,
+        })}>
+        <div>
+          {" "}
+          {navItem.icon && (
+            <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
+          )}
+          {navItem.name}
+        </div>
+      </NavLink>
+    );
+  };
 
   // Render a dropdown item with an action if the nav item has an action property
   const renderActionItem = () => (
@@ -122,11 +134,10 @@ const NavbarItem = React.memo(({ navItem }) => {
     </div>
   );
 
-  // Render a default dropdown item if none of the above properties are present
-  const renderDefaultItem = () => (
+  const renderHeader = () => (
     <DropdownItem
-      header
-      className={classNames("text-center px-1", {
+      header={navItem.header}
+      className={classNames("text-center ps-1 pe-3", {
         "text-uppercase": navItem.uppercase,
         "text-capitalize": navItem.capitalize,
       })}>
@@ -134,13 +145,45 @@ const NavbarItem = React.memo(({ navItem }) => {
     </DropdownItem>
   );
 
+  const renderBrand = () => (
+    <Link
+      to={navItem.path}
+      className={classNames(
+        "navbar-brand fs-5 fw-medium align-content-center",
+        {
+          "text-uppercase": navItem.uppercase,
+          "text-capitalize": navItem.capitalize,
+        }
+      )}>
+      {navItem.icon && (
+        <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
+      )}
+      {navItem.name}
+    </Link>
+  );
+
+  // render a default nav item
+  const renderDefaultItem = () => (
+    <NavItem
+      className={classNames({
+        "text-uppercase": navItem.uppercase,
+        "text-capitalize": navItem.capitalize,
+      })}>
+      {navItem.name}
+    </NavItem>
+  );
+
   // Determine which rendering function to use based on the nav item's properties
   if (navItem.collapse?.length > 0) {
     return renderDropdownMenu();
+  } else if (navItem.brand) {
+    return renderBrand();
   } else if (navItem.path && !navItem.action) {
     return renderNavLink();
   } else if (navItem.action) {
     return renderActionItem();
+  } else if (navItem.header) {
+    return renderHeader();
   } else {
     return renderDefaultItem();
   }

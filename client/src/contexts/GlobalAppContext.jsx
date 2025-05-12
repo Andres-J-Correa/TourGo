@@ -1,10 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser } from "services/userAuthService";
-
+import { getMinimalById } from "services/hotelService";
 import PropTypes from "prop-types";
+import { toast } from "react-toastify";
 
 const defaultUser = {
   id: 0,
@@ -14,10 +13,18 @@ const defaultUser = {
   isAuthenticated: false,
 };
 
+const defaultHotel = {
+  id: 0,
+  name: "",
+};
+
 const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
+  const location = useLocation();
   const [currentUser, setCurrentUser] = useState({ ...defaultUser });
+  const [hotel, setHotel] = useState({ ...defaultHotel });
+  const [isLoadingHotel, setIsLoadingHotel] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(false);
 
   const navigate = useNavigate();
@@ -33,6 +40,10 @@ export const AppContextProvider = ({ children }) => {
       set: setCurrentUser,
       logout,
       isLoading: isLoadingUser,
+    },
+    hotel: {
+      current: hotel,
+      isLoading: isLoadingHotel,
     },
   };
 
@@ -56,12 +67,40 @@ export const AppContextProvider = ({ children }) => {
           if (currentUser.isAuthenticated) {
             setCurrentUser({ ...defaultUser });
           }
+          toast.error("Error al cargar el usuario");
         })
         .finally(() => {
           setIsLoadingUser(false);
         });
     }
   }, [currentUser.isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const pathRegex = /\/hotels\/([^/]+)/; // Matches /hotel/{hotelId}
+    const pathMatch = location.pathname.match(pathRegex);
+    const hotelId = pathMatch ? pathMatch[1] : null;
+
+    if (hotelId && Number(hotelId) !== Number(hotel.id)) {
+      setIsLoadingHotel(true);
+      getMinimalById(hotelId)
+        .then((res) => {
+          if (res.isSuccessful) {
+            setHotel(res.item);
+          }
+        })
+        .catch((error) => {
+          if (error?.response?.status !== 404) {
+            toast.error("Hubo un error al cargar el hotel");
+          }
+          setHotel({ ...defaultHotel });
+        })
+        .finally(() => {
+          setIsLoadingHotel(false);
+        });
+    } else if (!hotelId) {
+      setHotel({ ...defaultHotel });
+    }
+  }, [location.pathname, hotel.id]);
 
   return (
     <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>

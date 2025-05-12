@@ -4,6 +4,7 @@ import NavbarItem from "./NavbarItem";
 import LanguageSelector from "components/commonUI/languages/LanguageSelector";
 import { useAppContext } from "contexts/GlobalAppContext";
 import PropTypes from "prop-types";
+import classNames from "classnames";
 import "./navbar.css";
 
 const _logger = require("debug")("navbar");
@@ -24,7 +25,7 @@ function DefaultNavbar({
     left: [],
   });
 
-  const { user } = useAppContext();
+  const { user, hotel } = useAppContext();
 
   useEffect(() => {
     const leftItems = [],
@@ -72,7 +73,12 @@ function DefaultNavbar({
         <NavbarToggler onClick={toggle} className="shadow-none ms-2" />
         <Collapse isOpen={isOpen} navbar className="pt-3 pb-2 py-lg-0 w-100">
           <Nav className="justify-content-end w-100" navbar>
-            <div className="left-items">{mappedItems.left}</div>
+            <div
+              className={classNames("left-items", {
+                "three-dots-loader mx-auto": hotel.isLoading,
+              })}>
+              {mappedItems.left}
+            </div>
             <div className="right-items">
               {showLanguageSelector && <LanguageSelector />}
               {mappedItems.right}

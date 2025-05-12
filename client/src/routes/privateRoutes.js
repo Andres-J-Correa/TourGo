@@ -26,6 +26,27 @@ const hotelRoutes = [
     path: "/hotels/add",
     component: lazy(() => import("components/hotels/HotelAdd")),
   },
+  {
+    name: "calendar",
+    path: "/hotels/:hotelId/calendar",
+    component: lazy(() =>
+      import("components/commonUI/fallback/SiteUnderConstruction")
+    ),
+  },
+  {
+    name: "customer",
+    path: "/hotels/:hotelId/customers",
+    component: lazy(() =>
+      import("components/commonUI/fallback/SiteUnderConstruction")
+    ),
+  },
+  {
+    name: "staff",
+    path: "/hotels/:hotelId/staff",
+    component: lazy(() =>
+      import("components/commonUI/fallback/SiteUnderConstruction")
+    ),
+  },
 ];
 
 const roomRoutes = [
@@ -73,9 +94,34 @@ const bookings = [
   },
 ];
 
+const finances = [
+  {
+    name: "financesView",
+    path: "/hotels/:hotelId/finances",
+    component: lazy(() =>
+      import("components/commonUI/fallback/SiteUnderConstruction")
+    ),
+  },
+  {
+    name: "paymentMethods",
+    path: "/hotels/:hotelId/payment-methods",
+    component: lazy(() =>
+      import("components/commonUI/fallback/SiteUnderConstruction")
+    ),
+  },
+  {
+    name: "financialPartners",
+    path: "/hotels/:hotelId/financial-partners",
+    component: lazy(() =>
+      import("components/commonUI/fallback/SiteUnderConstruction")
+    ),
+  },
+];
+
 export const privateRoutes = [
   ...hotelRoutes,
   ...roomRoutes,
   ...extraCharges,
   ...bookings,
+  ...finances,
 ];

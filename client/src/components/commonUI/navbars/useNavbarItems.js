@@ -1,35 +1,134 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHotel } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHotel,
+  faCalendarCheck,
+  faClipboardList,
+  faBed,
+  faAddressCard,
+  faUsers,
+  faMoneyBillTrendUp,
+} from "@fortawesome/free-solid-svg-icons";
+import { useAppContext } from "contexts/GlobalAppContext";
 
 export const useNavbarItems = () => {
-  const hotelItems = [
+  const { hotel } = useAppContext();
+
+  const hotelsItems = [
     {
-      name: "Alojamiento",
-      icon: <FontAwesomeIcon icon={faHotel} className="icon" />,
-      main: true,
+      name: "Alojamientos",
+      icon: faHotel,
       capitalize: true,
       collapse: [
         {
-          name: "Paginas",
+          name: "Registra un alojamiento",
+          path: "/hotels/add",
           capitalize: true,
-          collapse: [
-            {
-              name: "Registra un alojamiento",
-              path: "/hotels/add",
-              capitalize: true,
-            },
-            {
-              name: "Lista de alojamientos",
-              path: "/hotels",
-              capitalize: true,
-            },
-          ],
+        },
+        {
+          name: "Lista de alojamientos",
+          path: "/hotels",
+          capitalize: true,
         },
       ],
     },
   ];
 
-  const items = [...hotelItems];
+  let currentHotelItems = [];
+
+  if (hotel.current?.id) {
+    currentHotelItems = [
+      {
+        name: hotel.current.name,
+        position: "left",
+        brand: true,
+        path: `/hotels/${hotel.current.id}`,
+      },
+      {
+        name: "Reservas",
+        icon: faClipboardList,
+        position: "left",
+        capitalize: true,
+        collapse: [
+          {
+            name: "Nueva Reserva",
+            path: `/hotels/${hotel.current.id}/bookings/new`,
+            capitalize: true,
+          },
+          {
+            name: "Lista de Reservas",
+            path: `/hotels/${hotel.current.id}/bookings`,
+            capitalize: true,
+          },
+        ],
+      },
+      {
+        name: "Calendario",
+        icon: faCalendarCheck,
+        position: "left",
+        path: `/hotels/${hotel.current.id}/calendar`,
+        capitalize: true,
+      },
+      {
+        name: "Alojamiento",
+        icon: faBed,
+        position: "left",
+        capitalize: true,
+        collapse: [
+          {
+            name: "Habitaciones",
+            position: "left",
+            path: `/hotels/${hotel.current.id}/rooms`,
+            capitalize: true,
+          },
+          {
+            name: "Cargos Extra",
+            position: "left",
+            path: `/hotels/${hotel.current.id}/extra-charges`,
+            capitalize: true,
+          },
+        ],
+      },
+
+      {
+        name: "Clientes",
+        icon: faAddressCard,
+        position: "left",
+        path: `/hotels/${hotel.current.id}/customers`,
+        capitalize: true,
+      },
+      {
+        name: "Empleados",
+        icon: faUsers,
+        position: "left",
+        path: `/hotels/${hotel.current.id}/staff`,
+        capitalize: true,
+      },
+      {
+        name: "Finanzas",
+        icon: faMoneyBillTrendUp,
+        position: "left",
+        capitalize: true,
+        collapse: [
+          {
+            name: "Panel de Finanzas",
+            path: `/hotels/${hotel.current.id}/finances`,
+            capitalize: true,
+          },
+          {
+            name: "Metodos de Pago",
+            path: `/hotels/${hotel.current.id}/payment-methods`,
+            capitalize: true,
+          },
+          {
+            name: "Socios financieros",
+            position: "left",
+            path: `/hotels/${hotel.current.id}/financial-partners`,
+            capitalize: true,
+          },
+        ],
+      },
+    ];
+  }
+  const items = [...currentHotelItems, ...hotelsItems];
 
   return {
     items,

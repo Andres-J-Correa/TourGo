@@ -68,8 +68,8 @@
   --bs-border-radius-2xl: 1rem;
   --bs-border-radius-pill: 50rem;
   --bs-heading-color: #344767;
-  --bs-link-color: #e91e63;
-  --bs-link-hover-color: #e91e63;
+  --bs-link-color: #344767;
+  --bs-link-hover-color: #00bfff;
   --bs-code-color: #d63384;
   --bs-highlight-bg: #fcf8e3;
 }
@@ -378,10 +378,10 @@ button:not(:disabled),
   --bs-dropdown-divider-margin-y: 0.5rem;
   --bs-dropdown-box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --bs-dropdown-link-color: #7b809a;
+  --bs-dropdown-link-color: #676666;
   --bs-dropdown-link-hover-color: #344767;
   --bs-dropdown-link-hover-bg: #f0f2f5;
-  --bs-dropdown-link-active-color: #7b809a;
+  --bs-dropdown-link-active-color: #344767;
   --bs-dropdown-link-active-bg: transparent;
   --bs-dropdown-link-disabled-color: #6c757d;
   --bs-dropdown-item-padding-x: 1rem;
@@ -479,13 +479,13 @@ button:not(:disabled),
   --bs-navbar-color: #344767;
   --bs-navbar-hover-color: #7b809a;
   --bs-navbar-disabled-color: rgba(52, 71, 103, 0.3);
-  --bs-navbar-active-color: rgba(52, 71, 103, 0.9);
+  --bs-navbar-active-color: #b0e0e6;
   --bs-navbar-brand-padding-y: 0.40625rem;
   --bs-navbar-brand-margin-end: 1rem;
   --bs-navbar-brand-font-size: 1.5rem;
   --bs-navbar-brand-color: #fff;
   --bs-navbar-background-color: rgba(52, 71, 103, 0.9);
-  --bs-navbar-brand-hover-color: #7b809a;
+  --bs-navbar-brand-hover-color: #b0e0e6;
   --bs-navbar-nav-link-padding-x: 0.5rem;
   --bs-navbar-toggler-padding-y: 0.25rem;
   --bs-navbar-toggler-padding-x: 0.75rem;
@@ -1457,6 +1457,7 @@ h4 {
 a {
   letter-spacing: 0;
   color: #344767;
+  text-decoration: none;
 }
 .text-sm {
   line-height: 1.5;
@@ -2228,4 +2229,28 @@ p {
   --bs-btn-disabled-bg: transparent;
   --bs-btn-disabled-border-color: #344767;
   --bs-gradient: none;
+}
+
+.three-dots-loader {
+  width: 60px;
+  aspect-ratio: 2;
+  --_g: no-repeat radial-gradient(circle closest-side, #fff 90%, #0000);
+  background: var(--_g) 0% 50%, var(--_g) 50% 50%, var(--_g) 100% 50%;
+  background-size: calc(100% / 3) 50%;
+  animation: l3 1s infinite linear;
+  height: fit-content;
+}
+@keyframes l3 {
+  20% {
+    background-position: 0% 0%, 50% 50%, 100% 50%;
+  }
+  40% {
+    background-position: 0% 100%, 50% 0%, 100% 50%;
+  }
+  60% {
+    background-position: 0% 50%, 50% 100%, 100% 0%;
+  }
+  80% {
+    background-position: 0% 50%, 50% 50%, 100% 100%;
+  }
 }
