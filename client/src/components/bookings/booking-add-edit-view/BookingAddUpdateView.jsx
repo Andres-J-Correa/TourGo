@@ -27,6 +27,9 @@ const BookingAddUpdateView = () => {
     { label: "Hoteles", path: "/hotels" },
     { label: "Hotel", path: `/hotels/${hotelId}` },
     { label: "Reservas", path: `/hotels/${hotelId}/bookings` },
+    bookingId
+      ? { label: "Reserva", path: `/hotels/${hotelId}/bookings/${bookingId}` }
+      : undefined,
   ];
 
   const [currentStep, setCurrentStep] = useState(0);

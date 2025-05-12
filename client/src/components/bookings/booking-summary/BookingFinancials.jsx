@@ -11,12 +11,15 @@ const BookingFinancials = ({ bookingData }) => {
     charges = [],
     total = 0,
   } = bookingData || {};
-  const totalPaid = transactions?.reduce((sum, txn) => sum + txn.amount, 0);
+  const totalPaid =
+    transactions?.length > 0
+      ? transactions?.reduce((sum, txn) => sum + txn.amount, 0)
+      : 0;
   const balance = total - totalPaid;
 
   return (
     <>
-      <Row>
+      <Row className="mb-2">
         <Col md={4}>
           <div className="line-item">
             <span className="line-label fw-bold">Subtotal</span>
@@ -43,7 +46,7 @@ const BookingFinancials = ({ bookingData }) => {
           </div>
         </Col>
       </Row>
-      <Row>
+      <Row className="mb-2">
         <Col md={4}>
           <div className="line-item">
             <span className="line-label fw-bold">Total Pagado</span>

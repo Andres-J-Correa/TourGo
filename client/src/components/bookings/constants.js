@@ -39,6 +39,13 @@ export const customerSchema = Yup.object().shape({
     ),
 });
 
+export const searchCustomerSchema = Yup.object().shape({
+  documentNumber: Yup.string()
+    .min(2, "Documento muy corto")
+    .max(100, "Documento muy largo")
+    .required("Documento requerido"),
+});
+
 export const bookingSchema = Yup.object().shape({
   eta: Yup.date()
     .nullable()
@@ -344,7 +351,6 @@ export const bookingsTableColumns = [
   {
     header: "ID",
     accessorKey: "id",
-    enableSorting: false,
     cell: ({ row }) => (
       <Link to={`/hotels/${row.original.hotelId}/bookings/${row.original.id}`}>
         {row.getValue("id")}
@@ -381,9 +387,8 @@ export const bookingsTableColumns = [
   },
   {
     header: "ID externa",
-    accessorKey: "externalId",
+    accessorKey: "externalBookingId",
     maxSize: 150,
     size: 150,
-    enableSorting: false,
   },
 ];

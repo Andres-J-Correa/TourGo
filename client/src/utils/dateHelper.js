@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
 export const getDate = (date) => {
-  if (!date) return null;
+  if (!date) return "";
   if (!dayjs(date).isValid()) return null;
 
   const day = dayjs(date).get("date");

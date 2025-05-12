@@ -11,7 +11,10 @@ import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomField from "components/commonUI/forms/CustomField";
 import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
-import { customerSchema } from "components/bookings/constants";
+import {
+  customerSchema,
+  searchCustomerSchema,
+} from "components/bookings/constants";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -146,7 +149,7 @@ function CustomerForm({
           phone: customer?.phone || "",
           email: customer?.email || "",
         }}
-        validationSchema={creating ? customerSchema : undefined}
+        validationSchema={creating ? customerSchema : searchCustomerSchema}
         onSubmit={creating ? handleCustomerCreate : handleDocumentSubmit}
         enableReinitialize>
         {({ values, setFieldValue }) => {

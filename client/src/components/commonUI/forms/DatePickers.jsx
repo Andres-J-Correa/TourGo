@@ -45,6 +45,9 @@ const DatePickers = ({
           placeholderText={startDateName}
           popperClassName="custom-datepicker"
           autoComplete="off"
+          showYearDropdown={true}
+          showMonthDropdown={true}
+          dropdownMode="select"
         />
       </div>
 
@@ -64,6 +67,9 @@ const DatePickers = ({
           placeholderText={endDateName}
           popperClassName="custom-datepicker"
           autoComplete="off"
+          showYearDropdown={true}
+          showMonthDropdown={true}
+          dropdownMode="select"
         />
       </div>
     </div>

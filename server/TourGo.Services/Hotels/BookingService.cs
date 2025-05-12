@@ -27,20 +27,11 @@ namespace TourGo.Services.Hotels
     public class BookingService : IBookingService
     {
         private readonly IMySqlDataProvider _mySqlDataProvider;
-        public HashSet<string> BookingSortColumns { get; }
+
 
         public BookingService(IMySqlDataProvider dataProvider)
         {
             _mySqlDataProvider = dataProvider;
-            BookingSortColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                "ArrivalDate",
-                "DepartureDate",
-                "Total",
-                "BalanceDue",
-                "FirstName",
-                "LastName",
-            };
         }
 
         public Booking? GetById(int id)
@@ -78,35 +69,36 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
-        public Paged<BookingMinimal>? GetPaginatedByDateRange (DateOnly startDate, DateOnly endDate, bool isArrivalDate, int hotelId, int pageIndex, int pageSize,
-                                                                string sortColumn, string sortDirection, string? firstName, string? lastName)
+        public Paged<BookingMinimal>? GetPaginatedByDateRange(int hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
+                                                            string sortColumn, string sortDirection, DateOnly? startDate, DateOnly? endDate,
+                                                            string? firstName, string? lastName, string? bookingExternalId)
         {
             string proc = "bookings_select_minimal_by_date_range_paginated";
             Paged<BookingMinimal>? paged = null;
             List<BookingMinimal>? bookings = null;
             int totalCount = 0;
 
-            sortColumn = string.IsNullOrWhiteSpace(sortColumn) ? "ArrivalDate" : sortColumn;
-            sortDirection = string.IsNullOrWhiteSpace(sortDirection) ? "ASC" : sortDirection;
+            BookingSortColumns.TryGetValue(sortColumn, out var mappedColumn);
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
-                param.AddWithValue("p_startDate", startDate.ToString("yyyy-MM-dd"));
-                param.AddWithValue("p_endDate", endDate.ToString("yyyy-MM-dd"));
-                param.AddWithValue("p_isArrivalDate", isArrivalDate ? 1 : 0);
                 param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_pageIndex", pageIndex);
                 param.AddWithValue("p_pageSize", pageSize);
-                param.AddWithValue("p_sortColumn", sortColumn);
+                param.AddWithValue("p_sortColumn", mappedColumn);
                 param.AddWithValue("p_sortDirection", sortDirection);
+                param.AddWithValue("p_startDate", startDate?.ToString("yyyy-MM-dd") ?? (object)DBNull.Value);
+                param.AddWithValue("p_endDate", endDate?.ToString("yyyy-MM-dd") ?? (object)DBNull.Value);
+                param.AddWithValue("p_isArrivalDate", isArrivalDate.HasValue ? (isArrivalDate.Value ? 1 : 0) : DBNull.Value);
                 param.AddWithValue("p_firstName", string.IsNullOrWhiteSpace(firstName) ? DBNull.Value : firstName);
                 param.AddWithValue("p_lastName", string.IsNullOrWhiteSpace(lastName) ? DBNull.Value : lastName);
+                param.AddWithValue("p_externalBookingId", string.IsNullOrWhiteSpace(bookingExternalId) ? DBNull.Value : bookingExternalId);
             }, (reader, set) =>
             {
                 int index = 0;
                 BookingMinimal booking = new BookingMinimal();
                 booking.Id = reader.GetSafeInt32(index++);
-                booking.ExternalId = reader.GetSafeString(index++);
+                booking.ExternalBookingId = reader.GetSafeString(index++);
                 booking.ArrivalDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
                 booking.DepartureDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
                 booking.Total = reader.GetSafeDecimal(index++);
@@ -285,6 +277,11 @@ namespace TourGo.Services.Hotels
                 || string.Equals(direction, "DESC", StringComparison.OrdinalIgnoreCase);
         }
 
+        public bool IsValidSortColumn(string? column)
+        {
+            return !string.IsNullOrWhiteSpace(column) && BookingSortColumns.ContainsKey(column);
+        }
+
         private static RoomBooking MapRoomBooking(IDataReader reader, ref int index)
         {
             RoomBooking roomBooking = new RoomBooking();
@@ -329,5 +326,17 @@ namespace TourGo.Services.Hotels
 
             return booking;
         }
+
+        private readonly Dictionary<string, string> BookingSortColumns = new(StringComparer.OrdinalIgnoreCase)
+            {
+                {"Id", "b.Id"},
+                {"ArrivalDate", "b.ArrivalDate"},
+                {"DepartureDate", "b.DepartureDate"},
+                {"Total", "b.Total"},
+                {"BalanceDue", "i.BalanceDue"},
+                {"FirstName", "c.FirstName"},
+                {"LastName", "c.LastName"},
+                {"ExternalBookingId", "b.ExternalBookingId"},
+            };
     }
 }

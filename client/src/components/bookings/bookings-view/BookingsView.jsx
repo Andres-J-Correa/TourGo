@@ -22,7 +22,7 @@ import dayjs from "dayjs";
 import classNames from "classnames";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import { bookingsTableColumns } from "components/bookings/constants";
-import TableFilters from "components/bookings/bookings-view/BookingFilters";
+import BookingFilters from "components/bookings/bookings-view/BookingFilters";
 
 const defaultData = {
   items: [],
@@ -36,10 +36,6 @@ const BookingsView = () => {
   const { hotelId } = useParams();
   const [data, setData] = useState({ ...defaultData });
   const [loading, setLoading] = useState(false);
-  const [customerNameInputs, setCustomerNameInputs] = useState({
-    firstName: "",
-    lastName: "",
-  });
 
   const [paginationData, setPaginationData] = useState({
     pageIndex: 0,
@@ -51,14 +47,15 @@ const BookingsView = () => {
       },
     ],
     dates: {
-      start: dayjs().toDate(),
-      end: dayjs().endOf("month").toDate(),
+      start: "",
+      end: "",
     },
     isArrivalDate: true,
     customerNameFilters: {
       firstName: "",
       lastName: "",
     },
+    externalBookingId: "",
   });
 
   const breadcrumbs = [
@@ -119,13 +116,53 @@ const BookingsView = () => {
       isArrivalDate: !prev.isArrivalDate,
     }));
 
-  const handleCustomerNameChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setCustomerNameInputs((prev) => ({
+  const handleFilterByCustomerName = (values) => {
+    setPaginationData((prev) => ({
       ...prev,
-      [name]: value,
+      pageIndex: 0,
+      customerNameFilters: {
+        firstName: values.firstName,
+        lastName: values.lastName,
+      },
     }));
-  }, []);
+  };
+
+  const handleFilterByExternalBookingId = (value) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      externalBookingId: value,
+    }));
+  };
+
+  const handleClearCustomerNameFilter = () => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      customerNameFilters: {
+        firstName: "",
+        lastName: "",
+      },
+    }));
+  };
+  const handleClearExternalBookingIdFilter = () => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      externalBookingId: "",
+    }));
+  };
+
+  const handleClearDateFilters = () => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      dates: {
+        start: "",
+        end: "",
+      },
+    }));
+  };
 
   const onPageSizeChange = (e) =>
     setPaginationData((prev) => ({
@@ -139,79 +176,78 @@ const BookingsView = () => {
     setPaginationData((prev) => ({ ...prev, pageIndex }));
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const sortColumn = paginationData.sortBy[0]?.id || "ArrivalDate";
-      const sortDirection = paginationData.sortBy[0]?.desc ? "DESC" : "ASC";
-      try {
-        const res = await getPagedMinimalBookingsByDateRange(
-          hotelId,
-          dayjs(paginationData.dates.start).format("YYYY-MM-DD"),
-          dayjs(paginationData.dates.end).format("YYYY-MM-DD"),
-          paginationData.pageIndex,
-          paginationData.pageSize,
-          paginationData.isArrivalDate,
-          sortColumn,
-          sortDirection,
-          paginationData.customerNameFilters.firstName,
-          paginationData.customerNameFilters.lastName
-        );
+  const fetchData = useCallback(async (hotelId, values) => {
+    setLoading(true);
+    const sortColumn = values.sortBy[0]?.id || "ArrivalDate";
+    const sortDirection = values.sortBy[0]?.desc ? "DESC" : "ASC";
+    const startDate = values.dates.start
+      ? dayjs(values.dates.start).format("YYYY-MM-DD")
+      : null;
+    const endDate = values.dates.end
+      ? dayjs(values.dates.end).format("YYYY-MM-DD")
+      : null;
 
-        if (res.isSuccessful) {
-          setData({
-            items: res.item.pagedItems,
-            totalCount: res.item.totalCount,
-            totalPages: res.item.totalPages,
-            hasPreviousPage: res.item.hasPreviousPage,
-            hasNextPage: res.item.hasNextPage,
-          });
-        }
-      } catch (err) {
-        setData({ ...defaultData });
-      } finally {
-        setLoading(false);
+    try {
+      const res = await getPagedMinimalBookingsByDateRange(
+        hotelId,
+        startDate,
+        endDate,
+        values.pageIndex,
+        values.pageSize,
+        values.isArrivalDate,
+        sortColumn,
+        sortDirection,
+        values.customerNameFilters.firstName,
+        values.customerNameFilters.lastName,
+        values.externalBookingId
+      );
+
+      if (res.isSuccessful) {
+        setData({
+          items: res.item.pagedItems,
+          totalCount: res.item.totalCount,
+          totalPages: res.item.totalPages,
+          hasPreviousPage: res.item.hasPreviousPage,
+          hasNextPage: res.item.hasNextPage,
+        });
       }
-    };
-
-    if (hotelId) {
-      fetchData();
+    } catch (err) {
+      setData({ ...defaultData });
+    } finally {
+      setLoading(false);
     }
-  }, [hotelId, paginationData]);
+  }, []);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      if (
-        customerNameInputs.firstName !==
-          paginationData.customerNameFilters.firstName ||
-        customerNameInputs.lastName !==
-          paginationData.customerNameFilters.lastName
-      ) {
-        setPaginationData((prev) => ({
-          ...prev,
-          pageIndex: 0,
-          customerNameFilters: {
-            firstName: customerNameInputs.firstName,
-            lastName: customerNameInputs.lastName,
-          },
-        }));
-      }
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [customerNameInputs, paginationData.customerNameFilters]);
+    const hasDates =
+      Boolean(paginationData.dates.start) || Boolean(paginationData.dates.end);
+    const isValidDateRange =
+      !hasDates ||
+      (dayjs(paginationData.dates.start).isValid() &&
+        dayjs(paginationData.dates.end).isValid());
+
+    if (hotelId && isValidDateRange) {
+      fetchData(hotelId, paginationData);
+    }
+  }, [hotelId, paginationData, fetchData]);
 
   return (
     <Container className="my-4">
       <Breadcrumb breadcrumbs={breadcrumbs} active={"Reservas"} />
       <h3>Reservas</h3>
       <ErrorBoundary>
-        <TableFilters
+        <BookingFilters
           paginationData={paginationData}
           loading={loading}
           handleDateChange={handleDateChange}
           toggleDateType={toggleDateType}
-          handleCustomerNameChange={handleCustomerNameChange}
-          customerNameInputs={customerNameInputs}
+          handleFilterByCustomerName={handleFilterByCustomerName}
+          handleFilterByExternalBookingId={handleFilterByExternalBookingId}
+          handleClearCustomerNameFilter={handleClearCustomerNameFilter}
+          handleClearExternalBookingIdFilter={
+            handleClearExternalBookingIdFilter
+          }
+          handleClearDateFilters={handleClearDateFilters}
           onPageSizeChange={onPageSizeChange}
         />
 
@@ -249,11 +285,8 @@ const BookingsView = () => {
                         {{
                           asc: <FontAwesomeIcon icon={faArrowUpShortWide} />,
                           desc: <FontAwesomeIcon icon={faArrowDownWideShort} />,
-                        }[header.column.getIsSorted()] ||
-                        header.column.getCanSort() ? (
+                        }[header.column.getIsSorted()] || (
                           <FontAwesomeIcon icon={faSort} />
-                        ) : (
-                          ""
                         )}
                       </span>
                     </th>

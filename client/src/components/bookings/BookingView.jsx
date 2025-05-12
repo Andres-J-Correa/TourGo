@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getById as getBookingById } from "services/bookingService";
 import useBookingData from "components/bookings/booking-add-edit-view/hooks/useBookingData";
@@ -48,8 +48,12 @@ function BookingView() {
 
   return (
     <Container className="p-4">
+      <Breadcrumb breadcrumbs={breadcrumbs} active="Reserva" />
+      <h3 className="mb-4">Reserva</h3>
       <div className="mb-3">
-        <Breadcrumb breadcrumbs={breadcrumbs} active="Reserva" />
+        <Link to="edit" className="btn btn-outline-dark">
+          Editar
+        </Link>
       </div>
       <LoadingOverlay isVisible={isLoading || isLoadingBookingData} />
       <ErrorBoundary>

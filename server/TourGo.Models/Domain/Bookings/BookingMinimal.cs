@@ -10,7 +10,7 @@ namespace TourGo.Models.Domain.Bookings
     public class BookingMinimal
     {
         public int Id { get; set; }
-        public string? ExternalId { get; set; }
+        public string? ExternalBookingId { get; set; }
         public DateOnly ArrivalDate { get; set; }
         public DateOnly DepartureDate { get; set; }
         public decimal Total { get; set; }

@@ -74,18 +74,32 @@ export const getPagedMinimalBookingsByDateRange = async (
   sortColumn,
   sortDirection,
   firstName = "",
-  lastName = ""
+  lastName = "",
+  externalBookingId = ""
 ) => {
+  const queryParams = new URLSearchParams({
+    pageIndex,
+    pageSize,
+    sortColumn,
+    sortDirection,
+  });
+  if (startDate) queryParams.append("startDate", startDate);
+  if (endDate) queryParams.append("endDate", endDate);
+  if (isArrivalDate && startDate && endDate)
+    queryParams.append("isArrivalDate", isArrivalDate);
+  if (firstName) queryParams.append("firstName", firstName);
+  if (lastName) queryParams.append("lastName", lastName);
+  if (externalBookingId)
+    queryParams.append("externalBookingId", externalBookingId);
+
+  const url = `${api}/hotel/${hotelId}/date-range?${queryParams.toString()}`;
+
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url:
-      `${api}/hotel/${hotelId}/date-range?` +
-      `startDate=${startDate}&endDate=${endDate}&pageIndex=${pageIndex}` +
-      `&pageSize=${pageSize}&isArrivalDate=${isArrivalDate}&sortColumn=${sortColumn}` +
-      `&sortDirection=${sortDirection}&firstName=${firstName}&lastName=${lastName}`,
+    url: url,
   };
   try {
     const response = await axiosClient(config);

@@ -127,16 +127,17 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpGet("hotel/{id:int}/date-range")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemResponse<Paged<BookingMinimal>>> GetPaginatedByDateRange(int id, [FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate, 
-                                                                                        [FromQuery] int pageIndex, [FromQuery] int pageSize,[FromQuery] bool isArrivalDate,
-                                                                                        [FromQuery] string sortColumn,[FromQuery] string sortDirection, 
-                                                                                        [FromQuery]string? firstName, [FromQuery] string? lastName)
+        public ActionResult<ItemResponse<Paged<BookingMinimal>>> GetPaginatedByDateRange(int id, [FromQuery] int pageIndex, [FromQuery] int pageSize, [FromQuery] bool isArrivalDate,
+                                                                                        [FromQuery] string sortColumn, [FromQuery] string sortDirection,
+                                                                                        [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate,
+                                                                                        [FromQuery]string? firstName, [FromQuery] string? lastName,
+                                                                                        [FromQuery] string? externalBookingId)
         {
             ObjectResult result = null;
 
             try
             {
-                if (!_bookingService.BookingSortColumns.Contains(sortColumn))
+                if (!_bookingService.IsValidSortColumn(sortColumn))
                 {
                     return BadRequest(new ErrorResponse($"Invalid sort column: {sortColumn}"));
                 }
@@ -146,8 +147,10 @@ namespace TourGo.Web.Api.Controllers.Hotels
                     return BadRequest(new ErrorResponse($"Invalid sort direction: {sortDirection}"));
                 }
 
-                Paged<BookingMinimal>? bookings = _bookingService.GetPaginatedByDateRange(startDate, endDate, isArrivalDate, id, pageIndex, pageSize,sortColumn,sortDirection,
-                                                                                            firstName, lastName);
+                Paged<BookingMinimal>? bookings = _bookingService.GetPaginatedByDateRange(
+                    id, pageIndex, pageSize, isArrivalDate, sortColumn, sortDirection, startDate, endDate,
+                    firstName, lastName, externalBookingId);
+                    
 
                 if (bookings == null)
                 {
