@@ -7,10 +7,11 @@ const BookingRow = ({
   date,
   rooms,
   getBooking,
-  currentSelection,
-  selectedRoomBookings,
+  currentSelection = [],
+  selectedRoomBookings = [],
   onCellClick,
   disabled,
+  isCalendarView = false,
 }) => (
   <tr key={date}>
     <td
@@ -41,6 +42,7 @@ const BookingRow = ({
           selected={selected}
           onCellClick={onCellClick}
           disabled={disabled}
+          isCalendarView={isCalendarView}
         />
       );
     })}
