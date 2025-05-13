@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 
 import { HelmetProvider } from "react-helmet-async";
+import { Container } from "reactstrap";
 
 import NavbarContainer from "components/commonUI/navbars/NavbarContainer";
 import GlobalErrorHandler from "components/commonUI/errors/GlobalErrorHandler";
@@ -60,7 +61,9 @@ const App = () => {
             message="cargando usuario"
           />
           <NavbarContainer />
-          <Routes>{routes}</Routes>
+          <Container className="mt-4">
+            <Routes>{routes}</Routes>
+          </Container>
         </GlobalErrorHandler>
       </Suspense>
 

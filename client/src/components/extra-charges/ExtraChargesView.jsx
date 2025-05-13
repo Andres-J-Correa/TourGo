@@ -157,7 +157,7 @@ const ExtraChargesView = () => {
   }, [hotelId]);
 
   return (
-    <div className="container mt-4">
+    <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Cargos Adicionales" />
       <Row>
         <h1>Cargos Adicionales</h1>
@@ -291,7 +291,7 @@ const ExtraChargesView = () => {
           </Col>
         ))}
       </Row>
-    </div>
+    </>
   );
 };
 

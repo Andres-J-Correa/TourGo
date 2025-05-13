@@ -115,7 +115,7 @@ const HotelEdit = () => {
   }, [hotelId]);
 
   return (
-    <div className="container mt-4">
+    <>
       <Breadcrumbs breadcrumbs={breadcrumbs} active="Editar" />
       <h1 className="display-6 mb-4">Detalles del Hotel</h1>
 
@@ -243,7 +243,7 @@ const HotelEdit = () => {
           </Col>
         </Row>
       </div>
-    </div>
+    </>
   );
 };
 

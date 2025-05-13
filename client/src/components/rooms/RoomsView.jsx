@@ -136,7 +136,7 @@ const RoomsView = () => {
   }, [hotelId]);
 
   return (
-    <div className="container mt-4">
+    <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Habitaciones" />
       <Row>
         <h1>Habitaciones</h1>
@@ -254,7 +254,7 @@ const RoomsView = () => {
           </Col>
         ))}
       </Row>
-    </div>
+    </>
   );
 };
 

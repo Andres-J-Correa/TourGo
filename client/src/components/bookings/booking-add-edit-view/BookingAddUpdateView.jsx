@@ -74,7 +74,7 @@ const BookingAddUpdateView = () => {
     }
   }, [bookingId]);
   return (
-    <div className="container my-4">
+    <>
       <LoadingOverlay
         isVisible={submitting || isLoading || isLoadingBookingData}
         message={
@@ -171,7 +171,7 @@ const BookingAddUpdateView = () => {
           />
         </TabPane>
       </TabContent>
-    </div>
+    </>
   );
 };
 

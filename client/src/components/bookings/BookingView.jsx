@@ -6,7 +6,6 @@ import useBookingData from "components/bookings/booking-add-edit-view/hooks/useB
 import BookingSummary from "components/bookings/booking-summary/BookingSummary";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
-import { Container } from "reactstrap";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 
 function BookingView() {
@@ -47,7 +46,7 @@ function BookingView() {
   }, [bookingId]);
 
   return (
-    <Container className="p-4">
+    <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Reserva" />
       <h3 className="mb-4">Reserva</h3>
       <div className="mb-3">
@@ -65,7 +64,7 @@ function BookingView() {
           />
         )}
       </ErrorBoundary>
-    </Container>
+    </>
   );
 }
 
