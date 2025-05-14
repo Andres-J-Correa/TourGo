@@ -55,7 +55,7 @@ const HotelLandingPage = () => {
   const { hotel } = useAppContext();
 
   return (
-    <div className="container mt-4">
+    <>
       <LoadingOverlay isVisible={hotel.isLoading} />
       <Breadcrumb breadcrumbs={breadcrumbs} active="Hotel" />
       {/* Header with Hotel Name and Edit Button */}
@@ -146,7 +146,7 @@ const HotelLandingPage = () => {
           ))}
         </ul>
       </Card>
-    </div>
+    </>
   );
 };
 

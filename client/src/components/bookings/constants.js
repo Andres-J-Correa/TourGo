@@ -390,5 +390,8 @@ export const bookingsTableColumns = [
     accessorKey: "externalBookingId",
     maxSize: 150,
     size: 150,
+    sortDescFirst: true,
+    sortingFn: "alphanumeric",
+    sortUndefined: 1,
   },
 ];

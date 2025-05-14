@@ -7,8 +7,8 @@ const BookingRow = ({
   date,
   rooms,
   getBooking,
-  currentSelection,
-  selectedRoomBookings,
+  currentSelection = [],
+  selectedRoomBookings = [],
   onCellClick,
   disabled,
 }) => (

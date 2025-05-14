@@ -39,7 +39,7 @@ const HotelAdd = () => {
   };
 
   return (
-    <div className="container mt-4">
+    <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Agregar Hotel" />
       <h1 className="display-6 mb-4">Agregar Nuevo Hotel</h1>
 
@@ -113,7 +113,7 @@ const HotelAdd = () => {
           </div>
         </Form>
       </Formik>
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Spinner, Container } from "reactstrap";
+import { Spinner } from "reactstrap";
 import { useParams } from "react-router-dom";
 import {
   useReactTable,
@@ -232,7 +232,7 @@ const BookingsView = () => {
   }, [hotelId, paginationData, fetchData]);
 
   return (
-    <Container className="my-4">
+    <>
       <Breadcrumb breadcrumbs={breadcrumbs} active={"Reservas"} />
       <h3>Reservas</h3>
       <ErrorBoundary>
@@ -340,7 +340,7 @@ const BookingsView = () => {
           onPageChange={gotoPage}
         />
       </ErrorBoundary>
-    </Container>
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAll } from "services/hotelService";
-import { Container, Row, Col, Card } from "reactstrap";
+import { Row, Col, Card } from "reactstrap";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import { toast } from "react-toastify";
@@ -39,7 +39,7 @@ const HotelsView = () => {
   };
 
   return (
-    <Container className="mt-4">
+    <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Hoteles" />
       <LoadingOverlay isVisible={isLoading} message="Cargando..." />
       <Row>
@@ -54,7 +54,7 @@ const HotelsView = () => {
           </Col>
         ))}
       </Row>
-    </Container>
+    </>
   );
 };
 
