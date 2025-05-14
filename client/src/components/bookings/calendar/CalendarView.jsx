@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
@@ -11,6 +17,8 @@ import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
 import { formatCurrency } from "utils/currencyHelper";
 
+import { throttle } from "lodash";
+
 import {
   flexRender,
   getCoreRowModel,
@@ -21,10 +29,14 @@ import {
 import classNames from "classnames";
 
 import { useVirtualizer } from "@tanstack/react-virtual";
+import isSameorBefore from "dayjs/plugin/isSameOrBefore";
+import "./CalendarView.css";
 
-import "components/bookings/booking-add-edit-view/room-booking-table/RoomBookingTable.css";
+dayjs.extend(isSameorBefore);
 
-const _logger = require("debug")("CalendarView");
+const initialStartDate = dayjs().startOf("month").format("YYYY-MM-DD");
+const initialEndDate = dayjs().endOf("month").format("YYYY-MM-DD");
+const SCROLL_OFFSET_ROWS = 36;
 
 function CalendarView() {
   const { hotelId } = useParams();
@@ -40,11 +52,13 @@ function CalendarView() {
   const [roomBookings, setRoomBookings] = useState([]);
   const [isLoadingBookings, setIsLoadingBookings] = useState(false);
   const [dateRange, setDateRange] = useState({
-    start: dayjs().startOf("month").format("YYYY-MM-DD"),
-    end: dayjs().endOf("month").format("YYYY-MM-DD"),
+    start: initialStartDate,
+    end: initialEndDate,
   });
 
+  const lastScrollTop = useRef(0);
   const tableContainerRef = useRef(null);
+  const lastStartDate = useRef(initialStartDate);
 
   const bookingMap = useMemo(() => {
     const map = {};
@@ -71,8 +85,15 @@ function CalendarView() {
         header: () => room.name,
         cell: (info) => {
           const date = info.row.original.date;
-          const price = bookingMap[`${date}-${room.id}`];
-          return price ? formatCurrency(price, "COP") : "";
+          let price = bookingMap[`${date}-${room.id}`];
+          return (
+            <span
+              className={classNames("text-center", {
+                hasValue: Boolean(price),
+              })}>
+              {formatCurrency(price, "COP")}
+            </span>
+          );
         },
         size: 200,
       })
@@ -101,14 +122,11 @@ function CalendarView() {
     if (err?.response?.status !== 404) {
       toast.error("Error al cargar habitaciones");
     }
-    setRooms([]);
   };
 
   const onGetRoomBookingsSuccess = (res) => {
     if (res.isSuccessful) {
-      setRoomBookings(res.items);
-    } else {
-      setRoomBookings([]);
+      setRoomBookings((prev) => [...prev, ...res.items]);
     }
   };
 
@@ -116,8 +134,15 @@ function CalendarView() {
     if (err?.response?.status !== 404) {
       toast.error("Error al cargar reservas");
     }
-    setRoomBookings([]);
   };
+
+  const fetchRoomBookings = useCallback((hotelId, dateStart, dateEnd) => {
+    setIsLoadingBookings(true);
+    getRoomBookingsByDateRange(hotelId, dateStart, dateEnd)
+      .then(onGetRoomBookingsSuccess)
+      .catch(onGetRoomBookingsError)
+      .finally(() => setIsLoadingBookings(false));
+  }, []);
 
   const { rows } = table.getRowModel();
 
@@ -134,19 +159,107 @@ function CalendarView() {
     overscan: 5,
   });
 
-  // 🔁 Date range
-  useEffect(() => {
+  const buildDates = useCallback((startDate, endDate, direction = "append") => {
     const dateList = [];
-    let current = dayjs(dateRange.start);
-    while (
-      current.isBefore(dayjs(dateRange.end)) ||
-      current.isSame(dayjs(dateRange.end))
-    ) {
+    let current = dayjs(startDate);
+    while (current.isSameOrBefore(dayjs(endDate))) {
       dateList.push({ date: current.format("YYYY-MM-DD") });
       current = current.add(1, "day");
     }
-    setDates(dateList);
-  }, [dateRange]);
+    setDates((prev) => {
+      if (direction === "append") {
+        return [...prev, ...dateList];
+      } else {
+        return [...dateList, ...prev];
+      }
+    });
+  }, []);
+
+  const triggerNextMonthFetch = useCallback(() => {
+    const dateStart = dayjs(dateRange.end)
+      .endOf("month")
+      .add(1, "day")
+      .format("YYYY-MM-DD");
+    const newEnd = dayjs(dateStart).endOf("month").format("YYYY-MM-DD");
+    setDateRange((prev) => ({
+      ...prev,
+      end: newEnd,
+    }));
+
+    buildDates(dateStart, newEnd, "append");
+
+    fetchRoomBookings(hotelId, dateStart, newEnd);
+  }, [dateRange, buildDates, hotelId, fetchRoomBookings]);
+
+  const triggerPreviousMonthFetch = useCallback(() => {
+    const dateEnd = dayjs(dateRange.start)
+      .startOf("month")
+      .subtract(1, "day")
+      .format("YYYY-MM-DD");
+    const newStart = dayjs(dateEnd).startOf("month").format("YYYY-MM-DD");
+
+    setDateRange((prev) => ({
+      ...prev,
+      start: newStart,
+    }));
+
+    buildDates(newStart, dateEnd, "prepend");
+    fetchRoomBookings(hotelId, newStart, dateEnd);
+  }, [dateRange, buildDates, hotelId, fetchRoomBookings]);
+
+  useEffect(() => {
+    const container = tableContainerRef.current;
+    const handleScroll = throttle(() => {
+      if (!container) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const direction = scrollTop > lastScrollTop.current ? "down" : "up";
+      lastScrollTop.current = scrollTop;
+
+      const bottomVirtualItem = rowVirtualizer.getVirtualItems()?.at(-1);
+      const bottomVisibleRow = bottomVirtualItem
+        ? table.getRowModel().rows[bottomVirtualItem.index]
+        : null;
+      const lastRow = table.getRowModel().rows.at(-1);
+      const isLastRowVisible = bottomVisibleRow?.id === lastRow?.id;
+
+      const isAtBottom =
+        scrollHeight - scrollTop - clientHeight < 200 && isLastRowVisible;
+      if (isAtBottom && direction === "down" && !isLoadingBookings) {
+        triggerNextMonthFetch();
+      }
+
+      const isAtTop = scrollTop < 200;
+      if (isAtTop && direction === "up" && !isLoadingBookings) {
+        triggerPreviousMonthFetch();
+      }
+    }, 500);
+
+    container?.addEventListener("scroll", handleScroll);
+    return () => {
+      container?.removeEventListener("scroll", handleScroll);
+      handleScroll.cancel(); // Clean up throttle
+    };
+  }, [
+    isLoadingBookings,
+    triggerNextMonthFetch,
+    triggerPreviousMonthFetch,
+    rowVirtualizer,
+    table,
+  ]);
+
+  // 🔁 Date range
+  useEffect(() => {
+    if (dates.length === 0) {
+      const dateList = [];
+      let current = dayjs(initialStartDate);
+      while (current.isSameOrBefore(dayjs(initialEndDate))) {
+        dateList.push({ date: current.format("YYYY-MM-DD") });
+        current = current.add(1, "day");
+      }
+      setDates(dateList);
+    }
+  }, [dates]);
 
   useEffect(() => {
     if (!hotelId) return;
@@ -159,28 +272,31 @@ function CalendarView() {
   }, [hotelId]);
 
   useEffect(() => {
-    if (!hotelId || !dateRange.start || !dateRange.end) return;
-
-    setIsLoadingBookings(true);
-    getRoomBookingsByDateRange(hotelId, dateRange.start, dateRange.end)
-      .then(onGetRoomBookingsSuccess)
-      .catch(onGetRoomBookingsError)
-      .finally(() => setIsLoadingBookings(false));
-  }, [hotelId, dateRange]);
+    if (!hotelId) return;
+    fetchRoomBookings(hotelId, initialStartDate, initialEndDate);
+  }, [hotelId, fetchRoomBookings]);
 
   useEffect(() => {
-    _logger("rows", rows);
-    _logger("virtualItems", rowVirtualizer.getVirtualItems());
-  }, [rows, rowVirtualizer]);
+    if (dates.length === 0) return;
+
+    if (dayjs(dates[0]?.date).isBefore(dayjs(lastStartDate.current))) {
+      rowVirtualizer.scrollToIndex(SCROLL_OFFSET_ROWS);
+      lastStartDate.current = dates[0]?.date;
+    }
+  }, [dates, rowVirtualizer]);
 
   return (
     <>
-      <LoadingOverlay isVisible={isLoadingRooms} />
+      <LoadingOverlay
+        isVisible={isLoadingRooms || isLoadingBookings}
+        message={isLoadingBookings ? "Cargando Reservas" : undefined}
+      />
       <Breadcrumb breadcrumbs={breadcrumbs} active="Calendario" />
       <h3>Calendario</h3>
       <div
         ref={tableContainerRef}
         style={{
+          minHeight: "70vh",
           maxHeight: "70vh",
           overflowY: "auto",
         }}>
@@ -228,12 +344,15 @@ function CalendarView() {
             }}>
             {rowVirtualizer.getVirtualItems().map((virtualRow) => {
               const row = rows[virtualRow.index];
-              debugger;
               return (
                 <tr
                   data-index={virtualRow.index}
                   key={row.id}
-                  ref={(node) => rowVirtualizer.measureElement(node)}
+                  ref={
+                    rowVirtualizer.measureElement
+                      ? (node) => node && rowVirtualizer.measureElement(node)
+                      : undefined
+                  }
                   style={{
                     display: "flex",
                     position: "absolute",
@@ -245,7 +364,7 @@ function CalendarView() {
                     return (
                       <td
                         className={classNames(
-                          "text-center align-content-center",
+                          "text-center align-content-center justify-content-center calendar-cell",
                           {
                             "bg-dark text-white fw-bold": isDateColumn,
                           }
