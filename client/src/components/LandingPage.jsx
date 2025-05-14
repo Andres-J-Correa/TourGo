@@ -1,12 +1,12 @@
 import React from "react";
 import { Container } from "reactstrap";
-import Breadcrumbs from "components/commonUI/Breadcrumb";
+import Breadcrumb from "components/commonUI/Breadcrumb";
 
 const LandingPage = () => {
   return (
     <div>
       <Container className="text-center mt-5">
-        <Breadcrumbs active="Inicio" />
+        <Breadcrumb active="Inicio" />
         <div className="jumbotron">
           <h1 className="display-3">Bienvenido a TourGo</h1>
           <p className="lead">

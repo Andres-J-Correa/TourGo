@@ -11,7 +11,6 @@ const BookingCell = ({
   selected,
   onCellClick,
   disabled,
-  isCalendarView,
 }) => {
   const getContent = () => {
     if (booking) {
@@ -36,8 +35,8 @@ const BookingCell = ({
       key={room.id}
       className={classNames("text-center booking-table-cell-container", {
         "bg-secondary text-white": booking || disabled,
-        "cursor-not-allowed": (booking || disabled) && !isCalendarView,
-        "cursor-pointer": !booking || (booking && isCalendarView),
+        "cursor-not-allowed": booking || disabled,
+        "cursor-pointer": !booking,
         "bg-success-subtle text-success-emphasis": selected,
         "bg-success text-white": currentSelected,
       })}

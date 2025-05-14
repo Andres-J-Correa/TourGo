@@ -5,7 +5,7 @@ import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
 import { getDetailsById, updateById, deleteById } from "services/hotelService";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
-import Breadcrumbs from "components/commonUI/Breadcrumb";
+import Breadcrumb from "components/commonUI/Breadcrumb";
 import { addValidationSchema } from "./constants";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -116,7 +116,7 @@ const HotelEdit = () => {
 
   return (
     <>
-      <Breadcrumbs breadcrumbs={breadcrumbs} active="Editar" />
+      <Breadcrumb breadcrumbs={breadcrumbs} active="Editar" />
       <h1 className="display-6 mb-4">Detalles del Hotel</h1>
 
       <LoadingOverlay isVisible={isLoading} message="Cargando..." />
