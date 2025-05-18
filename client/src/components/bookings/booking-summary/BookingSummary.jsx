@@ -6,9 +6,12 @@ import CustomerInfo from "components/bookings/booking-summary/CustomerInfo";
 import BookingDetails from "components/bookings/booking-summary/BookingDetails";
 import BookingFinancials from "components/bookings/booking-summary/BookingFinancials";
 import RoomList from "components/bookings/booking-summary/RoomList";
+import BookingTransactions from "./BookingTransactions";
 
-const ReservationSummary = ({
+const BookingSummary = ({
   bookingData,
+  setBooking,
+  hotelId,
   roomBookings = [],
   extraCharges = [],
 }) => {
@@ -17,8 +20,8 @@ const ReservationSummary = ({
 
   return (
     <Card className="mb-4 bg-body-tertiary shadow">
-      <CardHeader tag="h4" className="text-bg-dark">
-        Información de Reserva
+      <CardHeader tag="h4" className="text-bg-dark text-center">
+        Reserva # {bookingData?.id}
       </CardHeader>
       <CardBody className="text-dark">
         <Row>
@@ -54,9 +57,18 @@ const ReservationSummary = ({
           bookingData={bookingData}
           extraCharges={extraCharges}
         />
+
+        <hr />
+
+        <BookingTransactions
+          hotelId={hotelId}
+          booking={bookingData}
+          setBooking={setBooking}
+        />
       </CardBody>
+      <br />
     </Card>
   );
 };
 
-export default ReservationSummary;
+export default BookingSummary;

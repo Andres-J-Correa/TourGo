@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Navbar, NavbarBrand, NavbarToggler, Collapse, Nav } from "reactstrap";
 import NavbarItem from "./NavbarItem";
 import LanguageSelector from "components/commonUI/languages/LanguageSelector";
@@ -65,10 +66,14 @@ function DefaultNavbar({
   }, [navbarItems, user, leftCustomComponents, rightCustomComponents]);
 
   return (
-    <div>
+    <div style={{ zIndex: 5000, position: "relative" }}>
       <Navbar expand="lg" className="shadow p-2 z-3">
-        <NavbarBrand className="font-weight-bolder ms-sm-3" href="/">
-          {brand}
+        <NavbarBrand className="font-weight-bolder ms-sm-3">
+          <Link
+            to={hotel.current?.id ? `/hotels/${hotel.current?.id}` : "/"}
+            className="text-decoration-none text-white">
+            {hotel.current?.name || brand}
+          </Link>
         </NavbarBrand>
         <NavbarToggler onClick={toggle} className="shadow-none ms-2" />
         <Collapse isOpen={isOpen} navbar className="pt-3 pb-2 py-lg-0 w-100">

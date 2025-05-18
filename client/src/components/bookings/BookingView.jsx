@@ -61,6 +61,8 @@ function BookingView() {
             bookingData={booking}
             roomBookings={bookingRoomBookings}
             extraCharges={bookingCharges}
+            setBooking={setBooking}
+            hotelId={hotelId}
           />
         )}
       </ErrorBoundary>

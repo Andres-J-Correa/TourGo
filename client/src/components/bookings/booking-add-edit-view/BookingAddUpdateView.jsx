@@ -71,6 +71,10 @@ const BookingAddUpdateView = () => {
         .then(onGetBookingSuccess)
         .catch(onGetBookingError)
         .finally(() => setIsLoading(false));
+    } else {
+      setBooking({ ...defaultBooking });
+      setCustomer(null);
+      setCurrentStep(0);
     }
   }, [bookingId]);
   return (
@@ -127,7 +131,7 @@ const BookingAddUpdateView = () => {
             <Button
               type="button"
               onClick={() => setCurrentStep(1)}
-              color="secondary"
+              color="dark"
               className="me-auto"
               disabled={submitting}>
               <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
@@ -137,7 +141,7 @@ const BookingAddUpdateView = () => {
               <Button
                 type="button"
                 onClick={() => setCurrentStep(3)}
-                color="secondary"
+                color="dark"
                 className="ms-auto"
                 disabled={submitting}>
                 Siguiente
@@ -157,7 +161,7 @@ const BookingAddUpdateView = () => {
             <Button
               type="button"
               onClick={() => setCurrentStep(2)}
-              color="secondary"
+              color="dark"
               className="me-auto"
               disabled={submitting}>
               <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
@@ -170,6 +174,7 @@ const BookingAddUpdateView = () => {
             extraCharges={booking?.extraCharges ?? bookingCharges}
           />
         </TabPane>
+        <br />
       </TabContent>
     </>
   );

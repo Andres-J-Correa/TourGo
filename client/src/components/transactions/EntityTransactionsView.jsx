@@ -21,7 +21,13 @@ import Dropzone from "components/commonUI/forms/Dropzone";
 import Swal from "sweetalert2";
 import { compressImage } from "utils/fileHelper";
 
-const EntityTransactionsView = ({ hotelId, submitting, entity, setEntity }) => {
+const EntityTransactionsView = ({
+  hotelId,
+  submitting,
+  entity,
+  setEntity,
+  showTotals = true,
+}) => {
   const [mappedTransactions, setMappedTransactions] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [files, setFiles] = useState([]);
@@ -238,30 +244,36 @@ const EntityTransactionsView = ({ hotelId, submitting, entity, setEntity }) => {
     <>
       <LoadingOverlay isVisible={isLoadingHotelData || submitting} />
       <div>
-        <Row>
-          <Col md={4}>
-            <strong className="fs-5 text">Total:</strong>
-            <span className="float-end mt-1">
-              {formatCurrency(entity.total, "COP")}
-            </span>
-          </Col>
-          <Col md={4}>
-            <strong className="fs-5 text">Pagado:</strong>
-            <span className="float-end mt-1">
-              {formatCurrency(paid, "COP")}
-            </span>
-          </Col>
-          <Col md={4}>
-            <strong className="fs-5 text">Saldo:</strong>
-            <span
-              className={classNames("float-end mt-1", {
-                "text-danger": balance < 0,
-              })}>
-              {formatCurrency(balance, "COP")}
-            </span>
-          </Col>
-        </Row>
-        <hr />
+        {showTotals && (
+          <>
+            {" "}
+            <Row>
+              <Col md={4}>
+                <strong className="fs-5 text">Total:</strong>
+                <span className="float-end mt-1">
+                  {formatCurrency(entity.total, "COP")}
+                </span>
+              </Col>
+              <Col md={4}>
+                <strong className="fs-5 text">Pagado:</strong>
+                <span className="float-end mt-1">
+                  {formatCurrency(paid, "COP")}
+                </span>
+              </Col>
+              <Col md={4}>
+                <strong className="fs-5 text">Saldo:</strong>
+                <span
+                  className={classNames("float-end mt-1", {
+                    "text-danger": balance < 0,
+                  })}>
+                  {formatCurrency(balance, "COP")}
+                </span>
+              </Col>
+            </Row>
+            <hr />
+          </>
+        )}
+
         {!showForm && (
           <div className="text-center mb-3">
             <Button color="primary" onClick={handleAddTransactionClick}>

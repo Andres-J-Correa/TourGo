@@ -56,14 +56,14 @@ function BookingForm({
   setCustomer,
   hotelId,
   bookingId,
+  bookingCharges = [],
+  bookingRoomBookings = [],
   //formik props
   values,
   setValues,
   resetForm,
   isSubmitting,
   initialValues,
-  bookingCharges,
-  bookingRoomBookings,
 }) {
   const [dates, setDates] = useState({
     start: null,
@@ -322,6 +322,13 @@ function BookingForm({
 
   useEffect(() => {
     if (!bookingId) {
+      setSelectedRoomBookings([]);
+      setSelectedCharges([]);
+      setDates({
+        start: null,
+        end: null,
+      });
+
       removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
       const currentForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT);
       const emptyBooking = {
@@ -366,7 +373,7 @@ function BookingForm({
         <Button
           type="button"
           onClick={() => setCurrentStep(0)}
-          color="secondary"
+          color="dark"
           className="me-auto"
           disabled={submitting || isSubmitting}>
           <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
@@ -376,7 +383,7 @@ function BookingForm({
           <Button
             type="button"
             onClick={handleNextClick}
-            color="secondary"
+            color="dark"
             className="ms-auto"
             disabled={submitting || isSubmitting}>
             Siguiente
@@ -384,13 +391,15 @@ function BookingForm({
           </Button>
         )}
       </div>
-      <DateSelector
-        dates={dates}
-        onDateChange={handleDateChange}
-        isDisabled={submitting || isLoadingBookings || isSubmitting}
-        selectedRoomBookings={selectedRoomBookings}
-        setSelectedRoomBookings={setSelectedRoomBookings}
-      />
+      {customer?.id && (
+        <DateSelector
+          dates={dates}
+          onDateChange={handleDateChange}
+          isDisabled={submitting || isLoadingBookings || isSubmitting}
+          selectedRoomBookings={selectedRoomBookings}
+          setSelectedRoomBookings={setSelectedRoomBookings}
+        />
+      )}
       <div
         className={classNames({
           "d-none": !dates.start || !dates.end,

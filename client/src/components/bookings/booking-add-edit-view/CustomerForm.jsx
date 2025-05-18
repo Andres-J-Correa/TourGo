@@ -134,7 +134,7 @@ function CustomerForm({
         {customer?.id && (
           <Button
             onClick={() => setCurrentStep(1)}
-            color="secondary"
+            color="dark"
             disabled={submitting}>
             Siguiente
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
