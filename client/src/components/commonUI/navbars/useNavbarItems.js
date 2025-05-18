@@ -37,12 +37,6 @@ export const useNavbarItems = () => {
   if (hotel.current?.id) {
     currentHotelItems = [
       {
-        name: hotel.current.name,
-        position: "left",
-        brand: true,
-        path: `/hotels/${hotel.current.id}`,
-      },
-      {
         name: "Reservas",
         icon: faClipboardList,
         position: "left",

@@ -137,51 +137,57 @@ function Transaction({ txn, updateHasDocumentUrl }) {
         {expanded && (
           <CardBody>
             <Row>
-              <Col md={4}>
-                <strong>Referencia:</strong> {txn.referenceNumber || "-"}
+              <Col md={3}>
+                <strong>Transacción #:</strong> {txn.id}
               </Col>
-              <Col md={4}>
+              <Col md={6}>
+                <strong>Referencia:</strong>{" "}
+                {txn.referenceNumber || "Sin referencia"}
+              </Col>
+              <Col md={3}>
                 <strong>Método de Pago:</strong> {txn.paymentMethod?.name}
               </Col>
-              <Col md={4}>
+            </Row>
+
+            <Row className="mt-2">
+              <Col md={3}>
                 <strong>Estado:</strong> {status}
               </Col>
-            </Row>
-
-            <Row className="mt-2">
-              <Col md={4}>
-                <strong>Subcategoría:</strong> {txn.subcategory?.name || "-"}
+              <Col md={3}>
+                <strong>Subcategoría:</strong>{" "}
+                {txn.subcategory?.name || "Sin subcategoría"}
               </Col>
-              <Col md={4}>
+              <Col md={3}>
                 <strong>Categoría:</strong> {category}
               </Col>
-              <Col md={4}>
+              <Col md={3}>
                 <strong>Socio Financiero:</strong>{" "}
-                {txn.financePartner?.name || "-"}
+                {txn.financePartner?.name || "Sin socio financiero"}
               </Col>
             </Row>
 
             <Row className="mt-2">
-              <Col md={4}>
+              <Col md={3}>
                 <strong>Creada por:</strong> {txn.createdBy?.firstName}{" "}
                 {txn.createdBy?.lastName}
               </Col>
-              <Col md={4}>
+              <Col md={3}>
                 <strong>Aprobada por:</strong> {txn.approvedBy?.firstName}{" "}
                 {txn.approvedBy?.lastName || "-"}
               </Col>
-              <Col md={4}>
+              <Col md="auto">
                 <strong>Creada el:</strong>{" "}
                 {dayjs(txn.dateCreated).format("DD/MMM/YYYY - h:mm A")}
               </Col>
             </Row>
 
-            <Row className="mt-2">
-              <Col>
-                <strong>Notas:</strong> {txn.description}
-              </Col>
-            </Row>
-
+            {txn?.description && (
+              <Row className="mt-2">
+                <Col>
+                  <strong>Notas:</strong> {txn.description}
+                </Col>
+              </Row>
+            )}
             <Row className="mt-3">
               <Col className="text-center">
                 {txn.hasDocumentUrl ? (

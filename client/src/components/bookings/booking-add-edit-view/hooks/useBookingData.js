@@ -63,6 +63,9 @@ export default function useBookingData(bookingId) {
         .finally(() => {
           setIsLoadingBookingData(false);
         });
+    } else {
+      setBookingCharges([]);
+      setBookingRoomBookings([]);
     }
   }, [bookingId]);
 
