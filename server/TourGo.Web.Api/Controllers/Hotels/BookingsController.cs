@@ -16,6 +16,7 @@ using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 using TourGo.Web.Api.Extensions;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -26,15 +27,18 @@ namespace TourGo.Web.Api.Controllers.Hotels
         private readonly IBookingService _bookingService;
         private readonly IWebAuthenticationService<int> _webAuthService;
         private readonly IErrorLoggingService _errorLoggingService;
+        private readonly IMemoryCache _cache;
 
         public BookingsController(ILogger<BookingsController> logger,
                                 IBookingService bookingService,
                                 IWebAuthenticationService<int> webAuthenticationService,
-                                IErrorLoggingService errorLoggingService) : base(logger)
+                                IErrorLoggingService errorLoggingService,
+                                IMemoryCache memoryCache) : base(logger)
         {
             _bookingService = bookingService;
             _webAuthService = webAuthenticationService;
             _errorLoggingService = errorLoggingService;
+            _cache = memoryCache;
         }
 
         [HttpPost("hotel/{id:int}")]
@@ -172,6 +176,51 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return result;
         }
+
+        [HttpGet("{id:int}/minimal")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemResponse<BookingMinimal>> GetBookingMinimal(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                string cacheKey = $"BookingMinimal_{id}";
+
+                if (!_cache.TryGetValue(cacheKey, out BookingMinimal? cachedBooking))
+                {
+                    cachedBooking = _bookingService.GetBookingMinimal(id);
+
+                    if (cachedBooking != null)
+                    {
+                        var cacheOptions = new MemoryCacheEntryOptions()
+                            .SetSlidingExpiration(TimeSpan.FromMinutes(5));
+
+                        _cache.Set(cacheKey, cachedBooking, cacheOptions);
+                    }
+                }
+
+                if (cachedBooking == null)
+                {
+                    result = NotFound404(new ErrorResponse("Booking not found"));
+                }
+                else
+                {
+                    ItemResponse<BookingMinimal> response = new ItemResponse<BookingMinimal>() { Item = cachedBooking };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
 
         [HttpGet("{id:int}/extra-charges")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]

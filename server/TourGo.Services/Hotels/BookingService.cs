@@ -96,18 +96,10 @@ namespace TourGo.Services.Hotels
             }, (reader, set) =>
             {
                 int index = 0;
-                BookingMinimal booking = new BookingMinimal();
-                booking.Id = reader.GetSafeInt32(index++);
-                booking.ExternalBookingId = reader.GetSafeString(index++);
-                booking.ArrivalDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
-                booking.DepartureDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
-                booking.Total = reader.GetSafeDecimal(index++);
-                booking.BalanceDue = reader.GetSafeDecimal(index++);
-                booking.FirstName = reader.GetSafeString(index++);
-                booking.LastName = reader.GetSafeString(index++);
+                BookingMinimal booking = MapBookingMinimal(reader, ref index);
                 booking.HotelId = hotelId;
 
-                if(totalCount == 0)
+                if (totalCount == 0)
                 {
                     totalCount = reader.GetSafeInt32(index++);
                 }
@@ -128,6 +120,25 @@ namespace TourGo.Services.Hotels
 
             return paged;
         }
+
+        public BookingMinimal? GetBookingMinimal (int bookingId)
+        {
+
+           string proc = "bookings_select_minimal_by_id";
+            BookingMinimal? booking = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_id", bookingId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                booking = MapBookingMinimal(reader, ref index);
+            });
+
+            return booking;
+        }
+
         public BookingAddResponse? Add(BookingAddUpdateRequest model, int userId, int hotelId)
         {
             BookingAddResponse? response = null;
@@ -291,6 +302,8 @@ namespace TourGo.Services.Hotels
             roomBooking.Room.Name = reader.GetSafeString(index++);
             roomBooking.BookingId = reader.GetSafeInt32(index++);
             roomBooking.Price = reader.GetSafeDecimal(index++);
+            roomBooking.FirstName = reader.GetSafeString(index++);
+            roomBooking.LastName = reader.GetSafeString(index++);
             return roomBooking;
         }
 
@@ -324,6 +337,20 @@ namespace TourGo.Services.Hotels
             booking.Charges = reader.GetSafeDecimal(index++);
             booking.InvoiceId = reader.GetSafeInt32(index++);
 
+            return booking;
+        }
+
+        private static BookingMinimal MapBookingMinimal(IDataReader reader, ref int index)
+        {
+            BookingMinimal booking = new BookingMinimal();
+            booking.Id = reader.GetSafeInt32(index++);
+            booking.ExternalBookingId = reader.GetSafeString(index++);
+            booking.ArrivalDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
+            booking.DepartureDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
+            booking.Total = reader.GetSafeDecimal(index++);
+            booking.BalanceDue = reader.GetSafeDecimal(index++);
+            booking.FirstName = reader.GetSafeString(index++);
+            booking.LastName = reader.GetSafeString(index++);
             return booking;
         }
 

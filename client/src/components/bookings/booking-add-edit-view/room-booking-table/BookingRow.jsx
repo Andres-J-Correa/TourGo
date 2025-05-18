@@ -16,7 +16,6 @@ const BookingRow = ({
     <td
       className={classNames("date-row-label", {
         "bg-secondary text-white": disabled,
-        "cursor-not-allowed": disabled,
         "text-bg-light": !disabled,
       })}>
       {dayjs(date).format("ddd DD - MMM - YYYY")}

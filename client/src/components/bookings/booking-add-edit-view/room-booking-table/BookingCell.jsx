@@ -2,6 +2,10 @@ import React from "react";
 import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarPlus } from "@fortawesome/free-solid-svg-icons";
+import { formatCurrency } from "utils/currencyHelper";
+import Popover from "components/commonUI/popover/Popover";
+import BookingMinimalCard from "components/bookings/BookingMinimalCard";
+import { useParams } from "react-router-dom";
 
 const BookingCell = ({
   date,
@@ -12,11 +16,24 @@ const BookingCell = ({
   onCellClick,
   disabled,
 }) => {
+  const { hotelId } = useParams();
   const getContent = () => {
     if (booking) {
-      return `$${booking.price.toFixed(2)}`;
+      return (
+        <Popover
+          content={
+            <BookingMinimalCard
+              bookingId={booking.bookingId}
+              hotelId={hotelId}
+            />
+          }>
+          <span className={`text-center cursor-pointer`}>
+            {`${formatCurrency(booking.price, "COP")}`}
+          </span>
+        </Popover>
+      );
     } else if (selected?.price) {
-      return `$${selected.price.toFixed(2)}`;
+      return `${formatCurrency(selected.price, "COP")}`;
     } else if (currentSelected?.roomId) {
       return "seleccionado";
     } else if (disabled) {
@@ -34,8 +51,9 @@ const BookingCell = ({
     <td
       key={room.id}
       className={classNames("text-center booking-table-cell-container", {
+        "booked-cell": booking,
         "bg-secondary text-white": booking || disabled,
-        "cursor-not-allowed": booking || disabled,
+        "cursor-not-allowed": disabled && !booking,
         "cursor-pointer": !booking,
         "bg-success-subtle text-success-emphasis": selected,
         "bg-success text-white": currentSelected,

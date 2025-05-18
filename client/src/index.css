@@ -624,8 +624,8 @@ button:not(:disabled),
   --bs-list-group-disabled-color: #6c757d;
   --bs-list-group-disabled-bg: #fff;
   --bs-list-group-active-color: #fff;
-  --bs-list-group-active-bg: #e91e63;
-  --bs-list-group-active-border-color: #e91e63;
+  --bs-list-group-active-bg: #344767;
+  --bs-list-group-active-border-color: #344767;
   display: flex;
   flex-direction: column;
   padding-left: 0;
@@ -2253,4 +2253,11 @@ p {
   80% {
     background-position: 0% 50%, 50% 50%, 100% 100%;
   }
+}
+
+.list-group-item.active {
+  z-index: 2;
+  color: var(--bs-list-group-active-color);
+  background-color: var(--bs-list-group-active-bg);
+  border-color: var(--bs-list-group-active-border-color);
 }

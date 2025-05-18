@@ -14,8 +14,12 @@ import { getRoomBookingsByDateRange } from "services/bookingService";
 
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
+import Popover from "components/commonUI/popover/Popover";
+import MinimalBookingCard from "components/bookings/BookingMinimalCard";
 
 import { formatCurrency } from "utils/currencyHelper";
+import { getColorForId } from "utils/colorHelper";
+import { cellColors } from "./constants";
 
 import { throttle } from "lodash";
 
@@ -36,7 +40,8 @@ dayjs.extend(isSameorBefore);
 
 const initialStartDate = dayjs().startOf("month").format("YYYY-MM-DD");
 const initialEndDate = dayjs().endOf("month").format("YYYY-MM-DD");
-const SCROLL_OFFSET_ROWS = 36;
+const SCROLL_OFFSET_ROWS = 66;
+const ROW_HEIGHT = 56.4;
 
 function CalendarView() {
   const { hotelId } = useParams();
@@ -63,8 +68,9 @@ function CalendarView() {
   const bookingMap = useMemo(() => {
     const map = {};
     roomBookings.forEach((booking) => {
-      const key = `${booking.date}-${booking.room.id}`;
-      map[key] = booking.price;
+      const bookingCopy = { ...booking };
+      const key = `${bookingCopy.date}-${bookingCopy.room.id}`;
+      map[key] = bookingCopy;
     });
     return map;
   }, [roomBookings]);
@@ -85,29 +91,54 @@ function CalendarView() {
         header: () => room.name,
         cell: (info) => {
           const date = info.row.original.date;
-          let price = bookingMap[`${date}-${room.id}`];
+          const booking = bookingMap[`${date}-${room.id}`];
+          const price = booking?.price;
+          const name = `${booking?.firstName} ${booking?.lastName}`;
+
+          if (!price) return "-";
           return (
-            <span
-              className={classNames("text-center", {
-                hasValue: Boolean(price),
-              })}>
-              {formatCurrency(price, "COP")}
-            </span>
+            <Popover
+              content={
+                <MinimalBookingCard
+                  bookingId={booking.bookingId}
+                  hotelId={hotelId}
+                />
+              }>
+              <div className="text-center cursor-pointer">
+                <p
+                  title={name}
+                  className="text-truncate m-0"
+                  style={{ maxWidth: 120 }}>
+                  {name}
+                </p>
+                <span className={`text-center cursor-pointer`}>
+                  {formatCurrency(price, "COP")}
+                </span>
+              </div>
+            </Popover>
           );
         },
-        size: 200,
+        size: 150,
+        meta: {
+          getDataAttributes: (info) => {
+            const date = info.row.original.date;
+            const booking = bookingMap[`${date}-${room.id}`];
+            return {
+              "data-booking-id": booking?.bookingId || "",
+            };
+          },
+        },
       })
     );
 
     return [dateColumn, ...roomColumns];
-  }, [rooms, bookingMap, columnHelper]);
+  }, [rooms, bookingMap, columnHelper, hotelId]);
 
   const table = useReactTable({
     data: dates,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    debugTable: true,
   });
 
   const onGetRoomsSuccess = (res) => {
@@ -148,7 +179,7 @@ function CalendarView() {
 
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    estimateSize: () => 42.4, //estimate row height for accurate scrollbar dragging
+    estimateSize: () => ROW_HEIGHT, //estimate row height for accurate scrollbar dragging
     getScrollElement: () => tableContainerRef.current,
     //measure dynamic row height, except in firefox because it measures table border height incorrectly
     measureElement:
@@ -180,7 +211,10 @@ function CalendarView() {
       .endOf("month")
       .add(1, "day")
       .format("YYYY-MM-DD");
-    const newEnd = dayjs(dateStart).endOf("month").format("YYYY-MM-DD");
+    const newEnd = dayjs(dateStart)
+      .endOf("month")
+      .add(1, "month")
+      .format("YYYY-MM-DD");
     setDateRange((prev) => ({
       ...prev,
       end: newEnd,
@@ -196,7 +230,10 @@ function CalendarView() {
       .startOf("month")
       .subtract(1, "day")
       .format("YYYY-MM-DD");
-    const newStart = dayjs(dateEnd).startOf("month").format("YYYY-MM-DD");
+    const newStart = dayjs(dateEnd)
+      .startOf("month")
+      .subtract(1, "month")
+      .format("YYYY-MM-DD");
 
     setDateRange((prev) => ({
       ...prev,
@@ -361,12 +398,20 @@ function CalendarView() {
                   }}>
                   {row.getVisibleCells().map((cell) => {
                     const isDateColumn = cell.column.id.includes("date");
+                    const dataAttributes =
+                      cell.column.columnDef.meta?.getDataAttributes(cell);
+                    const bookingId = dataAttributes?.["data-booking-id"];
+                    const bgColor = bookingId
+                      ? getColorForId(bookingId, cellColors)
+                      : "";
                     return (
                       <td
+                        data-booking-id={bookingId || undefined}
                         className={classNames(
-                          "text-center align-content-center justify-content-center calendar-cell",
+                          `text-center align-items-center justify-content-center calendar-cell p-1 ${bgColor}`,
                           {
                             "bg-dark text-white fw-bold": isDateColumn,
+                            "has-value": Boolean(bookingId),
                           }
                         )}
                         key={cell.id}
@@ -378,6 +423,8 @@ function CalendarView() {
                           maxWidth: cell.column.getSize(),
                           position: isDateColumn ? "sticky" : "static",
                           left: isDateColumn ? 0 : "auto",
+                          minHeight: ROW_HEIGHT,
+                          maxHeight: ROW_HEIGHT,
                         }}>
                         {flexRender(
                           cell.column.columnDef.cell,

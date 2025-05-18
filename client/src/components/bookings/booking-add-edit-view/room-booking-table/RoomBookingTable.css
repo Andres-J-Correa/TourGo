@@ -9,9 +9,7 @@
 }
 
 .booking-table-cell-container:hover {
-  background-color: var(
-    --bs-info-bg-subtle
-  ); /* Change background color on hover */
+  background-color: var(--bs-info-bg-subtle);
 }
 
 .booking-table-cell-container:hover .booking-table-cell-text {
@@ -32,4 +30,8 @@
   overflow: auto;
   max-height: 600px;
   position: relative;
+}
+
+.booked-cell:hover {
+  color: var(--bs-green) !important;
 }
