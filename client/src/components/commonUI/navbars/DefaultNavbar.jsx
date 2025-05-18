@@ -66,7 +66,7 @@ function DefaultNavbar({
   }, [navbarItems, user, leftCustomComponents, rightCustomComponents]);
 
   return (
-    <div style={{ zIndex: 5000, position: "relative" }}>
+    <div className="navbar-container">
       <Navbar expand="lg" className="shadow p-2 z-3">
         <NavbarBrand className="font-weight-bolder ms-sm-3">
           <Link
