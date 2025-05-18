@@ -22,6 +22,8 @@ import { setDefaultLocale, registerLocale } from "react-datepicker";
 import { es } from "date-fns/locale/es";
 
 import dayjs from "dayjs";
+import Footer from "components/commonUI/Footer";
+
 require("dayjs/locale/es"); // Import Spanish locale
 dayjs.locale("es");
 registerLocale("es", es);
@@ -63,6 +65,7 @@ const App = () => {
           <NavbarContainer />
           <Container className="mt-4">
             <Routes>{routes}</Routes>
+            <Footer />
           </Container>
         </GlobalErrorHandler>
       </Suspense>

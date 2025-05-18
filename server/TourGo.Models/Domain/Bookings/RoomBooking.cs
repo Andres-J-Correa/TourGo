@@ -13,5 +13,7 @@ namespace TourGo.Models.Domain.Bookings
 		public Room Room { get; set; }
         public int BookingId { get; set; }
         public decimal Price { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 	}
 }

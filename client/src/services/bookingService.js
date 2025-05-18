@@ -110,6 +110,23 @@ export const getPagedMinimalBookingsByDateRange = async (
   }
 };
 
+export const getMinimalById = async (bookingId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/${bookingId}/minimal`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
 export const getChargesByBookingId = async (bookingId) => {
   const config = {
     headers: {

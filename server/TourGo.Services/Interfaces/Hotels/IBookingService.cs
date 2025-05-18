@@ -15,6 +15,7 @@ namespace TourGo.Services.Interfaces
         Paged<BookingMinimal>? GetPaginatedByDateRange(int hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
                                                         string sortColumn, string sortDirection, DateOnly? startDate, DateOnly? endDate,
                                                         string? firstName, string? lastName, string? bookingExternalId);
+        BookingMinimal? GetBookingMinimal(int bookingId);
         List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, int hotelId);
