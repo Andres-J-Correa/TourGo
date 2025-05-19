@@ -11,6 +11,7 @@ using TourGo.Models.Domain;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Users;
+using TourGo.Models.Requests.Finances;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services.Interfaces.Hotels;
 
@@ -20,7 +21,7 @@ namespace TourGo.Services.Hotels
     {
         private readonly IMySqlDataProvider _mySqlDataProvider;
 
-        public HotelService(IWebAuthenticationService<int> authService, IMySqlDataProvider dataProvider)
+        public HotelService(IMySqlDataProvider dataProvider)
         {
             _mySqlDataProvider = dataProvider;
         }
@@ -197,29 +198,6 @@ namespace TourGo.Services.Hotels
             });
 
             return financePartners;
-        }
-
-        public List<TransactionSubcategory>? GetTransactionSubcategories(int hotelId)
-        {
-            string proc = "transaction_subcategories_select_by_hotel_id";
-            List<TransactionSubcategory>? transactionSubcategories = null;
-            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
-            {
-                param.AddWithValue("p_hotelId", hotelId);
-            }, (reader, set) =>
-            {
-                int index = 0;
-                TransactionSubcategory transactionSubcategory = new();
-                transactionSubcategory.Id = reader.GetSafeInt32(index++);
-                transactionSubcategory.Name = reader.GetSafeString(index++);
-                transactionSubcategory.CategoryId = reader.GetSafeInt32(index++);
-
-                transactionSubcategories ??= new List<TransactionSubcategory>();
-
-                transactionSubcategories.Add(transactionSubcategory);
-            });
-
-            return transactionSubcategories;
         }
 
         private static Hotel MapHotel(IDataReader reader, ref int index)

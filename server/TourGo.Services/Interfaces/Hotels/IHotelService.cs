@@ -1,6 +1,7 @@
 ﻿using TourGo.Models.Domain;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Requests.Finances;
 using TourGo.Models.Requests.Hotels;
 
 namespace TourGo.Services.Interfaces.Hotels
@@ -15,6 +16,5 @@ namespace TourGo.Services.Interfaces.Hotels
         void Delete(int id, int userId);
         List<Lookup>? GetPaymentMethods(int hotelId);
         List<Lookup>? GetFinancePartners(int hotelId);
-        List<TransactionSubcategory>? GetTransactionSubcategories(int hotelId);
     }
 }

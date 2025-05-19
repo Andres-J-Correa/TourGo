@@ -14,6 +14,7 @@ using TourGo.Web.Api.Extensions;
 using TourGo.Services.Interfaces;
 using TourGo.Models.Domain.Finances;
 using TourGo.Services.Finances;
+using TourGo.Models.Requests.Finances;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -35,6 +36,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _errorLoggingService = errorLoggingService;
         }
 
+        #region hotel
         [HttpPost]
         public ActionResult<ItemResponse<int>> Create(HotelAddRequest model)
         {
@@ -209,7 +211,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return StatusCode(code, response);
         }
+        #endregion
 
+        #region payment methods
         [HttpGet("{id:int}/payment-methods")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
         public ActionResult<ItemsResponse<Lookup>> GetPaymentMethods(int id)
@@ -239,7 +243,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return result;
         }
+        #endregion
 
+        #region FinancePartners
         [HttpGet("{id:int}/finance-partners")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
         public ActionResult<ItemsResponse<Lookup>> GetFinancePartners(int id)
@@ -269,36 +275,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return result;
         }
-
-        [HttpGet("{id:int}/transaction-subcategories")]
-        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemsResponse<TransactionSubcategory>> GetTransactionSubcategories(int id)
-        {
-            ObjectResult result = null;
-
-            try
-            {
-                List<TransactionSubcategory>? transactionSubcategories = _hotelService.GetTransactionSubcategories(id);
-
-                if (transactionSubcategories == null)
-                {
-                    result = NotFound("No transaction subcategories found for the given hotel ID.");
-                }
-                else
-                {
-                    ItemsResponse<TransactionSubcategory> response = new ItemsResponse<TransactionSubcategory> { Items = transactionSubcategories };
-                    result = Ok(response);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                ErrorResponse response = new ErrorResponse();
-                result = StatusCode(500, response);
-            }
-
-            return result;
-        }
-
+        #endregion
     }
 }

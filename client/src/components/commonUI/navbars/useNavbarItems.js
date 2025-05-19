@@ -19,14 +19,20 @@ export const useNavbarItems = () => {
       capitalize: true,
       collapse: [
         {
-          name: "Registra un alojamiento",
-          path: "/hotels/add",
+          name: "Accesos directos",
           capitalize: true,
-        },
-        {
-          name: "Lista de alojamientos",
-          path: "/hotels",
-          capitalize: true,
+          collapse: [
+            {
+              name: "Registra un alojamiento",
+              path: "/hotels/add",
+              capitalize: true,
+            },
+            {
+              name: "Lista de alojamientos",
+              path: "/hotels",
+              capitalize: true,
+            },
+          ],
         },
       ],
     },
@@ -43,14 +49,20 @@ export const useNavbarItems = () => {
         capitalize: true,
         collapse: [
           {
-            name: "Nueva Reserva",
-            path: `/hotels/${hotel.current.id}/bookings/new`,
+            name: "Accesos directos",
             capitalize: true,
-          },
-          {
-            name: "Lista de Reservas",
-            path: `/hotels/${hotel.current.id}/bookings`,
-            capitalize: true,
+            collapse: [
+              {
+                name: "Nueva Reserva",
+                path: `/hotels/${hotel.current.id}/bookings/new`,
+                capitalize: true,
+              },
+              {
+                name: "Lista de Reservas",
+                path: `/hotels/${hotel.current.id}/bookings`,
+                capitalize: true,
+              },
+            ],
           },
         ],
       },
@@ -62,22 +74,48 @@ export const useNavbarItems = () => {
         capitalize: true,
       },
       {
-        name: "Alojamiento",
+        name: "Gestionar Detalles",
         icon: faBed,
         position: "left",
         capitalize: true,
         collapse: [
           {
-            name: "Habitaciones",
-            position: "left",
-            path: `/hotels/${hotel.current.id}/rooms`,
+            name: "Alojamiento y Cargos",
             capitalize: true,
+            collapse: [
+              {
+                name: "Habitaciones",
+                path: `/hotels/${hotel.current.id}/rooms`,
+                capitalize: true,
+              },
+              {
+                name: "Cargos Extra",
+                path: `/hotels/${hotel.current.id}/extra-charges`,
+                capitalize: true,
+              },
+            ],
           },
+
           {
-            name: "Cargos Extra",
-            position: "left",
-            path: `/hotels/${hotel.current.id}/extra-charges`,
+            name: "Financieros",
             capitalize: true,
+            collapse: [
+              {
+                name: "Metodos de Pago",
+                path: `/hotels/${hotel.current.id}/payment-methods`,
+                capitalize: true,
+              },
+              {
+                name: "Socios financieros",
+                path: `/hotels/${hotel.current.id}/financial-partners`,
+                capitalize: true,
+              },
+              {
+                name: "Subcategorias de Transacciones",
+                path: `/hotels/${hotel.current.id}/transaction-subcategories`,
+                capitalize: true,
+              },
+            ],
           },
         ],
       },
@@ -105,17 +143,6 @@ export const useNavbarItems = () => {
           {
             name: "Panel de Finanzas",
             path: `/hotels/${hotel.current.id}/finances`,
-            capitalize: true,
-          },
-          {
-            name: "Metodos de Pago",
-            path: `/hotels/${hotel.current.id}/payment-methods`,
-            capitalize: true,
-          },
-          {
-            name: "Socios financieros",
-            position: "left",
-            path: `/hotels/${hotel.current.id}/financial-partners`,
             capitalize: true,
           },
         ],

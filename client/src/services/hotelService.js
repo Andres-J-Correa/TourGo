@@ -186,20 +186,3 @@ export const getFinancePartners = async (hotelId) => {
     return onGlobalError(error);
   }
 };
-
-export const getTransactionSubcategories = async (hotelId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/${hotelId}/transaction-subcategories`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
