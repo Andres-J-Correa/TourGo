@@ -76,6 +76,7 @@ function BookingFilters({
               handleStartChange={handleDateChange("start")}
               handleEndChange={handleDateChange("end")}
               isDisabled={loading}
+              allowSameDay={true}
             />
           </Col>
           <Col className="px-0 align-content-center" lg={4} xl={12}>

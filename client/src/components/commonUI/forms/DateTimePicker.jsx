@@ -34,6 +34,7 @@ const CustomDateTimePicker = ({ isRequired, ...props }) => {
         autoComplete="off"
         popperClassName="custom-datepicker"
         style={{ height: "58px" }}
+        timeCaption="Hora"
       />
       {isRequired && (
         <div

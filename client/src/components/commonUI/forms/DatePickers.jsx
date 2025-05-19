@@ -15,7 +15,14 @@ const DatePickers = ({
   handleEndChange = () => {},
   maxDate,
   isDisabled,
+  allowSameDay = false,
 }) => {
+  const endDateMinDate = allowSameDay
+    ? startDate
+    : startDate
+    ? dayjs(startDate).add(1, "day").toDate()
+    : null;
+
   const onStartDateChange = (date) => {
     if (date) {
       handleStartChange(getDate(date));
@@ -60,7 +67,7 @@ const DatePickers = ({
           selected={endDate}
           onChange={onEndDateChange}
           dateFormat="dd-MM-yyyy"
-          minDate={startDate ? dayjs(startDate).add(1, "day").toDate() : null}
+          minDate={endDateMinDate}
           maxDate={getDate(maxDate)}
           disabled={!startDate || isDisabled}
           className="form-control"
