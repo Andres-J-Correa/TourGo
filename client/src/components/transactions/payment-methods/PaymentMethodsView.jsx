@@ -35,9 +35,9 @@ import dayjs from "dayjs";
 import {
   add,
   deleteById,
-  getFinancePartnersByHotelId,
+  getPaymentMethodsByHotelId,
   updateById,
-} from "services/financePartnerService";
+} from "services/paymentMethodService";
 import { useAppContext } from "contexts/GlobalAppContext";
 
 // Components
@@ -54,10 +54,10 @@ const validationSchema = Yup.object().shape({
     .required("El nombre es requerido"),
 });
 
-function FinancePartnersView() {
+function PaymentMethodsView() {
   const { hotelId } = useParams();
   const { user } = useAppContext();
-  const [financePartners, setFinancePartners] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -76,13 +76,13 @@ function FinancePartnersView() {
   const filteredData = useMemo(() => {
     switch (isActiveFilter) {
       case "active":
-        return financePartners.filter((item) => item.isActive === true);
+        return paymentMethods.filter((item) => item.isActive === true);
       case "inactive":
-        return financePartners.filter((item) => item.isActive === false);
+        return paymentMethods.filter((item) => item.isActive === false);
       default:
-        return financePartners;
+        return paymentMethods;
     }
-  }, [financePartners, isActiveFilter]);
+  }, [paymentMethods, isActiveFilter]);
 
   const toggleForm = useCallback(() => {
     let isHiding = false;
@@ -91,7 +91,7 @@ function FinancePartnersView() {
       return !prev;
     });
     if (isHiding) {
-      setInitialValues({ name: "" });
+      setInitialValues({ name: "", categoryId: "" });
     }
   }, []);
 
@@ -107,9 +107,9 @@ function FinancePartnersView() {
     const { id, ...data } = values;
 
     const result = await Swal.fire({
-      title: `¿Está seguro de que desea ${
+      title: `Está seguro de que desea ${
         id ? "actualizar" : "agregar"
-      } el socio financiero?`,
+      } el método de pago?`,
       text: id
         ? "Esta acción puede afectar transacciones existentes."
         : "Revise los datos antes de continuar.",
@@ -127,7 +127,7 @@ function FinancePartnersView() {
 
     try {
       Swal.fire({
-        title: "Guardando socio financiero",
+        title: "Guardando método de pago",
         text: "Por favor espera",
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
@@ -136,7 +136,7 @@ function FinancePartnersView() {
       setIsUploading(true);
       let response;
       if (values.id) {
-        response = await updateById(values);
+        response = await updateById(values, id);
       } else {
         response = await add(values, hotelId);
       }
@@ -145,7 +145,7 @@ function FinancePartnersView() {
 
       if (response?.isSuccessful) {
         if (id) {
-          setFinancePartners((prev) => {
+          setPaymentMethods((prev) => {
             const copyOfPrev = [...prev];
             const index = copyOfPrev.findIndex((item) => item.id === id);
             if (index !== -1) {
@@ -162,7 +162,7 @@ function FinancePartnersView() {
             return prev;
           });
         } else {
-          setFinancePartners((prev) => [
+          setPaymentMethods((prev) => [
             ...prev,
             {
               ...data,
@@ -182,31 +182,31 @@ function FinancePartnersView() {
         toggleForm();
         await Swal.fire({
           icon: "success",
-          title: "Socio financiero guardado",
-          text: "El socio financiero se ha guardado correctamente",
+          title: "Método de pago guardado",
+          text: "El método de pago se ha guardado correctamente",
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
         });
       } else {
-        throw new Error("Error al guardar el socio financiero");
+        throw new Error("Error al guardar el método de pago");
       }
     } catch (error) {
       Swal.close(); // Close loading
       await Swal.fire({
         icon: "error",
         title: "Error",
-        text: "No se pudo guardar el socio financiero, intente nuevamente.",
+        text: "No se pudo guardar el método de pago, intente nuevamente.",
       });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleUpdateClick = (financePartner) => {
+  const handleUpdateClick = (paymentMethod) => {
     setInitialValues({
-      id: financePartner.id,
-      name: financePartner.name,
+      id: paymentMethod.id,
+      name: paymentMethod.name,
     });
     setShowForm(true);
   };
@@ -215,7 +215,7 @@ function FinancePartnersView() {
     async (id) => {
       const result = await Swal.fire({
         title: "¿Está seguro?",
-        text: "¡No podrás revertir esto!",
+        text: "No podrás revertir esto!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Sí, eliminar",
@@ -229,7 +229,7 @@ function FinancePartnersView() {
       try {
         setIsUploading(true);
         Swal.fire({
-          title: "Eliminando el socio financiero",
+          title: "Eliminando el método de pago",
           text: "Por favor espera",
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
@@ -237,7 +237,7 @@ function FinancePartnersView() {
 
         const response = await deleteById(id);
         if (response.isSuccessful) {
-          setFinancePartners((prev) => {
+          setPaymentMethods((prev) => {
             const copyOfPrev = [...prev];
             const index = copyOfPrev.findIndex((item) => item.id === id);
             if (index !== -1) {
@@ -255,8 +255,8 @@ function FinancePartnersView() {
           });
           await Swal.fire({
             icon: "success",
-            title: "Socio financiero eliminado",
-            text: "El socio financiero se ha eliminado correctamente",
+            title: "Método de pago eliminado",
+            text: "El método de pago se ha eliminado correctamente",
             timer: 1500,
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -267,7 +267,7 @@ function FinancePartnersView() {
         await Swal.fire({
           icon: "error",
           title: "Error",
-          text: "No se pudo eliminar el socio financiero, intente nuevamente.",
+          text: "No se pudo eliminar el método de pago, intente nuevamente.",
         });
       } finally {
         setIsUploading(false);
@@ -325,23 +325,23 @@ function FinancePartnersView() {
         header: "Acciones",
         enableSorting: false,
         cell: (info) => {
-          const financePartner = info.row.original;
+          const paymentMethod = info.row.original;
           return (
             <>
-              {financePartner.isActive && (
+              {paymentMethod.isActive && (
                 <div>
                   <Button
                     color="info"
                     size="sm"
                     className="me-2"
-                    onClick={() => handleUpdateClick(financePartner)}>
+                    onClick={() => handleUpdateClick(paymentMethod)}>
                     Editar
                   </Button>
                   <Button
                     color="danger"
                     size="sm"
                     className="btn-sm"
-                    onClick={() => handleDeleteClick(financePartner.id)}>
+                    onClick={() => handleDeleteClick(paymentMethod.id)}>
                     Eliminar
                   </Button>
                 </div>
@@ -365,23 +365,23 @@ function FinancePartnersView() {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const onGetFinancePartnersSuccess = (response) => {
+  const onGetPaymentMethodsSuccess = (response) => {
     if (response.isSuccessful) {
-      setFinancePartners(response.items);
+      setPaymentMethods(response.items);
     }
   };
 
-  const onGetFinancePartnersError = (error) => {
+  const onGetPaymentMethodsError = (error) => {
     if (error?.response?.status !== 404) {
-      toast.error("Error al cargar los socios financieros");
+      toast.error("Error al cargar los métodos de pago");
     }
   };
 
   useEffect(() => {
     setLoading(true);
-    getFinancePartnersByHotelId(hotelId)
-      .then(onGetFinancePartnersSuccess)
-      .catch(onGetFinancePartnersError)
+    getPaymentMethodsByHotelId(hotelId)
+      .then(onGetPaymentMethodsSuccess)
+      .catch(onGetPaymentMethodsError)
       .finally(() => {
         setLoading(false);
       });
@@ -389,18 +389,18 @@ function FinancePartnersView() {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Socios Financieros" />
+      <Breadcrumb breadcrumbs={breadcrumbs} active="Métodos de Pago" />
       <ErrorBoundary>
         <LoadingOverlay isVisible={loading} />
-        <h3>Socios Financieros</h3>
+        <h3>Métodos de Pago</h3>
 
         {showForm && (
           <Card className="border-0 shadow-lg mt-3">
             <CardBody className="p-3">
               <CardTitle tag="h5">
                 {initialValues.id
-                  ? "Editar socio financiero"
-                  : "Nuevo socio financiero"}
+                  ? "Editar método de pago"
+                  : "Nuevo método de pago"}
               </CardTitle>
               <Formik
                 initialValues={initialValues}
@@ -416,7 +416,7 @@ function FinancePartnersView() {
                           name="name"
                           type="text"
                           className="form-control"
-                          placeholder="Nombre del socio financiero"
+                          placeholder="Nombre del método de pago"
                           isRequired={true}
                         />
                       </Col>
@@ -425,14 +425,7 @@ function FinancePartnersView() {
                         <div className="text-center">
                           <Button
                             disabled={
-                              isUploading ||
-                              isEqual(
-                                { ...values, name: values.name.trim() },
-                                {
-                                  ...initialValues,
-                                  name: initialValues.name.trim(),
-                                }
-                              )
+                              isUploading || isEqual(values, initialValues)
                             }
                             type="submit"
                             className="btn bg-success text-white mb-3">
@@ -455,7 +448,7 @@ function FinancePartnersView() {
         )}
         <div className="mt-4">
           <Button color={showForm ? "warning" : "dark"} onClick={toggleForm}>
-            {showForm ? "Cancelar" : "Agregar Socio Financiero"}
+            {showForm ? "Cancelar" : "Agregar Método de Pago"}
           </Button>
         </div>
         <div className="mb-3 float-end">
@@ -529,4 +522,4 @@ function FinancePartnersView() {
   );
 }
 
-export default FinancePartnersView;
+export default PaymentMethodsView;
