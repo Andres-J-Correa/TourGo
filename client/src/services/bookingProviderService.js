@@ -5,9 +5,9 @@ import {
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-const api = `${API_HOST_PREFIX}/payment-methods`;
+const api = `${API_HOST_PREFIX}/booking-providers`;
 
-export const getPaymentMethodsMinimalByHotelId = async (hotelId) => {
+export const getBookingProvidersMinimalByHotelId = async (hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
@@ -24,7 +24,7 @@ export const getPaymentMethodsMinimalByHotelId = async (hotelId) => {
   }
 };
 
-export const getPaymentMethodsByHotelId = async (hotelId) => {
+export const getBookingProvidersByHotelId = async (hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",

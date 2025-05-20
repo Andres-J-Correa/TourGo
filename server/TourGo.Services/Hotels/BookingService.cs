@@ -261,7 +261,7 @@ namespace TourGo.Services.Hotels
 
         public List<Lookup>? GetBookingProviders(int hotelId)
         {
-            string proc = "booking_providers_select_by_hotel_id";
+            string proc = "booking_providers_select_minimal_by_hotel_id";
             List<Lookup>? providers = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

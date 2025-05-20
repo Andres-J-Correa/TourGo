@@ -59,6 +59,11 @@ const hotelRoutes = [
       import("components/commonUI/fallback/SiteUnderConstruction")
     ),
   },
+  {
+    name: "bookingProviders",
+    path: "/hotels/:hotelId/booking-providers",
+    component: lazy(() => import("components/bookings/BookingProvidersView")),
+  },
 ];
 
 const roomRoutes = [

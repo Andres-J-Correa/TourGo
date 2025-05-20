@@ -17,5 +17,6 @@ namespace TourGo.Models.Enums
         Invoices = 7,
         TransactionSubcategories = 8,
         PaymentMethods = 9,
+        BookingProviders = 10,
     }
 }
