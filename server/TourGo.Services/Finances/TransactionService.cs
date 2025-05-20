@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TourGo.Data;
 using TourGo.Data.Providers;
+using TourGo.Models;
 using TourGo.Models.Domain;
+using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Enums.Transactions;
@@ -87,6 +89,62 @@ namespace TourGo.Services.Finances
             return transactions;
         }
 
+        public Paged<Transaction>? GetPaginated(int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
+            DateTime? startDate, DateTime? endDate, int? id, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
+            string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
+        {
+            string proc = "transactions_select_paginated";
+            Paged<Transaction>? paged = null;
+            List<Transaction>? transactions = null;
+            int totalCount = 0;
+
+            _dataProvider.ExecuteCmd(proc, (col) =>
+            {
+                col.AddWithValue("p_pageIndex", pageIndex);
+                col.AddWithValue("p_pageSize", pageSize);
+
+                col.AddWithValue("p_sortColumn", string.IsNullOrEmpty(sortColumn) ? DBNull.Value: sortColumn);
+                col.AddWithValue("p_sortDirection", string.IsNullOrEmpty(sortDirection) ? DBNull.Value : sortDirection);
+                col.AddWithValue("p_startDate", startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
+                col.AddWithValue("p_endDate", endDate.HasValue ? endDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
+                col.AddWithValue("p_id", id > 0 ? id : DBNull.Value);
+                col.AddWithValue("p_parentId", parentId > 0 ? parentId : DBNull.Value);
+                col.AddWithValue("p_entityId", entityId > 0 ? entityId : DBNull.Value);
+                col.AddWithValue("p_categoryId", categoryId > 0 ? categoryId : DBNull.Value);
+                col.AddWithValue("p_statusId", statusId > 0 ? statusId : DBNull.Value);
+                col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(referenceNumber) ? DBNull.Value : referenceNumber);
+                col.AddWithValue("p_description", string.IsNullOrEmpty(description) ? DBNull.Value : description);
+                col.AddWithValue("p_hasDocumentUrl", hasDocumentUrl.HasValue ? hasDocumentUrl.Value : DBNull.Value);
+                col.AddWithValue("p_paymentMethodId", paymentMethodId > 0 ? paymentMethodId : DBNull.Value);
+                col.AddWithValue("p_subcategoryId", subcategoryId > 0 ? subcategoryId : DBNull.Value);
+                col.AddWithValue("p_financePartnerId", financePartnerId > 0 ? financePartnerId : DBNull.Value);
+                }, (reader, returnCol) =>
+                {
+                    int index = 0;
+                    Transaction transaction = MapTransaction(reader, ref index);
+
+                    if (totalCount == 0)
+                    {
+                        totalCount = reader.GetSafeInt32(index++);
+                    }
+
+                    transactions ??= new List<Transaction>();
+                    transactions.Add(transaction);
+                });
+
+            if(transactions != null)
+            {
+                paged = new Paged<Transaction>(
+                        transactions,
+                        pageIndex,
+                        pageSize,
+                        totalCount
+                        );
+            }
+
+            return paged;
+        }
+
         public void UpdateDocumentUrl (int transactionId, string fileKey)
         {
 
@@ -124,6 +182,17 @@ namespace TourGo.Services.Finances
             string date = DateTime.UtcNow.ToString("yyyy-MM-dd");
             string fileKey = $"{folder}/transaction-{model.Id}-date-{date}{fileExtension}";
             return fileKey;
+        }
+
+        public bool IsValidSortDirection(string? direction)
+        {
+            return string.Equals(direction, "ASC", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(direction, "DESC", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool IsValidSortColumn(string? column)
+        {
+            return !string.IsNullOrWhiteSpace(column) && TransactionSortColumns.ContainsKey(column);
         }
 
         private string GetFolderName (TransactionCategoryEnum category)
@@ -197,5 +266,22 @@ namespace TourGo.Services.Finances
 
             return transaction;
         }
+
+        private readonly Dictionary<string, string> TransactionSortColumns = new(StringComparer.OrdinalIgnoreCase)
+        {
+            {"Id", "t.Id"},
+            {"ParentId", "t.ParentId"},
+            {"EntityId", "t.EntityId"},
+            {"Amount", "t.Amount"},
+            {"TransactionDate", "t.TransactionDate"},
+            {"DateCreated", "t.DateCreated"},
+            {"CategoryId", "t.CategoryId"},
+            {"StatusId", "t.StatusId"},
+            {"ReferenceNumber", "t.ReferenceNumber"},
+            {"Description", "t.Description"},
+            {"PaymentMethodName", "pm.Name"},
+            {"TransactionStatusName", "tsc.Name"},
+            {"FinancePartnerName", "fp.Name"}
+        };
     }
 }
