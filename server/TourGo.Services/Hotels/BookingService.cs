@@ -36,7 +36,7 @@ namespace TourGo.Services.Hotels
 
         public Booking? GetById(int id)
         {
-            string proc = "bookings_select_details_by_id";
+            string proc = "bookings_select_details_by_id_v2";
             Booking? booking = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

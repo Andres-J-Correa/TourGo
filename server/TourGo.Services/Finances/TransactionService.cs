@@ -67,8 +67,8 @@ namespace TourGo.Services.Finances
         public List<Transaction>? GetByEntityId (int entityId)
         {
 
-            string proc = "transactions_select_by_entity_id";
-            List<Transaction> transactions = null;
+            string proc = "transactions_select_by_entity_id_v2";
+            List<Transaction>? transactions = null;
 
             _dataProvider.ExecuteCmd(proc, (col) =>
             {
@@ -147,38 +147,53 @@ namespace TourGo.Services.Finances
 
             transaction.Id = reader.GetSafeInt32(index++);
             transaction.ParentId = reader.GetSafeInt32(index++);
+            transaction.EntityId = reader.GetSafeInt32(index++);
             transaction.Amount = reader.GetSafeDecimal(index++);
             transaction.TransactionDate = reader.GetSafeDateTime(index++);
             transaction.DateCreated = reader.GetSafeDateTime(index++);
-            transaction.CreatedBy = new UserBase();
+            transaction.CategoryId = reader.GetSafeInt32(index++);
+            transaction.StatusId = reader.GetSafeInt32(index++);
+            transaction.ReferenceNumber = reader.GetSafeString(index++);
+            transaction.Description = reader.GetSafeString(index++);
+            transaction.CurrencyCode = reader.GetSafeString(index++);
+            transaction.HasDocumentUrl = reader.GetSafeBool(index++);
+
+
             transaction.CreatedBy.Id = reader.GetSafeInt32(index++);
             transaction.CreatedBy.FirstName = reader.GetSafeString(index++);
             transaction.CreatedBy.LastName = reader.GetSafeString(index++);
-            transaction.PaymentMethod = new Lookup();
             transaction.PaymentMethod.Id = reader.GetSafeInt32(index++);
             transaction.PaymentMethod.Name = reader.GetSafeString(index++);
-            transaction.Category = new Lookup();
-            transaction.Category.Id = reader.GetSafeInt32(index++);
-            transaction.Category.Name = reader.GetSafeString(index++);
-            transaction.Subcategory = new Lookup();
-            transaction.Subcategory.Id = reader.GetSafeInt32(index++);
-            transaction.Subcategory.Name = reader.GetSafeString(index++);
-            transaction.ReferenceNumber = reader.GetSafeString(index++);
-            transaction.Status = new Lookup();
-            transaction.Status.Id = reader.GetSafeInt32(index++);
-            transaction.Status.Name = reader.GetSafeString(index++);
-            transaction.Description = reader.GetSafeString(index++);
-            transaction.ApprovedBy = new UserBase();
+
+            int subcategoryId = reader.GetSafeInt32(index++);
+            if(subcategoryId > 0)
+            {
+                transaction.Subcategory = new Lookup();
+                transaction.Subcategory.Id = subcategoryId;
+                transaction.Subcategory.Name = reader.GetSafeString(index++);
+            }
+            else
+            {
+                transaction.Subcategory = null;
+                index++;
+            }
             transaction.ApprovedBy.Id = reader.GetSafeInt32(index++);
             transaction.ApprovedBy.FirstName = reader.GetSafeString(index++);
             transaction.ApprovedBy.LastName = reader.GetSafeString(index++);
-            transaction.CurrencyCode = reader.GetSafeString(index++);
-            transaction.HotelId = reader.GetSafeInt32(index++);
-            transaction.FinancePartner = new Lookup();
-            transaction.FinancePartner.Id = reader.GetSafeInt32(index++);
-            transaction.FinancePartner.Name = reader.GetSafeString(index++);
-            transaction.EntityId = reader.GetSafeInt32(index++);
-            transaction.HasDocumentUrl = reader.GetSafeBool(index++);
+
+            int financePartnerId = reader.GetSafeInt32(index++);
+
+            if (financePartnerId > 0)
+            {
+                transaction.FinancePartner = new Lookup();
+                transaction.FinancePartner.Id = financePartnerId;
+                transaction.FinancePartner.Name = reader.GetSafeString(index++);
+            }
+            else
+            {
+                transaction.FinancePartner = null;
+                index++;
+            }
 
             return transaction;
         }

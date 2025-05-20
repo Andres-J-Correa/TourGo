@@ -37,22 +37,12 @@ export const sanitizeNewTransaction = (
   financePartners
 ) => ({
   ...transaction,
+  statusId: Number(transaction.statusId),
+  categoryId: Number(transaction.categoryId),
   paymentMethod: {
     id: Number(transaction.paymentMethodId),
     name: paymentMethods.find(
       (pm) => Number(pm.id) === Number(transaction.paymentMethodId)
-    )?.name,
-  },
-  status: {
-    id: Number(transaction.statusId),
-    name: transactionStatuses.find(
-      (s) => Number(s.id) === Number(transaction.statusId)
-    )?.name,
-  },
-  category: {
-    id: Number(transaction.categoryId),
-    name: transactionCategories.find(
-      (c) => Number(c.id) === Number(transaction.categoryId)
     )?.name,
   },
   subcategory: {
