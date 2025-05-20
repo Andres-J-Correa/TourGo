@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TourGo.Data;
 using TourGo.Data.Providers;
+using TourGo.Models;
 using TourGo.Models.Domain;
+using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Enums.Transactions;
@@ -67,8 +69,8 @@ namespace TourGo.Services.Finances
         public List<Transaction>? GetByEntityId (int entityId)
         {
 
-            string proc = "transactions_select_by_entity_id";
-            List<Transaction> transactions = null;
+            string proc = "transactions_select_by_entity_id_v2";
+            List<Transaction>? transactions = null;
 
             _dataProvider.ExecuteCmd(proc, (col) =>
             {
@@ -85,6 +87,62 @@ namespace TourGo.Services.Finances
             });
 
             return transactions;
+        }
+
+        public Paged<Transaction>? GetPaginated(int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
+            DateTime? startDate, DateTime? endDate, int? id, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
+            string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
+        {
+            string proc = "transactions_select_paginated";
+            Paged<Transaction>? paged = null;
+            List<Transaction>? transactions = null;
+            int totalCount = 0;
+
+            _dataProvider.ExecuteCmd(proc, (col) =>
+            {
+                col.AddWithValue("p_pageIndex", pageIndex);
+                col.AddWithValue("p_pageSize", pageSize);
+
+                col.AddWithValue("p_sortColumn", string.IsNullOrEmpty(sortColumn) ? DBNull.Value: sortColumn);
+                col.AddWithValue("p_sortDirection", string.IsNullOrEmpty(sortDirection) ? DBNull.Value : sortDirection);
+                col.AddWithValue("p_startDate", startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
+                col.AddWithValue("p_endDate", endDate.HasValue ? endDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
+                col.AddWithValue("p_id", id > 0 ? id : DBNull.Value);
+                col.AddWithValue("p_parentId", parentId > 0 ? parentId : DBNull.Value);
+                col.AddWithValue("p_entityId", entityId > 0 ? entityId : DBNull.Value);
+                col.AddWithValue("p_categoryId", categoryId > 0 ? categoryId : DBNull.Value);
+                col.AddWithValue("p_statusId", statusId > 0 ? statusId : DBNull.Value);
+                col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(referenceNumber) ? DBNull.Value : referenceNumber);
+                col.AddWithValue("p_description", string.IsNullOrEmpty(description) ? DBNull.Value : description);
+                col.AddWithValue("p_hasDocumentUrl", hasDocumentUrl.HasValue ? hasDocumentUrl.Value : DBNull.Value);
+                col.AddWithValue("p_paymentMethodId", paymentMethodId > 0 ? paymentMethodId : DBNull.Value);
+                col.AddWithValue("p_subcategoryId", subcategoryId > 0 ? subcategoryId : DBNull.Value);
+                col.AddWithValue("p_financePartnerId", financePartnerId > 0 ? financePartnerId : DBNull.Value);
+                }, (reader, returnCol) =>
+                {
+                    int index = 0;
+                    Transaction transaction = MapTransaction(reader, ref index);
+
+                    if (totalCount == 0)
+                    {
+                        totalCount = reader.GetSafeInt32(index++);
+                    }
+
+                    transactions ??= new List<Transaction>();
+                    transactions.Add(transaction);
+                });
+
+            if(transactions != null)
+            {
+                paged = new Paged<Transaction>(
+                        transactions,
+                        pageIndex,
+                        pageSize,
+                        totalCount
+                        );
+            }
+
+            return paged;
         }
 
         public void UpdateDocumentUrl (int transactionId, string fileKey)
@@ -126,6 +184,17 @@ namespace TourGo.Services.Finances
             return fileKey;
         }
 
+        public bool IsValidSortDirection(string? direction)
+        {
+            return string.Equals(direction, "ASC", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(direction, "DESC", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool IsValidSortColumn(string? column)
+        {
+            return !string.IsNullOrWhiteSpace(column) && TransactionSortColumns.ContainsKey(column);
+        }
+
         private string GetFolderName (TransactionCategoryEnum category)
         {
             switch (category)
@@ -147,40 +216,72 @@ namespace TourGo.Services.Finances
 
             transaction.Id = reader.GetSafeInt32(index++);
             transaction.ParentId = reader.GetSafeInt32(index++);
+            transaction.EntityId = reader.GetSafeInt32(index++);
             transaction.Amount = reader.GetSafeDecimal(index++);
             transaction.TransactionDate = reader.GetSafeDateTime(index++);
             transaction.DateCreated = reader.GetSafeDateTime(index++);
-            transaction.CreatedBy = new UserBase();
+            transaction.CategoryId = reader.GetSafeInt32(index++);
+            transaction.StatusId = reader.GetSafeInt32(index++);
+            transaction.ReferenceNumber = reader.GetSafeString(index++);
+            transaction.Description = reader.GetSafeString(index++);
+            transaction.CurrencyCode = reader.GetSafeString(index++);
+            transaction.HasDocumentUrl = reader.GetSafeBool(index++);
+
+
             transaction.CreatedBy.Id = reader.GetSafeInt32(index++);
             transaction.CreatedBy.FirstName = reader.GetSafeString(index++);
             transaction.CreatedBy.LastName = reader.GetSafeString(index++);
-            transaction.PaymentMethod = new Lookup();
             transaction.PaymentMethod.Id = reader.GetSafeInt32(index++);
             transaction.PaymentMethod.Name = reader.GetSafeString(index++);
-            transaction.Category = new Lookup();
-            transaction.Category.Id = reader.GetSafeInt32(index++);
-            transaction.Category.Name = reader.GetSafeString(index++);
-            transaction.Subcategory = new Lookup();
-            transaction.Subcategory.Id = reader.GetSafeInt32(index++);
-            transaction.Subcategory.Name = reader.GetSafeString(index++);
-            transaction.ReferenceNumber = reader.GetSafeString(index++);
-            transaction.Status = new Lookup();
-            transaction.Status.Id = reader.GetSafeInt32(index++);
-            transaction.Status.Name = reader.GetSafeString(index++);
-            transaction.Description = reader.GetSafeString(index++);
-            transaction.ApprovedBy = new UserBase();
+
+            int subcategoryId = reader.GetSafeInt32(index++);
+            if(subcategoryId > 0)
+            {
+                transaction.Subcategory = new Lookup();
+                transaction.Subcategory.Id = subcategoryId;
+                transaction.Subcategory.Name = reader.GetSafeString(index++);
+            }
+            else
+            {
+                transaction.Subcategory = null;
+                index++;
+            }
             transaction.ApprovedBy.Id = reader.GetSafeInt32(index++);
             transaction.ApprovedBy.FirstName = reader.GetSafeString(index++);
             transaction.ApprovedBy.LastName = reader.GetSafeString(index++);
-            transaction.CurrencyCode = reader.GetSafeString(index++);
-            transaction.HotelId = reader.GetSafeInt32(index++);
-            transaction.FinancePartner = new Lookup();
-            transaction.FinancePartner.Id = reader.GetSafeInt32(index++);
-            transaction.FinancePartner.Name = reader.GetSafeString(index++);
-            transaction.EntityId = reader.GetSafeInt32(index++);
-            transaction.HasDocumentUrl = reader.GetSafeBool(index++);
+
+            int financePartnerId = reader.GetSafeInt32(index++);
+
+            if (financePartnerId > 0)
+            {
+                transaction.FinancePartner = new Lookup();
+                transaction.FinancePartner.Id = financePartnerId;
+                transaction.FinancePartner.Name = reader.GetSafeString(index++);
+            }
+            else
+            {
+                transaction.FinancePartner = null;
+                index++;
+            }
 
             return transaction;
         }
+
+        private readonly Dictionary<string, string> TransactionSortColumns = new(StringComparer.OrdinalIgnoreCase)
+        {
+            {"Id", "t.Id"},
+            {"ParentId", "t.ParentId"},
+            {"EntityId", "t.EntityId"},
+            {"Amount", "t.Amount"},
+            {"TransactionDate", "t.TransactionDate"},
+            {"DateCreated", "t.DateCreated"},
+            {"CategoryId", "t.CategoryId"},
+            {"StatusId", "t.StatusId"},
+            {"ReferenceNumber", "t.ReferenceNumber"},
+            {"Description", "t.Description"},
+            {"PaymentMethodName", "pm.Name"},
+            {"TransactionStatusName", "tsc.Name"},
+            {"FinancePartnerName", "fp.Name"}
+        };
     }
 }

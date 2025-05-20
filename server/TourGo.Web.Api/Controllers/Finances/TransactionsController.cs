@@ -13,6 +13,8 @@ using TourGo.Models.Requests;
 using TourGo.Models.Enums.Transactions;
 using Microsoft.Extensions.Caching.Memory;
 using TourGo.Models.Domain;
+using TourGo.Models;
+using TourGo.Services.Hotels;
 
 namespace TourGo.Web.Api.Controllers.Finances
 {
@@ -168,6 +170,81 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("hotel/{id:int}/paginated")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemResponse<Paged<Transaction>>> GetPaginated(
+            int id,
+            [FromQuery] int pageIndex, 
+            [FromQuery] int pageSize,
+            [FromQuery] string? sortColumn, 
+            [FromQuery] string? sortDirection,
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate,
+            [FromQuery] int? txnId,
+            [FromQuery] int? parentId,
+            [FromQuery] int? entityId,
+            [FromQuery] int? categoryId,
+            [FromQuery] int? statusId,
+            [FromQuery] string? referenceNumber,
+            [FromQuery] string? description,
+            [FromQuery] bool? hasDocumentUrl,
+            [FromQuery] int? paymentMethodId,
+            [FromQuery] int? subcategoryId,
+            [FromQuery] int? financePartnerId)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(sortColumn) && !_transactionService.IsValidSortColumn(sortColumn))
+                {
+                    return BadRequest(new ErrorResponse($"Invalid sort column: {sortColumn}"));
+                }
+
+                if (!string.IsNullOrEmpty(sortDirection) && !_transactionService.IsValidSortDirection(sortDirection))
+                {
+                    return BadRequest(new ErrorResponse($"Invalid sort direction: {sortDirection}"));
+                }
+
+                Paged<Transaction>? transactions = _transactionService.GetPaginated(
+                    pageIndex,
+                    pageSize,
+                    sortColumn,
+                    sortDirection,
+                    startDate, 
+                    endDate,
+                    txnId, 
+                    parentId, 
+                    entityId, 
+                    categoryId, 
+                    statusId, 
+                    referenceNumber, 
+                    description, 
+                    hasDocumentUrl, 
+                    paymentMethodId, 
+                    subcategoryId, 
+                    financePartnerId);
+
+                if (transactions == null)
+                {
+                    result = NotFound("No transactions found.");
+                }
+                else
+                {
+                    ItemResponse<Paged<Transaction>> response = new ItemResponse<Paged<Transaction>> { Item = transactions };
+                    result = Ok(response);
+                }
             }
             catch (Exception ex)
             {

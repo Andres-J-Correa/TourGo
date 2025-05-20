@@ -66,7 +66,7 @@ const EntityTransactionsView = ({
 
       const response = await updateDocumentUrl(
         compressedFile,
-        transaction.category.id,
+        transaction.categoryId,
         transaction.id
       );
       return Promise.resolve(response);

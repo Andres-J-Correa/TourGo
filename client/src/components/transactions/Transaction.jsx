@@ -40,10 +40,10 @@ function Transaction({ txn, updateHasDocumentUrl }) {
   const [submitting, setSubmitting] = useState(false);
 
   const category = transactionCategories.find(
-    (cat) => cat.id === txn.category?.id
+    (cat) => cat.id === txn.categoryId
   )?.name;
 
-  const status = transactionStatuses.find((s) => s.id === txn.status?.id)?.name;
+  const status = transactionStatuses.find((s) => s.id === txn.statusId)?.name;
 
   const toggleExpanded = () => setExpanded((prev) => !prev);
 
@@ -53,9 +53,9 @@ function Transaction({ txn, updateHasDocumentUrl }) {
   });
 
   const cardHeaderClass = classNames("transaction-card-header", {
-    "bg-success-subtle": txn.category?.id === 1,
-    "bg-danger-subtle": txn.category?.id === 2,
-    "bg-warning-subtle": txn.category?.id === 3,
+    "bg-success-subtle": txn.categoryId === 1,
+    "bg-danger-subtle": txn.categoryId === 2,
+    "bg-warning-subtle": txn.categoryId === 3,
     "text-dark": expanded,
   });
 
@@ -104,7 +104,7 @@ function Transaction({ txn, updateHasDocumentUrl }) {
 
       const uploadResponse = await updateDocumentUrl(
         compressedFile,
-        txn.category.id,
+        txn.categoryId,
         txn.id
       );
 
