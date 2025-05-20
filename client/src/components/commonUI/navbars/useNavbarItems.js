@@ -106,13 +106,13 @@ export const useNavbarItems = () => {
                 capitalize: true,
               },
               {
-                name: "Socios financieros",
-                path: `/hotels/${hotel.current.id}/financial-partners`,
+                name: "Subcategorias de Transacciones",
+                path: `/hotels/${hotel.current.id}/transaction-subcategories`,
                 capitalize: true,
               },
               {
-                name: "Subcategorias de Transacciones",
-                path: `/hotels/${hotel.current.id}/transaction-subcategories`,
+                name: "Socios financieros",
+                path: `/hotels/${hotel.current.id}/financial-partners`,
                 capitalize: true,
               },
             ],

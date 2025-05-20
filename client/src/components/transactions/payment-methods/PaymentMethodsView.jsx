@@ -35,9 +35,9 @@ import dayjs from "dayjs";
 import {
   add,
   deleteById,
-  getTransactionSubcategories,
+  getPaymentMethodsByHotelId,
   updateById,
-} from "services/transactionsSubcategoryService";
+} from "services/paymentMethodService";
 import { useAppContext } from "contexts/GlobalAppContext";
 
 // Components
@@ -47,21 +47,17 @@ import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
-// Constants/Static Data
-import { transactionCategories } from "components/transactions/constants";
-
 const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "El nombre debe tener al menos 2 caracteres")
     .max(100, "El nombre no puede exceder los 100 caracteres")
     .required("El nombre es requerido"),
-  categoryId: Yup.string().required("La categoría es requerida"),
 });
 
-function TransactionSubcategoriesView() {
+function PaymentMethodsView() {
   const { hotelId } = useParams();
   const { user } = useAppContext();
-  const [transactionSubcategories, setTransactionSubcategories] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -69,7 +65,6 @@ function TransactionSubcategoriesView() {
   const [isUploading, setIsUploading] = useState(false);
   const [initialValues, setInitialValues] = useState({
     name: "",
-    categoryId: "",
   });
 
   const breadcrumbs = [
@@ -81,17 +76,13 @@ function TransactionSubcategoriesView() {
   const filteredData = useMemo(() => {
     switch (isActiveFilter) {
       case "active":
-        return transactionSubcategories.filter(
-          (item) => item.isActive === true
-        );
+        return paymentMethods.filter((item) => item.isActive === true);
       case "inactive":
-        return transactionSubcategories.filter(
-          (item) => item.isActive === false
-        );
+        return paymentMethods.filter((item) => item.isActive === false);
       default:
-        return transactionSubcategories;
+        return paymentMethods;
     }
-  }, [transactionSubcategories, isActiveFilter]);
+  }, [paymentMethods, isActiveFilter]);
 
   const toggleForm = useCallback(() => {
     let isHiding = false;
@@ -118,7 +109,7 @@ function TransactionSubcategoriesView() {
     const result = await Swal.fire({
       title: `Está seguro de que desea ${
         id ? "actualizar" : "agregar"
-      } la subcategoría?`,
+      } el método de pago?`,
       text: id
         ? "Esta acción puede afectar transacciones existentes."
         : "Revise los datos antes de continuar.",
@@ -136,7 +127,7 @@ function TransactionSubcategoriesView() {
 
     try {
       Swal.fire({
-        title: "Guardando Subcategoría",
+        title: "Guardando método de pago",
         text: "Por favor espera",
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
@@ -154,7 +145,7 @@ function TransactionSubcategoriesView() {
 
       if (response?.isSuccessful) {
         if (id) {
-          setTransactionSubcategories((prev) => {
+          setPaymentMethods((prev) => {
             const copyOfPrev = [...prev];
             const index = copyOfPrev.findIndex((item) => item.id === id);
             if (index !== -1) {
@@ -171,7 +162,7 @@ function TransactionSubcategoriesView() {
             return prev;
           });
         } else {
-          setTransactionSubcategories((prev) => [
+          setPaymentMethods((prev) => [
             ...prev,
             {
               ...data,
@@ -191,32 +182,31 @@ function TransactionSubcategoriesView() {
         toggleForm();
         await Swal.fire({
           icon: "success",
-          title: "Subcategoría guardada",
-          text: "La subcategoría se ha guardado correctamente",
+          title: "Método de pago guardado",
+          text: "El método de pago se ha guardado correctamente",
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
         });
       } else {
-        throw new Error("Error al guardar la subcategoría");
+        throw new Error("Error al guardar el método de pago");
       }
     } catch (error) {
       Swal.close(); // Close loading
       await Swal.fire({
         icon: "error",
         title: "Error",
-        text: "No se pudo guardar la subcategoría, intente nuevamente.",
+        text: "No se pudo guardar el método de pago, intente nuevamente.",
       });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleUpdateClick = (subcategory) => {
+  const handleUpdateClick = (paymentMethod) => {
     setInitialValues({
-      id: subcategory.id,
-      name: subcategory.name,
-      categoryId: subcategory.categoryId,
+      id: paymentMethod.id,
+      name: paymentMethod.name,
     });
     setShowForm(true);
   };
@@ -239,7 +229,7 @@ function TransactionSubcategoriesView() {
       try {
         setIsUploading(true);
         Swal.fire({
-          title: "Eliminando Subcategoría",
+          title: "Eliminando el método de pago",
           text: "Por favor espera",
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
@@ -247,7 +237,7 @@ function TransactionSubcategoriesView() {
 
         const response = await deleteById(id);
         if (response.isSuccessful) {
-          setTransactionSubcategories((prev) => {
+          setPaymentMethods((prev) => {
             const copyOfPrev = [...prev];
             const index = copyOfPrev.findIndex((item) => item.id === id);
             if (index !== -1) {
@@ -265,8 +255,8 @@ function TransactionSubcategoriesView() {
           });
           await Swal.fire({
             icon: "success",
-            title: "Subcategoría eliminada",
-            text: "La subcategoría se ha eliminado correctamente",
+            title: "Método de pago eliminado",
+            text: "El método de pago se ha eliminado correctamente",
             timer: 1500,
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -277,7 +267,7 @@ function TransactionSubcategoriesView() {
         await Swal.fire({
           icon: "error",
           title: "Error",
-          text: "No se pudo eliminar la subcategoría, intente nuevamente.",
+          text: "No se pudo eliminar el método de pago, intente nuevamente.",
         });
       } finally {
         setIsUploading(false);
@@ -300,16 +290,6 @@ function TransactionSubcategoriesView() {
         accessorKey: "isActive",
         header: "Activo",
         cell: (info) => (info.getValue() ? "Sí" : "No"),
-      },
-      {
-        accessorKey: "categoryId",
-        header: "Categoría",
-        cell: (info) => {
-          const category = transactionCategories.find(
-            (cat) => Number(cat.id) === Number(info.getValue())
-          );
-          return category ? category.name : "N/A";
-        },
       },
       {
         accessorKey: "createdBy",
@@ -345,23 +325,23 @@ function TransactionSubcategoriesView() {
         header: "Acciones",
         enableSorting: false,
         cell: (info) => {
-          const subcategory = info.row.original;
+          const paymentMethod = info.row.original;
           return (
             <>
-              {subcategory.isActive && (
+              {paymentMethod.isActive && (
                 <div>
                   <Button
                     color="info"
                     size="sm"
                     className="me-2"
-                    onClick={() => handleUpdateClick(subcategory)}>
+                    onClick={() => handleUpdateClick(paymentMethod)}>
                     Editar
                   </Button>
                   <Button
                     color="danger"
                     size="sm"
                     className="btn-sm"
-                    onClick={() => handleDeleteClick(subcategory.id)}>
+                    onClick={() => handleDeleteClick(paymentMethod.id)}>
                     Eliminar
                   </Button>
                 </div>
@@ -385,23 +365,23 @@ function TransactionSubcategoriesView() {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const onGetTransactionSubcategoriesSuccess = (response) => {
+  const onGetPaymentMethodsSuccess = (response) => {
     if (response.isSuccessful) {
-      setTransactionSubcategories(response.items);
+      setPaymentMethods(response.items);
     }
   };
 
-  const onGetTransactionSubcategoriesError = (error) => {
+  const onGetPaymentMethodsError = (error) => {
     if (error?.response?.status !== 404) {
-      toast.error("Error al cargar las subcategorías de transacciones");
+      toast.error("Error al cargar los métodos de pago");
     }
   };
 
   useEffect(() => {
     setLoading(true);
-    getTransactionSubcategories(hotelId)
-      .then(onGetTransactionSubcategoriesSuccess)
-      .catch(onGetTransactionSubcategoriesError)
+    getPaymentMethodsByHotelId(hotelId)
+      .then(onGetPaymentMethodsSuccess)
+      .catch(onGetPaymentMethodsError)
       .finally(() => {
         setLoading(false);
       });
@@ -409,21 +389,18 @@ function TransactionSubcategoriesView() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active="Subcategoría de Transacciones"
-      />
+      <Breadcrumb breadcrumbs={breadcrumbs} active="Métodos de Pago" />
       <ErrorBoundary>
         <LoadingOverlay isVisible={loading} />
-        <h3>Subcategoría de Transacciones</h3>
+        <h3>Métodos de Pago</h3>
 
         {showForm && (
           <Card className="border-0 shadow-lg mt-3">
             <CardBody className="p-3">
               <CardTitle tag="h5">
                 {initialValues.id
-                  ? "Editar Subcategoría"
-                  : "Nueva Subcategoría"}
+                  ? "Editar método de pago"
+                  : "Nuevo método de pago"}
               </CardTitle>
               <Formik
                 initialValues={initialValues}
@@ -439,28 +416,12 @@ function TransactionSubcategoriesView() {
                           name="name"
                           type="text"
                           className="form-control"
-                          placeholder="Nombre de la subcategoría"
+                          placeholder="Nombre del método de pago"
                           isRequired={true}
                         />
                       </Col>
 
-                      <Col md="4">
-                        <CustomField
-                          name="categoryId"
-                          as="select"
-                          className="form-control"
-                          placeholder="Categoría"
-                          isRequired={true}>
-                          <option value="">Seleccionar</option>
-                          {transactionCategories.map((cat) => (
-                            <option key={cat.id} value={cat.id}>
-                              {cat.name}
-                            </option>
-                          ))}
-                        </CustomField>
-                      </Col>
-
-                      <Col md="4" className="align-content-center">
+                      <Col md="auto" className="align-content-center">
                         <div className="text-center">
                           <Button
                             disabled={
@@ -487,7 +448,7 @@ function TransactionSubcategoriesView() {
         )}
         <div className="mt-4">
           <Button color={showForm ? "warning" : "dark"} onClick={toggleForm}>
-            {showForm ? "Cancelar" : "Agregar Subcategoría"}
+            {showForm ? "Cancelar" : "Agregar Método de Pago"}
           </Button>
         </div>
         <div className="mb-3 float-end">
@@ -561,4 +522,4 @@ function TransactionSubcategoriesView() {
   );
 }
 
-export default TransactionSubcategoriesView;
+export default PaymentMethodsView;

@@ -213,38 +213,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
         #endregion
 
-        #region payment methods
-        [HttpGet("{id:int}/payment-methods")]
-        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemsResponse<Lookup>> GetPaymentMethods(int id)
-        {
-            ObjectResult result = null;
-
-            try
-            {
-                List<Lookup>? paymentMethods = _hotelService.GetPaymentMethods(id);
-
-                if (paymentMethods == null)
-                {
-                    result = NotFound("No payment methods found for the given hotel ID.");
-                }
-                else
-                {
-                    ItemsResponse<Lookup> response = new ItemsResponse<Lookup> { Items = paymentMethods };
-                    result = Ok(response);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                ErrorResponse response = new ErrorResponse();
-                result = StatusCode(500, response);
-            }
-
-            return result;
-        }
-        #endregion
-
         #region FinancePartners
         [HttpGet("{id:int}/finance-partners")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
