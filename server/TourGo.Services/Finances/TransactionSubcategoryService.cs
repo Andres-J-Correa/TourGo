@@ -9,9 +9,9 @@ using TourGo.Data;
 using TourGo.Data.Providers;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Requests.Finances;
-using TourGo.Services.Interfaces.Hotels;
+using TourGo.Services.Interfaces.Finances;
 
-namespace TourGo.Services.Hotels
+namespace TourGo.Services.Finances
 {
     public class TransactionSubcategoryService : ITransactionSubcategoryService
     {

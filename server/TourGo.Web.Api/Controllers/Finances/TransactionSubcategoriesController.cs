@@ -3,15 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Finances;
-using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Api.Extensions;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 using TourGo.Services.Interfaces;
 using TourGo.Services;
+using TourGo.Services.Interfaces.Finances;
 
-namespace TourGo.Web.Api.Controllers.Hotels
+namespace TourGo.Web.Api.Controllers.Finances
 {
     [Route("api/transaction-subcategories")]
     [ApiController]
@@ -24,7 +24,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         public TransactionSubcategoriesController(ILogger<TransactionSubcategoriesController> logger,
                                                 ITransactionSubcategoryService transactionSubcategoryService,
                                                 IErrorLoggingService errorLoggingService,
-                                                IWebAuthenticationService<int> webAuthService): base(logger)
+                                                IWebAuthenticationService<int> webAuthService) : base(logger)
         {
             _transactionSubcategoryService = transactionSubcategoryService;
             _errorLoggingService = errorLoggingService;
@@ -110,7 +110,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpGet("hotel/{id:int}/minimal")]
-        [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Read, isBulk:true)]
+        [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<TransactionSubcategoryBase>> GetMinimal(int id)
         {
             ObjectResult result = null;

@@ -10,6 +10,7 @@ using TourGo.Services.Finances;
 using TourGo.Services.Hotels;
 using TourGo.Services.Interfaces;
 using TourGo.Services.Interfaces.Email;
+using TourGo.Services.Interfaces.Finances;
 using TourGo.Services.Interfaces.Hotels;
 using TourGo.Services.Interfaces.Security;
 using TourGo.Services.Interfaces.Users;
@@ -81,6 +82,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<ITransactionSubcategoryService, TransactionSubcategoryService>();
             services.AddSingleton<IPaymentMethodService, PaymentMethodService>();
             services.AddSingleton<IBookingProviderService, BookingProviderService>();
+            services.AddSingleton<IFinancePartnerService, FinancePartnerService>();
 
             GetAllEntities().ForEach(tt =>
             {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TourGo.Services.Interfaces.Hotels;
 using TourGo.Services.Interfaces;
 using TourGo.Services;
 using TourGo.Web.Controllers;
@@ -11,44 +10,45 @@ using TourGo.Web.Core.Filters;
 using TourGo.Models.Enums;
 using TourGo.Models.Domain;
 using TourGo.Models.Requests.Finances;
+using TourGo.Services.Interfaces.Finances;
 
-namespace TourGo.Web.Api.Controllers.Hotels
+namespace TourGo.Web.Api.Controllers.Finances
 {
-    [Route("api/payment-methods")]
+    [Route("api/finance-partners")]
     [ApiController]
-    public class PaymentMethodsController : BaseApiController
+    public class FinancePartnersController : BaseApiController
     {
-        private readonly IPaymentMethodService _paymentMethodService;
+        private readonly IFinancePartnerService _financePartnerService;
         private readonly IErrorLoggingService _errorLoggingService;
         private readonly IWebAuthenticationService<int> _webAuthService;
 
-        public PaymentMethodsController(ILogger<PaymentMethodsController> logger,
-                                                 IPaymentMethodService paymentMethodService,
-                                                 IErrorLoggingService errorLoggingService,
-                                                 IWebAuthenticationService<int> webAuthService): base(logger)
+        public FinancePartnersController(ILogger<FinancePartnersController> logger,
+                                         IFinancePartnerService financePartnerService,
+                                         IErrorLoggingService errorLoggingService,
+                                         IWebAuthenticationService<int> webAuthService) : base(logger)
         {
-            _paymentMethodService = paymentMethodService;
+            _financePartnerService = financePartnerService;
             _errorLoggingService = errorLoggingService;
             _webAuthService = webAuthService;
         }
 
         [HttpGet("hotel/{id:int}")]
-        [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Read, isBulk:true)]
-        public ActionResult<ItemsResponse<PaymentMethod>> Get(int id)
+        [EntityAuth(EntityTypeEnum.FinancePartners, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<FinancePartner>> Get(int id)
         {
             ObjectResult result = null;
 
             try
             {
-                List<PaymentMethod>? paymentMethods = _paymentMethodService.Get(id);
+                List<FinancePartner>? financePartners = _financePartnerService.Get(id);
 
-                if (paymentMethods == null || paymentMethods.Count == 0)
+                if (financePartners == null || financePartners.Count == 0)
                 {
-                    result = NotFound("No payment methods found for the specified hotel.");
+                    result = NotFound("No finance partners found for the specified hotel.");
                 }
                 else
                 {
-                    ItemsResponse<PaymentMethod> response = new ItemsResponse<PaymentMethod>() { Items = paymentMethods };
+                    ItemsResponse<FinancePartner> response = new ItemsResponse<FinancePartner>() { Items = financePartners };
                     result = Ok200(response);
                 }
             }
@@ -63,22 +63,22 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpGet("hotel/{id:int}/minimal")]
-        [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Read, isBulk:true)]
+        [EntityAuth(EntityTypeEnum.FinancePartners, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<Lookup>> GetMinimal(int id)
         {
             ObjectResult result = null;
 
             try
             {
-                List<Lookup>? paymentMethods = _paymentMethodService.GetMinimal(id);
+                List<Lookup>? financePartners = _financePartnerService.GetMinimal(id);
 
-                if (paymentMethods == null || paymentMethods.Count == 0)
+                if (financePartners == null || financePartners.Count == 0)
                 {
-                    result = NotFound("No payment methods found for the specified hotel.");
+                    result = NotFound("No finance partners found for the specified hotel.");
                 }
                 else
                 {
-                    ItemsResponse<Lookup> response = new ItemsResponse<Lookup>() { Items = paymentMethods };
+                    ItemsResponse<Lookup> response = new ItemsResponse<Lookup>() { Items = financePartners };
                     result = Ok200(response);
                 }
             }
@@ -93,19 +93,19 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpPost("hotel/{id:int}")]
-        [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Add(PaymentMethodAddUpdateRequest model)
+        [EntityAuth(EntityTypeEnum.FinancePartners, EntityActionTypeEnum.Create)]
+        public ActionResult<ItemResponse<int>> Add(FinancePartnerAddUpdateRequest model)
         {
             ObjectResult result = null;
 
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                int newId = _paymentMethodService.Add(model, userId);
+                int newId = _financePartnerService.Add(model, userId);
 
                 if (newId == 0)
                 {
-                    throw new Exception("Failed to add payment method.");
+                    throw new Exception("Failed to add finance partner.");
                 }
                 else
                 {
@@ -124,15 +124,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpPut("{id:int}")]
-        [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(PaymentMethodAddUpdateRequest model)
+        [EntityAuth(EntityTypeEnum.FinancePartners, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> Update(FinancePartnerAddUpdateRequest model)
         {
             ObjectResult result = null;
 
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                _paymentMethodService.Update(model, userId);
+                _financePartnerService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
@@ -148,7 +148,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpDelete("{id:int}")]
-        [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Delete)]
+        [EntityAuth(EntityTypeEnum.FinancePartners, EntityActionTypeEnum.Delete)]
         public ActionResult<SuccessResponse> Delete(int id)
         {
             ObjectResult result = null;
@@ -156,7 +156,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                _paymentMethodService.Delete(id, userId);
+                _financePartnerService.Delete(id, userId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
@@ -170,6 +170,5 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return result;
         }
-
     }
 }

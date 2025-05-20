@@ -1,7 +1,7 @@
 ﻿using TourGo.Models.Domain.Finances;
 using TourGo.Models.Requests.Finances;
 
-namespace TourGo.Services.Interfaces.Hotels
+namespace TourGo.Services.Interfaces.Finances
 {
     public interface ITransactionSubcategoryService
     {

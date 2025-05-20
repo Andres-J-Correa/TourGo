@@ -156,28 +156,6 @@ namespace TourGo.Services.Hotels
             return hotels;
         }
 
-        public List<Lookup>? GetFinancePartners(int hotelId)
-        {
-            string proc = "finance_partners_select_by_hotel_id";
-            List<Lookup>? financePartners = null;
-            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
-            {
-                param.AddWithValue("p_hotelId", hotelId);
-            }, (reader, set) =>
-            {
-                int index = 0;
-                Lookup financePartner = new();
-                financePartner.Id = reader.GetSafeInt32(index++);
-                financePartner.Name = reader.GetSafeString(index++);
-
-                financePartners ??= new List<Lookup>();
-
-                financePartners.Add(financePartner);
-            });
-
-            return financePartners;
-        }
-
         private static Hotel MapHotel(IDataReader reader, ref int index)
         {
             Hotel hotel = new();

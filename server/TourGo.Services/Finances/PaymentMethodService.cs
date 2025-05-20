@@ -1,18 +1,13 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TourGo.Data;
 using TourGo.Data.Providers;
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Requests.Finances;
-using TourGo.Services.Interfaces.Hotels;
+using TourGo.Services.Interfaces.Finances;
 
-namespace TourGo.Services.Hotels
+namespace TourGo.Services.Finances
 {
     public class PaymentMethodService : IPaymentMethodService
     {

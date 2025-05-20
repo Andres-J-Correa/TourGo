@@ -53,10 +53,10 @@ const hotelRoutes = [
     ),
   },
   {
-    name: "financialPartners",
-    path: "/hotels/:hotelId/financial-partners",
+    name: "financePartners",
+    path: "/hotels/:hotelId/finance-partners",
     component: lazy(() =>
-      import("components/commonUI/fallback/SiteUnderConstruction")
+      import("components/transactions/FinancePartnersView")
     ),
   },
   {
