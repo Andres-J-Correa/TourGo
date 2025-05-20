@@ -212,37 +212,5 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return StatusCode(code, response);
         }
         #endregion
-
-        #region FinancePartners
-        [HttpGet("{id:int}/finance-partners")]
-        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemsResponse<Lookup>> GetFinancePartners(int id)
-        {
-            ObjectResult result = null;
-
-            try
-            {
-                List<Lookup>? financePartners = _hotelService.GetFinancePartners(id);
-
-                if (financePartners == null)
-                {
-                    result = NotFound("No finance partners found for the given hotel ID.");
-                }
-                else
-                {
-                    ItemsResponse<Lookup> response = new ItemsResponse<Lookup> { Items = financePartners };
-                    result = Ok(response);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                ErrorResponse response = new ErrorResponse();
-                result = StatusCode(500, response);
-            }
-
-            return result;
-        }
-        #endregion
     }
 }

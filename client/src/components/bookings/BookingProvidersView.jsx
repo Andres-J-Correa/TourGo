@@ -422,7 +422,14 @@ function BookingProvidersView() {
                         <div className="text-center">
                           <Button
                             disabled={
-                              isUploading || isEqual(values, initialValues)
+                              isUploading ||
+                              isEqual(
+                                { ...values, name: values.name.trim() },
+                                {
+                                  ...initialValues,
+                                  name: initialValues.name.trim(),
+                                }
+                              )
                             }
                             type="submit"
                             className="btn bg-success text-white mb-3">

@@ -116,7 +116,7 @@ export const useNavbarItems = () => {
               },
               {
                 name: "Socios financieros",
-                path: `/hotels/${hotel.current.id}/financial-partners`,
+                path: `/hotels/${hotel.current.id}/finance-partners`,
                 capitalize: true,
               },
             ],

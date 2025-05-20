@@ -14,6 +14,5 @@ namespace TourGo.Services.Interfaces.Hotels
         Lookup? GetMinimal(int id);
         void Update(HotelUpdateRequest model, int userId);
         void Delete(int id, int userId);
-        List<Lookup>? GetFinancePartners(int hotelId);
     }
 }
