@@ -49,7 +49,7 @@ const hotelRoutes = [
     name: "paymentMethods",
     path: "/hotels/:hotelId/payment-methods",
     component: lazy(() =>
-      import("components/commonUI/fallback/SiteUnderConstruction")
+      import("components/transactions/payment-methods/PaymentMethodsView")
     ),
   },
   {

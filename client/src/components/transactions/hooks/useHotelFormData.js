@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { getPaymentMethods, getFinancePartners } from "services/hotelService";
+import { getFinancePartners } from "services/hotelService";
 import { getTransactionSubcategoriesMinimal } from "services/transactionsSubcategoryService";
+import { getMinimal as getPaymentMethodsMinimal } from "services/paymentMethodService";
 import { toast } from "react-toastify";
 
 export default function useHotelFormData(hotelId) {
@@ -15,7 +16,7 @@ export default function useHotelFormData(hotelId) {
     setIsLoadingHotelData(true);
 
     Promise.allSettled([
-      getPaymentMethods(hotelId),
+      getPaymentMethodsMinimal(hotelId),
       getFinancePartners(hotelId),
       getTransactionSubcategoriesMinimal(hotelId),
     ])

@@ -156,28 +156,6 @@ namespace TourGo.Services.Hotels
             return hotels;
         }
 
-        public List<Lookup>? GetPaymentMethods(int hotelId)
-        {
-            string proc = "payment_methods_select_by_hotel_id";
-            List<Lookup>? paymentMethods = null;
-            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
-            {
-                param.AddWithValue("p_hotelId", hotelId);
-            }, (reader, set) =>
-            {
-                int index = 0;
-                Lookup paymentMethod = new();
-                paymentMethod.Id = reader.GetSafeInt32(index++);
-                paymentMethod.Name = reader.GetSafeString(index++);
-
-                paymentMethods ??= new List<Lookup>();
-
-                paymentMethods.Add(paymentMethod);
-            });
-
-            return paymentMethods;
-        }
-
         public List<Lookup>? GetFinancePartners(int hotelId)
         {
             string proc = "finance_partners_select_by_hotel_id";
