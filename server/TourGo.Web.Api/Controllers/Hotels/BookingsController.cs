@@ -314,36 +314,5 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return result;
         }
-
-        [HttpGet("hotel/{id:int}/providers")]
-        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<Lookup>> GetBookingProvidersByHotelId(int id)
-        {
-            ObjectResult result = null;
-
-            try
-            {
-                List<Lookup>? providers = _bookingService.GetBookingProviders(id);
-
-                if (providers == null)
-                {
-                    result = NotFound404(new ErrorResponse("No providers found"));
-                }
-                else
-                {
-                    ItemsResponse<Lookup> response = new ItemsResponse<Lookup>() { Items = providers };
-
-                    result = Ok200(response);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                ErrorResponse response = new ErrorResponse();
-                result = StatusCode(500, response);
-            }
-
-            return result;
-        }
     }
 }

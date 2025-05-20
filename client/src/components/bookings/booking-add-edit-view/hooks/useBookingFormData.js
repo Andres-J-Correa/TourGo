@@ -1,9 +1,7 @@
 // hooks/useBookingFormData.js
 import { useState, useEffect } from "react";
-import {
-  getRoomBookingsByDateRange,
-  getBookingProvidersByHotelId,
-} from "services/bookingService";
+import { getRoomBookingsByDateRange } from "services/bookingService";
+import { getBookingProvidersMinimalByHotelId } from "services/bookingProviderService";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { getByHotelId as getChargesByHotelId } from "services/extraChargeService";
 import { toast } from "react-toastify";
@@ -33,7 +31,7 @@ export default function useBookingFormData(hotelId, dates) {
     Promise.allSettled([
       getRoomsByHotelId(hotelId),
       getChargesByHotelId(hotelId),
-      getBookingProvidersByHotelId(hotelId),
+      getBookingProvidersMinimalByHotelId(hotelId),
     ])
       .then(([roomsResult, chargesResult, bookingProvidersResult]) => {
         if (roomsResult.status === "fulfilled") {

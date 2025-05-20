@@ -19,7 +19,6 @@ namespace TourGo.Services.Interfaces
         List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, int hotelId);
-        List<Lookup>? GetBookingProviders(int hotelId);
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
     }

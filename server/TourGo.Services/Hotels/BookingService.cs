@@ -259,29 +259,6 @@ namespace TourGo.Services.Hotels
             return list;
         }
 
-        public List<Lookup>? GetBookingProviders(int hotelId)
-        {
-            string proc = "booking_providers_select_by_hotel_id";
-            List<Lookup>? providers = null;
-
-            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
-            {
-                param.AddWithValue("p_hotelId", hotelId);
-            }, (reader, set) =>
-            {
-                int index = 0;
-                Lookup provider = new();
-                provider.Id = reader.GetSafeInt32(index++);
-                provider.Name = reader.GetSafeString(index++);
-
-                providers ??= new List<Lookup>();
-
-                providers.Add(provider);
-            });
-
-            return providers;
-        }
-
         public bool IsValidSortDirection(string? direction)
         {
             return string.Equals(direction, "ASC", StringComparison.OrdinalIgnoreCase)
