@@ -97,7 +97,6 @@ const DatePickers = ({
               type="button"
               title="Limpiar fechas"
               onClick={onClearDates}
-              disabled={isDisabled}
               icon={faRectangleXmark}
             />
           </div>
