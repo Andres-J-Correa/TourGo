@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Navbar, NavbarBrand, NavbarToggler, Collapse, Nav } from "reactstrap";
+import { Navbar, NavbarToggler, Collapse, Nav } from "reactstrap";
 import NavbarItem from "./NavbarItem";
 import LanguageSelector from "components/commonUI/languages/LanguageSelector";
 import { useAppContext } from "contexts/GlobalAppContext";
@@ -68,13 +68,13 @@ function DefaultNavbar({
   return (
     <div className="navbar-container">
       <Navbar expand="lg" className="shadow p-2 z-3">
-        <NavbarBrand className="font-weight-bolder ms-sm-3">
+        <div className="font-weight-bolder ms-sm-3 navbar-brand">
           <Link
             to={hotel.current?.id ? `/hotels/${hotel.current?.id}` : "/"}
             className="text-decoration-none text-white">
             {hotel.current?.name || brand}
           </Link>
-        </NavbarBrand>
+        </div>
         <NavbarToggler onClick={toggle} className="shadow-none ms-2" />
         <Collapse isOpen={isOpen} navbar className="pt-3 pb-2 py-lg-0 w-100">
           <Nav className="justify-content-end w-100" navbar>

@@ -145,9 +145,20 @@ export const useNavbarItems = () => {
         capitalize: true,
         collapse: [
           {
-            name: "Panel de Finanzas",
-            path: `/hotels/${hotel.current.id}/finances`,
+            name: "Accesos directos",
             capitalize: true,
+            collapse: [
+              {
+                name: "Panel de Finanzas",
+                path: `/hotels/${hotel.current.id}/finances`,
+                capitalize: true,
+              },
+              {
+                name: "Transacciones",
+                path: `/hotels/${hotel.current.id}/transactions`,
+                capitalize: true,
+              },
+            ],
           },
         ],
       },

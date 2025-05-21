@@ -80,3 +80,63 @@ export const updateDocumentUrl = async (file, categoryId, transactionId) => {
     return onGlobalError(error);
   }
 };
+
+export const getPagedTransactions = async (
+  hotelId,
+  pageIndex,
+  pageSize,
+  sortColumn,
+  sortDirection,
+  startDate,
+  endDate,
+  txnId,
+  parentId,
+  entityId,
+  categoryId,
+  statusId,
+  referenceNumber,
+  description,
+  hasDocumentUrl,
+  paymentMethodId,
+  subcategoryId,
+  financePartnerId
+) => {
+  const queryParams = new URLSearchParams({
+    pageIndex,
+    pageSize,
+  });
+
+  if (sortColumn) queryParams.append("sortColumn", sortColumn);
+  if (sortDirection) queryParams.append("sortDirection", sortDirection);
+  if (startDate) queryParams.append("startDate", startDate);
+  if (endDate) queryParams.append("endDate", endDate);
+  if (txnId) queryParams.append("txnId", txnId);
+  if (parentId) queryParams.append("parentId", parentId);
+  if (entityId) queryParams.append("entityId", entityId);
+  if (categoryId) queryParams.append("categoryId", categoryId);
+  if (statusId) queryParams.append("statusId", statusId);
+  if (referenceNumber) queryParams.append("referenceNumber", referenceNumber);
+  if (description) queryParams.append("description", description);
+  if (hasDocumentUrl) queryParams.append("hasDocumentUrl", hasDocumentUrl);
+  if (paymentMethodId) queryParams.append("paymentMethodId", paymentMethodId);
+  if (subcategoryId) queryParams.append("subcategoryId", subcategoryId);
+  if (financePartnerId)
+    queryParams.append("financePartnerId", financePartnerId);
+
+  const url = `${api}/hotel/${hotelId}/paginated?${queryParams.toString()}`;
+
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: url,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

@@ -119,6 +119,13 @@ const finances = [
       import("components/commonUI/fallback/SiteUnderConstruction")
     ),
   },
+  {
+    name: "transactionsView",
+    path: "/hotels/:hotelId/transactions",
+    component: lazy(() =>
+      import("components/transactions/transactions-view/TransactionsView")
+    ),
+  },
 ];
 
 const transactionSubCategories = [
