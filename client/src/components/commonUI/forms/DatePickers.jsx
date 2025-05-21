@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import DatePicker from "react-datepicker";
 import dayjs from "dayjs";
 import { getDate } from "utils/dateHelper";
+import { faRectangleXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "react-datepicker/dist/react-datepicker.css";
 import "./DatePickers.css"; // Custom styles for the date picker
 
@@ -13,6 +15,7 @@ const DatePickers = ({
   endDateName = "Fecha fin",
   handleStartChange = () => {},
   handleEndChange = () => {},
+  handleClearDates,
   maxDate,
   isDisabled,
   allowSameDay = false,
@@ -22,6 +25,8 @@ const DatePickers = ({
     : startDate
     ? dayjs(startDate).add(1, "day").toDate()
     : null;
+
+  const showClearButton = typeof handleClearDates === "function";
 
   const onStartDateChange = (date) => {
     if (date) {
@@ -35,9 +40,15 @@ const DatePickers = ({
     }
   };
 
+  const onClearDates = () => {
+    if (startDate || endDate) {
+      handleClearDates();
+    }
+  };
+
   return (
-    <div className="d-flex align-items-center gap-3 mb-3">
-      <div>
+    <div className="d-flex align-items-center mb-3">
+      <div className="me-2">
         <label htmlFor="start-date" className="form-label w-100">
           {startDateName}
         </label>
@@ -58,7 +69,7 @@ const DatePickers = ({
         />
       </div>
 
-      <div>
+      <div className="me-2 position-relative">
         <label htmlFor="end-date" className="form-label w-100">
           {endDateName}
         </label>
@@ -78,6 +89,18 @@ const DatePickers = ({
           showMonthDropdown={true}
           dropdownMode="select"
         />
+        {showClearButton && (
+          <div className="position-absolute top-0 end-0">
+            <FontAwesomeIcon
+              size="sm"
+              color="tomato"
+              type="button"
+              title="Limpiar fechas"
+              onClick={onClearDates}
+              icon={faRectangleXmark}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

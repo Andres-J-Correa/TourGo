@@ -77,6 +77,7 @@ function BookingFilters({
               handleEndChange={handleDateChange("end")}
               isDisabled={loading}
               allowSameDay={true}
+              handleClearDates={handleClearDateFilters}
             />
           </Col>
           <Col className="px-0 align-content-center" lg={4} xl={12}>
@@ -94,14 +95,6 @@ function BookingFilters({
                   {paginationData.isArrivalDate ? "Llegada" : "Salida"}
                   <FontAwesomeIcon icon={faRepeat} className="ms-2" size="sm" />
                 </button>
-                <Button
-                  color="outline-secondary"
-                  className="float-end ms-2"
-                  type="button"
-                  onClick={handleClearDateFilters}
-                  disabled={loading}>
-                  Limpiar
-                </Button>
               </div>
             )}
           </Col>

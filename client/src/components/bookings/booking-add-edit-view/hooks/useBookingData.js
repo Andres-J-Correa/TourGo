@@ -21,10 +21,6 @@ export default function useBookingData(bookingId) {
     }
   };
 
-  const onGetBookingChargesError = () => {
-    toast.error("Error al cargar cargos extras de la reserva");
-  };
-
   const onGetRoomBookingsSuccess = (res) => {
     if (res.items?.length > 0) {
       const mappedRoomBookings = res.items.map((b) => ({
@@ -33,10 +29,6 @@ export default function useBookingData(bookingId) {
       }));
       setBookingRoomBookings(mappedRoomBookings);
     }
-  };
-
-  const onGetRoomBookingsError = () => {
-    toast.error("Error al cargar reservas de habitaciones");
   };
 
   useEffect(() => {
@@ -48,16 +40,22 @@ export default function useBookingData(bookingId) {
         getRoomBookingsByBookingId(bookingId),
       ])
         .then(([chargesResult, roomBookingsResult]) => {
+          let errorMessage = "";
+
           if (chargesResult.status === "fulfilled") {
             onGetBookingChargesSuccess(chargesResult.value);
           } else if (chargesResult.reason?.response?.status !== 404) {
-            onGetBookingChargesError();
+            errorMessage += "Error al cargar los cargos de la reserva";
           }
 
           if (roomBookingsResult.status === "fulfilled") {
             onGetRoomBookingsSuccess(roomBookingsResult.value);
           } else if (roomBookingsResult.reason?.response?.status !== 404) {
-            onGetRoomBookingsError();
+            errorMessage += "y las habitaciones de la reserva";
+          }
+
+          if (errorMessage) {
+            toast.error(errorMessage);
           }
         })
         .finally(() => {

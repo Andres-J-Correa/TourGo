@@ -1,10 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Row } from "reactstrap";
 
 function Footer() {
   return (
-    <footer className="text-center mt-2">
-      <p>
+    <Row className="w-100">
+      <footer className="text-center mt-2">
         &copy; 2025 Tourgo. Todos los derechos reservados. <div></div>
         <Link to={`/privacy-policy`} className="footer-link mx-2">
           Política de Privacidad
@@ -15,8 +16,8 @@ function Footer() {
         <Link to="/careers" className="footer-link mx-2">
           Trabaja con nosotros
         </Link>
-      </p>
-    </footer>
+      </footer>
+    </Row>
   );
 }
 

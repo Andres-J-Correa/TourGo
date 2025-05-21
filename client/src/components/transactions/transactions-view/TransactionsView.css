@@ -1,0 +1,3 @@
+.filter-container {
+  overflow: hidden; /* Prevents content from spilling during height transition */
+}

@@ -98,12 +98,14 @@ namespace TourGo.Services.Finances
             List<Transaction>? transactions = null;
             int totalCount = 0;
 
+            string mappedColumn = !string.IsNullOrEmpty(sortColumn) && TransactionSortColumns.TryGetValue(sortColumn, out var value) ? value : string.Empty;
+
             _dataProvider.ExecuteCmd(proc, (col) =>
             {
                 col.AddWithValue("p_pageIndex", pageIndex);
                 col.AddWithValue("p_pageSize", pageSize);
 
-                col.AddWithValue("p_sortColumn", string.IsNullOrEmpty(sortColumn) ? DBNull.Value: sortColumn);
+                col.AddWithValue("p_sortColumn", string.IsNullOrEmpty(mappedColumn) ? DBNull.Value: mappedColumn);
                 col.AddWithValue("p_sortDirection", string.IsNullOrEmpty(sortDirection) ? DBNull.Value : sortDirection);
                 col.AddWithValue("p_startDate", startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
                 col.AddWithValue("p_endDate", endDate.HasValue ? endDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
@@ -122,6 +124,7 @@ namespace TourGo.Services.Finances
                 {
                     int index = 0;
                     Transaction transaction = MapTransaction(reader, ref index);
+                    transaction.Total = reader.GetSafeDecimal(index++);
 
                     if (totalCount == 0)
                     {
@@ -270,18 +273,15 @@ namespace TourGo.Services.Finances
         private readonly Dictionary<string, string> TransactionSortColumns = new(StringComparer.OrdinalIgnoreCase)
         {
             {"Id", "t.Id"},
-            {"ParentId", "t.ParentId"},
             {"EntityId", "t.EntityId"},
             {"Amount", "t.Amount"},
             {"TransactionDate", "t.TransactionDate"},
             {"DateCreated", "t.DateCreated"},
             {"CategoryId", "t.CategoryId"},
+            {"Subcategory_Name", "tsc.Name" },
             {"StatusId", "t.StatusId"},
-            {"ReferenceNumber", "t.ReferenceNumber"},
-            {"Description", "t.Description"},
-            {"PaymentMethodName", "pm.Name"},
-            {"TransactionStatusName", "tsc.Name"},
-            {"FinancePartnerName", "fp.Name"}
+            {"PaymentMethod_Name", "pm.Name"},
+            {"FinancePartner_Name", "fp.Name"}
         };
     }
 }
