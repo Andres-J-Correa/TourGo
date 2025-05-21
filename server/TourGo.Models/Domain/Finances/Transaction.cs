@@ -26,6 +26,7 @@ namespace TourGo.Models.Domain.Finances
         public Lookup? FinancePartner {get ;set;}
         public int EntityId { get; set; } 
         public bool HasDocumentUrl { get; set; }
+        public decimal Total { get; set; }
 
     }
 }

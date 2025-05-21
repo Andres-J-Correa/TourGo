@@ -124,6 +124,7 @@ namespace TourGo.Services.Finances
                 {
                     int index = 0;
                     Transaction transaction = MapTransaction(reader, ref index);
+                    transaction.Total = reader.GetSafeDecimal(index++);
 
                     if (totalCount == 0)
                     {

@@ -89,17 +89,17 @@ export const getPagedTransactions = async (
   sortDirection,
   startDate,
   endDate,
-  txnId,
-  parentId,
-  entityId,
   categoryId,
   statusId,
+  subcategoryId,
+  financePartnerId,
+  paymentMethodId,
+  txnId,
   referenceNumber,
   description,
+  entityId,
   hasDocumentUrl,
-  paymentMethodId,
-  subcategoryId,
-  financePartnerId
+  parentId
 ) => {
   const queryParams = new URLSearchParams({
     pageIndex,

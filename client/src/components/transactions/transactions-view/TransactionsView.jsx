@@ -5,11 +5,14 @@ import Breadcrumb from "components/commonUI/Breadcrumb";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import Pagination from "components/commonUI/Pagination";
 import TransactionDetails from "components/transactions/TransactionDetails";
+import TransactionsTableFilters from "components/transactions/transactions-view/TransactionsTableFilters";
+import TransactionAddForm from "components/transactions/TransactionAddForm";
 
 import { getPagedTransactions } from "services/transactionService";
 import { transactionsTableColumns } from "./constants";
+import { formatCurrency } from "utils/currencyHelper";
 
-import { Spinner } from "reactstrap";
+import { Button, Col, Label, Row, Spinner } from "reactstrap";
 import classNames from "classnames";
 import {
   useReactTable,
@@ -24,7 +27,12 @@ import {
   faArrowUpShortWide,
   faArrowDownWideShort,
   faSort,
+  faSquarePlus,
+  faSquareMinus,
 } from "@fortawesome/free-solid-svg-icons";
+import dayjs from "dayjs";
+
+import "./TransactionsView.css";
 
 const defaultData = {
   items: [],
@@ -38,11 +46,28 @@ function TransactionsView() {
   const { hotelId } = useParams();
   const [data, setData] = useState({ ...defaultData });
   const [loading, setLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   const [paginationData, setPaginationData] = useState({
     pageIndex: 0,
     pageSize: 5,
     sortBy: [],
+    dates: {
+      start: "",
+      end: "",
+    },
+    categoryId: "",
+    statusId: "",
+    subcategoryId: "",
+    financePartnerId: "",
+    paymentMethodId: "",
+    txnId: "",
+    referenceNumber: "",
+    description: "",
+    entityId: "",
+    hasDocumentUrl: "",
+    randomIdForUpdate: "",
   });
 
   const breadcrumbs = [
@@ -96,16 +121,171 @@ function TransactionsView() {
     getRowCanExpand: () => true,
   });
 
-  //     const onPageSizeChange = (e) =>
-  // setPaginationData((prev) => ({
-  //   ...prev,
-  //   pageSize: Number(e.target.value),
-  //   pageIndex: 0,
-  // }));
+  const onPageSizeChange = (e) =>
+    setPaginationData((prev) => ({
+      ...prev,
+      pageSize: Number(e.target.value),
+      pageIndex: 0,
+    }));
+
+  const handleDateChange = (field) => (date) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      dates: { ...prev.dates, [field]: date },
+    }));
+    table.setExpanded({});
+  };
+
+  const handleClearDateFilters = () => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      dates: {
+        start: "",
+        end: "",
+      },
+    }));
+    table.setExpanded({});
+  };
 
   const gotoPage = (pageIndex) => {
     if (pageIndex < 0 || pageIndex >= data.totalPages) return;
     setPaginationData((prev) => ({ ...prev, pageIndex }));
+    table.setExpanded({});
+  };
+
+  const handleCategoryChange = (categoryId) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      categoryId,
+    }));
+    table.setExpanded({});
+  };
+
+  const handleStatusChange = (statusId) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      statusId,
+    }));
+    table.setExpanded({});
+  };
+
+  const handleHasDocumentUrlChange = (hasDocumentUrl) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      hasDocumentUrl,
+    }));
+    table.setExpanded({});
+  };
+  const handleSubcategoryChange = (subcategoryId) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      subcategoryId,
+    }));
+    table.setExpanded({});
+  };
+
+  const handleFinancePartnerChange = (financePartnerId) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      financePartnerId,
+    }));
+    table.setExpanded({});
+  };
+
+  const handlePaymentMethodChange = (paymentMethodId) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      paymentMethodId,
+    }));
+    table.setExpanded({});
+  };
+
+  const handleTransactionIdInputChange = (txnId) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      txnId,
+    }));
+    table.setExpanded({});
+  };
+
+  const handleReferenceNumberInputChange = (referenceNumber) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      referenceNumber,
+    }));
+    table.setExpanded({});
+  };
+
+  const handleDescriptionInputChange = (description) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      description,
+    }));
+    table.setExpanded({});
+  };
+
+  const handleEntityIdInputChange = (entityId) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      entityId,
+    }));
+    table.setExpanded({});
+  };
+
+  const handleToggleFilters = () => {
+    setShowFilters((prev) => !prev);
+  };
+
+  const handleAddTransactionClick = () => {
+    setShowForm(true);
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 100);
+  };
+
+  const onTransactionAdded = useCallback(() => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      randomIdForUpdate: Math.random(),
+    }));
+  }, [setPaginationData]);
+
+  const handleClearAllFilters = () => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      dates: {
+        start: "",
+        end: "",
+      },
+      categoryId: "",
+      statusId: "",
+      subcategoryId: "",
+      financePartnerId: "",
+      paymentMethodId: "",
+      txnId: "",
+      referenceNumber: "",
+      description: "",
+      entityId: "",
+      hasDocumentUrl: "",
+      randomIdForUpdate: "",
+    }));
     table.setExpanded({});
   };
 
@@ -117,12 +297,12 @@ function TransactionsView() {
         ? "DESC"
         : "ASC"
       : undefined;
-    //   const startDate = values.dates.start
-    //     ? dayjs(values.dates.start).format("YYYY-MM-DD")
-    //     : null;
-    //   const endDate = values.dates.end
-    //     ? dayjs(values.dates.end).format("YYYY-MM-DD")
-    //     : null;
+    const startDate = values.dates.start
+      ? dayjs(values.dates.start).format("YYYY-MM-DD")
+      : null;
+    const endDate = values.dates.end
+      ? dayjs(values.dates.end).format("YYYY-MM-DD")
+      : null;
 
     try {
       const res = await getPagedTransactions(
@@ -130,7 +310,19 @@ function TransactionsView() {
         values.pageIndex,
         values.pageSize,
         sortColumn,
-        sortDirection
+        sortDirection,
+        startDate,
+        endDate,
+        values.categoryId,
+        values.statusId,
+        values.subcategoryId,
+        values.financePartnerId,
+        values.paymentMethodId,
+        values.txnId,
+        values.referenceNumber,
+        values.description,
+        values.entityId,
+        values.hasDocumentUrl
       );
 
       if (res.isSuccessful) {
@@ -164,14 +356,16 @@ function TransactionsView() {
   }, []);
 
   useEffect(() => {
-    // const hasDates =
-    //   Boolean(paginationData.dates.start) || Boolean(paginationData.dates.end);
-    // const isValidDateRange =
-    //   !hasDates ||
-    //   (dayjs(paginationData.dates.start).isValid() &&
-    //     dayjs(paginationData.dates.end).isValid());
-    // if (hotelId && isValidDateRange) {
-    if (hotelId) {
+    const hasDates =
+      Boolean(paginationData.dates.start) || Boolean(paginationData.dates.end);
+
+    const isValidDateRange =
+      dayjs(paginationData.dates.start).isValid() &&
+      dayjs(paginationData.dates.end).isValid();
+
+    const shouldFetchData = (hasDates && isValidDateRange) || !hasDates;
+
+    if (hotelId && shouldFetchData) {
       fetchData(hotelId, paginationData);
     }
   }, [hotelId, paginationData, fetchData]);
@@ -181,6 +375,91 @@ function TransactionsView() {
       <Breadcrumb breadcrumbs={breadcrumbs} active={"Transacciones"} />
       <h3>Transacciones</h3>
       <ErrorBoundary>
+        <div>
+          <div
+            className="text-dark cursor-pointer fw-bold fs-4 mb-2 ms-auto"
+            style={{ maxWidth: "max-content" }}
+            onClick={handleToggleFilters}>
+            Filtros
+            <span className="ms-2">
+              <FontAwesomeIcon
+                size="lg"
+                icon={showFilters ? faSquareMinus : faSquarePlus}
+              />
+            </span>
+          </div>
+
+          <div
+            className={classNames(
+              "mb-3 p-3 border shadow-sm rounded-3 bg-light",
+              {
+                "d-none": !showFilters,
+              }
+            )}>
+            <TransactionsTableFilters
+              hotelId={hotelId}
+              paginationData={paginationData}
+              loading={loading}
+              handleDateChange={handleDateChange}
+              handleClearDateFilters={handleClearDateFilters}
+              onPageSizeChange={onPageSizeChange}
+              handleCategoryChange={handleCategoryChange}
+              handleStatusChange={handleStatusChange}
+              handleSubcategoryChange={handleSubcategoryChange}
+              handleFinancePartnerChange={handleFinancePartnerChange}
+              handlePaymentMethodChange={handlePaymentMethodChange}
+              handleTransactionIdInputChange={handleTransactionIdInputChange}
+              handleReferenceNumberInputChange={
+                handleReferenceNumberInputChange
+              }
+              handleDescriptionInputChange={handleDescriptionInputChange}
+              handleEntityIdInputChange={handleEntityIdInputChange}
+              handleHasDocumentUrlChange={handleHasDocumentUrlChange}
+              handleClearAllFilters={handleClearAllFilters}
+            />
+          </div>
+        </div>
+        <Row className="mb-3">
+          <Col md="auto" className="align-content-end">
+            <span className="text-dark fw-bold fs-5">
+              Total Actual:{" "}
+              {data.items?.length > 0
+                ? formatCurrency(
+                    data.items[0].total,
+                    data.items[0].currencyCode
+                  )
+                : 0}
+            </span>
+          </Col>
+          <Col>
+            <div className="float-end">
+              <Label htmlFor="pageSize" className="text-dark">
+                Filas por página:
+              </Label>
+              <select
+                id="pageSize"
+                className="form-select"
+                value={paginationData.pageSize}
+                disabled={loading}
+                onChange={onPageSizeChange}>
+                {[5, 10, 20, 50].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          {!showForm && (
+            <div className="text-center">
+              <Button color="primary" onClick={handleAddTransactionClick}>
+                Agregar Transacción
+              </Button>
+            </div>
+          )}
+        </Row>
         <div className="table-responsive">
           <span
             className={classNames("float-end", {
@@ -324,6 +603,16 @@ function TransactionsView() {
           hasNextPage={data.hasNextPage}
           onPageChange={gotoPage}
         />
+
+        <div className="mt-5">
+          <TransactionAddForm
+            hotelId={hotelId}
+            submitting={loading}
+            showForm={showForm}
+            setShowForm={setShowForm}
+            onTransactionAdded={onTransactionAdded}
+          />
+        </div>
       </ErrorBoundary>
     </>
   );
