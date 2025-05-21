@@ -517,7 +517,7 @@ function TransactionsTableFilters({
         </Col>
         <Col className="align-content-end">
           <Button
-            color="outline-secondary"
+            color="dark"
             type="button"
             className="float-end"
             onClick={onClearAllFilters}
