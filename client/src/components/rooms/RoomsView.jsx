@@ -303,49 +303,25 @@ const RoomsView = () => {
       {
         accessorKey: "capacity",
         header: "Capacidad",
+        maxSize: 80,
         cell: (info) => `${info.getValue()} personas`,
       },
       {
         accessorKey: "isActive",
         header: "Activo",
+        maxSize: 70,
         cell: (info) => (info.getValue() ? "Sí" : "No"),
       },
       {
-        accessorKey: "createdBy",
-        header: "Creado por",
-        cell: (info) => {
-          const user = info.getValue();
-          if (user) {
-            return <span>{`${user.firstName} ${user.lastName}`}</span>;
-          }
-        },
-      },
-      {
-        accessorKey: "dateCreated",
-        header: "Fecha de creación",
-        cell: (info) => dayjs(info.getValue()).format("DD/MM/YYYY - h:mm a"),
-        minSize: 200,
-      },
-      {
-        accessorKey: "modifiedBy",
-        header: "Modificado por",
-        cell: (info) => {
-          const user = info.getValue();
-          if (user) {
-            return <span>{`${user.firstName} ${user.lastName}`}</span>;
-          }
-        },
-      },
-      {
-        accessorKey: "dateModified",
-        header: "Fecha de modificación",
-        cell: (info) => dayjs(info.getValue()).format("DD/MM/YYYY - h:mm a"),
-        minSize: 200,
+        accessorKey: "description",
+        header: "Descripción",
+        maxSize: 300,
+        minSize: 150,
       },
       {
         header: "Acciones",
         enableSorting: false,
-        minSize: "max-content",
+        maxSize: 140,
         cell: (info) => {
           const room = info.row.original;
           return (
@@ -385,6 +361,11 @@ const RoomsView = () => {
   const table = useReactTable({
     data: filteredData,
     columns,
+    defaultColumn: {
+      maxSize: "none",
+      minSize: 50,
+      size: "auto",
+    },
     state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -606,11 +587,32 @@ const RoomsView = () => {
                           colSpan={row.getVisibleCells().length}
                           className="p-0">
                           <div className="p-2 border border-info-subtle bg-light">
-                            <span>
-                              {row.original?.description
-                                ? row.original?.description
-                                : "Sin Descripción"}
-                            </span>
+                            <Row>
+                              <Col md={6}>
+                                <strong>Creado por:</strong>{" "}
+                                {row.original.createdBy?.firstName}{" "}
+                                {row.original.createdBy?.lastName}
+                              </Col>
+                              <Col md={6}>
+                                <strong>Fecha de creación:</strong>{" "}
+                                {dayjs(row.original.dateCreated).format(
+                                  "DD/MM/YYYY - h:mm A"
+                                )}
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col md={6}>
+                                <strong>Modificado por:</strong>{" "}
+                                {row.original.modifiedBy?.firstName}{" "}
+                                {row.original.modifiedBy?.lastName}
+                              </Col>
+                              <Col md={6}>
+                                <strong>Fecha de modificación:</strong>{" "}
+                                {dayjs(row.original.dateModified).format(
+                                  "DD/MM/YYYY - h:mm A"
+                                )}
+                              </Col>
+                            </Row>
                           </div>
                         </td>
                       </tr>

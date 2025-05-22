@@ -103,7 +103,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Update)]
         public ActionResult<SuccessResponse> Update(RoomAddUpdateRequest model)
         {
-            int code = 200;
             ObjectResult result = null;
 
             try
@@ -117,10 +116,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                code = 500;
                 ErrorResponse error = new ErrorResponse();
                 Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                result = StatusCode(code, error);
+                result = StatusCode(500, error);
             }
 
             return result;
@@ -131,7 +129,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Delete)]
         public ActionResult<SuccessResponse> Delete(int id)
         {
-            int code = 200;
             ObjectResult result = null;
 
             try
@@ -144,21 +141,18 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (MySqlException dbEx)
             {
-                code = 500;
-
                 ErrorResponse error = dbEx.Number == 1001 ?
-                    new ErrorResponse(HotelManagementErrorCode.RoomHasActiveBookings) :
+                    new ErrorResponse(HotelManagementErrorCode.HasActiveBooking) :
                     new ErrorResponse();
 
                 Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
-                result = StatusCode(code, error);
+                result = StatusCode(500, error);
             }
             catch (Exception ex)
             {
-                code = 500;
                 ErrorResponse error = new ErrorResponse();
                 Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                result = StatusCode(code, error);
+                result = StatusCode(500, error);
             }
 
             return result;

@@ -30,7 +30,7 @@ export default function useBookingFormData(hotelId, dates) {
 
     Promise.allSettled([
       getRoomsByHotelId(hotelId, true),
-      getChargesByHotelId(hotelId),
+      getChargesByHotelId(hotelId, true),
       getBookingProvidersMinimalByHotelId(hotelId),
     ])
       .then(([roomsResult, chargesResult, bookingProvidersResult]) => {

@@ -8,6 +8,6 @@ namespace TourGo.Web.Models.Enums
 {
     public enum HotelManagementErrorCode
     {
-        RoomHasActiveBookings = BaseErrorCode.HotelManagementError + 1,
+        HasActiveBooking = BaseErrorCode.HotelManagementError + 1,
     }
 }

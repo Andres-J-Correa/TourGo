@@ -89,13 +89,13 @@ export const useNavbarItems = () => {
                 capitalize: true,
               },
               {
-                name: "Proveedores de Reservas",
-                path: `/hotels/${hotel.current.id}/booking-providers`,
-              },
-              {
                 name: "Cargos Extra",
                 path: `/hotels/${hotel.current.id}/extra-charges`,
                 capitalize: true,
+              },
+              {
+                name: "Proveedores de Reservas",
+                path: `/hotels/${hotel.current.id}/booking-providers`,
               },
             ],
           },
