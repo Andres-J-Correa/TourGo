@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardBody, CardHeader, Row, Col } from "reactstrap";
 
 import { groupRoomBookings } from "components/bookings/booking-summary/helpers";
+import { bookingStatuses } from "components/bookings/constants";
 import CustomerInfo from "components/bookings/booking-summary/CustomerInfo";
 import BookingDetails from "components/bookings/booking-summary/BookingDetails";
 import BookingFinancials from "components/bookings/booking-summary/BookingFinancials";
@@ -21,7 +22,7 @@ const BookingSummary = ({
   return (
     <Card className="mb-4 bg-body-tertiary shadow">
       <CardHeader tag="h4" className="text-bg-dark text-center">
-        Reserva # {bookingData?.id}
+        Reserva # {bookingData?.id} - {bookingStatuses[bookingData?.status?.id]}
       </CardHeader>
       <CardBody className="text-dark">
         <Row>

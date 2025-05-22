@@ -2,6 +2,7 @@
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Bookings;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Enums.Bookings;
 using TourGo.Models.Requests.Bookings;
 using TourGo.Models.Responses;
 
@@ -21,5 +22,6 @@ namespace TourGo.Services.Interfaces
         List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, int hotelId);
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
+        void UpdateStatus(int bookingId, int userId, BookingStatusEnum status);
     }
 }

@@ -34,6 +34,7 @@ import {
   bookingKeysToCompare,
   currentFormKeysToCompare,
 } from "components/bookings/constants";
+import { errorCodes } from "constants/errorCodes";
 
 import useBookingFormData from "./hooks/useBookingFormData";
 import useBookingTotals from "./hooks/useBookingTotals";
@@ -526,11 +527,17 @@ export default withFormik({
         throw new Error("Error al guardar la reserva");
       }
     } catch (err) {
-      Swal.close(); // Close loading
+      let errorMessage =
+        "Error al guardar la reserva. Por favor, inténtelo de nuevo. Si el problema persiste, contacte al soporte técnico.";
+      if (Number(err?.response?.data?.code) === errorCodes.IS_LOCKED) {
+        errorMessage = "No se puede actualizar reservas con estado terminado.";
+      }
+
+      Swal.close();
       await Swal.fire({
         icon: "error",
         title: "Error",
-        text: "No se pudo guardar la reserva, intente nuevamente.",
+        text: errorMessage,
       });
     }
   },

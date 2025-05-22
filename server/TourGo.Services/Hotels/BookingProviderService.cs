@@ -114,14 +114,7 @@ namespace TourGo.Services.Hotels
             bookingProvider.Id = reader.GetSafeInt32(index++);
             bookingProvider.Name = reader.GetSafeString(index++);
             bookingProvider.IsActive = reader.GetSafeBool(index++);
-            bookingProvider.CreatedBy.Id = reader.GetSafeInt32(index++);
-            bookingProvider.CreatedBy.FirstName = reader.GetSafeString(index++);
-            bookingProvider.CreatedBy.LastName = reader.GetSafeString(index++);
-            bookingProvider.ModifiedBy.Id = reader.GetSafeInt32(index++);
-            bookingProvider.ModifiedBy.FirstName = reader.GetSafeString(index++);
-            bookingProvider.ModifiedBy.LastName = reader.GetSafeString(index++);
-            bookingProvider.DateCreated = reader.GetSafeDateTime(index++);
-            bookingProvider.DateModified = reader.GetSafeDateTime(index++);
+            bookingProvider.MapFromReader(reader, ref index);
 
             return bookingProvider;
         }

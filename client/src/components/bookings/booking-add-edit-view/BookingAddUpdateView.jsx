@@ -10,7 +10,11 @@ import TabNavigation from "components/bookings/booking-add-edit-view/TabNavigati
 import { toast } from "react-toastify";
 import { getById as getBookingById } from "services/bookingService";
 
-import { bookingFormTabs as tabs, defaultBooking } from "../constants";
+import {
+  bookingFormTabs as tabs,
+  defaultBooking,
+  BOOKING_STATUS_DICTIONARY,
+} from "../constants";
 
 import CustomerForm from "components/bookings/booking-add-edit-view/CustomerForm";
 import BookingForm from "components/bookings/booking-add-edit-view/BookingForm";
@@ -154,6 +158,11 @@ const BookingAddUpdateView = () => {
             submitting={submitting}
             entity={booking}
             setEntity={setBooking}
+            showAddButton={
+              booking?.status?.id !== BOOKING_STATUS_DICTIONARY.CANCELLED &&
+              booking?.status?.id !== BOOKING_STATUS_DICTIONARY.NO_SHOW &&
+              booking?.status?.id !== BOOKING_STATUS_DICTIONARY.COMPLETED
+            }
           />
         </TabPane>
         <TabPane tabId={3}>

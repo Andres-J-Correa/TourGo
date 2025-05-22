@@ -1,6 +1,5 @@
 import React from "react";
 import { Row, Col } from "reactstrap";
-import { bookingStatuses } from "components/bookings/constants";
 import dayjs from "dayjs";
 
 const BookingDetails = ({ bookingData }) => (
@@ -34,17 +33,13 @@ const BookingDetails = ({ bookingData }) => (
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col md={5}>
             <strong>Proveedor</strong>
             <p>
               {bookingData?.bookingProvider?.name
                 ? bookingData?.bookingProvider.name
                 : "-"}
             </p>
-          </Col>
-          <Col md="auto">
-            <strong>Estado:</strong>{" "}
-            <p>{bookingStatuses[bookingData?.status?.id]}</p>
           </Col>
           <Col md="auto">
             <strong>Noches:</strong> <p>{bookingData?.nights}</p>

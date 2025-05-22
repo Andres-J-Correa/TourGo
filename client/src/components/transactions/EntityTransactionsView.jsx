@@ -12,6 +12,7 @@ const EntityTransactionsView = ({
   entity,
   setEntity,
   showTotals = true,
+  showAddButton = true,
 }) => {
   const [mappedTransactions, setMappedTransactions] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -113,7 +114,7 @@ const EntityTransactionsView = ({
           </>
         )}
 
-        {!showForm && (
+        {!showForm && showAddButton && (
           <div className="text-center mb-3">
             <Button color="primary" onClick={handleAddTransactionClick}>
               Agregar Transacción

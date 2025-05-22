@@ -66,8 +66,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<ExtraCharge>> GetByHotel(int id, [FromQuery] bool? isActive)
         {
-            int code = 200;
-            BaseResponse response = null;
+            ObjectResult result = null;
 
             try
             {
@@ -75,22 +74,23 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 if (list == null)
                 {
-                    code = 404;
-                    response = new ErrorResponse("App Resource not found.");
+                    ErrorResponse response = new ErrorResponse("App Resource not found.");
+                    result = NotFound404(response);
                 }
                 else
                 {
-                    response = new ItemsResponse<ExtraCharge> { Items = list };
+                    ItemsResponse<ExtraCharge>  response = new ItemsResponse<ExtraCharge> { Items = list };
+                    result = Ok200(response);
                 }
             }
             catch (Exception ex)
             {
-                code = 500;
-                response = new ErrorResponse();
+                ErrorResponse response = new ErrorResponse();
                 Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                result = StatusCode(500, response);
             }
 
-            return StatusCode(code, response);
+            return result;
         }
 
         [HttpPut("{id:int}")]

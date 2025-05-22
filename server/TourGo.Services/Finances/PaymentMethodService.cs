@@ -114,14 +114,7 @@ namespace TourGo.Services.Finances
             paymentMethod.Id = reader.GetSafeInt32(index++);
             paymentMethod.Name = reader.GetSafeString(index++);
             paymentMethod.IsActive = reader.GetSafeBool(index++);
-            paymentMethod.CreatedBy.Id = reader.GetSafeInt32(index++);
-            paymentMethod.CreatedBy.FirstName = reader.GetSafeString(index++);
-            paymentMethod.CreatedBy.LastName = reader.GetSafeString(index++);
-            paymentMethod.ModifiedBy.Id = reader.GetSafeInt32(index++);
-            paymentMethod.ModifiedBy.FirstName = reader.GetSafeString(index++);
-            paymentMethod.ModifiedBy.LastName = reader.GetSafeString(index++);
-            paymentMethod.DateCreated = reader.GetSafeDateTime(index++);
-            paymentMethod.DateModified = reader.GetSafeDateTime(index++);
+            paymentMethod.MapFromReader(reader, ref index);
             return paymentMethod;
         }
     }

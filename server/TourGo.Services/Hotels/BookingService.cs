@@ -16,6 +16,7 @@ using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Domain.Users;
+using TourGo.Models.Enums.Bookings;
 using TourGo.Models.Requests.Bookings;
 using TourGo.Models.Responses;
 using TourGo.Services.Customers;
@@ -257,6 +258,17 @@ namespace TourGo.Services.Hotels
             });
 
             return list;
+        }
+
+        public void UpdateStatus(int bookingId, int userId, BookingStatusEnum status)
+        {
+            string proc = "bookings_update_status";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_bookingId", bookingId);
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_statusId", (int)status);
+            });
         }
 
         public bool IsValidSortDirection(string? direction)
