@@ -13,6 +13,8 @@ using TourGo.Web.Models.Responses;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Hotels;
+using MySql.Data.MySqlClient;
+using TourGo.Web.Models.Enums;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -100,6 +102,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok(response);
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error = dbEx.Number == 1001 ?
+                    new ErrorResponse(HotelManagementErrorCode.HasActiveBooking) :
+                    new ErrorResponse();
+
+                Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                result = StatusCode(500, error);
             }
             catch (Exception ex)
             {

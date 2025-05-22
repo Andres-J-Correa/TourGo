@@ -269,8 +269,7 @@ const RoomsView = () => {
         let errorMessage =
           "No se pudo eliminar la habitación, intente nuevamente.";
         if (
-          Number(error?.response.data?.code) ===
-          errorCodes.ROOM_HAS_ACTIVE_BOOKINGS
+          Number(error?.response.data?.code) === errorCodes.HAS_ACTIVE_BOOKINGS
         ) {
           errorMessage =
             "No se puede eliminar la habitación porque tiene reservas activas.";

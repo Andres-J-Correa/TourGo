@@ -14,7 +14,7 @@ export const errorCodes = {
   PHONE_ALREADY_EXISTS: 3003,
 
   // Hotel Management-specific error codes
-  ROOM_HAS_ACTIVE_BOOKINGS: 4001,
+  HAS_ACTIVE_BOOKINGS: 4001,
 
   // Add other specific error codes here
 };

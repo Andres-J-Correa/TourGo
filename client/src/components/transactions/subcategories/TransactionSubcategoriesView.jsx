@@ -329,14 +329,20 @@ function TransactionSubcategoriesView() {
                     color="info"
                     size="sm"
                     className="me-2"
-                    onClick={() => handleUpdateClick(subcategory)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateClick(subcategory);
+                    }}>
                     Editar
                   </Button>
                   <Button
                     color="danger"
                     size="sm"
                     className="btn-sm"
-                    onClick={() => handleDeleteClick(subcategory.id)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(subcategory.id);
+                    }}>
                     Eliminar
                   </Button>
                 </div>

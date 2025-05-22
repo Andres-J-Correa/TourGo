@@ -41,6 +41,7 @@ import {
   updateById,
 } from "services/bookingProviderService";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { errorCodes } from "constants/errorCodes";
 
 // Components
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -261,11 +262,20 @@ function BookingProvidersView() {
           });
         }
       } catch (error) {
-        Swal.close(); // Close loading
+        let errorMessage =
+          "No se pudo eliminar el proveedor, intente nuevamente.";
+        if (
+          Number(error?.response.data?.code) === errorCodes.HAS_ACTIVE_BOOKINGS
+        ) {
+          errorMessage =
+            "No se puede eliminar el proveedor porque tiene reservas activas asociadas.";
+        }
+
+        Swal.close();
         await Swal.fire({
           icon: "error",
           title: "Error",
-          text: "No se pudo eliminar el proveedor de reservas, intente nuevamente.",
+          text: errorMessage,
         });
       } finally {
         setIsUploading(false);
@@ -296,23 +306,29 @@ function BookingProvidersView() {
         enableSorting: false,
         maxSize: 140,
         cell: (info) => {
-          const paymentMethod = info.row.original;
+          const bookingProvider = info.row.original;
           return (
             <>
-              {paymentMethod.isActive && (
-                <div>
+              {bookingProvider.isActive && (
+                <div style={{ minWidth: "max-content" }}>
                   <Button
                     color="info"
                     size="sm"
                     className="me-2"
-                    onClick={() => handleUpdateClick(paymentMethod)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateClick(bookingProvider);
+                    }}>
                     Editar
                   </Button>
                   <Button
                     color="danger"
                     size="sm"
                     className="btn-sm"
-                    onClick={() => handleDeleteClick(paymentMethod.id)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(bookingProvider.id);
+                    }}>
                     Eliminar
                   </Button>
                 </div>
