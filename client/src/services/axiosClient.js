@@ -18,10 +18,7 @@ axiosRetry(axiosClient, {
   },
   retryCondition: (error) => {
     // Retry on network errors or specific status codes (e.g., 503)
-    return (
-      axiosRetry.isNetworkOrIdempotentRequestError(error) ||
-      error.response?.status === 503
-    );
+    return axiosRetry.isNetworkError(error) || error.response?.status === 503;
   },
 });
 

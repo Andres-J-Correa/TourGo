@@ -15,6 +15,15 @@ namespace TourGo.Web.Models.Responses
             Errors.Add("An unexpected error occurred while processing your request.");
             this.IsSuccessful = false;
         }
+
+        public ErrorResponse(Enum specificCode)
+        {
+            Errors = new List<string>();
+            Errors.Add("An unexpected error occurred while processing your request.");
+            this.Code = Convert.ToInt32(specificCode);
+            this.IsSuccessful = false;
+        }
+
         public ErrorResponse(string errMsg)
         {
             Errors = new List<string>();
@@ -29,27 +38,11 @@ namespace TourGo.Web.Models.Responses
             this.IsSuccessful = false;
         }
 
-        public ErrorResponse(string errMsg, BaseErrorCode baseCode)
-        {
-            Errors = new List<string>();
-            Errors.Add(errMsg);
-            this.Code = (int)baseCode;
-            this.IsSuccessful = false;
-        }
-
         public ErrorResponse(string errMsg, Enum specificCode)
         {
             Errors = new List<string>();
             Errors.Add(errMsg);
             this.Code = Convert.ToInt32(specificCode);
-            this.IsSuccessful = false;
-        }
-
-        public ErrorResponse(IEnumerable<string> errMsg, BaseErrorCode baseCode)
-        {
-            Errors = new List<string>();
-            Errors.AddRange(errMsg);
-            this.Code = (int)baseCode;
             this.IsSuccessful = false;
         }
 

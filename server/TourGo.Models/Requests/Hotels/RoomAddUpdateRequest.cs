@@ -18,7 +18,7 @@ namespace TourGo.Models.Requests.Hotels
         [Required, Range(1, 50)]
         public int Capacity { get; set; }
 
-        [Required, StringLength(100)]
-        public string Description { get; set; }
+        [StringLength(100, MinimumLength = 2)]
+        public string? Description { get; set; }
     }
 }
