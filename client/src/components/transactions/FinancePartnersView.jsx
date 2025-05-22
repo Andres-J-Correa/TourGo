@@ -308,14 +308,20 @@ function FinancePartnersView() {
                     color="info"
                     size="sm"
                     className="me-2"
-                    onClick={() => handleUpdateClick(financePartner)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateClick(financePartner);
+                    }}>
                     Editar
                   </Button>
                   <Button
                     color="danger"
                     size="sm"
                     className="btn-sm"
-                    onClick={() => handleDeleteClick(financePartner.id)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(financePartner.id);
+                    }}>
                     Eliminar
                   </Button>
                 </div>

@@ -289,8 +289,7 @@ const ExtraChargesView = () => {
       } catch (error) {
         let errorMessage = "No se pudo eliminar el cargo, intente nuevamente.";
         if (
-          Number(error?.response.data?.code) ===
-          errorCodes.ROOM_HAS_ACTIVE_BOOKINGS
+          Number(error?.response.data?.code) === errorCodes.HAS_ACTIVE_BOOKINGS
         ) {
           errorMessage =
             "No se puede eliminar el cargo porque tiene reservas activas asociadas.";
@@ -356,14 +355,20 @@ const ExtraChargesView = () => {
                     color="info"
                     size="sm"
                     className="me-2"
-                    onClick={() => handleUpdateClick(charge)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateClick(charge);
+                    }}>
                     Editar
                   </Button>
                   <Button
                     color="danger"
                     size="sm"
                     className="btn-sm"
-                    onClick={() => handleDeleteClick(charge.id)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(charge.id);
+                    }}>
                     Eliminar
                   </Button>
                 </div>

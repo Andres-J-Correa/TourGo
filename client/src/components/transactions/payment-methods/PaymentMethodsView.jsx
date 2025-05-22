@@ -303,19 +303,25 @@ function PaymentMethodsView() {
           return (
             <>
               {paymentMethod.isActive && (
-                <div>
+                <div style={{ minWidth: "max-content" }}>
                   <Button
                     color="info"
                     size="sm"
                     className="me-2"
-                    onClick={() => handleUpdateClick(paymentMethod)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpdateClick(paymentMethod);
+                    }}>
                     Editar
                   </Button>
                   <Button
                     color="danger"
                     size="sm"
                     className="btn-sm"
-                    onClick={() => handleDeleteClick(paymentMethod.id)}>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(paymentMethod.id);
+                    }}>
                     Eliminar
                   </Button>
                 </div>
