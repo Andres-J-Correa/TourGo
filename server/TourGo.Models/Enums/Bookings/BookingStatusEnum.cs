@@ -12,6 +12,6 @@ namespace TourGo.Models.Enums.Bookings
         Cancelled = 2,
         Completed = 3,
         NoShow = 4,
-        CheckedIn = 5,
+        Arrived = 5,
     }
 }

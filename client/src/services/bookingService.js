@@ -184,7 +184,7 @@ export const updateStatusToCheckedIn = async (bookingId) => {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "PUT",
+    method: "PATCH",
     url: `${api}/${bookingId}/check-in`,
   };
   try {
@@ -201,7 +201,7 @@ export const updateStatusToNoShow = async (bookingId) => {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "PUT",
+    method: "PATCH",
     url: `${api}/${bookingId}/no-show`,
   };
   try {
@@ -218,7 +218,7 @@ export const updateStatusToCompleted = async (bookingId) => {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "PUT",
+    method: "PATCH",
     url: `${api}/${bookingId}/complete`,
   };
   try {
@@ -235,7 +235,7 @@ export const updateStatusToCancelled = async (bookingId) => {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "PUT",
+    method: "PATCH",
     url: `${api}/${bookingId}/cancel`,
   };
   try {

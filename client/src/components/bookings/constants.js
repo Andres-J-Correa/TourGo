@@ -345,7 +345,7 @@ export const bookingStatuses = {
   2: "Cancelado",
   3: "Completado",
   4: "No Show",
-  5: "Arrivada",
+  5: "Arribada",
 };
 
 export const BOOKING_STATUS_DICTIONARY = {

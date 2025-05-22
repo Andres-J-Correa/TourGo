@@ -260,48 +260,14 @@ namespace TourGo.Services.Hotels
             return list;
         }
 
-        public void UpdateStatusToCheckedIn(int bookingId, int userId)
-        {
-
-            string proc = "bookings_update_status";
-            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
-            {
-                param.AddWithValue("p_bookingId", bookingId);
-                param.AddWithValue("p_modifiedBy", userId);
-                param.AddWithValue("p_statusId", (int)BookingStatusEnum.CheckedIn);
-            });
-        }
-
-        public void UpdateStatusToNoShow(int bookingId, int userId)
+        public void UpdateStatus(int bookingId, int userId, BookingStatusEnum status)
         {
             string proc = "bookings_update_status";
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_bookingId", bookingId);
                 param.AddWithValue("p_modifiedBy", userId);
-                param.AddWithValue("p_statusId", (int)BookingStatusEnum.NoShow);
-            });
-        }
-
-        public void UpdateStatusToCancelled(int bookingId, int userId)
-        {
-            string proc = "bookings_update_status";
-            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
-            {
-                param.AddWithValue("p_bookingId", bookingId);
-                param.AddWithValue("p_modifiedBy", userId);
-                param.AddWithValue("p_statusId", (int)BookingStatusEnum.Cancelled);
-            });
-        }
-
-        public void UpdateStatusToCompleted(int bookingId, int userId)
-        {
-            string proc = "bookings_update_status";
-            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
-            {
-                param.AddWithValue("p_bookingId", bookingId);
-                param.AddWithValue("p_modifiedBy", userId);
-                param.AddWithValue("p_statusId", (int)BookingStatusEnum.Completed);
+                param.AddWithValue("p_statusId", (int)status);
             });
         }
 
