@@ -114,14 +114,7 @@ namespace TourGo.Services.Finances
             financePartner.Id = reader.GetSafeInt32(index++);
             financePartner.Name = reader.GetSafeString(index++);
             financePartner.IsActive = reader.GetSafeBool(index++);
-            financePartner.CreatedBy.Id = reader.GetSafeInt32(index++);
-            financePartner.CreatedBy.FirstName = reader.GetSafeString(index++);
-            financePartner.CreatedBy.LastName = reader.GetSafeString(index++);
-            financePartner.ModifiedBy.Id = reader.GetSafeInt32(index++);
-            financePartner.ModifiedBy.FirstName = reader.GetSafeString(index++);
-            financePartner.ModifiedBy.LastName = reader.GetSafeString(index++);
-            financePartner.DateCreated = reader.GetSafeDateTime(index++);
-            financePartner.DateModified = reader.GetSafeDateTime(index++);
+            financePartner.MapFromReader(reader, ref index);
             return financePartner;
         }
     }

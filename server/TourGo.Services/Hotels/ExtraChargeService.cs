@@ -88,6 +88,7 @@ namespace TourGo.Services.Hotels
             {
                 int index = 0;
                 ExtraCharge extraCharge = MapExtraCharge(reader, ref index);
+                extraCharge.MapFromReader(reader, ref index);
 
                 list ??= new List<ExtraCharge>();
 
@@ -105,20 +106,9 @@ namespace TourGo.Services.Hotels
             extraCharge.Id = reader.GetSafeInt32(index++);
             extraCharge.Name = reader.GetSafeString(index++);
             extraCharge.Amount = reader.GetSafeDecimal(index++);
-            extraCharge.Type = new Lookup
-            {
-                Id = reader.GetSafeInt32(index++),
-                Name = reader.GetSafeString(index++)
-            };
+            extraCharge.Type.Id = reader.GetSafeInt32(index++);
+            extraCharge.Type.Name = reader.GetSafeString(index++);
             extraCharge.IsActive = reader.GetSafeBool(index++);
-            extraCharge.CreatedBy.Id = reader.GetSafeInt32(index++);
-            extraCharge.CreatedBy.FirstName = reader.GetSafeString(index++);
-            extraCharge.CreatedBy.LastName = reader.GetSafeString(index++);
-            extraCharge.ModifiedBy.Id = reader.GetSafeInt32(index++);
-            extraCharge.ModifiedBy.FirstName = reader.GetSafeString(index++);
-            extraCharge.ModifiedBy.LastName = reader.GetSafeString(index++);
-            extraCharge.DateCreated = reader.GetSafeDateTime(index++);
-            extraCharge.DateModified = reader.GetSafeDateTime(index++);
 
             return extraCharge;
         }

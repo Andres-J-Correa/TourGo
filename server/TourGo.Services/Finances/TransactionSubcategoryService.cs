@@ -122,14 +122,7 @@ namespace TourGo.Services.Finances
             transactionSubcategory.Name = reader.GetSafeString(index++);
             transactionSubcategory.CategoryId = reader.GetSafeInt32(index++);
             transactionSubcategory.IsActive = reader.GetSafeBool(index++);
-            transactionSubcategory.CreatedBy.Id = reader.GetSafeInt32(index++);
-            transactionSubcategory.CreatedBy.FirstName = reader.GetSafeString(index++);
-            transactionSubcategory.CreatedBy.LastName = reader.GetSafeString(index++);
-            transactionSubcategory.ModifiedBy.Id = reader.GetSafeInt32(index++);
-            transactionSubcategory.ModifiedBy.FirstName = reader.GetSafeString(index++);
-            transactionSubcategory.ModifiedBy.LastName = reader.GetSafeString(index++);
-            transactionSubcategory.DateCreated = reader.GetSafeDateTime(index++);
-            transactionSubcategory.DateModified = reader.GetSafeDateTime(index++);
+            transactionSubcategory.MapFromReader(reader, ref index);
             return transactionSubcategory;
         }
 
