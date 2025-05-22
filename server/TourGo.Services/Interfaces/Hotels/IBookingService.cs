@@ -21,5 +21,9 @@ namespace TourGo.Services.Interfaces
         List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, int hotelId);
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
+        void UpdateStatusToCheckedIn(int bookingId, int userId);
+        void UpdateStatusToCompleted(int bookingId, int userId);
+        void UpdateStatusToCancelled(int bookingId, int userId);
+        void UpdateStatusToNoShow(int bookingId, int userId);
     }
 }

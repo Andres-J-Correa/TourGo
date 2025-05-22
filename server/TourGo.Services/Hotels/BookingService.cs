@@ -16,6 +16,7 @@ using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Domain.Users;
+using TourGo.Models.Enums.Bookings;
 using TourGo.Models.Requests.Bookings;
 using TourGo.Models.Responses;
 using TourGo.Services.Customers;
@@ -257,6 +258,51 @@ namespace TourGo.Services.Hotels
             });
 
             return list;
+        }
+
+        public void UpdateStatusToCheckedIn(int bookingId, int userId)
+        {
+
+            string proc = "bookings_update_status";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_bookingId", bookingId);
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_statusId", (int)BookingStatusEnum.CheckedIn);
+            });
+        }
+
+        public void UpdateStatusToNoShow(int bookingId, int userId)
+        {
+            string proc = "bookings_update_status";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_bookingId", bookingId);
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_statusId", (int)BookingStatusEnum.NoShow);
+            });
+        }
+
+        public void UpdateStatusToCancelled(int bookingId, int userId)
+        {
+            string proc = "bookings_update_status";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_bookingId", bookingId);
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_statusId", (int)BookingStatusEnum.Cancelled);
+            });
+        }
+
+        public void UpdateStatusToCompleted(int bookingId, int userId)
+        {
+            string proc = "bookings_update_status";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_bookingId", bookingId);
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_statusId", (int)BookingStatusEnum.Completed);
+            });
         }
 
         public bool IsValidSortDirection(string? direction)

@@ -17,6 +17,8 @@ using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 using TourGo.Web.Api.Extensions;
 using Microsoft.Extensions.Caching.Memory;
+using MySql.Data.MySqlClient;
+using TourGo.Web.Models.Enums;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -87,6 +89,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 SuccessResponse response = new SuccessResponse();
 
                 result = Ok200(response);
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error = dbEx.Number == 1002 ?
+                    new ErrorResponse(HotelManagementErrorCode.IsLocked) :
+                    new ErrorResponse();
+
+                Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                result = StatusCode(500, error);
             }
             catch (Exception ex)
             {
@@ -304,6 +315,110 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                     result = Ok200(response);
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPut("{id:int}/check-in")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> UpdateStatusToCheckedIn(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.UpdateStatusToCheckedIn(id, userId);
+
+                SuccessResponse response = new SuccessResponse();
+
+                result = Ok200(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPut("{id:int}/complete")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> UpdateStatusToCompleted(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.UpdateStatusToCompleted(id, userId);
+
+                SuccessResponse response = new SuccessResponse();
+
+                result = Ok200(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPut("{id:int}/cancel")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> UpdateStatusToCancelled(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.UpdateStatusToCancelled(id, userId);
+
+                SuccessResponse response = new SuccessResponse();
+
+                result = Ok200(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPut("{id:int}/no-show")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> UpdateStatusToNoShow(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.UpdateStatusToNoShow(id, userId);
+
+                SuccessResponse response = new SuccessResponse();
+
+                result = Ok200(response);
             }
             catch (Exception ex)
             {

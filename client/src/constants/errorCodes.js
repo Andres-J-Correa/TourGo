@@ -15,6 +15,7 @@ export const errorCodes = {
 
   // Hotel Management-specific error codes
   HAS_ACTIVE_BOOKINGS: 4001,
+  IS_LOCKED: 4002,
 
   // Add other specific error codes here
 };
