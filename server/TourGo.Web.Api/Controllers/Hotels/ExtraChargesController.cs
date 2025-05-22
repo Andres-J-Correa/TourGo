@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services;
-using TourGo.Services.Hotels;
 using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
@@ -12,7 +10,6 @@ using TourGo.Web.Models.Responses;
 using TourGo.Web.Api.Extensions;
 using TourGo.Services.Interfaces;
 using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
 using TourGo.Web.Models.Enums;
 
 namespace TourGo.Web.Api.Controllers.Hotels

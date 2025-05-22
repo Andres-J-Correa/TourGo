@@ -13,7 +13,7 @@ export const errorCodes = {
   EMAIL_ALREADY_EXISTS: 3002,
   PHONE_ALREADY_EXISTS: 3003,
 
-  // Hotel MAnagement-specific error codes
+  // Hotel Management-specific error codes
   ROOM_HAS_ACTIVE_BOOKINGS: 4001,
 
   // Add other specific error codes here

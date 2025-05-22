@@ -1,15 +1,12 @@
 ﻿using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
 using System.Data;
-using System.Security.Claims;
 using TourGo.Data;
 using TourGo.Data.Extensions;
 using TourGo.Data.Providers;
 using TourGo.Models;
 using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Users;
-using TourGo.Models.Enums;
 using TourGo.Models.Requests.Users;
 using TourGo.Services.Interfaces.Users;
 
