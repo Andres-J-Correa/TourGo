@@ -1,44 +1,84 @@
-import React, { useEffect, useState } from "react";
+// External Libraries
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  flexRender,
+  getExpandedRowModel,
+} from "@tanstack/react-table";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowUpShortWide,
+  faArrowDownWideShort,
+  faSort,
+} from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 import {
   Button,
   Card,
   CardBody,
   CardTitle,
-  CardText,
-  Row,
   Col,
-  Spinner,
+  Input,
   InputGroup,
+  Label,
+  Row,
+  Spinner,
 } from "reactstrap";
-import { Formik, Form } from "formik";
+import Swal from "sweetalert2";
+import dayjs from "dayjs";
+import classNames from "classnames";
+
+// Internal Services/Utilities
 import {
   getByHotelId,
   add,
   updateById,
   deleteById,
 } from "services/extraChargeService";
-import CustomField from "components/commonUI/forms/CustomField";
-import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
+import { useAppContext } from "contexts/GlobalAppContext"; // Assuming you have this context
 import Breadcrumb from "components/commonUI/Breadcrumb";
-import { toast } from "react-toastify";
+import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
-import { EXTRA_CHARGE_TYPES, addValidationSchema } from "./constants";
-import Swal from "sweetalert2";
+import ErrorBoundary from "components/commonUI/ErrorBoundary";
+import { EXTRA_CHARGE_TYPES } from "./constants";
+import { errorCodes } from "constants/errorCodes";
+
+// Validation Schema
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(100, "El nombre no puede exceder los 100 caracteres")
+    .required("El nombre es requerido"),
+  typeId: Yup.string()
+    .required("El tipo es requerido")
+    .oneOf(
+      EXTRA_CHARGE_TYPES.map((type) => type.value.toString()),
+      "Tipo inválido"
+    ),
+  amount: Yup.number()
+    .min(0, "El monto debe ser mayor o igual a 0")
+    .required("El monto es requerido"),
+});
 
 const ExtraChargesView = () => {
+  const { hotelId } = useParams();
+  const { user } = useAppContext(); // Assuming you have user context
   const [extraCharges, setExtraCharges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sorting, setSorting] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [isActiveFilter, setIsActiveFilter] = useState("active");
   const [isUploading, setIsUploading] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [initialValues, setInitialValues] = useState({
     name: "",
     typeId: "",
     amount: "",
   });
-  const [chargeIdToDelete, setChargeIdToDelete] = useState(null);
-
-  const { hotelId } = useParams();
 
   const breadcrumbs = [
     { label: "Inicio", path: "/" },
@@ -46,251 +86,573 @@ const ExtraChargesView = () => {
     { label: "Hotel", path: `/hotels/${hotelId}` },
   ];
 
-  const toggleForm = () => {
-    let isHiding = showForm;
-    setShowForm((prev) => !prev);
+  const filteredData = useMemo(() => {
+    switch (isActiveFilter) {
+      case "active":
+        return extraCharges.filter((item) => item.isActive === true);
+      case "inactive":
+        return extraCharges.filter((item) => item.isActive === false);
+      default:
+        return extraCharges;
+    }
+  }, [extraCharges, isActiveFilter]);
+
+  const toggleForm = useCallback(() => {
+    let isHiding = false;
+    setShowForm((prev) => {
+      isHiding = prev;
+      return !prev;
+    });
     if (isHiding) {
       setInitialValues({ name: "", typeId: "", amount: "" });
     }
-  };
+  }, []);
 
-  // Format Amounts
+  const currentUser = useMemo(() => {
+    return {
+      id: user.current?.id,
+      firstName: user.current?.firstName,
+      lastName: user.current?.lastName,
+    };
+  }, [user]);
+
+  // Format Amounts for Display
   const formatAmount = (amount, typeId) => {
-    if (typeId === 1) return `${amount * 100}%`; // Percentage
-    return `$${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`; // Daily/General
+    if (Number(typeId) === 1) return `${(amount * 100).toFixed(2)}%`; // Percentage
+    return `$${Number(amount)
+      .toFixed(2)
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`; // Daily/General
   };
 
-  // Form Submission
   const handleSubmit = async (values) => {
-    try {
-      const amount =
-        Number(values.typeId) === 1 ? values.amount / 100 : values.amount;
-      setIsUploading(true);
+    const { id, ...data } = values;
+    const amount =
+      Number(values.typeId) === 1 ? values.amount / 100 : values.amount;
 
+    const result = await Swal.fire({
+      title: `Está seguro de que desea ${
+        id ? "actualizar" : "agregar"
+      } el cargo adicional?`,
+      text: id
+        ? "Esta acción puede afectar reservas existentes."
+        : "Revise los datos antes de continuar.",
+      icon: id ? "warning" : "info",
+      showCancelButton: true,
+      confirmButtonText: "Sí, guardar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: Boolean(id),
+      confirmButtonColor: id ? "red" : "#0d6efd",
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: "Guardando cargo adicional",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      setIsUploading(true);
+      let response;
       if (values.id) {
-        const res = await updateById({ ...values, amount }, values.id);
-        if (res.isSuccessful && res.item > 0) {
-          const updatedCharges = extraCharges.map((charge) =>
-            charge.id === values.id
-              ? { ...charge, ...values, amount, id: res.item }
-              : charge
-          );
-          setExtraCharges(updatedCharges);
-          toast.success("Cargo adicional actualizado correctamente");
-        }
+        response = await updateById({ ...values, amount }, id);
       } else {
-        const res = await add({ ...values, amount }, hotelId);
-        if (res.isSuccessful && res.item > 0) {
-          const charge = {
-            id: res.item,
-            ...values,
-            amount,
-            type: { id: values.typeId },
-          };
-          setExtraCharges((prev) => [...prev, charge]);
-          toast.success("Cargo adicional agregado correctamente");
-        }
+        response = await add({ ...values, amount }, hotelId);
       }
-      setShowForm(false);
+
+      Swal.close();
+
+      if (response?.isSuccessful) {
+        if (id) {
+          setExtraCharges((prev) => {
+            const copyOfPrev = [...prev];
+            const index = copyOfPrev.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              copyOfPrev[index] = {
+                ...copyOfPrev[index],
+                ...data,
+                amount,
+                type: { id: values.typeId },
+                modifiedBy: { ...currentUser },
+                dateModified: new Date(),
+              };
+              return copyOfPrev;
+            }
+            return prev;
+          });
+        } else {
+          setExtraCharges((prev) => [
+            ...prev,
+            {
+              ...data,
+              amount,
+              id: response.item,
+              type: { id: values.typeId },
+              createdBy: { ...currentUser },
+              dateCreated: new Date(),
+              modifiedBy: { ...currentUser },
+              dateModified: new Date(),
+              isActive: true,
+            },
+          ]);
+        }
+        toggleForm();
+        await Swal.fire({
+          icon: "success",
+          title: "Cargo adicional guardado",
+          text: "El cargo adicional se ha guardado correctamente",
+          timer: 1500,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+        });
+      } else {
+        throw new Error("Error al guardar el cargo adicional");
+      }
     } catch (error) {
-      toast.error("Hubo un error al agregar el cargo adicional");
+      Swal.close();
+      await Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo guardar el cargo adicional, intente nuevamente.",
+      });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleEditExtraCharge = async (charge) => {
+  const handleUpdateClick = (charge) => {
     const amount =
       Number(charge.type.id) === 1 ? charge.amount * 100 : charge.amount;
-    setInitialValues({ ...charge, typeId: charge.type.id, amount });
+    setInitialValues({
+      id: charge.id,
+      name: charge.name,
+      typeId: charge.type.id,
+      amount,
+    });
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDeleteExtraCharge = async (id) => {
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          setIsUploading(true);
-          setChargeIdToDelete(id);
-          const res = await deleteById(id);
-          if (res.isSuccessful) {
-            const newCharges = extraCharges.filter(
-              (charge) => charge.id !== id
-            );
-            setExtraCharges(newCharges);
-            toast.success("Cargo adicional eliminado correctamente");
-          }
-        } catch (error) {
-          toast.error("Hubo un error al eliminar el cargo adicional");
-        } finally {
-          setIsUploading(false);
-          setChargeIdToDelete(null);
-        }
+  const handleDeleteClick = useCallback(
+    async (id) => {
+      const result = await Swal.fire({
+        title: "¿Está seguro?",
+        text: "No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (!result.isConfirmed) {
+        return;
       }
-    });
+
+      try {
+        setIsUploading(true);
+        Swal.fire({
+          title: "Eliminando el cargo adicional",
+          text: "Por favor espera",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        const response = await deleteById(id);
+        if (response.isSuccessful) {
+          setExtraCharges((prev) => {
+            const copyOfPrev = [...prev];
+            const index = copyOfPrev.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              copyOfPrev[index] = {
+                ...copyOfPrev[index],
+                modifiedBy: { ...currentUser },
+                dateModified: new Date(),
+                isActive: false,
+              };
+              return copyOfPrev;
+            }
+            return prev;
+          });
+          await Swal.fire({
+            icon: "success",
+            title: "Cargo adicional eliminado",
+            text: "El cargo adicional se ha eliminado correctamente",
+            timer: 1500,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+          });
+        }
+      } catch (error) {
+        let errorMessage = "No se pudo eliminar el cargo, intente nuevamente.";
+        if (
+          Number(error?.response.data?.code) ===
+          errorCodes.ROOM_HAS_ACTIVE_BOOKINGS
+        ) {
+          errorMessage =
+            "No se puede eliminar el cargo porque tiene reservas activas asociadas.";
+        }
+
+        Swal.close();
+        await Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [currentUser]
+  );
+
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "id",
+        header: "ID",
+        maxSize: 50,
+      },
+      {
+        accessorKey: "name",
+        header: "Nombre",
+        minSize: 200,
+      },
+      {
+        accessorKey: "amount",
+        header: "Monto",
+        maxSize: 200,
+        cell: (info) =>
+          formatAmount(info.getValue(), info.row.original.type.id),
+      },
+      {
+        accessorKey: "type",
+        header: "Tipo",
+        cell: (info) =>
+          EXTRA_CHARGE_TYPES.find(
+            (type) => Number(type.value) === Number(info.getValue().id)
+          )?.label || "N/A",
+      },
+      {
+        accessorKey: "isActive",
+        header: "Activo",
+        maxSize: 70,
+        cell: (info) => (info.getValue() ? "Sí" : "No"),
+      },
+      {
+        header: "Acciones",
+        enableSorting: false,
+        maxSize: 140,
+        cell: (info) => {
+          const charge = info.row.original;
+          return (
+            <>
+              {charge.isActive && (
+                <div style={{ minWidth: "max-content" }}>
+                  <Button
+                    color="info"
+                    size="sm"
+                    className="me-2"
+                    onClick={() => handleUpdateClick(charge)}>
+                    Editar
+                  </Button>
+                  <Button
+                    color="danger"
+                    size="sm"
+                    className="btn-sm"
+                    onClick={() => handleDeleteClick(charge.id)}>
+                    Eliminar
+                  </Button>
+                </div>
+              )}
+            </>
+          );
+        },
+      },
+    ],
+    [handleDeleteClick]
+  );
+
+  const table = useReactTable({
+    data: filteredData,
+    columns,
+    defaultColumn: {
+      maxSize: "none",
+      minSize: 50,
+      size: "auto",
+    },
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getExpandedRowModel: getExpandedRowModel(), // Enable row expansion
+    getRowCanExpand: () => true,
+  });
+
+  const onGetExtraChargesSuccess = (response) => {
+    if (response.isSuccessful) {
+      setExtraCharges(response.items);
+    }
+  };
+
+  const onGetExtraChargesError = (error) => {
+    if (error?.response?.status !== 404) {
+      toast.error("Hubo un error al cargar los cargos adicionales");
+    }
   };
 
   useEffect(() => {
-    setIsLoading(true);
+    setLoading(true);
     getByHotelId(hotelId)
-      .then((res) => {
-        if (res.isSuccessful) {
-          setExtraCharges(res.items);
-        }
-      })
-      .catch((err) => {
-        if (err?.response?.status !== 404) {
-          toast.error("Hubo un error al cargar los cargos adicionales");
-        }
-      })
-      .finally(() => setIsLoading(false));
+      .then(onGetExtraChargesSuccess)
+      .catch(onGetExtraChargesError)
+      .finally(() => {
+        setLoading(false);
+      });
   }, [hotelId]);
 
   return (
     <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Cargos Adicionales" />
-      <Row>
-        <h1>Cargos Adicionales</h1>
-      </Row>
+      <ErrorBoundary>
+        <h3>Cargos Adicionales</h3>
 
-      {/* Add Extra Charge Form */}
-      {showForm && (
-        <Card className="border-0 shadow-lg">
-          <CardBody className="p-3">
-            <CardTitle tag="h5">Nuevo Cargo Adicional</CardTitle>
-            <Formik
-              initialValues={initialValues}
-              validationSchema={addValidationSchema}
-              onSubmit={handleSubmit}
-              enableReinitialize>
-              <Form>
-                <ErrorAlert />
-                <Row>
-                  <Col md="4">
-                    <CustomField
-                      name="name"
-                      type="text"
-                      className="form-control"
-                      placeholder="Nombre del cargo"
-                    />
-                  </Col>
-
-                  <Col md="4">
-                    <InputGroup>
-                      <CustomField
-                        name="amount"
-                        type="number"
-                        className="form-control"
-                        placeholder="Monto"
-                      />
-                      <CustomField
-                        name="typeId"
-                        as="select"
-                        className="form-select">
-                        <option value="" disabled>
-                          Seleccione el tipo
-                        </option>
-                        {EXTRA_CHARGE_TYPES.map((type) => (
-                          <option key={type.value} value={type.value}>
-                            {type.label}
-                          </option>
-                        ))}
-                      </CustomField>
-                    </InputGroup>
-                  </Col>
-
-                  <Col md="4" className="align-content-center">
-                    <div className="text-center">
-                      <Button
-                        disabled={isUploading}
-                        type="submit"
-                        className="btn bg-success text-white mb-3">
-                        {isUploading ? (
-                          <Spinner size="sm" color="light" />
-                        ) : initialValues.id ? (
-                          "Actualizar"
-                        ) : (
-                          "Agregar"
-                        )}
-                      </Button>
-                    </div>
-                  </Col>
-                </Row>
-              </Form>
-            </Formik>
-          </CardBody>
-        </Card>
-      )}
-
-      <Row>
-        <Col>
-          <Button
-            onClick={toggleForm}
-            disabled={isUploading}
-            className={
-              showForm
-                ? "btn bg-warning text-white my-4"
-                : "btn bg-dark text-white my-4"
-            }>
-            {showForm ? "Esconder Formulario" : "Agregar Cargo Adicional"}
+        {showForm && (
+          <Card className="border-0 shadow-lg mt-3">
+            <CardBody className="p-3">
+              <CardTitle tag="h5">
+                {initialValues.id
+                  ? "Editar cargo adicional"
+                  : "Nuevo cargo adicional"}
+              </CardTitle>
+              <Formik
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmit}
+                enableReinitialize>
+                {({ values }) => (
+                  <Form>
+                    <ErrorAlert />
+                    <Row>
+                      <Col md="4">
+                        <CustomField
+                          name="name"
+                          type="text"
+                          className="form-control"
+                          placeholder="Nombre del cargo"
+                          isRequired={true}
+                        />
+                      </Col>
+                      <Col md="4">
+                        <InputGroup>
+                          <CustomField
+                            name="amount"
+                            type="number"
+                            className="form-control"
+                            placeholder="Monto"
+                            isRequired={true}
+                          />
+                          <CustomField
+                            name="typeId"
+                            as="select"
+                            className="form-select"
+                            isRequired={true}>
+                            <option value="" disabled>
+                              Seleccione el tipo
+                            </option>
+                            {EXTRA_CHARGE_TYPES.map((type) => (
+                              <option key={type.value} value={type.value}>
+                                {type.label}
+                              </option>
+                            ))}
+                          </CustomField>
+                        </InputGroup>
+                      </Col>
+                      <Col md="auto" className="align-content-center">
+                        <div className="text-center">
+                          <Button
+                            disabled={isUploading}
+                            type="submit"
+                            className="btn bg-success text-white mb-3">
+                            {isUploading ? (
+                              <Spinner size="sm" color="light" />
+                            ) : initialValues.id ? (
+                              "Actualizar"
+                            ) : (
+                              "Agregar"
+                            )}
+                          </Button>
+                        </div>
+                      </Col>
+                    </Row>
+                  </Form>
+                )}
+              </Formik>
+            </CardBody>
+          </Card>
+        )}
+        <div className="mt-4">
+          <Button color={showForm ? "warning" : "dark"} onClick={toggleForm}>
+            {showForm ? "Cancelar" : "Agregar Cargo Adicional"}
           </Button>
-        </Col>
-      </Row>
-
-      {/* Extra Charges Cards Display */}
-      <LoadingOverlay isVisible={isLoading} message="Cargando" />
-      <Row>
-        {extraCharges.map((charge) => (
-          <Col md="3" key={charge.id} className="mb-4">
-            <Card className="h-100 d-flex flex-column">
-              <CardBody className="d-flex flex-column">
-                <CardTitle tag="h5">{charge.name}</CardTitle>
-                <CardText className="flex-grow-1">
-                  <strong>Monto:</strong>{" "}
-                  {formatAmount(Number(charge.amount), Number(charge.type?.id))}
-                  <br />
-                  <strong>Tipo:</strong>{" "}
-                  {
-                    EXTRA_CHARGE_TYPES.find(
-                      (type) => Number(type.value) === Number(charge.type?.id)
-                    )?.label
-                  }
-                </CardText>
-                <div className="d-flex justify-content-between mt-auto">
-                  <Button
-                    color="secondary"
-                    outline
-                    onClick={() => handleEditExtraCharge(charge)}
-                    disabled={isUploading}>
-                    Editar
-                  </Button>
-                  <Button
-                    color="danger"
-                    outline
-                    onClick={() => handleDeleteExtraCharge(charge.id)}
-                    disabled={isUploading}>
-                    {isUploading && chargeIdToDelete === charge.id ? (
-                      <Spinner size="sm" color="danger" />
-                    ) : (
-                      "Eliminar"
+        </div>
+        <div className="mb-3 float-end">
+          <Label for="isActiveFilter" className="text-dark">
+            Filtrar por Estado
+          </Label>
+          <Input
+            id="isActiveFilter"
+            type="select"
+            style={{ width: "auto" }}
+            value={isActiveFilter}
+            onChange={(e) => setIsActiveFilter(e.target.value)}>
+            <option value="active">Activo</option>
+            <option value="inactive">Inactivo</option>
+            <option value="all">Todos</option>
+          </Input>
+        </div>
+        <div className="table-responsive w-100">
+          <table className="table table-bordered table-striped table-hover">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      onClick={
+                        !loading
+                          ? header.column.getToggleSortingHandler()
+                          : () => {}
+                      }
+                      className={classNames(
+                        "text-bg-dark text-center align-content-center",
+                        {
+                          "cursor-pointer": header.column.getCanSort(),
+                          "text-bg-info": header.column.getIsSorted(),
+                          "cursor-not-allowed": loading,
+                        }
+                      )}
+                      style={{
+                        maxWidth: header.column.columnDef.maxSize || "none",
+                        minWidth: header.column.columnDef.minSize || "none",
+                        width: header.column.getSize() || "auto",
+                      }}>
+                      {
+                        <div
+                          style={{ minWidth: "max-content" }}
+                          className="align-items-center">
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          <span className="float-end ms-2">
+                            {{
+                              asc: (
+                                <FontAwesomeIcon icon={faArrowUpShortWide} />
+                              ),
+                              desc: (
+                                <FontAwesomeIcon icon={faArrowDownWideShort} />
+                              ),
+                            }[header.column.getIsSorted()] ||
+                              (header.column.getCanSort() && (
+                                <FontAwesomeIcon icon={faSort} />
+                              ))}
+                          </span>
+                        </div>
+                      }
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={columns.length} className="text-center">
+                    <Spinner size="sm" /> Cargando...
+                  </td>
+                </tr>
+              ) : table.getRowModel().rows.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="text-center">
+                    No hay reservas
+                  </td>
+                </tr>
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <React.Fragment key={row.id}>
+                    <tr
+                      onClick={() =>
+                        table.setExpanded({ [row.id]: !row.getIsExpanded() })
+                      }
+                      className="cursor-pointer">
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          className={classNames(
+                            "text-center align-content-center",
+                            {
+                              "bg-info-subtle": row.getIsExpanded(),
+                            }
+                          )}
+                          style={{
+                            maxWidth: cell.column.columnDef.maxSize || "none",
+                            minWidth: cell.column.columnDef.minSize || "none",
+                            width: cell.column.getSize() || "auto",
+                          }}
+                          key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                    {row.getIsExpanded() && (
+                      <tr>
+                        <td
+                          colSpan={row.getVisibleCells().length}
+                          className="p-0">
+                          <div className="p-2 border border-info-subtle bg-light">
+                            <Row>
+                              <Col md={6}>
+                                <strong>Creado por:</strong>{" "}
+                                {row.original.createdBy?.firstName}{" "}
+                                {row.original.createdBy?.lastName}
+                              </Col>
+                              <Col md={6}>
+                                <strong>Fecha de creación:</strong>{" "}
+                                {dayjs(row.original.dateCreated).format(
+                                  "DD/MM/YYYY - h:mm A"
+                                )}
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col md={6}>
+                                <strong>Modificado por:</strong>{" "}
+                                {row.original.modifiedBy?.firstName}{" "}
+                                {row.original.modifiedBy?.lastName}
+                              </Col>
+                              <Col md={6}>
+                                <strong>Fecha de modificación:</strong>{" "}
+                                {dayjs(row.original.dateModified).format(
+                                  "DD/MM/YYYY - h:mm A"
+                                )}
+                              </Col>
+                            </Row>
+                          </div>
+                        </td>
+                      </tr>
                     )}
-                  </Button>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+                  </React.Fragment>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </ErrorBoundary>
     </>
   );
 };

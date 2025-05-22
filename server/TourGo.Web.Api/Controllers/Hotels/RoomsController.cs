@@ -1,17 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MySqlX.XDevAPI.Common;
+﻿using Microsoft.AspNetCore.Mvc;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services;
-using TourGo.Services.Hotels;
 using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 using TourGo.Web.Api.Extensions;
 using TourGo.Services.Interfaces;
+using MySql.Data.MySqlClient;
+using TourGo.Web.Models.Enums;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -66,14 +65,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpGet("hotel/{id:int}")]
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<Room>> GetByHotel(int id)
+        public ActionResult<ItemsResponse<Room>> GetByHotel(int id, [FromQuery] bool? isActive)
         {
             int code = 200;
             BaseResponse response = null;
 
             try
             {
-                List<Room>? list = _roomService.GetByHotel(id);
+                List<Room>? list = _roomService.GetByHotel(id, isActive);
 
                 if (list == null)
                 {
@@ -99,31 +98,27 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Update)]
-        public ActionResult<ItemResponse<int>> Update(RoomAddUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(RoomAddUpdateRequest model)
         {
-            int code = 200;
-            BaseResponse response = null;
+            ObjectResult result = null;
 
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
-                int roomId = _roomService.Update(model, userId);
+                _roomService.Update(model, userId);
 
-                if (roomId == 0)
-                {
-                    throw new Exception("Failed to update room");
-                }
+                SuccessResponse response = new SuccessResponse();
+                result= Ok200(response);
 
-                response = new ItemResponse<int> { Item = roomId };
             }
             catch (Exception ex)
             {
-                code = 500;
-                response = new ErrorResponse();
+                ErrorResponse error = new ErrorResponse();
                 Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                result = StatusCode(500, error);
             }
 
-            return StatusCode(code, response);
+            return result;
         }
 
 
@@ -131,24 +126,33 @@ namespace TourGo.Web.Api.Controllers.Hotels
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Delete)]
         public ActionResult<SuccessResponse> Delete(int id)
         {
-            int code = 200;
-            BaseResponse response = null;
+            ObjectResult result = null;
 
             try
             {
                 int userId = _webAuthService.GetCurrentUserId();
                 _roomService.Delete(id, userId);
 
-                response = new SuccessResponse();
+                SuccessResponse response = new SuccessResponse();
+                result = Ok200(response);
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error = dbEx.Number == 1001 ?
+                    new ErrorResponse(HotelManagementErrorCode.HasActiveBooking) :
+                    new ErrorResponse();
+
+                Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                result = StatusCode(500, error);
             }
             catch (Exception ex)
             {
-                code = 500;
-                response = new ErrorResponse();
+                ErrorResponse error = new ErrorResponse();
                 Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                result = StatusCode(500, error);
             }
 
-            return StatusCode(code, response);
+            return result;
         }
 
 

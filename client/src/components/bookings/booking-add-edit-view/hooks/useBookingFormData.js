@@ -29,8 +29,8 @@ export default function useBookingFormData(hotelId, dates) {
     setIsLoadingHotelData(true);
 
     Promise.allSettled([
-      getRoomsByHotelId(hotelId),
-      getChargesByHotelId(hotelId),
+      getRoomsByHotelId(hotelId, true),
+      getChargesByHotelId(hotelId, true),
       getBookingProvidersMinimalByHotelId(hotelId),
     ])
       .then(([roomsResult, chargesResult, bookingProvidersResult]) => {

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TourGo.Data;
 using TourGo.Data.Providers;
+using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services.Interfaces.Hotels;
@@ -31,7 +32,7 @@ namespace TourGo.Services.Hotels
             {
                 param.AddWithValue("p_name", model.Name);
                 param.AddWithValue("p_capacity", model.Capacity);
-                param.AddWithValue("p_description", model.Description);
+                param.AddWithValue("p_description", string.IsNullOrEmpty(model.Description) ? DBNull.Value : model.Description);
                 param.AddWithValue("p_hotelId", model.Id);
                 param.AddWithValue("p_modifiedBy", userId);
 
@@ -48,29 +49,18 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public int Update(RoomAddUpdateRequest model, int userId)
+        public void Update(RoomAddUpdateRequest model, int userId)
         {
-            string proc = "rooms_update_v2";
-            int newId = 0;
+            string proc = "rooms_update";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_name", model.Name);
                 param.AddWithValue("p_capacity", model.Capacity);
-                param.AddWithValue("p_description", model.Description);
+                param.AddWithValue("p_description", string.IsNullOrEmpty(model.Description) ? DBNull.Value : model.Description);
                 param.AddWithValue("p_roomId", model.Id);
                 param.AddWithValue("p_modifiedBy", userId);
-                MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
-                newIdOut.Direction = ParameterDirection.Output;
-                param.Add(newIdOut);
-            }, (returnColl) =>
-            {
-                object newIdObj = returnColl["p_newId"].Value;
-
-                newId = int.TryParse(newIdObj.ToString(), out newId) ? newId : 0;
             });
-
-            return newId;
         }
 
         public void Delete(int id, int userId)
@@ -84,7 +74,7 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public List<Room>? GetByHotel(int hotelId)
+        public List<Room>? GetByHotel(int hotelId, bool? isActive)
         {
             string proc = "rooms_select_by_hotel";
             List<Room>? list = null;
@@ -92,15 +82,12 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
                 param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_isActive", isActive.HasValue ? isActive: DBNull.Value);
             }, (reader, set) =>
             {
-                Room room = new Room();
                 int index = 0;
 
-                room.Id = reader.GetSafeInt32(index++);
-                room.Name = reader.GetSafeString(index++);
-                room.Description = reader.GetSafeString(index++);
-                room.Capacity = reader.GetSafeInt32(index++);
+                Room room = MapRoom(reader, ref index);
 
                 list ??= new List<Room>();
 
@@ -108,6 +95,25 @@ namespace TourGo.Services.Hotels
             });
 
             return list;
+        }
+
+        private static Room MapRoom(IDataReader reader, ref int index)
+        {
+            Room room = new Room();
+            room.Id = reader.GetSafeInt32(index++);
+            room.Name = reader.GetSafeString(index++);
+            room.Description = reader.GetSafeString(index++);
+            room.Capacity = reader.GetSafeInt32(index++);
+            room.IsActive = reader.GetSafeBool(index++);
+            room.CreatedBy.Id = reader.GetSafeInt32(index++);
+            room.CreatedBy.FirstName = reader.GetSafeString(index++);
+            room.CreatedBy.LastName = reader.GetSafeString(index++);
+            room.ModifiedBy.Id = reader.GetSafeInt32(index++);
+            room.ModifiedBy.FirstName = reader.GetSafeString(index++);
+            room.ModifiedBy.LastName = reader.GetSafeString(index++);
+            room.DateCreated = reader.GetSafeDateTime(index++);
+            room.DateModified = reader.GetSafeDateTime(index++);
+            return room;
         }
     }
 }

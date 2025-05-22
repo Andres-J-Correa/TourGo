@@ -6,8 +6,8 @@ namespace TourGo.Services.Interfaces.Hotels
     public interface IRoomService
     {
         int Create(RoomAddUpdateRequest model, int userId);
-        List<Room>? GetByHotel(int hotelId);
-        int Update(RoomAddUpdateRequest model, int userId);
+        List<Room>? GetByHotel(int hotelId, bool? isActive);
+        void Update(RoomAddUpdateRequest model, int userId);
         void Delete(int id, int userId);
     }
 }

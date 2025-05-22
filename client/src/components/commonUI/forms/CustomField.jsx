@@ -52,6 +52,7 @@ const CustomField = ({ isRequired, ...props }) => {
             top: "-7px",
             right: "-3px",
             fontSize: "0.65rem",
+            zIndex: 1,
           }}>
           <FontAwesomeIcon icon={faAsterisk} />
         </div>

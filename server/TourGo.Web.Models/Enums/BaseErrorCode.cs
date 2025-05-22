@@ -11,6 +11,7 @@ namespace TourGo.Web.Models.Enums
         UnknownError = 1000,
         AuthenticationError = 2000,
         UserManagementError = 3000,
+        HotelManagementError = 4000,
         // Add other domains as needed
     }
 

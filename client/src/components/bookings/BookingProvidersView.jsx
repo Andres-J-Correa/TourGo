@@ -8,6 +8,7 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   flexRender,
+  getExpandedRowModel,
 } from "@tanstack/react-table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -30,6 +31,7 @@ import {
 import { isEqual } from "lodash";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
+import classNames from "classnames";
 
 // Internal Services/Utilities
 import {
@@ -45,7 +47,6 @@ import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
-import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -278,6 +279,7 @@ function BookingProvidersView() {
       {
         accessorKey: "id",
         header: "ID",
+        maxSize: 50,
       },
       {
         accessorKey: "name",
@@ -286,41 +288,13 @@ function BookingProvidersView() {
       {
         accessorKey: "isActive",
         header: "Activo",
+        maxSize: 70,
         cell: (info) => (info.getValue() ? "Sí" : "No"),
-      },
-      {
-        accessorKey: "createdBy",
-        header: "Creado por",
-        cell: (info) => {
-          const user = info.getValue();
-          if (user) {
-            return <span>{`${user.firstName} ${user.lastName}`}</span>;
-          }
-        },
-      },
-      {
-        accessorKey: "dateCreated",
-        header: "Fecha de creación",
-        cell: (info) => dayjs(info.getValue()).format("DD/MM/YYYY - h:mm a"),
-      },
-      {
-        accessorKey: "modifiedBy",
-        header: "Modificado por",
-        cell: (info) => {
-          const user = info.getValue();
-          if (user) {
-            return <span>{`${user.firstName} ${user.lastName}`}</span>;
-          }
-        },
-      },
-      {
-        accessorKey: "dateModified",
-        header: "Fecha de modificación",
-        cell: (info) => dayjs(info.getValue()).format("DD/MM/YYYY - h:mm a"),
       },
       {
         header: "Acciones",
         enableSorting: false,
+        maxSize: 140,
         cell: (info) => {
           const paymentMethod = info.row.original;
           return (
@@ -354,12 +328,19 @@ function BookingProvidersView() {
   const table = useReactTable({
     data: filteredData,
     columns,
+    defaultColumn: {
+      maxSize: "none",
+      minSize: 50,
+      size: "auto",
+    },
     state: {
       sorting,
     },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getExpandedRowModel: getExpandedRowModel(), // Enable row expansion
+    getRowCanExpand: () => true,
   });
 
   const onGetBookingProvidersSuccess = (response) => {
@@ -388,7 +369,6 @@ function BookingProvidersView() {
     <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Proveedores de Reservas" />
       <ErrorBoundary>
-        <LoadingOverlay isVisible={loading} />
         <h3>Proveedores de Reservas</h3>
 
         {showForm && (
@@ -470,57 +450,143 @@ function BookingProvidersView() {
             <option value="all">Todos</option>
           </Input>
         </div>
-        <table className="table table-bordered table-striped table-hover">
-          <thead
-            className="border"
-            style={{
-              position: "sticky",
-              top: 0,
-            }}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  const isSortable = header.column.getCanSort();
-                  return (
+        <div className="table-responsive w-100">
+          <table className="table table-bordered table-striped table-hover">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
                     <th
-                      className="text-center align-content-center bg-dark text-white fw-bold"
                       key={header.id}
-                      style={{ cursor: isSortable ? "pointer" : "default" }}
                       onClick={
-                        isSortable
+                        !loading
                           ? header.column.getToggleSortingHandler()
-                          : undefined
-                      }>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
+                          : () => {}
+                      }
+                      className={classNames(
+                        "text-bg-dark text-center align-content-center",
+                        {
+                          "cursor-pointer": header.column.getCanSort(),
+                          "cursor-not-allowed": loading,
+                        }
                       )}
-                      <span className="float-end">
-                        {{
-                          asc: <FontAwesomeIcon icon={faArrowUpShortWide} />,
-                          desc: <FontAwesomeIcon icon={faArrowDownWideShort} />,
-                        }[header.column.getIsSorted()] || (
-                          <FontAwesomeIcon icon={faSort} />
-                        )}
-                      </span>
+                      style={{
+                        maxWidth: header.column.columnDef.maxSize || "none",
+                        minWidth: header.column.columnDef.minSize || "none",
+                        width: header.column.getSize() || "auto",
+                      }}>
+                      {
+                        <div
+                          style={{ minWidth: "max-content" }}
+                          className="align-items-center">
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          <span className="float-end ms-2">
+                            {{
+                              asc: (
+                                <FontAwesomeIcon icon={faArrowUpShortWide} />
+                              ),
+                              desc: (
+                                <FontAwesomeIcon icon={faArrowDownWideShort} />
+                              ),
+                            }[header.column.getIsSorted()] ||
+                              (header.column.getCanSort() && (
+                                <FontAwesomeIcon icon={faSort} />
+                              ))}
+                          </span>
+                        </div>
+                      }
                     </th>
-                  );
-                })}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td className="text-center" key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={columns.length} className="text-center">
+                    <Spinner size="sm" /> Cargando...
                   </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </tr>
+              ) : table.getRowModel().rows.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="text-center">
+                    No hay reservas
+                  </td>
+                </tr>
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <React.Fragment key={row.id}>
+                    <tr
+                      onClick={() =>
+                        table.setExpanded({ [row.id]: !row.getIsExpanded() })
+                      }
+                      className="cursor-pointer">
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          className={classNames(
+                            "text-center align-content-center",
+                            {
+                              "bg-info-subtle": row.getIsExpanded(),
+                            }
+                          )}
+                          style={{
+                            maxWidth: cell.column.columnDef.maxSize || "none",
+                            minWidth: cell.column.columnDef.minSize || "none",
+                            width: cell.column.getSize() || "auto",
+                          }}
+                          key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                    {row.getIsExpanded() && (
+                      <tr>
+                        <td
+                          colSpan={row.getVisibleCells().length}
+                          className="p-0">
+                          <div className="p-2 border border-info-subtle bg-light">
+                            <Row>
+                              <Col md={6}>
+                                <strong>Creado por:</strong>{" "}
+                                {row.original.createdBy?.firstName}{" "}
+                                {row.original.createdBy?.lastName}
+                              </Col>
+                              <Col md={6}>
+                                <strong>Fecha de creación:</strong>{" "}
+                                {dayjs(row.original.dateCreated).format(
+                                  "DD/MM/YYYY - h:mm A"
+                                )}
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col md={6}>
+                                <strong>Modificado por:</strong>{" "}
+                                {row.original.modifiedBy?.firstName}{" "}
+                                {row.original.modifiedBy?.lastName}
+                              </Col>
+                              <Col md={6}>
+                                <strong>Fecha de modificación:</strong>{" "}
+                                {dayjs(row.original.dateModified).format(
+                                  "DD/MM/YYYY - h:mm A"
+                                )}
+                              </Col>
+                            </Row>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </ErrorBoundary>
     </>
   );

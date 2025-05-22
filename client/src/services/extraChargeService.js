@@ -10,15 +10,21 @@ const api = `${API_HOST_PREFIX}/extra-charges`;
 /**
  *
  * @param {number} hotelId
+ * @param {boolean} isActive nullable
  * @returns {Promise<{id: number, name: string, amount: number, type: { id: number, name: string }}[]>}
  */
-export const getByHotelId = async (hotelId) => {
+export const getByHotelId = async (hotelId, isActive) => {
+  const queryParams = new URLSearchParams();
+  if (isActive !== undefined && isActive !== null) {
+    queryParams.append("isActive", isActive);
+  }
+
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url: `${api}/hotel/${hotelId}`,
+    url: `${api}/hotel/${hotelId}?${queryParams.toString()}`,
   };
   try {
     const response = await axiosClient(config);
