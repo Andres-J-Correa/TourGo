@@ -18,11 +18,8 @@ namespace TourGo.Models.Domain.Bookings
         public DateTime? ETA { get; set; }
         public int AdultGuests { get; set; }
         public int ChildGuests { get; set; }
-        public Lookup? Status { get; set; }
+        public Lookup Status { get; set; } = new Lookup();
         public string? Notes { get; set; }
-        public DateTime DateCreated { get; set; }
-        public DateTime DateModified { get; set; }
-        public UserBase? ModifiedBy { get; set; }
         public Lookup? BookingProvider { get; set; }
         public decimal ExternalCommission { get; set; }
         public int Nights { get; set; }

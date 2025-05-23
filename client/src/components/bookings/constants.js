@@ -9,6 +9,7 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { formatCurrency } from "utils/currencyHelper";
+import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 
 dayjs.extend(isSameOrBefore);
 
@@ -403,24 +404,7 @@ export const bookingsTableColumns = [
     accessorKey: "statusId",
     cell: ({ getValue }) => {
       const statusId = getValue();
-      return (
-        <span
-          className={`badge ${
-            statusId === BOOKING_STATUS_DICTIONARY.ACTIVE
-              ? "bg-success"
-              : statusId === BOOKING_STATUS_DICTIONARY.CANCELLED
-              ? "bg-danger"
-              : statusId === BOOKING_STATUS_DICTIONARY.COMPLETED
-              ? "bg-primary"
-              : statusId === BOOKING_STATUS_DICTIONARY.NO_SHOW
-              ? "bg-warning"
-              : statusId === BOOKING_STATUS_DICTIONARY.ARRIVED
-              ? "bg-info"
-              : ""
-          }`}>
-          {bookingStatuses[statusId]}
-        </span>
-      );
+      return <BookingStatusBadge statusId={statusId} />;
     },
   },
 ];
