@@ -552,9 +552,12 @@ function TransactionsView() {
                       className="cursor-pointer">
                       {row.getVisibleCells().map((cell) => (
                         <td
-                          className={classNames("text-center", {
-                            "bg-info-subtle": row.getIsExpanded(),
-                          })}
+                          className={classNames(
+                            "text-center align-content-center",
+                            {
+                              "bg-info-subtle": row.getIsExpanded(),
+                            }
+                          )}
                           style={{
                             maxWidth: cell.column.columnDef.maxSize || "none",
                             minWidth: cell.column.columnDef.minSize || "none",

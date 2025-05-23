@@ -14,6 +14,14 @@ export const transactionStatuses = [
   { id: 5, name: "Revertido" },
 ];
 
+export const TRANSACTION_STATUS_DICT = {
+  PENDING: 1,
+  COMPLETED: 2,
+  FAILED: 3,
+  ADJUSTED: 4,
+  REVERTED: 5,
+};
+
 export const transactionAddValidationSchema = Yup.object({
   amount: Yup.number().required("El monto es requerido"),
   transactionDate: Yup.date().required(

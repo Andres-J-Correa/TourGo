@@ -3,8 +3,8 @@
   position: relative;
 }
 .calendar-cell.has-value:hover {
-  color: var(--bs-info) !important;
-  border: 1px solid var(--bs-info) !important;
+  color: var(--bs-primary) !important;
+  border: 1px solid var(--bs-primary) !important;
 }
 
 .calendar-cell.has-value:hover::before {

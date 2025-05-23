@@ -71,34 +71,36 @@ namespace TourGo.Services.Hotels
         }
 
         public Paged<BookingMinimal>? GetPaginatedByDateRange(int hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
-                                                            string sortColumn, string sortDirection, DateOnly? startDate, DateOnly? endDate,
-                                                            string? firstName, string? lastName, string? bookingExternalId)
+                                                            string? sortColumn, string? sortDirection, DateOnly? startDate, DateOnly? endDate,
+                                                            string? firstName, string? lastName, string? bookingExternalId, int? statusId)
         {
-            string proc = "bookings_select_minimal_by_date_range_paginated";
+            string proc = "bookings_select_minimal_by_date_range_paginated_v2";
             Paged<BookingMinimal>? paged = null;
             List<BookingMinimal>? bookings = null;
             int totalCount = 0;
 
-            BookingSortColumns.TryGetValue(sortColumn, out var mappedColumn);
+            string mappedColumn = !string.IsNullOrEmpty(sortColumn) && BookingSortColumns.TryGetValue(sortColumn, out var value) ? value : string.Empty;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
                 param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_pageIndex", pageIndex);
                 param.AddWithValue("p_pageSize", pageSize);
-                param.AddWithValue("p_sortColumn", mappedColumn);
-                param.AddWithValue("p_sortDirection", sortDirection);
+
+                param.AddWithValue("p_sortColumn", string.IsNullOrEmpty(mappedColumn) ? DBNull.Value : mappedColumn);
+                param.AddWithValue("p_sortDirection", string.IsNullOrEmpty(sortDirection) ? DBNull.Value : sortDirection);
                 param.AddWithValue("p_startDate", startDate?.ToString("yyyy-MM-dd") ?? (object)DBNull.Value);
                 param.AddWithValue("p_endDate", endDate?.ToString("yyyy-MM-dd") ?? (object)DBNull.Value);
                 param.AddWithValue("p_isArrivalDate", isArrivalDate.HasValue ? (isArrivalDate.Value ? 1 : 0) : DBNull.Value);
                 param.AddWithValue("p_firstName", string.IsNullOrWhiteSpace(firstName) ? DBNull.Value : firstName);
                 param.AddWithValue("p_lastName", string.IsNullOrWhiteSpace(lastName) ? DBNull.Value : lastName);
                 param.AddWithValue("p_externalBookingId", string.IsNullOrWhiteSpace(bookingExternalId) ? DBNull.Value : bookingExternalId);
+                param.AddWithValue("p_statusId", statusId.HasValue ? statusId.Value : DBNull.Value);
             }, (reader, set) =>
             {
                 int index = 0;
                 BookingMinimal booking = MapBookingMinimal(reader, ref index);
-                booking.HotelId = hotelId;
+                booking.MapFromReader(reader, ref index);
 
                 if (totalCount == 0)
                 {
@@ -125,7 +127,7 @@ namespace TourGo.Services.Hotels
         public BookingMinimal? GetBookingMinimal (int bookingId)
         {
 
-           string proc = "bookings_select_minimal_by_id";
+           string proc = "bookings_select_minimal_by_id_v2";
             BookingMinimal? booking = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -340,6 +342,7 @@ namespace TourGo.Services.Hotels
             booking.BalanceDue = reader.GetSafeDecimal(index++);
             booking.FirstName = reader.GetSafeString(index++);
             booking.LastName = reader.GetSafeString(index++);
+            booking.StatusId = reader.GetSafeInt32(index++);
             return booking;
         }
 
@@ -353,6 +356,7 @@ namespace TourGo.Services.Hotels
                 {"FirstName", "c.FirstName"},
                 {"LastName", "c.LastName"},
                 {"ExternalBookingId", "b.ExternalBookingId"},
+                {"StatusId", "b.StatusId" }
             };
     }
 }

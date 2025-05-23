@@ -2,7 +2,7 @@ import React from "react";
 import { Row, Col } from "reactstrap";
 import RoomCard from "./RoomCard";
 
-const RoomList = ({ rooms, bookingData, extraCharges }) => (
+const RoomList = ({ rooms, extraCharges }) => (
   <>
     <h5>Habitaciones</h5>
     <Row className="justify-content-around">
@@ -10,7 +10,7 @@ const RoomList = ({ rooms, bookingData, extraCharges }) => (
         <Col key={`${room.roomName}-${idx}`} md={4} className="d-flex">
           <RoomCard
             room={room}
-            bookingNights={bookingData?.nights}
+            bookingNights={room.segments?.length || 0}
             extraCharges={extraCharges}
           />
         </Col>

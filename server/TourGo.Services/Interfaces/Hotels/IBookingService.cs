@@ -14,8 +14,8 @@ namespace TourGo.Services.Interfaces
         void Update(BookingAddUpdateRequest model, int userId);
         Booking? GetById(int id);
         Paged<BookingMinimal>? GetPaginatedByDateRange(int hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
-                                                        string sortColumn, string sortDirection, DateOnly? startDate, DateOnly? endDate,
-                                                        string? firstName, string? lastName, string? bookingExternalId);
+                                                        string? sortColumn, string? sortDirection, DateOnly? startDate, DateOnly? endDate,
+                                                        string? firstName, string? lastName, string? bookingExternalId, int? statusId);
         BookingMinimal? GetBookingMinimal(int bookingId);
         List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByBookingId(int bookingId);

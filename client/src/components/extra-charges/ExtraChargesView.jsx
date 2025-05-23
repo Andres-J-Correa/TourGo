@@ -25,6 +25,7 @@ import {
   Col,
   Input,
   InputGroup,
+  InputGroupText,
   Label,
   Row,
   Spinner,
@@ -453,6 +454,9 @@ const ExtraChargesView = () => {
                       </Col>
                       <Col md="4">
                         <InputGroup>
+                          {values.typeId && Number(values.typeId) !== 1 && (
+                            <InputGroupText className="mb-3">$</InputGroupText>
+                          )}
                           <CustomField
                             name="amount"
                             type="number"
@@ -460,10 +464,14 @@ const ExtraChargesView = () => {
                             placeholder="Monto"
                             isRequired={true}
                           />
+                          {values.typeId && Number(values.typeId) === 1 && (
+                            <InputGroupText className="mb-3">%</InputGroupText>
+                          )}
                           <CustomField
                             name="typeId"
                             as="select"
                             className="form-select"
+                            placeholder="Tipo"
                             isRequired={true}>
                             <option value="" disabled>
                               Seleccione el tipo

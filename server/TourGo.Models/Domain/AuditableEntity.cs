@@ -13,14 +13,16 @@ namespace TourGo.Models.Domain
     {
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
-        public UserBase CreatedBy { get; set; } = new UserBase();
-        public UserBase ModifiedBy { get; set; } = new UserBase();
+        public UserBase? CreatedBy { get; set; }
+        public UserBase? ModifiedBy { get; set; }
 
         public void MapFromReader(IDataReader reader, ref int index)
         {
+            CreatedBy = new UserBase();
             CreatedBy.Id = reader.GetSafeInt32(index++);
             CreatedBy.FirstName = reader.GetSafeString(index++);
             CreatedBy.LastName = reader.GetSafeString(index++);
+            ModifiedBy = new UserBase();
             ModifiedBy.Id = reader.GetSafeInt32(index++);
             ModifiedBy.FirstName = reader.GetSafeString(index++);
             ModifiedBy.LastName = reader.GetSafeString(index++);

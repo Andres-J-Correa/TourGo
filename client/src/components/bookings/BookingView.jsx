@@ -16,17 +16,18 @@ import Breadcrumb from "components/commonUI/Breadcrumb";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { Button, Col, Row } from "reactstrap";
 import {
-  faCalendarCheck,
+  faPlaneArrival,
   faRectangleXmark,
-  faPlaneCircleCheck,
-  faPlaneCircleXmark,
+  faPlaneDeparture,
+  faCalendarXmark,
+  faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 
 function BookingView() {
   const { hotelId, bookingId } = useParams();
@@ -75,7 +76,7 @@ function BookingView() {
     }
 
     const result = await Swal.fire({
-      title: "¿Desea marcar la reserva como arrivada?",
+      title: "¿Desea marcar la reserva como arribada?",
       text: swalText,
       icon: hasBalanceDue ? "warning" : "info",
       showCancelButton: true,
@@ -300,28 +301,28 @@ function BookingView() {
           {booking?.status?.id === BOOKING_STATUS_DICTIONARY.ACTIVE && (
             <Button color="outline-dark" onClick={handleCheckIn}>
               Marcar Check-in
-              <FontAwesomeIcon icon={faCalendarCheck} className="ms-2" />
+              <FontAwesomeIcon icon={faPlaneArrival} className="ms-2" />
             </Button>
           )}
           {(booking?.status?.id === BOOKING_STATUS_DICTIONARY.ACTIVE ||
             booking?.status?.id === BOOKING_STATUS_DICTIONARY.ARRIVED) &&
-            dayjs(booking?.departureDate).isSameOrBefore(dayjs()) && (
+            dayjs(dayjs()).isAfter(booking?.arrivalDate) && (
               <Button
                 color="outline-dark"
                 className="ms-2"
                 onClick={handleComplete}>
                 Marcar Completada
-                <FontAwesomeIcon icon={faPlaneCircleCheck} className="ms-2" />
+                <FontAwesomeIcon icon={faPlaneDeparture} className="ms-2" />
               </Button>
             )}
           {booking?.status?.id === BOOKING_STATUS_DICTIONARY.ACTIVE &&
-            dayjs(booking?.arrivalDate).isSameOrBefore(dayjs()) && (
+            dayjs(dayjs()).isSameOrAfter(booking?.arrivalDate) && (
               <Button
                 color="outline-dark"
                 className="ms-2"
                 onClick={handleNoShow}>
                 Marcar No Show
-                <FontAwesomeIcon icon={faPlaneCircleXmark} className="ms-2" />
+                <FontAwesomeIcon icon={faCalendarXmark} className="ms-2" />
               </Button>
             )}
           {booking?.status?.id !== BOOKING_STATUS_DICTIONARY.NO_SHOW &&
@@ -339,6 +340,7 @@ function BookingView() {
             booking?.status?.id === BOOKING_STATUS_DICTIONARY.ARRIVED) && (
             <Link to="edit" className="btn btn-outline-dark float-end">
               Editar
+              <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
             </Link>
           )}
         </Col>

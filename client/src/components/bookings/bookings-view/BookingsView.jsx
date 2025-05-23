@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Spinner } from "reactstrap";
-import { useParams } from "react-router-dom";
+import { Spinner, Row, Col } from "reactstrap";
+import { Link, useParams } from "react-router-dom";
 import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
   getPaginationRowModel,
   flexRender,
+  getExpandedRowModel,
 } from "@tanstack/react-table";
 import { getPagedMinimalBookingsByDateRange } from "services/bookingService";
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -40,12 +41,7 @@ const BookingsView = () => {
   const [paginationData, setPaginationData] = useState({
     pageIndex: 0,
     pageSize: 5,
-    sortBy: [
-      {
-        id: "ArrivalDate",
-        desc: false,
-      },
-    ],
+    sortBy: [],
     dates: {
       start: "",
       end: "",
@@ -56,6 +52,7 @@ const BookingsView = () => {
       lastName: "",
     },
     externalBookingId: "",
+    statusId: "",
   });
 
   const breadcrumbs = [
@@ -64,7 +61,33 @@ const BookingsView = () => {
     { label: "Hotel", path: `/hotels/${hotelId}` },
   ];
 
-  const columns = useMemo(() => bookingsTableColumns, []);
+  const actionsColumn = useMemo(
+    () => ({
+      header: "Acciones",
+      enableSorting: false,
+      maxSize: 100,
+      minSize: 100,
+      cell: (info) => {
+        const booking = info.row.original;
+        return (
+          <div style={{ minWidth: "max-content" }}>
+            <Link
+              className="btn btn-info btn-sm"
+              target="_blank"
+              to={`/hotels/${hotelId}/bookings/${booking.id}`}>
+              Ver
+            </Link>
+          </div>
+        );
+      },
+    }),
+    [hotelId]
+  );
+
+  const columns = useMemo(
+    () => [...bookingsTableColumns, actionsColumn],
+    [actionsColumn]
+  );
 
   const table = useReactTable({
     data: data.items,
@@ -73,7 +96,12 @@ const BookingsView = () => {
     manualSorting: true,
     pageCount: data.totalPages,
     defaultColumn: {
-      width: "auto",
+      size: "auto",
+      minSize: 120,
+      maxSize: "none",
+    },
+    initialState: {
+      expanded: {}, // Initialize expanded state
     },
     state: {
       pagination: {
@@ -95,10 +123,13 @@ const BookingsView = () => {
         sortBy: sortArray,
         pageIndex: 0,
       }));
+      table.setExpanded({});
     },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getExpandedRowModel: getExpandedRowModel(), // Enable row expansion
+    getRowCanExpand: () => true,
   });
 
   const handleDateChange = (field) => (date) => {
@@ -132,6 +163,14 @@ const BookingsView = () => {
       ...prev,
       pageIndex: 0,
       externalBookingId: value,
+    }));
+  };
+
+  const handleFilterByStatusId = (value) => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      statusId: value,
     }));
   };
 
@@ -178,8 +217,12 @@ const BookingsView = () => {
 
   const fetchData = useCallback(async (hotelId, values) => {
     setLoading(true);
-    const sortColumn = values.sortBy[0]?.id || "ArrivalDate";
-    const sortDirection = values.sortBy[0]?.desc ? "DESC" : "ASC";
+    const sortColumn = values.sortBy[0]?.id;
+    const sortDirection = values.sortBy[0]
+      ? values.sortBy[0].desc
+        ? "DESC"
+        : "ASC"
+      : undefined;
     const startDate = values.dates.start
       ? dayjs(values.dates.start).format("YYYY-MM-DD")
       : null;
@@ -199,7 +242,8 @@ const BookingsView = () => {
         sortDirection,
         values.customerNameFilters.firstName,
         values.customerNameFilters.lastName,
-        values.externalBookingId
+        values.externalBookingId,
+        values.statusId
       );
 
       if (res.isSuccessful) {
@@ -248,6 +292,7 @@ const BookingsView = () => {
             handleClearExternalBookingIdFilter
           }
           handleClearDateFilters={handleClearDateFilters}
+          handleFilterByStatusId={handleFilterByStatusId}
           onPageSizeChange={onPageSizeChange}
         />
 
@@ -267,30 +312,56 @@ const BookingsView = () => {
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      onClick={header.column.getToggleSortingHandler()}
-                      className="text-bg-dark text-center"
-                      style={{
-                        cursor: header.column.getCanSort()
-                          ? "pointer"
-                          : "default",
-                      }}>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      <span className="float-end">
-                        {{
-                          asc: <FontAwesomeIcon icon={faArrowUpShortWide} />,
-                          desc: <FontAwesomeIcon icon={faArrowDownWideShort} />,
-                        }[header.column.getIsSorted()] || (
-                          <FontAwesomeIcon icon={faSort} />
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <th
+                        key={header.id}
+                        onClick={
+                          !loading
+                            ? header.column.getToggleSortingHandler()
+                            : () => {}
+                        }
+                        className={classNames(
+                          "text-bg-dark text-center align-content-center",
+                          {
+                            "cursor-pointer": header.column.getCanSort(),
+                            "text-bg-info": header.column.getIsSorted(),
+                            "cursor-not-allowed": loading,
+                          }
                         )}
-                      </span>
-                    </th>
-                  ))}
+                        style={{
+                          maxWidth: header.column.columnDef.maxSize || "none",
+                          minWidth: header.column.columnDef.minSize || "none",
+                          width: header.column.getSize() || "auto",
+                        }}>
+                        {
+                          <div
+                            style={{ minWidth: "max-content" }}
+                            className="align-items-center">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            <span className="float-end ms-2">
+                              {{
+                                asc: (
+                                  <FontAwesomeIcon icon={faArrowUpShortWide} />
+                                ),
+                                desc: (
+                                  <FontAwesomeIcon
+                                    icon={faArrowDownWideShort}
+                                  />
+                                ),
+                              }[header.column.getIsSorted()] ||
+                                (header.column.getCanSort() && (
+                                  <FontAwesomeIcon icon={faSort} />
+                                ))}
+                            </span>
+                          </div>
+                        }
+                      </th>
+                    );
+                  })}
                 </tr>
               ))}
             </thead>
@@ -309,16 +380,70 @@ const BookingsView = () => {
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="text-center">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </td>
-                    ))}
-                  </tr>
+                  <React.Fragment key={row.id}>
+                    <tr
+                      onClick={() =>
+                        table.setExpanded({ [row.id]: !row.getIsExpanded() })
+                      }
+                      className="cursor-pointer">
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          className={classNames(
+                            "text-center align-content-center",
+                            {
+                              "bg-info-subtle": row.getIsExpanded(),
+                            }
+                          )}
+                          style={{
+                            maxWidth: cell.column.columnDef.maxSize || "none",
+                            minWidth: cell.column.columnDef.minSize || "none",
+                            width: cell.column.getSize() || "auto",
+                          }}
+                          key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                    {row.getIsExpanded() && (
+                      <tr>
+                        <td
+                          colSpan={row.getVisibleCells().length}
+                          className="p-0">
+                          <div className="p-2 border border-info-subtle bg-light">
+                            <Row>
+                              <Col md={6}>
+                                <strong>Creado por:</strong>{" "}
+                                {row.original.createdBy?.firstName}{" "}
+                                {row.original.createdBy?.lastName}
+                              </Col>
+                              <Col md={6}>
+                                <strong>Fecha de creación:</strong>{" "}
+                                {dayjs(row.original.dateCreated).format(
+                                  "DD/MM/YYYY - h:mm A"
+                                )}
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col md={6}>
+                                <strong>Modificado por:</strong>{" "}
+                                {row.original.modifiedBy?.firstName}{" "}
+                                {row.original.modifiedBy?.lastName}
+                              </Col>
+                              <Col md={6}>
+                                <strong>Fecha de modificación:</strong>{" "}
+                                {dayjs(row.original.dateModified).format(
+                                  "DD/MM/YYYY - h:mm A"
+                                )}
+                              </Col>
+                            </Row>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))
               )}
             </tbody>
