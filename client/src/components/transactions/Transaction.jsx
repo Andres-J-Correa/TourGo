@@ -4,7 +4,7 @@ import { formatCurrency } from "utils/currencyHelper";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import TransactionDetails from "components/transactions/TransactionDetails";
-
+import TransactionStatusBadge from "components/transactions/TransactionStatusBadge";
 import "./Transaction.css";
 
 function Transaction({ txn, updateHasDocumentUrl }) {
@@ -33,6 +33,10 @@ function Transaction({ txn, updateHasDocumentUrl }) {
           {dayjs(txn.transactionDate).format("DD/MMM/YYYY")}
           {" - "}
           {txn.paymentMethod?.name}
+          <TransactionStatusBadge
+            statusId={txn?.statusId}
+            className="float-end"
+          />
         </CardHeader>
 
         {expanded && (
