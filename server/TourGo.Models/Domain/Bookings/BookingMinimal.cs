@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourGo.Models.Domain.Customers;
+using TourGo.Models.Enums.Bookings;
 
 namespace TourGo.Models.Domain.Bookings
 {
-    public class BookingMinimal
+    public class BookingMinimal: AuditableEntity
     {
         public int Id { get; set; }
         public string? ExternalBookingId { get; set; }
@@ -17,6 +18,6 @@ namespace TourGo.Models.Domain.Bookings
         public decimal BalanceDue { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public int HotelId { get; set; }
+        public int StatusId { get; set; }
     }
 }

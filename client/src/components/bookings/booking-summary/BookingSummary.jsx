@@ -53,11 +53,7 @@ const BookingSummary = ({
 
         <hr />
 
-        <RoomList
-          rooms={groupedRooms}
-          bookingData={bookingData}
-          extraCharges={extraCharges}
-        />
+        <RoomList rooms={groupedRooms} extraCharges={extraCharges} />
 
         <hr />
 

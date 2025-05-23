@@ -73,16 +73,17 @@ export const getPagedMinimalBookingsByDateRange = async (
   isArrivalDate,
   sortColumn,
   sortDirection,
-  firstName = "",
-  lastName = "",
-  externalBookingId = ""
+  firstName,
+  lastName,
+  externalBookingId,
+  statusId
 ) => {
   const queryParams = new URLSearchParams({
     pageIndex,
     pageSize,
-    sortColumn,
-    sortDirection,
   });
+  if (sortColumn) queryParams.append("sortColumn", sortColumn);
+  if (sortDirection) queryParams.append("sortDirection", sortDirection);
   if (startDate) queryParams.append("startDate", startDate);
   if (endDate) queryParams.append("endDate", endDate);
   if (isArrivalDate && startDate && endDate)
@@ -91,6 +92,7 @@ export const getPagedMinimalBookingsByDateRange = async (
   if (lastName) queryParams.append("lastName", lastName);
   if (externalBookingId)
     queryParams.append("externalBookingId", externalBookingId);
+  if (statusId) queryParams.append("statusId", statusId);
 
   const url = `${api}/hotel/${hotelId}/date-range?${queryParams.toString()}`;
 

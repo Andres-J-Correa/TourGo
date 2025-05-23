@@ -1,5 +1,9 @@
 import dayjs from "dayjs";
-import { transactionCategories, transactionStatuses } from "../constants";
+import {
+  transactionCategories,
+  transactionStatuses,
+  TRANSACTION_STATUS_DICT,
+} from "../constants";
 import { formatCurrency } from "utils/currencyHelper";
 
 export const transactionsTableColumns = [
@@ -50,10 +54,26 @@ export const transactionsTableColumns = [
     accessorKey: "statusId",
     cell: ({ getValue }) => {
       const statusId = getValue();
-      const status = transactionStatuses.find(
-        (status) => Number(status.id) === Number(statusId)
+      return (
+        <span
+          className={`badge ${
+            statusId === TRANSACTION_STATUS_DICT.PENDING
+              ? "bg-warning"
+              : statusId === TRANSACTION_STATUS_DICT.COMPLETED
+              ? "bg-success"
+              : statusId === TRANSACTION_STATUS_DICT.FAILED
+              ? "bg-danger"
+              : statusId === TRANSACTION_STATUS_DICT.ADJUSTED
+              ? "bg-info"
+              : statusId === TRANSACTION_STATUS_DICT.REVERTED
+              ? "bg-secondary"
+              : ""
+          }`}>
+          {transactionStatuses.find(
+            (status) => Number(status.id) === Number(statusId)
+          )?.name || "No definido"}
+        </span>
       );
-      return status ? status.name : "No definido";
     },
   },
   {
