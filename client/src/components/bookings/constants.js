@@ -141,6 +141,22 @@ export const chargeTypeLabels = {
   3: "General",
 };
 
+export const bookingStatuses = {
+  1: "Activo",
+  2: "Cancelado",
+  3: "Completado",
+  4: "No Show",
+  5: "Arribada",
+};
+
+export const BOOKING_STATUS_DICTIONARY = {
+  ACTIVE: 1,
+  CANCELLED: 2,
+  COMPLETED: 3,
+  NO_SHOW: 4,
+  ARRIVED: 5,
+};
+
 export const defaultBooking = {
   id: null,
   externalId: null,
@@ -182,6 +198,9 @@ export const bookingDefaultInitialValues = {
   externalId: "",
   externalCommission: "",
   notes: "",
+  status: {
+    id: BOOKING_STATUS_DICTIONARY.ACTIVE,
+  },
 };
 
 export const sanitizeBooking = (booking) => {
@@ -200,6 +219,8 @@ export const sanitizeBooking = (booking) => {
   sanitizedBooking.childGuests = sanitizedBooking.childGuests || "";
   sanitizedBooking.adultGuests = sanitizedBooking.adultGuests || "";
   sanitizedBooking.customerId = booking.customer?.id || booking.customerId;
+  sanitizeBooking.status = booking.status?.id ||
+    booking.status || { id: BOOKING_STATUS_DICTIONARY.ACTIVE };
 
   return sanitizedBooking;
 };
@@ -338,22 +359,6 @@ export const deepCompareBooking = (obj1, obj2, keysToCompare) => {
 export const LOCAL_STORAGE_FORM_KEYS = {
   PREVIOUS: "previousBookingForm",
   CURRENT: "currentBookingForm",
-};
-
-export const bookingStatuses = {
-  1: "Activo",
-  2: "Cancelado",
-  3: "Completado",
-  4: "No Show",
-  5: "Arribada",
-};
-
-export const BOOKING_STATUS_DICTIONARY = {
-  ACTIVE: 1,
-  CANCELLED: 2,
-  COMPLETED: 3,
-  NO_SHOW: 4,
-  ARRIVED: 5,
 };
 
 export const bookingsTableColumns = [

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { TabContent, TabPane, Button } from "reactstrap";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -9,6 +9,7 @@ import TabNavigation from "components/bookings/booking-add-edit-view/TabNavigati
 
 import { toast } from "react-toastify";
 import { getById as getBookingById } from "services/bookingService";
+import { useAppContext } from "contexts/GlobalAppContext";
 
 import {
   bookingFormTabs as tabs,
@@ -35,6 +36,17 @@ const BookingAddUpdateView = () => {
       ? { label: "Reserva", path: `/hotels/${hotelId}/bookings/${bookingId}` }
       : undefined,
   ];
+
+  const { user } = useAppContext();
+
+  const modifiedBy = useMemo(
+    () => ({
+      id: user.current?.id,
+      firstName: user.current?.firstName,
+      lastName: user.current?.lastName,
+    }),
+    [user]
+  );
 
   const [currentStep, setCurrentStep] = useState(0);
   const [customer, setCustomer] = useState(null);
@@ -128,6 +140,7 @@ const BookingAddUpdateView = () => {
             bookingId={bookingId}
             bookingCharges={bookingCharges}
             bookingRoomBookings={bookingRoomBookings}
+            modifiedBy={modifiedBy}
           />
         </TabPane>
         <TabPane tabId={2}>

@@ -79,7 +79,11 @@ export const AppContextProvider = ({ children }) => {
     const pathMatch = location.pathname.match(pathRegex);
     const hotelId = pathMatch ? pathMatch[1] : null;
 
-    if (hotelId && Number(hotelId) !== Number(hotel.id)) {
+    if (
+      hotelId &&
+      Number(hotelId) !== Number(hotel.id) &&
+      currentUser.isAuthenticated
+    ) {
       setIsLoadingHotel(true);
       getMinimalById(hotelId)
         .then((res) => {
@@ -99,7 +103,7 @@ export const AppContextProvider = ({ children }) => {
     } else if (!hotelId) {
       setHotel({ ...defaultHotel });
     }
-  }, [location.pathname, hotel.id]);
+  }, [location.pathname, hotel.id, currentUser]);
 
   return (
     <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>

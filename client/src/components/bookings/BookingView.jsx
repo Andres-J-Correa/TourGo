@@ -26,6 +26,7 @@ import {
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppContext } from "contexts/GlobalAppContext";
 
 dayjs.extend(isSameOrAfter);
 
@@ -35,6 +36,17 @@ function BookingView() {
   const [booking, setBooking] = useState(null);
   const { isLoadingBookingData, bookingCharges, bookingRoomBookings } =
     useBookingData(bookingId);
+
+  const { user } = useAppContext();
+
+  const modifiedBy = useMemo(
+    () => ({
+      id: user.current?.id,
+      firstName: user.current?.firstName,
+      lastName: user.current?.lastName,
+    }),
+    [user]
+  );
 
   const hasBalanceDue = useMemo(() => {
     const sum =
@@ -105,6 +117,8 @@ function BookingView() {
         setBooking((prevBooking) => ({
           ...prevBooking,
           status: { id: BOOKING_STATUS_DICTIONARY.ARRIVED },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
         Swal.fire({
@@ -124,7 +138,7 @@ function BookingView() {
         text: "Error al marcar como check-in",
       });
     }
-  }, [hasBalanceDue, bookingId]);
+  }, [hasBalanceDue, bookingId, modifiedBy]);
 
   const handleNoShow = useCallback(async () => {
     const result = await Swal.fire({
@@ -157,6 +171,8 @@ function BookingView() {
         setBooking((prevBooking) => ({
           ...prevBooking,
           status: { id: BOOKING_STATUS_DICTIONARY.NO_SHOW },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
         Swal.fire({
@@ -176,7 +192,7 @@ function BookingView() {
         text: "Error al marcar como no show",
       });
     }
-  }, [bookingId]);
+  }, [bookingId, modifiedBy]);
 
   const handleComplete = useCallback(async () => {
     const result = await Swal.fire({
@@ -209,6 +225,8 @@ function BookingView() {
         setBooking((prevBooking) => ({
           ...prevBooking,
           status: { id: BOOKING_STATUS_DICTIONARY.COMPLETED },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
         Swal.fire({
@@ -228,7 +246,7 @@ function BookingView() {
         text: "Error al marcar como completada",
       });
     }
-  }, [bookingId]);
+  }, [bookingId, modifiedBy]);
 
   const handleCancel = useCallback(async () => {
     const result = await Swal.fire({
@@ -261,6 +279,8 @@ function BookingView() {
         setBooking((prevBooking) => ({
           ...prevBooking,
           status: { id: BOOKING_STATUS_DICTIONARY.CANCELLED },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
         Swal.fire({
@@ -280,7 +300,7 @@ function BookingView() {
         text: "Error al cancelar la reserva",
       });
     }
-  }, [bookingId]);
+  }, [bookingId, modifiedBy]);
 
   useEffect(() => {
     if (bookingId) {

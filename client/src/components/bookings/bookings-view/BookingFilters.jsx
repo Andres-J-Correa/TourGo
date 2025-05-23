@@ -187,7 +187,7 @@ function BookingFilters({
       </Row>
       <Row className="px-3 mb-3">
         <Col lg="auto" xl="auto">
-          <Label className="text-dark">Estado:</Label>
+          <Label className="text-dark">Filtrar por estado:</Label>
           <select
             className={classNames("form-select", {
               "bg-info-subtle": paginationData.statusId,
