@@ -53,7 +53,7 @@ namespace TourGo.Services.Customers
 
         public Customer? GetByDocumentNumber(string documentNumber, int userId, int hotelId)
         {
-            string proc = "customers_select_by_document_number";
+            string proc = "customers_select_by_document_number_v2";
             Customer customer = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -82,10 +82,7 @@ namespace TourGo.Services.Customers
                 Phone = reader.GetSafeString(index++),
                 Email = reader.GetSafeString(index++),
                 DocumentNumber = reader.GetSafeString(index++),
-                Status = new Lookup
-                {
-                    Id = reader.GetSafeInt32(index++)
-                }
+                IsActive = reader.GetSafeBool(index++),
             };
         }
     }

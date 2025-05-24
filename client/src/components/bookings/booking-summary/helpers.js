@@ -4,7 +4,7 @@ export function groupRoomBookings(roomBookings) {
   const grouped = {};
 
   roomBookings?.forEach((b) => {
-    const roomId = b.roomId;
+    const roomId = b.room?.id || b.roomId;
     if (!grouped[roomId]) grouped[roomId] = [];
     grouped[roomId].push(b);
   });
@@ -20,7 +20,7 @@ export function groupRoomBookings(roomBookings) {
 }
 
 export function calculateRoomCharges(extraCharges, subtotal, nights) {
-  return extraCharges.map((charge) => {
+  return extraCharges?.map((charge) => {
     let amount = 0;
     switch (Number(charge.type.id)) {
       case 1:

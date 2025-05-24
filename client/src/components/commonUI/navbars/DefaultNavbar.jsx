@@ -66,7 +66,7 @@ function DefaultNavbar({
   }, [navbarItems, user, leftCustomComponents, rightCustomComponents]);
 
   return (
-    <div className="navbar-container">
+    <div className="navbar-container no-print">
       <Navbar expand="lg" className="shadow p-2 z-3">
         <div className="font-weight-bolder ms-sm-3 navbar-brand">
           <Link

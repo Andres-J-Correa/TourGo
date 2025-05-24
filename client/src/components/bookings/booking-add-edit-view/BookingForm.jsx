@@ -59,6 +59,7 @@ function BookingForm({
   bookingId,
   bookingCharges = [],
   bookingRoomBookings = [],
+  modifiedBy,
   //formik props
   values,
   setValues,
@@ -452,7 +453,7 @@ export default withFormik({
   validationSchema: bookingSchema,
   enableReinitialize: true,
   handleSubmit: async (values, { props, setSubmitting }) => {
-    const { hotelId, customer, setBooking, setCurrentStep } = props;
+    const { hotelId, customer, setBooking, setCurrentStep, modifiedBy } = props;
 
     const result = await Swal.fire({
       title: "¿Está seguro de que desea guardar la reserva?",
@@ -499,13 +500,18 @@ export default withFormik({
             dayjs(values.arrivalDate),
             "day"
           ),
-          status: {
-            id: 1,
-          },
           bookingProvider: {
             id: values.bookingProviderId,
             name: values.bookingProviderName,
           },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+          ...(!values.id
+            ? {
+                createdBy: { ...modifiedBy },
+                dateCreated: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+              }
+            : {}),
         });
 
         setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, { ...values });

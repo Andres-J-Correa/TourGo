@@ -6,17 +6,18 @@ import { calculateRoomCharges } from "./helpers";
 import "./BookingSummary.css";
 
 const RoomCard = ({ room, bookingNights, extraCharges }) => {
-  const subtotal = room.segments.reduce((sum, seg) => sum + seg.price, 0);
+  const subtotal = room?.segments?.reduce((sum, seg) => sum + seg.price, 0);
   const charges = calculateRoomCharges(extraCharges, subtotal, bookingNights);
-  const total = subtotal + charges.reduce((acc, c) => acc + c.total, 0);
+  const total =
+    subtotal + (charges ? charges?.reduce((acc, c) => acc + c.total, 0) : 0);
 
   return (
-    <Card className="mb-3 flex-fill shadow bg-light">
+    <Card className="mb-3 flex-fill shadow bg-light room-card-print">
       <CardBody className="d-flex flex-column text-dark">
         <h5 className="text-center">{room.roomName}</h5>
 
         <ListGroup className="mt-2 flex-grow-1">
-          {room.segments.map((seg, i) => (
+          {room?.segments?.map((seg, i) => (
             <ListGroupItem key={i}>
               <strong>Noche:</strong> {dayjs(seg.date).format("DD/MM/YYYY")} -{" "}
               <strong>Precio:</strong> {formatCurrency(seg.price, "COP")}
@@ -33,7 +34,7 @@ const RoomCard = ({ room, bookingNights, extraCharges }) => {
             </span>
           </div>
 
-          {charges.map((charge, idx) => (
+          {charges?.map((charge, idx) => (
             <div className="line-item" key={`charge-${idx}`}>
               <span className="line-label">{charge.name}</span>
               <div className="line-fill" />

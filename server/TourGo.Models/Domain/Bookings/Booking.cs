@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TourGo.Models.Domain.Customers;
 using TourGo.Models.Domain.Finances;
+using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Domain.Users;
 
@@ -18,13 +19,13 @@ namespace TourGo.Models.Domain.Bookings
         public DateTime? ETA { get; set; }
         public int AdultGuests { get; set; }
         public int ChildGuests { get; set; }
-        public Lookup? Status { get; set; }
+        public Lookup Status { get; set; } = new Lookup();
         public string? Notes { get; set; }
-        public DateTime DateCreated { get; set; }
-        public DateTime DateModified { get; set; }
-        public UserBase? ModifiedBy { get; set; }
         public Lookup? BookingProvider { get; set; }
         public decimal ExternalCommission { get; set; }
         public int Nights { get; set; }
+        public List<RoomBooking>? RoomBookings { get; set; }
+
+        public List<ExtraCharge>? ExtraCharges { get; set; }
     }
 }

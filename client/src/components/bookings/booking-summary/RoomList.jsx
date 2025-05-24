@@ -7,7 +7,10 @@ const RoomList = ({ rooms, extraCharges }) => (
     <h5>Habitaciones</h5>
     <Row className="justify-content-around">
       {rooms.map((room, idx) => (
-        <Col key={`${room.roomName}-${idx}`} md={4} className="d-flex">
+        <Col
+          key={`${room.roomName}-${idx}`}
+          lg={4}
+          className="d-flex justify-content-center">
           <RoomCard
             room={room}
             bookingNights={room.segments?.length || 0}

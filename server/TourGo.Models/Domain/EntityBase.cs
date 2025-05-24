@@ -8,7 +8,7 @@ using TourGo.Models.Domain.Finances;
 
 namespace TourGo.Models.Domain
 {
-    public class EntityBase
+    public class EntityBase : AuditableEntity
     {
         public int Id { get; set; }
         public decimal Subtotal { get; set; }

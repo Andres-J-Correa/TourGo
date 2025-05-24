@@ -37,7 +37,7 @@ namespace TourGo.Services.Hotels
 
         public Booking? GetById(int id)
         {
-            string proc = "bookings_select_details_by_id_v2";
+            string proc = "bookings_select_details_by_id_v4";
             Booking? booking = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -50,6 +50,7 @@ namespace TourGo.Services.Hotels
                 if (set == 0)
                 {
                     booking = MapBooking(reader, ref index);
+                    booking.MapFromReader(reader, ref index);
                 }
 
                 if (set == 1 && booking != null)
@@ -64,6 +65,22 @@ namespace TourGo.Services.Hotels
                     Transaction transaction = TransactionService.MapTransaction(reader, ref index);
                     booking.Transactions ??= new List<Transaction>();
                     booking.Transactions.Add(transaction);
+                }
+
+                if (set== 3 && booking != null)
+                {
+                    index = 0;
+                    RoomBooking roomBooking = MapRoomBooking(reader, ref index);
+                    booking.RoomBookings ??= new List<RoomBooking>();
+                    booking.RoomBookings.Add(roomBooking);      
+                }
+
+                if (set == 4 && booking != null)
+                {
+                    index = 0;
+                    ExtraCharge extraCharge = ExtraChargeService.MapExtraCharge(reader, ref index);
+                    booking.ExtraCharges ??= new List<ExtraCharge>();
+                    booking.ExtraCharges.Add(extraCharge);
                 }
             });
 
@@ -288,7 +305,6 @@ namespace TourGo.Services.Hotels
         {
             RoomBooking roomBooking = new RoomBooking();
             roomBooking.Date = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
-            roomBooking.Room = new Room();
             roomBooking.Room.Id = reader.GetSafeInt32(index++);
             roomBooking.Room.Name = reader.GetSafeString(index++);
             roomBooking.BookingId = reader.GetSafeInt32(index++);
@@ -298,31 +314,34 @@ namespace TourGo.Services.Hotels
             return roomBooking;
         }
 
-        private static Booking MapBooking(IDataReader reader, ref int index)
+        public static Booking MapBooking(IDataReader reader, ref int index)
         {
             Booking booking = new Booking();
             booking.Id = reader.GetSafeInt32(index++);
             booking.ExternalId = reader.GetSafeString(index++);
-            booking.BookingProvider = new Lookup();
-            booking.BookingProvider.Id = reader.GetSafeInt32(index++);
-            booking.BookingProvider.Name = reader.GetSafeString(index++);
+
+            int bookingProviderId = reader.GetSafeInt32(index++);
+            if(bookingProviderId > 0)
+            {
+                booking.BookingProvider = new Lookup();
+                booking.BookingProvider.Id = bookingProviderId;
+                booking.BookingProvider.Name = reader.GetSafeString(index++);
+            }
+            else
+            {
+                index++;
+            }
+
             booking.ArrivalDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
             booking.DepartureDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
             booking.ETA = reader.GetSafeDateTimeNullable(index++);
             booking.AdultGuests = reader.GetSafeInt32(index++);
             booking.ChildGuests = reader.GetSafeInt32(index++);
-            booking.Status = new Lookup();
             booking.Status.Id = reader.GetSafeInt32(index++);
             booking.Status.Name = reader.GetSafeString(index++);
             booking.Notes = reader.GetSafeString(index++);
             booking.ExternalCommission = reader.GetSafeDecimal(index++);
             booking.Nights = reader.GetSafeInt32(index++);
-            booking.ModifiedBy = new UserBase();
-            booking.ModifiedBy.Id = reader.GetSafeInt32(index++);
-            booking.ModifiedBy.FirstName = reader.GetSafeString(index++);
-            booking.ModifiedBy.LastName = reader.GetSafeString(index++);
-            booking.DateCreated = reader.GetSafeDateTime(index++);
-            booking.DateModified = reader.GetSafeDateTime(index++);
             booking.Total = reader.GetSafeDecimal(index++);
             booking.Subtotal = reader.GetSafeDecimal(index++);
             booking.Charges = reader.GetSafeDecimal(index++);

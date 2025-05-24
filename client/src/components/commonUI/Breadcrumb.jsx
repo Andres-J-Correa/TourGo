@@ -27,7 +27,7 @@ const Breadcrumb = ({ breadcrumbs, active }) => {
   }, [breadcrumbs]);
 
   return (
-    <Row>
+    <Row className="no-print">
       <Col xs="12">
         <div className="page-title-box d-flex align-items-center justify-content-between">
           <div className="ms-auto">

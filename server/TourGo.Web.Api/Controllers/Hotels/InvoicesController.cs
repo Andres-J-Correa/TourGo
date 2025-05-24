@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Invoices;
 using TourGo.Services;
@@ -7,6 +8,8 @@ using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
+using TourGo.Web.Api.Extensions;
+using TourGo.Services.Interfaces;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -17,18 +20,23 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         private readonly IInvoiceService _invoiceService;
         private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IErrorLoggingService _errorLoggingService;
 
-        public InvoicesController(ILogger<InvoicesController> logger, IInvoiceService invoiceService, IWebAuthenticationService<int> webAuthenticationService) : base(logger)
+        public InvoicesController(ILogger<InvoicesController> logger, 
+            IInvoiceService invoiceService, 
+            IWebAuthenticationService<int> webAuthenticationService,
+            IErrorLoggingService errorLoggingService) : base(logger)
         {
             _invoiceService = invoiceService;
             _webAuthService = webAuthenticationService;
+            _errorLoggingService = errorLoggingService;
         }
 
         [HttpPost("hotel/{id:int}")]
         [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Create)]
         public ActionResult<ItemResponse<int>> Add(InvoiceAddRequest model)
         {
-            ObjectResult result = null;
+            ObjectResult? result = null;
 
             try
             {
@@ -45,7 +53,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
@@ -57,7 +65,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Update)]
         public ActionResult<SuccessResponse> Update(InvoiceUpdateRequest model)
         {
-            ObjectResult result = null;
+            ObjectResult? result = null;
 
             try
             {
@@ -69,7 +77,38 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("{id:int}/entities")]
+        [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemResponse<InvoiceWithEntities>> GetWithEntitiesById(int id)
+        {
+            ObjectResult? result = null;
+
+            try
+            {
+                InvoiceWithEntities? invoiceWithEntities = _invoiceService.GetWithEntitiesById(id);
+
+                if (invoiceWithEntities == null)
+                {
+                    ErrorResponse response = new ErrorResponse("Invoice not found.");
+                    result = NotFound404(response);
+                }
+                else
+                {
+                    ItemResponse<InvoiceWithEntities> response = new ItemResponse<InvoiceWithEntities> { Item = invoiceWithEntities };
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }

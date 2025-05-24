@@ -9,6 +9,7 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { formatCurrency } from "utils/currencyHelper";
+import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 
 dayjs.extend(isSameOrBefore);
 
@@ -140,6 +141,22 @@ export const chargeTypeLabels = {
   3: "General",
 };
 
+export const bookingStatuses = {
+  1: "Activo",
+  2: "Cancelado",
+  3: "Completado",
+  4: "No Show",
+  5: "Arribada",
+};
+
+export const BOOKING_STATUS_DICTIONARY = {
+  ACTIVE: 1,
+  CANCELLED: 2,
+  COMPLETED: 3,
+  NO_SHOW: 4,
+  ARRIVED: 5,
+};
+
 export const defaultBooking = {
   id: null,
   externalId: null,
@@ -181,6 +198,9 @@ export const bookingDefaultInitialValues = {
   externalId: "",
   externalCommission: "",
   notes: "",
+  status: {
+    id: BOOKING_STATUS_DICTIONARY.ACTIVE,
+  },
 };
 
 export const sanitizeBooking = (booking) => {
@@ -199,6 +219,9 @@ export const sanitizeBooking = (booking) => {
   sanitizedBooking.childGuests = sanitizedBooking.childGuests || "";
   sanitizedBooking.adultGuests = sanitizedBooking.adultGuests || "";
   sanitizedBooking.customerId = booking.customer?.id || booking.customerId;
+  sanitizedBooking.status = booking.status?.id
+    ? booking.status
+    : { id: BOOKING_STATUS_DICTIONARY.ACTIVE };
 
   return sanitizedBooking;
 };
@@ -339,22 +362,6 @@ export const LOCAL_STORAGE_FORM_KEYS = {
   CURRENT: "currentBookingForm",
 };
 
-export const bookingStatuses = {
-  1: "Activo",
-  2: "Cancelado",
-  3: "Completado",
-  4: "No Show",
-  5: "Arribada",
-};
-
-export const BOOKING_STATUS_DICTIONARY = {
-  ACTIVE: 1,
-  CANCELLED: 2,
-  COMPLETED: 3,
-  NO_SHOW: 4,
-  ARRIVED: 5,
-};
-
 export const bookingsTableColumns = [
   {
     header: "ID",
@@ -403,24 +410,7 @@ export const bookingsTableColumns = [
     accessorKey: "statusId",
     cell: ({ getValue }) => {
       const statusId = getValue();
-      return (
-        <span
-          className={`badge ${
-            statusId === BOOKING_STATUS_DICTIONARY.ACTIVE
-              ? "bg-success"
-              : statusId === BOOKING_STATUS_DICTIONARY.CANCELLED
-              ? "bg-danger"
-              : statusId === BOOKING_STATUS_DICTIONARY.COMPLETED
-              ? "bg-primary"
-              : statusId === BOOKING_STATUS_DICTIONARY.NO_SHOW
-              ? "bg-warning"
-              : statusId === BOOKING_STATUS_DICTIONARY.ARRIVED
-              ? "bg-info"
-              : ""
-          }`}>
-          {bookingStatuses[statusId]}
-        </span>
-      );
+      return <BookingStatusBadge statusId={statusId} />;
     },
   },
 ];

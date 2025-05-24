@@ -37,3 +37,13 @@ h6 {
   --surface-color: #252525;
   --contrast-color: #ffffff;
 }
+
+@media print {
+  .main-container {
+    max-width: 100% !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

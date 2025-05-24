@@ -9,7 +9,6 @@ import {
   updateStatusToCancelled,
 } from "services/bookingService";
 import { BOOKING_STATUS_DICTIONARY } from "components/bookings/constants";
-import useBookingData from "components/bookings/booking-add-edit-view/hooks/useBookingData";
 import BookingSummary from "components/bookings/booking-summary/BookingSummary";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -24,8 +23,10 @@ import {
   faPlaneDeparture,
   faCalendarXmark,
   faPenToSquare,
+  faFileInvoiceDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAppContext } from "contexts/GlobalAppContext";
 
 dayjs.extend(isSameOrAfter);
 
@@ -33,8 +34,17 @@ function BookingView() {
   const { hotelId, bookingId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [booking, setBooking] = useState(null);
-  const { isLoadingBookingData, bookingCharges, bookingRoomBookings } =
-    useBookingData(bookingId);
+
+  const { user } = useAppContext();
+
+  const modifiedBy = useMemo(
+    () => ({
+      id: user.current?.id,
+      firstName: user.current?.firstName,
+      lastName: user.current?.lastName,
+    }),
+    [user]
+  );
 
   const hasBalanceDue = useMemo(() => {
     const sum =
@@ -105,6 +115,8 @@ function BookingView() {
         setBooking((prevBooking) => ({
           ...prevBooking,
           status: { id: BOOKING_STATUS_DICTIONARY.ARRIVED },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
         Swal.fire({
@@ -124,7 +136,7 @@ function BookingView() {
         text: "Error al marcar como check-in",
       });
     }
-  }, [hasBalanceDue, bookingId]);
+  }, [hasBalanceDue, bookingId, modifiedBy]);
 
   const handleNoShow = useCallback(async () => {
     const result = await Swal.fire({
@@ -157,6 +169,8 @@ function BookingView() {
         setBooking((prevBooking) => ({
           ...prevBooking,
           status: { id: BOOKING_STATUS_DICTIONARY.NO_SHOW },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
         Swal.fire({
@@ -176,7 +190,7 @@ function BookingView() {
         text: "Error al marcar como no show",
       });
     }
-  }, [bookingId]);
+  }, [bookingId, modifiedBy]);
 
   const handleComplete = useCallback(async () => {
     const result = await Swal.fire({
@@ -209,6 +223,8 @@ function BookingView() {
         setBooking((prevBooking) => ({
           ...prevBooking,
           status: { id: BOOKING_STATUS_DICTIONARY.COMPLETED },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
         Swal.fire({
@@ -228,7 +244,7 @@ function BookingView() {
         text: "Error al marcar como completada",
       });
     }
-  }, [bookingId]);
+  }, [bookingId, modifiedBy]);
 
   const handleCancel = useCallback(async () => {
     const result = await Swal.fire({
@@ -261,6 +277,8 @@ function BookingView() {
         setBooking((prevBooking) => ({
           ...prevBooking,
           status: { id: BOOKING_STATUS_DICTIONARY.CANCELLED },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
 
         Swal.fire({
@@ -280,7 +298,7 @@ function BookingView() {
         text: "Error al cancelar la reserva",
       });
     }
-  }, [bookingId]);
+  }, [bookingId, modifiedBy]);
 
   useEffect(() => {
     if (bookingId) {
@@ -338,20 +356,27 @@ function BookingView() {
             )}
           {(booking?.status?.id === BOOKING_STATUS_DICTIONARY.ACTIVE ||
             booking?.status?.id === BOOKING_STATUS_DICTIONARY.ARRIVED) && (
-            <Link to="edit" className="btn btn-outline-dark float-end">
+            <Link to="edit" className=" ms-2 btn btn-outline-dark float-end">
               Editar
               <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
             </Link>
           )}
+          <Link
+            to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
+            target="_blank"
+            className="btn btn-outline-dark float-end">
+            Ir a Factura
+            <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />
+          </Link>
         </Col>
       </Row>
-      <LoadingOverlay isVisible={isLoading || isLoadingBookingData} />
+      <LoadingOverlay isVisible={isLoading} />
       <ErrorBoundary>
         {booking !== null && (
           <BookingSummary
             bookingData={booking}
-            roomBookings={bookingRoomBookings}
-            extraCharges={bookingCharges}
+            roomBookings={booking?.roomBookings}
+            extraCharges={booking?.extraCharges}
             setBooking={setBooking}
             hotelId={hotelId}
           />

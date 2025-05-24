@@ -43,8 +43,8 @@ const BookingsView = () => {
     pageSize: 5,
     sortBy: [],
     dates: {
-      start: "",
-      end: "",
+      start: dayjs().format("YYYY-MM-DD"),
+      end: dayjs().format("YYYY-MM-DD"),
     },
     isArrivalDate: true,
     customerNameFilters: {
@@ -66,16 +66,24 @@ const BookingsView = () => {
       header: "Acciones",
       enableSorting: false,
       maxSize: 100,
-      minSize: 100,
+      minSize: 140,
       cell: (info) => {
         const booking = info.row.original;
         return (
           <div style={{ minWidth: "max-content" }}>
             <Link
-              className="btn btn-info btn-sm"
+              className="btn btn-dark btn-sm"
               target="_blank"
-              to={`/hotels/${hotelId}/bookings/${booking.id}`}>
+              to={`/hotels/${hotelId}/bookings/${booking.id}`}
+              onClick={(e) => e.stopPropagation()}>
               Ver
+            </Link>
+            <Link
+              className="btn btn-info btn-sm ms-1"
+              target="_blank"
+              to={`/hotels/${hotelId}/bookings/${booking.id}/edit`}
+              onClick={(e) => e.stopPropagation()}>
+              Editar
             </Link>
           </div>
         );

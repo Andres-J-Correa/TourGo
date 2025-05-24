@@ -126,6 +126,11 @@ const finances = [
       import("components/transactions/transactions-view/TransactionsView")
     ),
   },
+  {
+    name: "invoiceView",
+    path: "/hotels/:hotelId/invoices/:invoiceId",
+    component: lazy(() => import("components/invoices/InvoiceView")),
+  },
 ];
 
 const transactionSubCategories = [

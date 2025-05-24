@@ -433,7 +433,7 @@ function TransactionsView() {
           </Col>
           <Col>
             <div className="float-end">
-              <Label htmlFor="pageSize" className="text-dark">
+              <Label for="pageSize" className="text-dark">
                 Filas por página:
               </Label>
               <select

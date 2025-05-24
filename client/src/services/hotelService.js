@@ -152,20 +152,3 @@ export const getMinimalById = async (id) => {
     return onGlobalError(error);
   }
 };
-
-export const getPaymentMethods = async (hotelId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/${hotelId}/payment-methods`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
