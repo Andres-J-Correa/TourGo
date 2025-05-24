@@ -23,6 +23,7 @@ import {
   faPlaneDeparture,
   faCalendarXmark,
   faPenToSquare,
+  faFileInvoiceDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppContext } from "contexts/GlobalAppContext";
@@ -355,11 +356,17 @@ function BookingView() {
             )}
           {(booking?.status?.id === BOOKING_STATUS_DICTIONARY.ACTIVE ||
             booking?.status?.id === BOOKING_STATUS_DICTIONARY.ARRIVED) && (
-            <Link to="edit" className="btn btn-outline-dark float-end">
+            <Link to="edit" className=" ms-2 btn btn-outline-dark float-end">
               Editar
               <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
             </Link>
           )}
+          <Link
+            to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
+            className="btn btn-outline-dark float-end">
+            Ir a Factura
+            <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />
+          </Link>
         </Col>
       </Row>
       <LoadingOverlay isVisible={isLoading} />

@@ -1,14 +1,6 @@
-import React from "react";
-import {
-  Row,
-  Col,
-  Card,
-  CardBody,
-  CardHeader,
-  Table,
-  ListGroup,
-  ListGroupItem,
-} from "reactstrap";
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { Row, Col, Card, CardBody, CardHeader, Button } from "reactstrap";
 import dayjs from "dayjs";
 import {
   faPhone,
@@ -16,203 +8,98 @@ import {
   faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-const hotel = {
-  name: "Cabaña Gaia 2",
-  phone: "+573125644985",
-  address: "CLL 454A # 4 - 456 Rodadero Santa Marta",
-  email: "asdd.gasdia@gmail.com",
-  taxId: "324234234-4",
-};
-
-const customer = {
-  id: 1,
-  documentNumber: "A12345678",
-  firstName: "John",
-  lastName: "Doe",
-  phone: "123-456-7890",
-  email: "john.doe@example.com",
-};
-
-const invoice = {
-  invoiceNumber: "INV-20250523-0001",
-  externalId: null,
-  parentId: null,
-  type: "reservation",
-  locked: false,
-  dateCreated: "2025-05-23",
-  dateModified: "2025-05-23",
-  createdBy: "admin",
-  modifiedBy: "admin",
-  subtotal: 180000,
-  charges: 20000,
-  total: 200000,
-  paid: 150000,
-  balanceDue: 50000,
-};
-
-const bookings = [
-  {
-    arrivalDate: "2025-05-19",
-    departureDate: "2025-05-22",
-    adultGuests: 4,
-    childGuests: 0,
-    roomBookings: [
-      {
-        roomName: "My full stack room4",
-        subtotal: 180000,
-        charges: [
-          {
-            name: "Cleaning fee",
-            price: 20000,
-          },
-          {
-            name: "Daily fee",
-            price: 30000,
-          },
-        ],
-        segments: [
-          {
-            date: "2025-05-19",
-            price: 60000,
-          },
-          {
-            date: "2025-05-20",
-            price: 60000,
-          },
-          {
-            date: "2025-05-21",
-            price: 60000,
-          },
-        ],
-      },
-      {
-        roomName: "My full stack room4",
-        subtotal: 180000,
-        charges: [
-          {
-            name: "Cleaning fee",
-            price: 20000,
-          },
-          {
-            name: "Daily fee",
-            price: 30000,
-          },
-        ],
-        segments: [
-          {
-            date: "2025-05-19",
-            price: 60000,
-          },
-          {
-            date: "2025-05-20",
-            price: 60000,
-          },
-          {
-            date: "2025-05-21",
-            price: 60000,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    arrivalDate: "2025-05-19",
-    departureDate: "2025-05-22",
-    adultGuests: 4,
-    childGuests: 0,
-    roomBookings: [
-      {
-        roomName: "My full stack room4",
-        subtotal: 180000,
-        charges: [
-          {
-            name: "Cleaning fee",
-            price: 20000,
-          },
-          {
-            name: "Daily fee",
-            price: 30000,
-          },
-        ],
-        segments: [
-          {
-            date: "2025-05-19",
-            price: 60000,
-          },
-          {
-            date: "2025-05-20",
-            price: 60000,
-          },
-          {
-            date: "2025-05-21",
-            price: 60000,
-          },
-        ],
-      },
-      {
-        roomName: "My full stack room4",
-        subtotal: 180000,
-        charges: [
-          {
-            name: "Cleaning fee",
-            price: 20000,
-          },
-          {
-            name: "Daily fee",
-            price: 30000,
-          },
-        ],
-        segments: [
-          {
-            date: "2025-05-19",
-            price: 60000,
-          },
-          {
-            date: "2025-05-20",
-            price: 60000,
-          },
-          {
-            date: "2025-05-21",
-            price: 60000,
-          },
-        ],
-      },
-    ],
-  },
-];
+import { groupRoomBookings } from "components/bookings/booking-summary/helpers";
+import RoomList from "components/bookings/booking-summary/RoomList";
+import { getDetailsById as getHotelDetailsById } from "services/hotelService";
+import { getWithEntitiesById as getInvoiceDetailsById } from "services/invoiceService";
+import { formatCurrency } from "utils/currencyHelper";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
+import Breadcrumb from "components/commonUI/Breadcrumb";
+import { toast } from "react-toastify";
+import { INVOICE_TYPES_BY_ID } from "components/invoices/constants";
+import classNames from "classnames";
+import "./InvoiceView.css";
 
 const InvoiceView = () => {
-  const formattedDate = dayjs().format("DD-MM-YYYY");
+  const [invoiceData, setInvoiceData] = useState({
+    hotel: null,
+    details: null,
+  });
+  const [loading, setLoading] = useState(true);
+  const { hotelId, invoiceId } = useParams();
 
-  const calculateRoomTotal = (room) => {
-    const segmentTotal = room.segments.reduce((sum, seg) => sum + seg.price, 0);
-    const chargesTotal = room.charges.reduce(
-      (sum, charge) => sum + charge.price,
-      0
-    );
-    return segmentTotal + chargesTotal;
-  };
+  const breadcrumbs = [
+    { label: "Inicio", path: "/" },
+    { label: "Hoteles", path: "/hotels" },
+    { label: "Hotel", path: `/hotels/${hotelId}` },
+  ];
+
+  useEffect(() => {
+    if (!hotelId || !invoiceId) return;
+    setLoading(true);
+    Promise.allSettled([
+      getHotelDetailsById(hotelId),
+      getInvoiceDetailsById(invoiceId),
+    ])
+      .then(([hotelResult, invoiceResult]) => {
+        let errorMessage = "";
+
+        if (hotelResult.status === "fulfilled") {
+          setInvoiceData((prev) => ({
+            ...prev,
+            hotel: hotelResult.value.item,
+          }));
+        } else if (hotelResult.reason?.response?.status !== 404) {
+          errorMessage = "Error al cargar el hotel";
+        }
+
+        if (invoiceResult.status === "fulfilled") {
+          setInvoiceData((prev) => ({
+            ...prev,
+            details: invoiceResult.value.item,
+          }));
+        } else if (invoiceResult.reason?.response?.status !== 404) {
+          errorMessage = errorMessage
+            ? errorMessage + "y los detalles de la factura"
+            : "Error al cargar los detalles de la factura";
+        }
+        if (errorMessage) {
+          toast.error(errorMessage);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [hotelId, invoiceId]);
 
   return (
-    <div className="my-4">
-      {/* Hotel Information */}
+    <div>
+      <Breadcrumb breadcrumbs={breadcrumbs} active={"Factura"} />
+      <LoadingOverlay isVisible={loading} />
+      <Button
+        color="dark"
+        className="no-print float-end mt-5"
+        onClick={() => window.print()}>
+        Descargar PDF
+      </Button>
       <Row>
         <Col className="text-center">
-          <h1>{hotel.name}</h1>
-          <span className="me-4">NIT: {hotel.taxId}</span>
-          <span>
+          <h1>{invoiceData?.hotel?.name}</h1>
+          <span className="me-4">NIT: {invoiceData?.hotel?.taxId}</span>
+          <span className="text-capitalize">{invoiceData?.hotel?.type}</span>
+          <br />
+          <span className="me-4">
             <FontAwesomeIcon className="me-2" icon={faLocationDot} />
-            {hotel.address}
+            {invoiceData?.hotel?.address}
           </span>
           <br />
           <span className="me-4">
             <FontAwesomeIcon className="me-2" icon={faPhone} />
-            {hotel.phone}
+            {invoiceData?.hotel?.phone}
           </span>
           <span>
             <FontAwesomeIcon className="me-2" icon={faEnvelope} />
-            {hotel.email}
+            {invoiceData?.hotel?.email}
           </span>
         </Col>
       </Row>
@@ -220,7 +107,9 @@ const InvoiceView = () => {
       {/* Invoice Information */}
 
       <Row className="mb-4">
-        <h4 className="text-end mb-3">Recibo # {invoice.invoiceNumber}</h4>
+        <h4 className="text-end mb-3">
+          Factura # {invoiceData?.details?.invoiceNumber}
+        </h4>
         <Col className="border-end">
           <h5 className="text-start">Cliente</h5>
           <Row className="mb-3">
@@ -230,14 +119,15 @@ const InvoiceView = () => {
                   <span>
                     <strong>Nombre:</strong>
                     <p>
-                      {customer.firstName} {customer.lastName}
+                      {invoiceData?.details?.customer?.firstName}{" "}
+                      {invoiceData?.details?.customer?.lastName}
                     </p>
                   </span>
                 </Col>
                 <Col>
                   <span>
                     <strong>Documento:</strong>
-                    <p>{customer.documentNumber}</p>
+                    <p>{invoiceData?.details?.customer?.documentNumber}</p>
                   </span>
                 </Col>
               </Row>
@@ -245,13 +135,13 @@ const InvoiceView = () => {
                 <Col>
                   <span>
                     <strong>Email:</strong>
-                    <p>{customer.email}</p>
+                    <p>{invoiceData?.details?.customer?.email}</p>
                   </span>
                 </Col>
                 <Col>
                   <span>
                     <strong>Teléfono:</strong>
-                    <p>{customer.phone}</p>
+                    <p>{invoiceData?.details?.customer?.phone}</p>
                   </span>
                 </Col>
               </Row>
@@ -260,33 +150,33 @@ const InvoiceView = () => {
         </Col>
         <Col>
           <Row className="mb-3">
-            <h5>Detalles del recibo</h5>
+            <h5>Detalles de la factura</h5>
             <Col>
               <Row>
                 <Col>
                   <span>
                     <strong>Id Externa: </strong>
-                    <p>{invoice.externalId || "N/A"}</p>
+                    <p>{invoiceData?.details?.externalId || "N/A"}</p>
                   </span>
                 </Col>
                 <Col>
                   <span>
                     <strong>Fecha de emisión:</strong>
-                    <p>{formattedDate}</p>
+                    <p>{dayjs().format("DD-MM-YYYY")}</p>
                   </span>
                 </Col>
               </Row>
               <Row>
                 <Col>
                   <span>
-                    <strong>Recibo Matriz: </strong>
-                    <p>{invoice.parentId || "N/A"}</p>
+                    <strong>Factura Matriz: </strong>
+                    <p>{invoiceData?.details?.parentId || "N/A"}</p>
                   </span>
                 </Col>
                 <Col>
-                  <span>
+                  <span className="no-print">
                     <strong>Tipo: </strong>
-                    <p>{invoice.type}</p>
+                    <p>{INVOICE_TYPES_BY_ID[invoiceData?.details?.typeId]}</p>
                   </span>
                 </Col>
               </Row>
@@ -295,110 +185,121 @@ const InvoiceView = () => {
         </Col>
       </Row>
 
-      {/* Booking Details */}
-      {bookings.map((booking, index) => (
-        <Card className="mb-4" key={index}>
-          <CardHeader>
-            <strong>Booking {index + 1}</strong>
-          </CardHeader>
-          <CardBody>
-            <Row>
-              <Col md={4}>
-                <p>
-                  <strong>Arrival:</strong>{" "}
-                  {dayjs(booking.arrivalDate).format("DD-MM-YYYY")}
-                </p>
-                <p>
-                  <strong>Departure:</strong>{" "}
-                  {dayjs(booking.departureDate).format("DD-MM-YYYY")}
-                </p>
-              </Col>
-              <Col md={4}>
-                <p>
-                  <strong>Adults:</strong> {booking.adultGuests}
-                </p>
-                <p>
-                  <strong>Children:</strong> {booking.childGuests}
-                </p>
-              </Col>
-            </Row>
+      <hr />
 
-            {/* Room Bookings */}
-            {booking.roomBookings.map((room, rIndex) => (
-              <Card className="mb-3" key={rIndex}>
-                <CardHeader>
-                  <strong>{room.roomName}</strong>
-                </CardHeader>
-                <CardBody>
-                  {/* Nightly Breakdown */}
-                  <h6>Nightly Rates:</h6>
-                  <Table bordered size="sm">
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {room.segments.map((segment, sIndex) => (
-                        <tr key={sIndex}>
-                          <td>{dayjs(segment.date).format("DD-MM-YYYY")}</td>
-                          <td>{segment.price}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+      <div className="fs-5">
+        <Row className="mb-2">
+          <Col md={4}>
+            <div className="line-item">
+              <span className="line-label fw-bold">Subtotal</span>
+              <div className="line-fill" />
+              <span className="line-amount">
+                {formatCurrency(invoiceData?.details?.subtotal, "COP")}
+              </span>
+            </div>
+          </Col>
+          <Col md={4}>
+            <div className="line-item">
+              <span className="line-label fw-bold">Cargos</span>
+              <div className="line-fill" />
+              <span className="line-amount">
+                {formatCurrency(invoiceData?.details?.charges, "COP")}
+              </span>
+            </div>
+          </Col>
+          <Col md={4}>
+            <div className="line-item">
+              <span className="line-label fw-bold">Total</span>
+              <div className="line-fill" />
+              <span className="line-amount">
+                {formatCurrency(invoiceData?.details?.total, "COP")}
+              </span>
+            </div>
+          </Col>
+        </Row>
+        <Row className="mb-2">
+          <Col md={4}>
+            <div className="line-item">
+              <span className="line-label fw-bold">Total Pagado</span>
+              <div className="line-fill" />
+              <span className="line-amount">
+                {formatCurrency(invoiceData?.details?.paid, "COP")}
+              </span>
+            </div>
+          </Col>
+          <Col md={4}>
+            <div className="line-item">
+              <span className="line-label fw-bold">Saldo</span>
+              <div className="line-fill" />
+              <span
+                className={classNames("line-amount", {
+                  "text-danger": invoiceData?.details?.balanceDue < 0,
+                })}>
+                {formatCurrency(invoiceData?.details?.balanceDue, "COP")}
+              </span>
+            </div>
+          </Col>
+        </Row>
+      </div>
 
-                  {/* Charges */}
-                  <h6>Additional Charges:</h6>
-                  <ListGroup>
-                    {room.charges.map((charge, cIndex) => (
-                      <ListGroupItem key={cIndex}>
-                        {charge.name}: {charge.price}
-                      </ListGroupItem>
-                    ))}
-                  </ListGroup>
+      <hr />
 
-                  {/* Subtotal */}
-                  <p className="mt-2">
-                    <strong>Room Total:</strong> {calculateRoomTotal(room)}
-                  </p>
-                </CardBody>
-              </Card>
-            ))}
-          </CardBody>
-        </Card>
-      ))}
-      {/* Invoice Totals */}
-      <Row className="mt-4">
-        <Col md={6}>
-          <h5>Invoice Summary</h5>
-          <Table bordered>
-            <tbody>
-              <tr>
-                <th>Subtotal</th>
-                <td>{invoice.subtotal}</td>
-              </tr>
-              <tr>
-                <th>Charges</th>
-                <td>{invoice.charges}</td>
-              </tr>
-              <tr>
-                <th>Total</th>
-                <td>{invoice.total}</td>
-              </tr>
-              <tr>
-                <th>Paid</th>
-                <td>{invoice.paid}</td>
-              </tr>
-              <tr>
-                <th>Balance Due</th>
-                <td>{invoice.balanceDue}</td>
-              </tr>
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
+      <h5 className="mb-4">Servicios ⬇️</h5>
+      {invoiceData?.details?.bookings?.map((booking, index) => {
+        const groupedRooms = groupRoomBookings(booking?.roomBookings);
+
+        return (
+          <Card
+            id={`booking_${booking.id}-${index}`}
+            key={`booking_${booking.id}-${index}`}
+            className="mb-4 bg-body-tertiary shadow booking-card ">
+            <CardHeader tag="h5" className="text-bg-dark text-center">
+              <Link
+                to={`/hotels/${hotelId}/bookings/${booking.id}`}
+                target="_blank"
+                className="text-white text-decoration-none  booking-card-header-print">
+                Reserva # {booking?.id}
+              </Link>
+            </CardHeader>
+            <CardBody>
+              <Row className="mb-3">
+                <Col>
+                  <Row>
+                    <Col>
+                      <span>
+                        <strong>Fecha de llegada:</strong>
+                        <p>{dayjs(booking.arrivalDate).format("DD/MM/YYYY")}</p>
+                      </span>
+                    </Col>
+                    <Col>
+                      <span>
+                        <strong>Fecha de Salida</strong>
+                        <p>
+                          {dayjs(booking.departureDate).format("DD/MM/YYYY")}
+                        </p>
+                      </span>
+                    </Col>
+                    <Col>
+                      <span>
+                        <strong>Número de Huespedes:</strong>
+                        <p>
+                          Adultos: {booking.adultGuests} - Niños:{" "}
+                          {booking.childGuests || 0}
+                        </p>
+                      </span>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+
+              <RoomList
+                rooms={groupedRooms}
+                extraCharges={booking?.extraCharges}
+              />
+            </CardBody>
+          </Card>
+        );
+      })}
     </div>
   );
 };

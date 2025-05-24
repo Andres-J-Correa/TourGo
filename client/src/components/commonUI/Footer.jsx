@@ -4,7 +4,7 @@ import { Row } from "reactstrap";
 
 function Footer() {
   return (
-    <Row className="w-100">
+    <Row className="w-100 no-print">
       <footer className="text-center mt-2">
         &copy; 2025 Tourgo. Todos los derechos reservados. <div></div>
         <Link to={`/privacy-policy`} className="footer-link mx-2">

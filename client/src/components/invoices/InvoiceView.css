@@ -1,7 +1,7 @@
 .line-item {
   display: flex;
   align-items: center;
-  font-size: 0.95rem;
+  font-size: 1rem;
   padding: 2px 0;
 }
 
@@ -31,8 +31,11 @@
 }
 
 @media print {
-  .room-card-print {
-    max-width: 400px;
+  .booking-card-header-print {
+    color: var(--bs-dark) !important;
+  }
+
+  .booking-card {
     break-inside: avoid; /* Prevents the card from being split across pages */
     page-break-inside: avoid; /* Fallback for older browsers */
     margin-bottom: 1rem; /* Ensure spacing between cards */
