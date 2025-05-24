@@ -166,10 +166,9 @@ const BookingAddUpdateView = () => {
               <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
               Anterior
             </Button>
-            {isStepComplete[2] && (
+            {isStepComplete[2] && !submitting && (
               <Link
                 className="ms-auto btn btn-dark"
-                disabled={submitting}
                 to={`/hotels/${hotelId}/bookings/${booking.id}`}>
                 Ir a Resumen
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
