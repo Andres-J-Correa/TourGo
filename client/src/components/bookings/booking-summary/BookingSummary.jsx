@@ -19,7 +19,7 @@ const BookingSummary = ({
 }) => {
   const { customer } = bookingData || {};
   const groupedRooms = groupRoomBookings(roomBookings);
-  console.log("Grouped Rooms", groupedRooms);
+
   return (
     <Card className="mb-4 bg-body-tertiary shadow">
       <CardHeader tag="h4" className="text-bg-dark text-center">

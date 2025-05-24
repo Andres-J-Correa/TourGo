@@ -114,9 +114,12 @@ function BookingFilters({
         </Col>
         <Col lg={6} xl={4}>
           <Form onSubmit={handleCustomerNameFilterSubmit}>
-            <Label className="text-dark">Filtrar por nombre de cliente:</Label>
+            <Label for="firstName" className="text-dark">
+              Filtrar por nombre de cliente:
+            </Label>
             <InputGroup>
               <Input
+                id="firstName"
                 type="text"
                 aria-label="First name"
                 placeholder="Nombre"
@@ -156,11 +159,12 @@ function BookingFilters({
         </Col>
         <Col lg={6} xl="auto">
           <Form onSubmit={handleExternalBookingIdFilterSubmit}>
-            <Label className="text-dark">
+            <Label for="externalBookingId" className="text-dark">
               Filtrar por ID de reserva externa:
             </Label>
             <InputGroup>
               <Input
+                id="externalBookingId"
                 type="text"
                 placeholder="ID de reserva externa"
                 value={externalBookingIdInput}
@@ -187,8 +191,11 @@ function BookingFilters({
       </Row>
       <Row className="px-3 mb-3">
         <Col lg="auto" xl="auto">
-          <Label className="text-dark">Filtrar por estado:</Label>
+          <Label for="statusId" className="text-dark">
+            Filtrar por estado:
+          </Label>
           <select
+            id="statusId"
             className={classNames("form-select", {
               "bg-info-subtle": paginationData.statusId,
             })}
@@ -220,7 +227,7 @@ function BookingFilters({
         </Col>
         <Col>
           <div className="float-end">
-            <Label htmlFor="pageSize" className="text-dark">
+            <Label for="pageSize" className="text-dark">
               Filas por página:
             </Label>
             <select

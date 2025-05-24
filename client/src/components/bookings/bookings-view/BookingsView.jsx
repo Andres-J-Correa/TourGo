@@ -74,13 +74,15 @@ const BookingsView = () => {
             <Link
               className="btn btn-dark btn-sm"
               target="_blank"
-              to={`/hotels/${hotelId}/bookings/${booking.id}`}>
+              to={`/hotels/${hotelId}/bookings/${booking.id}`}
+              onClick={(e) => e.stopPropagation()}>
               Ver
             </Link>
             <Link
               className="btn btn-info btn-sm ms-1"
               target="_blank"
-              to={`/hotels/${hotelId}/bookings/${booking.id}/edit`}>
+              to={`/hotels/${hotelId}/bookings/${booking.id}/edit`}
+              onClick={(e) => e.stopPropagation()}>
               Editar
             </Link>
           </div>

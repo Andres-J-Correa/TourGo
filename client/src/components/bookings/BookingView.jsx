@@ -363,6 +363,7 @@ function BookingView() {
           )}
           <Link
             to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
+            target="_blank"
             className="btn btn-outline-dark float-end">
             Ir a Factura
             <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />

@@ -219,8 +219,9 @@ export const sanitizeBooking = (booking) => {
   sanitizedBooking.childGuests = sanitizedBooking.childGuests || "";
   sanitizedBooking.adultGuests = sanitizedBooking.adultGuests || "";
   sanitizedBooking.customerId = booking.customer?.id || booking.customerId;
-  sanitizeBooking.status = booking.status?.id ||
-    booking.status || { id: BOOKING_STATUS_DICTIONARY.ACTIVE };
+  sanitizedBooking.status = booking.status?.id
+    ? booking.status
+    : { id: BOOKING_STATUS_DICTIONARY.ACTIVE };
 
   return sanitizedBooking;
 };

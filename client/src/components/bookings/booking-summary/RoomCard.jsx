@@ -8,7 +8,8 @@ import "./BookingSummary.css";
 const RoomCard = ({ room, bookingNights, extraCharges }) => {
   const subtotal = room?.segments?.reduce((sum, seg) => sum + seg.price, 0);
   const charges = calculateRoomCharges(extraCharges, subtotal, bookingNights);
-  const total = subtotal + charges?.reduce((acc, c) => acc + c.total, 0);
+  const total =
+    subtotal + (charges ? charges?.reduce((acc, c) => acc + c.total, 0) : 0);
 
   return (
     <Card className="mb-3 flex-fill shadow bg-light room-card-print">

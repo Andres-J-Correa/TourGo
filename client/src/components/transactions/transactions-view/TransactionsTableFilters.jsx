@@ -257,8 +257,11 @@ function TransactionsTableFilters({
           />
         </Col>
         <Col lg="auto" xl="auto">
-          <Label className="text-dark">Categoría:</Label>
+          <Label for="transaction-category" className="text-dark">
+            Categoría:
+          </Label>
           <select
+            id="transaction-category"
             className={classNames("form-select", {
               "bg-info-subtle": paginationData.categoryId,
             })}
@@ -279,8 +282,11 @@ function TransactionsTableFilters({
           </select>
         </Col>
         <Col lg="auto" xl="auto">
-          <Label className="text-dark">Subcategoría:</Label>
+          <Label for="transaction-subcategory" className="text-dark">
+            Subcategoría:
+          </Label>
           <select
+            id="transaction-subcategory"
             className={classNames("form-select", {
               "bg-info-subtle": paginationData.subcategoryId,
             })}
@@ -305,8 +311,11 @@ function TransactionsTableFilters({
           </select>
         </Col>
         <Col lg="auto" xl="auto">
-          <Label className="text-dark">Método de pago:</Label>
+          <Label for="payment-method" className="text-dark">
+            Método de pago:
+          </Label>
           <select
+            id="payment-method"
             className={classNames("form-select", {
               "bg-info-subtle": paginationData.paymentMethodId,
             })}
@@ -331,8 +340,11 @@ function TransactionsTableFilters({
           </select>
         </Col>
         <Col lg="auto" xl="auto">
-          <Label className="text-dark">Socio Financiero:</Label>
+          <Label for="finance-partner" className="text-dark">
+            Socio Financiero:
+          </Label>
           <select
+            id="finance-partner"
             className={classNames("form-select", {
               "bg-info-subtle": paginationData.financePartnerId,
             })}
@@ -360,9 +372,12 @@ function TransactionsTableFilters({
       <Row className="mb-3">
         <Col lg={6} xl={3}>
           <Form onSubmit={handleTransactionIdFilterSubmit}>
-            <Label className="text-dark">Id de transacción:</Label>
+            <Label for="transactionId" className="text-dark">
+              Id de transacción:
+            </Label>
             <InputGroup>
               <Input
+                id="transactionId"
                 type="number"
                 placeholder="Id de transacción"
                 value={transactionIdInput}
@@ -389,9 +404,12 @@ function TransactionsTableFilters({
         </Col>
         <Col lg={6} xl={3}>
           <Form onSubmit={handleReferenceNumberFilterSubmit}>
-            <Label className="text-dark">Número de referencia:</Label>
+            <Label for="referenceNumber" className="text-dark">
+              Número de referencia:
+            </Label>
             <InputGroup>
               <Input
+                id="referenceNumber"
                 type="text"
                 placeholder="Número de referencia"
                 value={referenceNumberInput}
@@ -418,9 +436,12 @@ function TransactionsTableFilters({
         </Col>
         <Col lg={6} xl={3}>
           <Form onSubmit={handleEntityIdFilterSubmit}>
-            <Label className="text-dark">Id de Entidad Asociada:</Label>
+            <Label for="entityId" className="text-dark">
+              Id de Entidad Asociada:
+            </Label>
             <InputGroup>
               <Input
+                id="entityId"
                 type="number"
                 placeholder="Id de entidad"
                 value={entityIdInput}
@@ -447,9 +468,12 @@ function TransactionsTableFilters({
         </Col>
         <Col lg={6} xl={3}>
           <Form onSubmit={handleDescriptionFilterSubmit}>
-            <Label className="text-dark">Descripción:</Label>
+            <Label for="description" className="text-dark">
+              Descripción:
+            </Label>
             <InputGroup>
               <Input
+                id="description"
                 type="text"
                 placeholder="Descripción"
                 value={descriptionInput}
@@ -477,8 +501,11 @@ function TransactionsTableFilters({
       </Row>
       <Row>
         <Col lg="auto" xl="auto">
-          <Label className="text-dark">Estado:</Label>
+          <Label for="statusId" className="text-dark">
+            Estado:
+          </Label>
           <select
+            id="statusId"
             className={classNames("form-select", {
               "bg-info-subtle": paginationData.statusId,
             })}
@@ -499,8 +526,11 @@ function TransactionsTableFilters({
           </select>
         </Col>
         <Col lg="auto" xl="auto">
-          <Label className="text-dark">Comprobante</Label>
+          <Label for="hasDocumentUrl" className="text-dark">
+            Comprobante
+          </Label>
           <select
+            id="hasDocumentUrl"
             className={classNames("form-select", {
               "bg-info-subtle": paginationData.hasDocumentUrl,
             })}
