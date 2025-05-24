@@ -21,8 +21,6 @@ namespace TourGo.Models.Requests.Invoices
         [MinLength(2)]
         public string? ExternalId { get; set; }
 
-        public string? Url { get; set; }
-
         [Range(0, double.MaxValue)]
         public decimal Subtotal { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using TourGo.Models.Requests.Invoices;
+﻿using TourGo.Models.Domain.Invoices;
+using TourGo.Models.Requests.Invoices;
 
 namespace TourGo.Services.Interfaces.Hotels
 {
@@ -6,5 +7,6 @@ namespace TourGo.Services.Interfaces.Hotels
     {
         int Add(InvoiceAddRequest model, int userId);
         void Update(InvoiceUpdateRequest model, int userId);
+        InvoiceWithEntities? GetWithEntitiesById(int invoiceId);
     }
 }

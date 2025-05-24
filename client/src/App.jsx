@@ -63,7 +63,7 @@ const App = () => {
             message="cargando usuario"
           />
           <NavbarContainer />
-          <Container className="mt-4">
+          <Container className="mt-4 main-container">
             <Routes>{routes}</Routes>
             <Footer />
           </Container>

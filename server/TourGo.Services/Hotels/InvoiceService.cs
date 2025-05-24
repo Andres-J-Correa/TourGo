@@ -1,13 +1,18 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.Data;
+using TourGo.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourGo.Data.Providers;
+using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Requests.Invoices;
 using TourGo.Services.Interfaces.Hotels;
+using System.Data;
+using TourGo.Models.Domain.Bookings;
+using TourGo.Services.Customers;
+using TourGo.Models.Domain.Hotels;
 
 namespace TourGo.Services.Hotels
 {
@@ -34,7 +39,6 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_hotelId", model.Id);
                 param.AddWithValue("p_typeId", model.TypeId);
                 param.AddWithValue("p_statusId", model.StatusId);
-                param.AddWithValue("p_url", model.Url ?? (object)DBNull.Value);
                 param.AddWithValue("p_modifiedBy", userId);
                 param.AddWithValue("p_subtotal", model.Subtotal);
                 param.AddWithValue("p_paid", model.Paid);
@@ -66,7 +70,6 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_customerId", model.CustomerId);
                 param.AddWithValue("p_typeId", model.TypeId);
                 param.AddWithValue("p_statusId", model.StatusId);
-                param.AddWithValue("p_url", model.Url ?? (object)DBNull.Value);
                 param.AddWithValue("p_modifiedBy", userId);
                 param.AddWithValue("p_subtotal", model.Subtotal);
                 param.AddWithValue("p_paid", model.Paid);
@@ -78,7 +81,62 @@ namespace TourGo.Services.Hotels
 
         }
 
+        public InvoiceWithEntities? GetWithEntitiesById(int invoiceId)
+        {
+            string proc = "invoices_select_with_entities_by_id";
+            InvoiceWithEntities? invoiceWithEntities = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_invoiceId", invoiceId);
+            }, (IDataReader reader, short set) =>
+            {
+
+                int index = 0;
 
 
+                if (set == 0)
+                {
+                    Invoice invoice = MapInvoice(reader, ref index);
+                    invoiceWithEntities = new InvoiceWithEntities(invoice);
+                    invoiceWithEntities.MapFromReader(reader, ref index);
+                }
+
+                if (set == 1 && invoiceWithEntities != null)
+                {
+                    index = 0;
+                    invoiceWithEntities.Customer = CustomerService.MapCustomer(reader, ref index);
+                }
+
+                if( set == 2 && invoiceWithEntities != null)
+                {
+                    Booking booking = BookingService.MapBooking(reader, ref index);
+                    booking.RoomBookings = reader.DeserializeObjectSafely<List<RoomBooking>>(index++, ()=> null);
+                    booking.ExtraCharges = reader.DeserializeObjectSafely<List<ExtraCharge>>(index++, () => null);
+                    invoiceWithEntities.Bookings ??= new List<Booking>();
+                    invoiceWithEntities.Bookings.Add(booking);
+                }
+            });
+
+            return invoiceWithEntities;
+        }
+
+        private static Invoice MapInvoice(IDataReader reader, ref int index)
+        {
+            Invoice invoice = new Invoice();
+            invoice.Id = reader.GetSafeInt32(index++);
+            invoice.ParentId = reader.GetSafeInt32(index++);
+            invoice.InvoiceNumber = reader.GetSafeString(index++);
+            invoice.ExternalId = reader.GetSafeString(index++);
+            invoice.TypeId = reader.GetSafeInt32(index++);
+            invoice.Subtotal = reader.GetSafeDecimal(index++);
+            invoice.Paid = reader.GetSafeDecimal(index++);
+            invoice.Charges = reader.GetSafeDecimal(index++);
+            invoice.Total = reader.GetSafeDecimal(index++);
+            invoice.BalanceDue = reader.GetSafeDecimal(index++);
+            invoice.Locked = reader.GetSafeBool(index++);
+            invoice.StatusId = reader.GetSafeInt32(index++);
+            return invoice;
+        }
     }
 }

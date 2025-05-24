@@ -32,9 +32,9 @@ namespace TourGo.Data
             }
         }
 
-        public static T DeserializeObject<T>(this IDataReader reader, Int32 ordinal)
+        public static T? DeserializeObject<T>(this IDataReader reader, Int32 ordinal)
         {
-            T result = default(T);
+            T? result = default(T);
 
             if (reader[ordinal] != null && reader[ordinal] != DBNull.Value)
             {
@@ -418,6 +418,37 @@ namespace TourGo.Data
             }
 
             return parsedValue;
+        }
+
+        public static T? DeserializeObjectSafely<T>(this IDataReader reader, Int32 ordinal, Func<T?> backup)
+        {
+            T? result = default(T);
+
+            if (reader[ordinal] != null && reader[ordinal] != DBNull.Value)
+            {
+                try
+                {
+
+                    if (reader[ordinal] is not string json || string.IsNullOrWhiteSpace(json))
+                    {
+                        return backup();
+                    }
+
+                    string myJson = reader.GetString(ordinal);
+
+                    if (!string.IsNullOrEmpty(myJson))
+                    {
+                        result = JsonConvert.DeserializeObject<T>(myJson);
+                    }
+
+                }
+                catch
+                {
+                    result = backup();
+                }
+
+            }
+            return result;
         }
 
         #endregion - Safe Value Type mappers -

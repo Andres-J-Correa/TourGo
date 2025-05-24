@@ -23,8 +23,6 @@ import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import EntityTransactionsView from "components/transactions/EntityTransactionsView";
 import BookingSummary from "components/bookings/booking-summary/BookingSummary";
 
-import useBookingData from "./hooks/useBookingData";
-
 const BookingAddUpdateView = () => {
   const { hotelId, bookingId } = useParams();
   const breadcrumbs = [
@@ -55,9 +53,6 @@ const BookingAddUpdateView = () => {
   const [booking, setBooking] = useState({ ...defaultBooking });
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isLoadingBookingData, bookingCharges, bookingRoomBookings } =
-    useBookingData(bookingId);
-
   const isStepComplete = {
     0: customer?.id > 0,
     1: Number(booking.id) > 0,
@@ -67,7 +62,20 @@ const BookingAddUpdateView = () => {
 
   const onGetBookingSuccess = (res) => {
     if (res.isSuccessful) {
-      setBooking(res.item);
+      const mappedRoomBookings = res.item.roomBookings.map((booking) => ({
+        ...booking,
+        roomId: booking.room.id,
+      }));
+
+      const mappedExtraCharges = res.item.extraCharges.map((charge) => ({
+        ...charge,
+        extraChargeId: charge.id,
+      }));
+      setBooking({
+        ...res.item,
+        roomBookings: mappedRoomBookings,
+        extraCharges: mappedExtraCharges,
+      });
       setCustomer(res.item.customer);
     }
   };
@@ -96,12 +104,8 @@ const BookingAddUpdateView = () => {
   return (
     <>
       <LoadingOverlay
-        isVisible={submitting || isLoading || isLoadingBookingData}
-        message={
-          isLoading || isLoadingBookingData
-            ? "Cargando información"
-            : "procesando..."
-        }
+        isVisible={submitting || isLoading}
+        message={isLoading ? "Cargando información" : "procesando..."}
       />
 
       <Breadcrumb
@@ -138,8 +142,8 @@ const BookingAddUpdateView = () => {
             setCustomer={setCustomer}
             hotelId={hotelId}
             bookingId={bookingId}
-            bookingCharges={bookingCharges}
-            bookingRoomBookings={bookingRoomBookings}
+            bookingCharges={booking?.extraCharges}
+            bookingRoomBookings={booking?.roomBookings}
             modifiedBy={modifiedBy}
           />
         </TabPane>
@@ -192,8 +196,8 @@ const BookingAddUpdateView = () => {
           </div>
           <BookingSummary
             bookingData={booking}
-            roomBookings={booking?.roomBookings ?? bookingRoomBookings}
-            extraCharges={booking?.extraCharges ?? bookingCharges}
+            roomBookings={booking?.roomBookings}
+            extraCharges={booking?.extraCharges}
           />
         </TabPane>
         <br />

@@ -9,7 +9,6 @@ import {
   updateStatusToCancelled,
 } from "services/bookingService";
 import { BOOKING_STATUS_DICTIONARY } from "components/bookings/constants";
-import useBookingData from "components/bookings/booking-add-edit-view/hooks/useBookingData";
 import BookingSummary from "components/bookings/booking-summary/BookingSummary";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -34,8 +33,6 @@ function BookingView() {
   const { hotelId, bookingId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [booking, setBooking] = useState(null);
-  const { isLoadingBookingData, bookingCharges, bookingRoomBookings } =
-    useBookingData(bookingId);
 
   const { user } = useAppContext();
 
@@ -365,13 +362,13 @@ function BookingView() {
           )}
         </Col>
       </Row>
-      <LoadingOverlay isVisible={isLoading || isLoadingBookingData} />
+      <LoadingOverlay isVisible={isLoading} />
       <ErrorBoundary>
         {booking !== null && (
           <BookingSummary
             bookingData={booking}
-            roomBookings={bookingRoomBookings}
-            extraCharges={bookingCharges}
+            roomBookings={booking?.roomBookings}
+            extraCharges={booking?.extraCharges}
             setBooking={setBooking}
             hotelId={hotelId}
           />

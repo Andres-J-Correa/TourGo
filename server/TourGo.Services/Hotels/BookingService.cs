@@ -37,7 +37,7 @@ namespace TourGo.Services.Hotels
 
         public Booking? GetById(int id)
         {
-            string proc = "bookings_select_details_by_id_v3";
+            string proc = "bookings_select_details_by_id_v4";
             Booking? booking = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -65,6 +65,22 @@ namespace TourGo.Services.Hotels
                     Transaction transaction = TransactionService.MapTransaction(reader, ref index);
                     booking.Transactions ??= new List<Transaction>();
                     booking.Transactions.Add(transaction);
+                }
+
+                if (set== 3 && booking != null)
+                {
+                    index = 0;
+                    RoomBooking roomBooking = MapRoomBooking(reader, ref index);
+                    booking.RoomBookings ??= new List<RoomBooking>();
+                    booking.RoomBookings.Add(roomBooking);      
+                }
+
+                if (set == 4 && booking != null)
+                {
+                    index = 0;
+                    ExtraCharge extraCharge = ExtraChargeService.MapExtraCharge(reader, ref index);
+                    booking.ExtraCharges ??= new List<ExtraCharge>();
+                    booking.ExtraCharges.Add(extraCharge);
                 }
             });
 
@@ -289,7 +305,6 @@ namespace TourGo.Services.Hotels
         {
             RoomBooking roomBooking = new RoomBooking();
             roomBooking.Date = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
-            roomBooking.Room = new Room();
             roomBooking.Room.Id = reader.GetSafeInt32(index++);
             roomBooking.Room.Name = reader.GetSafeString(index++);
             roomBooking.BookingId = reader.GetSafeInt32(index++);
@@ -299,7 +314,7 @@ namespace TourGo.Services.Hotels
             return roomBooking;
         }
 
-        private static Booking MapBooking(IDataReader reader, ref int index)
+        public static Booking MapBooking(IDataReader reader, ref int index)
         {
             Booking booking = new Booking();
             booking.Id = reader.GetSafeInt32(index++);
