@@ -3,7 +3,7 @@ import { useFormikContext } from "formik";
 import { Row, Col } from "reactstrap";
 
 import { setLocalStorageForm } from "utils/localStorageHelper";
-import { LOCAL_STORAGE_FORM_KEYS } from "components/bookings/constants";
+import { LOCAL_STORAGE_FORM_KEYS } from "components/bookings/booking-add-edit-view/constants";
 import CustomField from "components/commonUI/forms/CustomField";
 import DateTimePicker from "components/commonUI/forms/DateTimePicker";
 
@@ -23,12 +23,12 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
     });
   };
 
-  const handleEtaChange = (date, fieldName) => {
+  const handleEtaChange = (date) => {
     const val = dayjs(date).format("YYYY-MM-DDTHH:mm:ss");
-    setFieldValue(fieldName, val); // Update Formik state
+    setFieldValue("eta", val); // Update Formik state
     setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT, {
       ...values,
-      [fieldName]: val,
+      eta: val,
     });
   };
 
@@ -82,7 +82,7 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
           <DateTimePicker
             name="eta"
             placeholder="Fecha y Hora estimada de llegada"
-            onChange={(date) => handleEtaChange(date, "eta")}
+            onChange={(date) => handleEtaChange(date)}
             disabled={submitting}
           />
         </Col>

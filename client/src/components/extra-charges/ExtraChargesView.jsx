@@ -46,7 +46,10 @@ import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
-import { EXTRA_CHARGE_TYPES } from "./constants";
+import {
+  EXTRA_CHARGE_TYPES,
+  formatExtraChargeAmount,
+} from "components/extra-charges/constants";
 import { errorCodes } from "constants/errorCodes";
 
 // Validation Schema
@@ -116,14 +119,6 @@ const ExtraChargesView = () => {
       lastName: user.current?.lastName,
     };
   }, [user]);
-
-  // Format Amounts for Display
-  const formatAmount = (amount, typeId) => {
-    if (Number(typeId) === 1) return `${(amount * 100).toFixed(2)}%`; // Percentage
-    return `$${Number(amount)
-      .toFixed(2)
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`; // Daily/General
-  };
 
   const handleSubmit = async (values) => {
     const { id, ...data } = values;
@@ -326,7 +321,7 @@ const ExtraChargesView = () => {
         header: "Monto",
         maxSize: 200,
         cell: (info) =>
-          formatAmount(info.getValue(), info.row.original.type.id),
+          formatExtraChargeAmount(info.getValue(), info.row.original.type.id),
       },
       {
         accessorKey: "type",

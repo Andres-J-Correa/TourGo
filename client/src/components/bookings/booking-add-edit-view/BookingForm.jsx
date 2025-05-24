@@ -26,14 +26,18 @@ import {
   getLocalStorageForm,
 } from "utils/localStorageHelper";
 import {
-  sanitizeBooking,
-  bookingDefaultInitialValues,
-  bookingSchema,
   LOCAL_STORAGE_FORM_KEYS,
   deepCompareBooking,
   bookingKeysToCompare,
   currentFormKeysToCompare,
-} from "components/bookings/constants";
+} from "components/bookings/booking-add-edit-view/constants";
+
+import {
+  bookingSchema,
+  bookingDefaultInitialValues,
+  sanitizeBooking,
+} from "components/bookings/booking-add-edit-view/constants";
+
 import { errorCodes } from "constants/errorCodes";
 
 import useBookingFormData from "./hooks/useBookingFormData";

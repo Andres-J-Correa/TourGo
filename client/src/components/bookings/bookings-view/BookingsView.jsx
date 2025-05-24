@@ -22,7 +22,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
 import classNames from "classnames";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
-import { bookingsTableColumns } from "components/bookings/constants";
+import {
+  bookingsTableColumns,
+  LOCKED_BOOKING_STATUSES,
+} from "components/bookings/constants";
 import BookingFilters from "components/bookings/bookings-view/BookingFilters";
 
 const defaultData = {
@@ -65,7 +68,7 @@ const BookingsView = () => {
     () => ({
       header: "Acciones",
       enableSorting: false,
-      maxSize: 100,
+      maxSize: 140,
       minSize: 140,
       cell: (info) => {
         const booking = info.row.original;
@@ -78,13 +81,15 @@ const BookingsView = () => {
               onClick={(e) => e.stopPropagation()}>
               Ver
             </Link>
-            <Link
-              className="btn btn-info btn-sm ms-1"
-              target="_blank"
-              to={`/hotels/${hotelId}/bookings/${booking.id}/edit`}
-              onClick={(e) => e.stopPropagation()}>
-              Editar
-            </Link>
+            {!LOCKED_BOOKING_STATUSES.includes(info.row.original.statusId) && (
+              <Link
+                className="btn btn-info btn-sm ms-1"
+                target="_blank"
+                to={`/hotels/${hotelId}/bookings/${booking.id}/edit`}
+                onClick={(e) => e.stopPropagation()}>
+                Editar
+              </Link>
+            )}
           </div>
         );
       },

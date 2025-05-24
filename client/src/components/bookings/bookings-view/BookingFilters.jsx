@@ -8,7 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DatePickers from "components/commonUI/forms/DatePickers";
 import classNames from "classnames";
-import { bookingStatuses } from "components/bookings/constants";
+import { BOOKING_STATUSES } from "components/bookings/constants";
 
 function BookingFilters({
   paginationData,
@@ -212,15 +212,15 @@ function BookingFilters({
               value="">
               {paginationData.statusId ? "Quitar Filtro" : "Seleccionar"}
             </option>
-            {Object.entries(bookingStatuses).map(([key, value]) => (
+            {BOOKING_STATUSES.map((status) => (
               <option
-                key={key}
+                key={`${status.id}`}
                 className={classNames({
-                  "bg-info-subtle": paginationData.statusId === key,
-                  "bg-white": paginationData.statusId !== key,
+                  "bg-info-subtle": paginationData.statusId === status.id,
+                  "bg-white": paginationData.statusId !== status.id,
                 })}
-                value={key}>
-                {value}
+                value={status.id}>
+                {status.name}
               </option>
             ))}
           </select>

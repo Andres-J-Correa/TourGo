@@ -8,7 +8,10 @@ import {
   updateStatusToCompleted,
   updateStatusToCancelled,
 } from "services/bookingService";
-import { BOOKING_STATUS_DICTIONARY } from "components/bookings/constants";
+import {
+  BOOKING_STATUS_IDS,
+  LOCKED_BOOKING_STATUSES,
+} from "components/bookings/constants";
 import BookingSummary from "components/bookings/booking-summary/BookingSummary";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -114,7 +117,7 @@ function BookingView() {
       if (res.isSuccessful) {
         setBooking((prevBooking) => ({
           ...prevBooking,
-          status: { id: BOOKING_STATUS_DICTIONARY.ARRIVED },
+          status: { id: BOOKING_STATUS_IDS.ARRIVED },
           modifiedBy: { ...modifiedBy },
           dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
@@ -168,7 +171,7 @@ function BookingView() {
       if (res.isSuccessful) {
         setBooking((prevBooking) => ({
           ...prevBooking,
-          status: { id: BOOKING_STATUS_DICTIONARY.NO_SHOW },
+          status: { id: BOOKING_STATUS_IDS.NO_SHOW },
           modifiedBy: { ...modifiedBy },
           dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
@@ -222,7 +225,7 @@ function BookingView() {
       if (res.isSuccessful) {
         setBooking((prevBooking) => ({
           ...prevBooking,
-          status: { id: BOOKING_STATUS_DICTIONARY.COMPLETED },
+          status: { id: BOOKING_STATUS_IDS.COMPLETED },
           modifiedBy: { ...modifiedBy },
           dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
@@ -276,7 +279,7 @@ function BookingView() {
       if (res.isSuccessful) {
         setBooking((prevBooking) => ({
           ...prevBooking,
-          status: { id: BOOKING_STATUS_DICTIONARY.CANCELLED },
+          status: { id: BOOKING_STATUS_IDS.CANCELLED },
           modifiedBy: { ...modifiedBy },
           dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
         }));
@@ -316,14 +319,13 @@ function BookingView() {
       <h3 className="mb-4">Reserva</h3>
       <Row className="mb-3">
         <Col className="px-3">
-          {booking?.status?.id === BOOKING_STATUS_DICTIONARY.ACTIVE && (
+          {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE && (
             <Button color="outline-dark" onClick={handleCheckIn}>
               Marcar Check-in
               <FontAwesomeIcon icon={faPlaneArrival} className="ms-2" />
             </Button>
           )}
-          {(booking?.status?.id === BOOKING_STATUS_DICTIONARY.ACTIVE ||
-            booking?.status?.id === BOOKING_STATUS_DICTIONARY.ARRIVED) &&
+          {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) &&
             dayjs(dayjs()).isAfter(booking?.arrivalDate) && (
               <Button
                 color="outline-dark"
@@ -333,7 +335,7 @@ function BookingView() {
                 <FontAwesomeIcon icon={faPlaneDeparture} className="ms-2" />
               </Button>
             )}
-          {booking?.status?.id === BOOKING_STATUS_DICTIONARY.ACTIVE &&
+          {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE &&
             dayjs(dayjs()).isSameOrAfter(booking?.arrivalDate) && (
               <Button
                 color="outline-dark"
@@ -343,20 +345,17 @@ function BookingView() {
                 <FontAwesomeIcon icon={faCalendarXmark} className="ms-2" />
               </Button>
             )}
-          {booking?.status?.id !== BOOKING_STATUS_DICTIONARY.NO_SHOW &&
-            booking?.status?.id !== BOOKING_STATUS_DICTIONARY.COMPLETED &&
-            booking?.status?.id !== BOOKING_STATUS_DICTIONARY.CANCELLED && (
-              <Button
-                color="outline-danger"
-                className="ms-2 float-end"
-                onClick={handleCancel}>
-                Cancelar Reserva
-                <FontAwesomeIcon icon={faRectangleXmark} className="ms-2" />
-              </Button>
-            )}
-          {(booking?.status?.id === BOOKING_STATUS_DICTIONARY.ACTIVE ||
-            booking?.status?.id === BOOKING_STATUS_DICTIONARY.ARRIVED) && (
-            <Link to="edit" className=" ms-2 btn btn-outline-dark float-end">
+          {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
+            <Button
+              color="outline-danger"
+              className="ms-2 float-end"
+              onClick={handleCancel}>
+              Cancelar Reserva
+              <FontAwesomeIcon icon={faRectangleXmark} className="ms-2" />
+            </Button>
+          )}
+          {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
+            <Link to="edit" className=" ms-2 float-end btn btn-outline-dark">
               Editar
               <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
             </Link>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Link, useParams } from "react-router-dom";
 import { TabContent, TabPane, Button } from "reactstrap";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,17 +11,17 @@ import { toast } from "react-toastify";
 import { getById as getBookingById } from "services/bookingService";
 import { useAppContext } from "contexts/GlobalAppContext";
 
+import { BOOKING_STATUS_IDS } from "../constants";
+
 import {
-  bookingFormTabs as tabs,
   defaultBooking,
-  BOOKING_STATUS_DICTIONARY,
-} from "../constants";
+  bookingFormTabs as tabs,
+} from "components/bookings/booking-add-edit-view/constants";
 
 import CustomerForm from "components/bookings/booking-add-edit-view/CustomerForm";
 import BookingForm from "components/bookings/booking-add-edit-view/BookingForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import EntityTransactionsView from "components/transactions/EntityTransactionsView";
-import BookingSummary from "components/bookings/booking-summary/BookingSummary";
 
 const BookingAddUpdateView = () => {
   const { hotelId, bookingId } = useParams();
@@ -60,25 +60,32 @@ const BookingAddUpdateView = () => {
     3: false,
   };
 
-  const onGetBookingSuccess = (res) => {
-    if (res.isSuccessful) {
-      const mappedRoomBookings = res.item.roomBookings.map((booking) => ({
-        ...booking,
-        roomId: booking.room.id,
-      }));
+  const mapBookingData = useCallback((bookingData) => {
+    const mappedRoomBookings = bookingData.roomBookings.map((booking) => ({
+      ...booking,
+      roomId: booking.room.id,
+    }));
 
-      const mappedExtraCharges = res.item.extraCharges.map((charge) => ({
-        ...charge,
-        extraChargeId: charge.id,
-      }));
-      setBooking({
-        ...res.item,
-        roomBookings: mappedRoomBookings,
-        extraCharges: mappedExtraCharges,
-      });
-      setCustomer(res.item.customer);
-    }
-  };
+    const mappedExtraCharges = bookingData.extraCharges.map((charge) => ({
+      ...charge,
+      extraChargeId: charge.id,
+    }));
+    setBooking({
+      ...bookingData,
+      roomBookings: mappedRoomBookings,
+      extraCharges: mappedExtraCharges,
+    });
+    setCustomer(bookingData.customer);
+  }, []);
+
+  const onGetBookingSuccess = useCallback(
+    (res) => {
+      if (res.isSuccessful) {
+        mapBookingData(res.item);
+      }
+    },
+    [mapBookingData]
+  );
 
   const onGetBookingError = (e) => {
     if (e.response?.status === 404) {
@@ -100,7 +107,8 @@ const BookingAddUpdateView = () => {
       setCustomer(null);
       setCurrentStep(0);
     }
-  }, [bookingId]);
+  }, [bookingId, onGetBookingSuccess, mapBookingData]);
+
   return (
     <>
       <LoadingOverlay
@@ -159,15 +167,13 @@ const BookingAddUpdateView = () => {
               Anterior
             </Button>
             {isStepComplete[2] && (
-              <Button
-                type="button"
-                onClick={() => setCurrentStep(3)}
-                color="dark"
-                className="ms-auto"
-                disabled={submitting}>
-                Siguiente
+              <Link
+                className="ms-auto btn btn-dark"
+                disabled={submitting}
+                to={`/hotels/${hotelId}/bookings/${booking.id}`}>
+                Ir a Resumen
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
-              </Button>
+              </Link>
             )}
           </div>
           <EntityTransactionsView
@@ -176,28 +182,10 @@ const BookingAddUpdateView = () => {
             entity={booking}
             setEntity={setBooking}
             showAddButton={
-              booking?.status?.id !== BOOKING_STATUS_DICTIONARY.CANCELLED &&
-              booking?.status?.id !== BOOKING_STATUS_DICTIONARY.NO_SHOW &&
-              booking?.status?.id !== BOOKING_STATUS_DICTIONARY.COMPLETED
+              booking?.status?.id !== BOOKING_STATUS_IDS.CANCELLED &&
+              booking?.status?.id !== BOOKING_STATUS_IDS.NO_SHOW &&
+              booking?.status?.id !== BOOKING_STATUS_IDS.COMPLETED
             }
-          />
-        </TabPane>
-        <TabPane tabId={3}>
-          <div className="d-flex mb-4">
-            <Button
-              type="button"
-              onClick={() => setCurrentStep(2)}
-              color="dark"
-              className="me-auto"
-              disabled={submitting}>
-              <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-              Anterior
-            </Button>
-          </div>
-          <BookingSummary
-            bookingData={booking}
-            roomBookings={booking?.roomBookings}
-            extraCharges={booking?.extraCharges}
           />
         </TabPane>
         <br />

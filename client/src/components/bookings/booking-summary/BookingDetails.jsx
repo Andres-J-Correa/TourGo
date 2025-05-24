@@ -1,6 +1,9 @@
 import React from "react";
 import { Row, Col } from "reactstrap";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 const BookingDetails = ({ bookingData }) => (
   <>
@@ -23,7 +26,7 @@ const BookingDetails = ({ bookingData }) => (
             <strong>Día y Hora de Llegada:</strong>{" "}
             <p>
               {bookingData?.eta
-                ? dayjs(bookingData?.eta).format("DD/MM/YYYY - h:mm a")
+                ? dayjs.utc(bookingData?.eta).format("DD/MM/YYYY - h:mm a")
                 : "-"}
             </p>
           </Col>

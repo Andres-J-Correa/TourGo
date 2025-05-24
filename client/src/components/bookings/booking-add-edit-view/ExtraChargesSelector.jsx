@@ -1,7 +1,10 @@
 // components/bookings/ExtraChargesSelector.jsx
 import React from "react";
 import { Row, Col, Card, CardBody, CardTitle, CardText } from "reactstrap";
-import { chargeTypeLabels, formatAmount } from "../constants";
+import {
+  EXTRA_CHARGE_TYPES_BY_ID,
+  formatExtraChargeAmount,
+} from "components/extra-charges/constants";
 import PropTypes from "prop-types";
 import "./ExtraChargesSelector.css"; // Assuming you have some CSS for styling
 
@@ -29,11 +32,11 @@ const ExtraChargesSelector = ({ charges, selectedCharges, toggleCharge }) => {
                 </CardTitle>
                 <CardText className="mb-1">
                   <strong>Tipo:</strong>{" "}
-                  {chargeTypeLabels[charge.type?.id] || "N/A"}
+                  {EXTRA_CHARGE_TYPES_BY_ID[charge.type?.id] || "N/A"}
                 </CardText>
                 <CardText>
                   <strong>Monto:</strong>{" "}
-                  {formatAmount(charge.amount, charge.type?.id)}
+                  {formatExtraChargeAmount(charge.amount, charge.type?.id)}
                 </CardText>
               </CardBody>
             </Card>

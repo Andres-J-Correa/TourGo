@@ -2,7 +2,7 @@ import { Nav, NavItem, NavLink } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classnames from "classnames";
 import PropTypes from "prop-types";
-import { bookingFormTabs as tabs } from "components/bookings/constants";
+import { bookingFormTabs as tabs } from "components/bookings/booking-add-edit-view/constants";
 
 const TabNavigation = ({ currentStep, setCurrentStep, isStepComplete }) => {
   return (
