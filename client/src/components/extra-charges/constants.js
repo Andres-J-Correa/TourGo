@@ -1,10 +1,29 @@
 import * as Yup from "yup";
+import { formatCurrency } from "utils/currencyHelper";
 
 export const EXTRA_CHARGE_TYPES = [
   { label: "Porcentaje", value: 1 },
   { label: "Diario", value: 2 },
   { label: "General", value: 3 },
 ];
+
+export const EXTRA_CHARGE_TYPES_BY_ID = {
+  1: "Porcentaje",
+  2: "Diario",
+  3: "General",
+};
+
+export const EXTRA_CHARGE_IDS = {
+  PERCENTAGE: 1,
+  DAILY: 2,
+  GENERAL: 3,
+};
+
+export const formatExtraChargeAmount = (amount, typeId) => {
+  if (typeId === EXTRA_CHARGE_IDS.PERCENTAGE)
+    return `${(amount * 100).toFixed(0)}%`;
+  return formatCurrency(amount, "COP");
+};
 
 export const addValidationSchema = Yup.object().shape({
   name: Yup.string().required("El nombre es obligatorio").max(100),

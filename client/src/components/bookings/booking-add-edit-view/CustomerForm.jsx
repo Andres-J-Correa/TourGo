@@ -14,7 +14,7 @@ import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import {
   customerSchema,
   searchCustomerSchema,
-} from "components/bookings/constants";
+} from "components/bookings/booking-add-edit-view/constants";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
