@@ -8,7 +8,7 @@ import classNames from "classnames";
 function TransactionStatusBadge({ statusId, className, ...props }) {
   return (
     <span
-      className={classNames("badge", className, {
+      className={classNames("badge text-capitalize", className, {
         "bg-warning": statusId === TRANSACTION_STATUS_DICT.PENDING,
         "bg-success": statusId === TRANSACTION_STATUS_DICT.COMPLETED,
         "bg-danger": statusId === TRANSACTION_STATUS_DICT.FAILED,

@@ -9,7 +9,7 @@ function BookingStatusBadge({ statusId, className, ...props }) {
   return (
     <span
       {...props}
-      className={classNames("badge", className, {
+      className={classNames("badge text-capitalize", className, {
         "bg-success": statusId === BOOKING_STATUS_IDS.ACTIVE,
         "bg-danger": statusId === BOOKING_STATUS_IDS.CANCELLED,
         "bg-primary": statusId === BOOKING_STATUS_IDS.COMPLETED,
