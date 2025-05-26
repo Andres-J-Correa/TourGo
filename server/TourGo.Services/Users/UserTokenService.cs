@@ -17,10 +17,10 @@ namespace TourGo.Services.Users
         }
 
    
-        public UserToken GetUserToken(string token)
+        public UserToken? GetUserToken(string token)
         {
-            UserToken userToken = null;
-            string proc = "users_tokens_select_byToken";
+            UserToken? userToken = null;
+            string proc = "users_tokens_select_by_token_v2";
 
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
@@ -34,10 +34,27 @@ namespace TourGo.Services.Users
             return userToken;
         }
 
+        public UserToken? GetUserToken(int userId, UserTokenTypeEnum tokenType)
+        {
+            string proc = "users_tokens_select_by_user_id_type_id";
+            UserToken? userToken = null;
+            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
+            {
+                coll.AddWithValue("p_userId", userId);
+                coll.AddWithValue("p_typeId", (int)tokenType);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                userToken = MapUserToken(reader, ref index);
+            });
+
+            return userToken;
+        }
+
         public Guid CreateToken(int userId, UserTokenTypeEnum tokenType, DateTime expirationDate)
         {
             Guid guid = Guid.NewGuid();
-            string proc = "users_tokens_insert";
+            string proc = "users_tokens_insert_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
@@ -52,7 +69,7 @@ namespace TourGo.Services.Users
 
         public void DeleteUserToken(UserToken userToken)
         {
-            string proc = "users_tokens_delete";
+            string proc = "users_tokens_delete_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {

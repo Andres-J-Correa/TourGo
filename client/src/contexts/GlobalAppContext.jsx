@@ -1,9 +1,13 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getCurrentUser } from "services/userAuthService";
+import { getCurrentUser, usersLogout } from "services/userAuthService";
 import { getMinimalById } from "services/hotelService";
+import UserSignInModal from "components/users/UserSignInModal";
+import { SignUpFormModal } from "components/commonUI/forms/SignUpForm";
+import UserPasswordResetModal from "components/users/UserPasswordResetModal";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const defaultUser = {
   id: 0,
@@ -11,11 +15,18 @@ const defaultUser = {
   lastName: "",
   roles: [],
   isAuthenticated: false,
+  isVerified: false,
 };
 
 const defaultHotel = {
   id: 0,
   name: "",
+};
+
+const defaultModals = {
+  login: false,
+  register: false,
+  reset: false,
 };
 
 const AppContext = createContext();
@@ -26,29 +37,79 @@ export const AppContextProvider = ({ children }) => {
   const [hotel, setHotel] = useState({ ...defaultHotel });
   const [isLoadingHotel, setIsLoadingHotel] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(false);
+  const [modals, setModals] = useState({ ...defaultModals });
 
   const navigate = useNavigate();
 
-  const logout = () => {
-    setCurrentUser({ ...defaultUser });
-    navigate("/");
+  const toggleModal = (key) => () => {
+    setModals((prev) => ({ ...defaultModals, [key]: !prev[key] }));
+  };
+
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: "Cerrar sesión",
+      text: "¿Seguro que quieres cerrar la sesión?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, cerrar sesión",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      Swal.fire({
+        title: "Cerrando sesión...",
+        text: "Por favor espera un momento.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      await usersLogout();
+
+      Swal.fire({
+        title: "Sesión cerrada",
+        text: "Has cerrado sesión correctamente.",
+        icon: "success",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        showCancelButton: false,
+        showCloseButton: false,
+        timer: 1500,
+      });
+
+      setCurrentUser({ ...defaultUser });
+      navigate("/");
+    } catch (error) {
+      Swal.close();
+      Swal.fire({
+        title: "Error",
+        text: "Hubo un problema al cerrar la sesión. Por favor, intenta nuevamente.",
+        icon: "error",
+      });
+    }
   };
 
   const contextValue = {
     user: {
       current: currentUser,
       set: setCurrentUser,
-      logout,
+      logout: handleLogout,
       isLoading: isLoadingUser,
     },
     hotel: {
       current: hotel,
       isLoading: isLoadingHotel,
     },
+    toggleUserSignInModal: toggleModal("login"),
+    toggleUserSignUpModal: toggleModal("register"),
+    toggleUserPasswordResetModal: toggleModal("reset"),
   };
 
   useEffect(() => {
-    if (!currentUser.isAuthenticated) {
+    if (currentUser.id === 0) {
       setIsLoadingUser(true);
       getCurrentUser()
         .then((data) => {
@@ -72,7 +133,7 @@ export const AppContextProvider = ({ children }) => {
           setIsLoadingUser(false);
         });
     }
-  }, [currentUser.isAuthenticated, navigate]);
+  }, [currentUser, navigate]);
 
   useEffect(() => {
     const pathRegex = /\/hotels\/([^/]+)/; // Matches /hotel/{hotelId}
@@ -106,7 +167,25 @@ export const AppContextProvider = ({ children }) => {
   }, [location.pathname, hotel.id, currentUser]);
 
   return (
-    <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
+    <AppContext.Provider value={contextValue}>
+      <UserSignInModal
+        isOpen={modals.login}
+        toggle={toggleModal("login")}
+        onSignUp={toggleModal("register")}
+        onPasswordReset={toggleModal("reset")}
+      />
+      <SignUpFormModal
+        isOpen={modals.register}
+        toggle={toggleModal("register")}
+        onSignIn={toggleModal("login")}
+      />
+      <UserPasswordResetModal
+        isOpen={modals.reset}
+        toggle={toggleModal("reset")}
+        onSignIn={toggleModal("login")}
+      />
+      {children}
+    </AppContext.Provider>
   );
 };
 

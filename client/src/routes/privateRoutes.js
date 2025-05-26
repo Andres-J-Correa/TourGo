@@ -145,7 +145,16 @@ const transactionSubCategories = [
   },
 ];
 
+const userRoutes = [
+  {
+    name: "userSettings",
+    path: "/profile/settings",
+    component: lazy(() => import("components/users/UserSettings")),
+  },
+];
+
 export const privateRoutes = [
+  ...userRoutes,
   ...hotelRoutes,
   ...roomRoutes,
   ...extraCharges,

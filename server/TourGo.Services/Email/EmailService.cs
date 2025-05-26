@@ -50,12 +50,45 @@ namespace TourGo.Services.Email
                 }
 
                 htmlTemplate = htmlTemplate.Replace("Reset-Link-Insert", customLink)
-                                           .Replace("Users-Name", user.FirstName)
-                                           .Replace("Expiration-Time", $"{_emailConfig.TokenExpirationHours} hours");
+                                           .Replace("User-Name", user.FirstName)
+                                           .Replace("Expiration-Time", $"{_emailConfig.PasswordResetExpirationHours} horas");
 
                 var sendSmtpEmail = new SendSmtpEmail(sender, recipients)
                 {
-                    Subject = "Reset your TourGo password",
+                    Subject = "TourGo - Reestablecer contraseña",
+                    HtmlContent = htmlTemplate,
+                };
+
+                await _emailsApi.SendTransacEmailAsync(sendSmtpEmail);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task UserEmailVerification(IUserAuthData user, string token)
+        {
+            try
+            {
+                var sender = new SendSmtpEmailSender(_brevoConfig.SenderName, _brevoConfig.SenderEmail);
+                var recipient = new SendSmtpEmailTo(user.Email, user.FirstName);
+                var recipients = new List<SendSmtpEmailTo> { recipient };
+
+                string htmlTemplate = _templateLoader.LoadTemplate("emailVerification.html");
+
+                if (string.IsNullOrEmpty(htmlTemplate))
+                {
+                    throw new Exception("Error loading template");
+                }
+
+                htmlTemplate = htmlTemplate.Replace("Verification-Code", token)
+                                           .Replace("User-Name", user.FirstName)
+                                           .Replace("Expiration-Time", $"{_emailConfig.EmailVerificationExpirationHours} horas");
+
+                var sendSmtpEmail = new SendSmtpEmail(sender, recipients)
+                {
+                    Subject = "TourGo - Verificar Correo",
                     HtmlContent = htmlTemplate,
                 };
 

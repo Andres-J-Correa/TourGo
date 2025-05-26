@@ -66,7 +66,8 @@ namespace TourGo.Services.Users
                 FirstName = email,
                 LastName = email,
                 Email = email,
-                Roles = allRoles
+                Roles = allRoles,
+                IsVerified = false
             };
 
             Claim fullName = new Claim("CustomClaim", "test val");

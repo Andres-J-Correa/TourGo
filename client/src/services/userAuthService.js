@@ -220,3 +220,31 @@ export const changePassword = async (payload) => {
     return onGlobalError()(error);
   }
 };
+
+export const requestEmailVerification = async () => {
+  const config = {
+    method: "POST",
+    url: `${api}/email/verify/request`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const verifyEmail = async (token) => {
+  const config = {
+    method: "GET",
+    url: `${api}/email/verify/${token}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

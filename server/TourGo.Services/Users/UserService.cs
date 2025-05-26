@@ -93,7 +93,7 @@ namespace TourGo.Services.Users
 
         public IUserAuthData Get(string email)
         {
-            string proc = "users_selectBase_ByEmail";
+            string proc = "users_selectBase_by_email_v2";
             UserBase user = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
@@ -110,7 +110,7 @@ namespace TourGo.Services.Users
 
         public IUserAuthData Get(int userId)
         {
-            string proc = "users_selectBase_ById";
+            string proc = "users_selectBase_by_id_v2";
             UserBase user = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
@@ -139,6 +139,16 @@ namespace TourGo.Services.Users
             });
         }
 
+        public void UpdateIsVerified(int userId, bool isVerified)
+        {
+            string proc = "users_update_is_verified_by_id";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
+            {
+                coll.AddWithValue("p_userId", userId);
+                coll.AddWithValue("p_isVerified", isVerified);
+            });
+        }
+
         private static UserBase MapBaseUser(IDataReader reader, ref int index)
         {
             UserBase user = new UserBase();
@@ -147,6 +157,7 @@ namespace TourGo.Services.Users
             user.LastName = reader.GetSafeString(index++);
             user.Email = reader.GetSafeString(index++);
             user.Roles = reader.DeserializeObject<List<string>>(index++);
+            user.IsVerified = reader.GetSafeBool(index++);
             return user;
         }
 

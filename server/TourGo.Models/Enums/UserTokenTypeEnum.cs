@@ -9,5 +9,6 @@ namespace TourGo.Models.Enums
     public enum UserTokenTypeEnum
     {
         PasswordReset = 1,
+        EmailVerification = 2,
     }
 }
