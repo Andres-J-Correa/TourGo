@@ -4,7 +4,6 @@ import { HelmetProvider } from "react-helmet-async";
 import { Container } from "reactstrap";
 
 import NavbarContainer from "components/commonUI/navbars/NavbarContainer";
-import GlobalErrorHandler from "components/commonUI/errors/GlobalErrorHandler";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
 import { useAppContext } from "./contexts/GlobalAppContext";
@@ -57,17 +56,12 @@ const App = () => {
     <HelmetProvider>
       <Suspense
         fallback={<LoadingOverlay isVisible={true} message="cargando" />}>
-        <GlobalErrorHandler>
-          <LoadingOverlay
-            isVisible={user.isLoading}
-            message="cargando usuario"
-          />
-          <NavbarContainer />
-          <Container className="mt-4 main-container">
-            <Routes>{routes}</Routes>
-            <Footer />
-          </Container>
-        </GlobalErrorHandler>
+        <LoadingOverlay isVisible={user.isLoading} message="cargando usuario" />
+        <NavbarContainer />
+        <Container className="mt-4 main-container">
+          <Routes>{routes}</Routes>
+          <Footer />
+        </Container>
       </Suspense>
 
       <ToastContainer

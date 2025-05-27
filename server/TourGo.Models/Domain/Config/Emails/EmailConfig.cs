@@ -8,7 +8,8 @@ namespace TourGo.Models.Domain.Config.Emails
 {
     public class EmailConfig
     {
-        public int TokenExpirationHours { get; set; }
+        public int PasswordResetExpirationHours { get; set; }
+        public int EmailVerificationExpirationHours { get; set; }
         public string DomainUrl { get; set; }
     }
 }

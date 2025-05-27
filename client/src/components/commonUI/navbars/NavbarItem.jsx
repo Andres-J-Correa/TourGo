@@ -10,16 +10,11 @@ import "./navbaritem.css";
 
 // Helper function to render inner items in a dropdown
 const renderInnerItem = (innerItem, innerIndex) => (
-  <Link
-    className={classNames("dropdown-item", {
-      "text-uppercase": innerItem.uppercase,
-      "text-capitalize": innerItem.capitalize,
-      "item-long-text": innerItem.name.length > 25,
-    })}
+  <NavbarItem
+    navItem={innerItem}
     key={`inner-${innerIndex}-${innerItem.name}`}
-    to={innerItem.path || "#"}>
-    {innerItem.name}
-  </Link>
+    isInnerItem={true}
+  />
 );
 
 // Helper function to render sub-items in a dropdown
@@ -34,7 +29,7 @@ const renderSubItem = (subItem, subIndex) => {
           className={classNames("dropdown-item", {
             "text-uppercase": subItem.uppercase,
             "text-capitalize": subItem.capitalize,
-            "item-long-text": subItem.name.length > 25,
+            "item-long-text": subItem?.name?.length > 25,
           })}>
           {subItem.name}
         </Link>
@@ -46,7 +41,7 @@ const renderSubItem = (subItem, subIndex) => {
               "font-weight-bolder": isHeader,
               "text-uppercase": subItem.uppercase,
               "text-capitalize": subItem.capitalize,
-              "item-long-text": subItem.name.length > 25,
+              "item-long-text": subItem?.name?.length > 25,
             },
             "align-items-center px-1"
           )}
@@ -60,7 +55,7 @@ const renderSubItem = (subItem, subIndex) => {
 };
 
 // Main NavbarItem component
-const NavbarItem = React.memo(({ navItem }) => {
+const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
   // Render dropdown menu if the nav item has a collapse property
   const renderDropdownMenu = () => (
     <HoverDropdown nav inNavbar className="mx-2">
@@ -89,6 +84,7 @@ const NavbarItem = React.memo(({ navItem }) => {
       </DropdownToggle>
       <DropdownMenu
         flip
+        end={navItem.end}
         className="border-0 shadow px-3 border-radius-xl min-width-auto">
         <div className="hidden-box">{/* For hover effect */}</div>
         {navItem.collapse.map(renderSubItem)}
@@ -101,9 +97,11 @@ const NavbarItem = React.memo(({ navItem }) => {
     return (
       <NavLink
         to={navItem.path}
-        className={classNames("nav-link nav-action-item", {
+        className={classNames("nav-action-item", {
           "text-uppercase": navItem.uppercase,
           "text-capitalize": navItem.capitalize,
+          "dropdown-item": isInnerItem,
+          "nav-link": !isInnerItem,
         })}>
         <div>
           {" "}
@@ -120,8 +118,9 @@ const NavbarItem = React.memo(({ navItem }) => {
   const renderActionItem = () => (
     <div
       className={classNames("dropdown-item text-center px-1 nav-action-item", {
-        "text-uppercase": navItem.uppercase,
-        "text-capitalize": navItem.capitalize,
+        "text-uppercase": navItem?.uppercase,
+        "text-capitalize": navItem?.capitalize,
+        "dropdown-item": isInnerItem,
       })}
       onClick={navItem.action}
       role="button">
@@ -136,6 +135,7 @@ const NavbarItem = React.memo(({ navItem }) => {
       className={classNames("text-center px-1", {
         "text-uppercase": navItem.uppercase,
         "text-capitalize": navItem.capitalize,
+        "dropdown-item": isInnerItem,
       })}>
       {navItem.name}
     </DropdownItem>

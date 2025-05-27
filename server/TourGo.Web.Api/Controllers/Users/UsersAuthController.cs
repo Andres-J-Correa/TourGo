@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using TourGo.Models;
 using TourGo.Models.Domain.Config.Emails;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Enums;
+using TourGo.Models.Requests;
 using TourGo.Models.Requests.Users;
 using TourGo.Services;
 using TourGo.Services.Interfaces.Email;
@@ -165,9 +167,9 @@ namespace TourGo.Web.Api.Controllers.Users
             }
         }
 
-        [HttpPost("password/reset")]
+        [HttpPost("password/forgot")]
         [AllowAnonymous]
-        public async Task<ActionResult<SuccessResponse>> ResetPassword(EmailValidateRequest model)
+        public async Task<ActionResult<SuccessResponse>> ForgotPassword(EmailValidateRequest model)
         {
             ObjectResult result = null;
 
@@ -177,20 +179,15 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 if (user != null)
                 {
-                    DateTime TokenExpirationDate = DateTime.UtcNow.AddHours(_emailConfig.TokenExpirationHours);
+                    DateTime TokenExpirationDate = DateTime.UtcNow.AddHours(_emailConfig.PasswordResetExpirationHours);
                     Guid token = _userTokenService.CreateToken(user.Id, UserTokenTypeEnum.PasswordReset, TokenExpirationDate);
 
                     await _emailService.UserPasswordReset(user, token.ToString());
+                }
 
-                    SuccessResponse response = new SuccessResponse();
-                    result = Ok200(response);
-                }
-                else
-                {
-                    int iCode = 404;
-                    ErrorResponse response = new ErrorResponse("Email not found", AuthenticationErrorCode.UserNotFound);
-                    result = StatusCode(iCode, response);
-                }
+                SuccessResponse response = new SuccessResponse();
+                result = Ok200(response);
+
             }
             catch (Exception ex)
             {
@@ -204,52 +201,20 @@ namespace TourGo.Web.Api.Controllers.Users
             return result;
         }
 
-        [HttpGet("validateToken/{token}")]
+        [HttpPut("password/reset")]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<bool>> ValidateToken (string token)
-        {
-            int iCode = 200;
-            BaseResponse response;
-
-            try
-            {
-                UserToken userToken = _userTokenService.GetUserToken(token);
-
-                if (userToken != null)
-                {
-                    bool isValid = DateTime.UtcNow <= userToken.Expiration;
-
-                    response = new ItemResponse<bool> { Item = isValid };
-                }
-                else
-                {
-                    iCode = 404;
-                    response = new ErrorResponse("Token not Found", AuthenticationErrorCode.TokenNotFound);
-                }
-            }
-            catch (Exception ex)
-            {
-
-                iCode = 500;
-                Logger.LogError(ex.ToString());
-                response = new ErrorResponse();
-            }
-
-            return StatusCode(iCode, response);
-        }
-
-        [HttpPut("password/change")]
-        [AllowAnonymous]
-        public ActionResult<SuccessResponse> ChangePassword (UserUpdatePasswordRequest model)
+        public ActionResult<SuccessResponse> ChangePassword (UserPasswordResetRequest model)
         {
             int iCode = 200;
             BaseResponse response = null;
 
             try
             {
-                UserToken userToken = _userTokenService.GetUserToken(model.Token);
+                UserToken? userToken = _userTokenService.GetUserToken(model.Token);
 
-                if (userToken != null)
+                IUserAuthData user = _userService.Get(model.Email);
+
+                if (userToken != null && model.Email == user.Email)
                 {
                     _userService.ChangePassword(userToken.UserId, model.Password);
 
@@ -274,6 +239,10 @@ namespace TourGo.Web.Api.Controllers.Users
 
             return StatusCode(iCode, response);
         }
+
+        #endregion
+
+        #region Private Endpoints
 
         [HttpGet("current")]
         public ActionResult<ItemResponse<IUserAuthData>> GetCurrrent()
@@ -320,9 +289,78 @@ namespace TourGo.Web.Api.Controllers.Users
             return result;
         }
 
-        #endregion
+        [HttpPost("email/verify/request")]
+        public async Task<ActionResult<SuccessResponse>> RequestEmailVerification()
+        {
+            ObjectResult result = null;
 
-        #region Private Endpoints
+            try
+            {
+                IUserAuthData user = _webAuthService.GetCurrentUser();
+
+                if (user != null)
+                {
+                    DateTime TokenExpirationDate = DateTime.UtcNow.AddHours(_emailConfig.EmailVerificationExpirationHours);
+                    Guid token = _userTokenService.CreateToken(user.Id, UserTokenTypeEnum.EmailVerification, TokenExpirationDate);
+
+                    await _emailService.UserEmailVerification(user, token.ToString());
+
+                    SuccessResponse response = new SuccessResponse();
+                    result = Ok200(response);
+                }
+                else
+                {
+                    ErrorResponse response = new ErrorResponse("User not found", AuthenticationErrorCode.UserNotFound);
+                    result = NotFound404(response);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Logger.LogError(ex.ToString());
+                ErrorResponse response = new ErrorResponse();
+
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPost("email/verify")]
+        public ActionResult<SuccessResponse> VerifyEmail(TokenValidationRequest model)
+        {
+            try
+            {
+                IUserAuthData user = _webAuthService.GetCurrentUser();
+
+                UserToken? userToken = _userTokenService.GetUserToken(user.Id, UserTokenTypeEnum.EmailVerification);
+
+                if (userToken == null)
+                {
+                    return NotFound404(new ErrorResponse("Token not found", AuthenticationErrorCode.TokenNotFound));
+                }
+                else if (userToken.Expiration <= DateTime.UtcNow)
+                {
+                    return StatusCode(400, new ErrorResponse("Token expired"));
+                }
+                else if (userToken.Token != model.Token)
+                {
+                    return StatusCode(400, new ErrorResponse("Invalid token"));
+                }
+
+                _userService.UpdateIsVerified(user.Id, true);
+                Claim verified = new Claim("https://tourgo.site/claims/isverified", "True", ClaimValueTypes.Boolean);
+                _webAuthService.LogInAsync(user, [verified]);
+
+                return Ok200(new SuccessResponse());
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
 
         #endregion
 

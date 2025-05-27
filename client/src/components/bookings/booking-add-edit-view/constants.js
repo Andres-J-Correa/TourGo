@@ -197,8 +197,9 @@ export const sanitizeBooking = (booking) => {
   sanitizedBooking.bookingProviderName =
     sanitizedBooking.bookingProvider?.name || "";
   sanitizedBooking.externalId = sanitizedBooking.externalId || "";
-  sanitizedBooking.eta =
-    dayjs.utc(sanitizedBooking.eta).format("YYYY-MM-DDTHH:mm:ss") || "";
+  sanitizedBooking.eta = sanitizedBooking.eta
+    ? dayjs.utc(sanitizedBooking.eta).format("YYYY-MM-DDTHH:mm:ss")
+    : "";
   sanitizedBooking.externalCommission =
     sanitizedBooking.externalCommission || "";
   sanitizedBooking.notes = sanitizedBooking.notes || "";

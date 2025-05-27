@@ -47,7 +47,7 @@ const BookingsView = () => {
     sortBy: [],
     dates: {
       start: dayjs().format("YYYY-MM-DD"),
-      end: dayjs().format("YYYY-MM-DD"),
+      end: dayjs().endOf("week").format("YYYY-MM-DD"),
     },
     isArrivalDate: true,
     customerNameFilters: {

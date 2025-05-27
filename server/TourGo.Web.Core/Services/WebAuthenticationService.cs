@@ -57,6 +57,8 @@ namespace TourGo.Web.Core.Services
 
             identity.AddClaim(new Claim(ClaimTypes.Email, user.Email, ClaimValueTypes.String, _title, originalIssuer));
 
+            identity.AddClaim(new Claim("https://tourgo.site/claims/isverified", user.IsVerified.ToString(), ClaimValueTypes.Boolean, _title, originalIssuer));
+
             if (user.Roles != null && user.Roles.Any())
             {
                 foreach (string singleRole in user.Roles)
@@ -67,8 +69,19 @@ namespace TourGo.Web.Core.Services
 
             if (extraClaims != null)
             {
-                identity.AddClaims(extraClaims);
+                foreach (var claim in extraClaims)
+                {
+                    // Remove any existing claim with the same type
+                    var existingClaims = identity.FindAll(claim.Type).ToList();
+                    foreach (var existing in existingClaims)
+                    {
+                        identity.RemoveClaim(existing);
+                    }
+
+                    identity.AddClaim(claim);
+                }
             }
+
 
             return identity;
         }
@@ -150,6 +163,15 @@ namespace TourGo.Web.Core.Services
                         roles.Add(claim.Value);
 
                         break;
+
+                    case "https://tourgo.site/claims/isverified":
+                        bool isVerified;
+                        if (Boolean.TryParse(claim.Value, out isVerified))
+                        {
+                            baseUser.IsVerified = isVerified;
+                        }
+                        break;
+
 
                     default:
 

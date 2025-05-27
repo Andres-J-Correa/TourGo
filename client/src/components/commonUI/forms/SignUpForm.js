@@ -14,7 +14,7 @@ import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import { userSignUpSchema } from "components/users/validationSchemas";
 import { useLanguage } from "contexts/LanguageContext";
 import { usersRegister } from "services/userAuthService";
-import { errorCodes } from "constants/errorCodes";
+import { ERROR_CODES } from "constants/errorCodes";
 
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
@@ -46,19 +46,19 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
       onSignIn();
     } catch (error) {
       if (
-        Number(error?.response.data?.code) === errorCodes.EMAIL_ALREADY_EXISTS
+        Number(error?.response.data?.code) === ERROR_CODES.EMAIL_ALREADY_EXISTS
       ) {
         formRef?.current?.setFieldError(
           "email",
-          t(`errors.custom.${errorCodes.EMAIL_ALREADY_EXISTS}`)
+          t(`errors.custom.${ERROR_CODES.EMAIL_ALREADY_EXISTS}`)
         );
       }
       if (
-        Number(error?.response.data?.code) === errorCodes.PHONE_ALREADY_EXISTS
+        Number(error?.response.data?.code) === ERROR_CODES.PHONE_ALREADY_EXISTS
       ) {
         formRef?.current?.setFieldError(
           "phone",
-          t(`errors.custom.${errorCodes.PHONE_ALREADY_EXISTS}`)
+          t(`errors.custom.${ERROR_CODES.PHONE_ALREADY_EXISTS}`)
         );
       }
 

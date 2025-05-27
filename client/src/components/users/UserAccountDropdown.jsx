@@ -1,39 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faUserCircle } from "@fortawesome/free-solid-svg-icons";
-import Swal from "sweetalert2";
-
-import { DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
-
-import HoverDropDown from "components/commonUI/navbars/HoverDropdown";
-import UserSignInModal from "components/users/UserSignInModal";
-import { SignUpFormModal } from "components/commonUI/forms/SignUpForm";
-import UserPasswordResetModal from "./UserPasswordResetModal";
-
-import { usersLogout } from "services/userAuthService";
+import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import NavbarItem from "components/commonUI/navbars/NavbarItem";
 
 import { useLanguage } from "contexts/LanguageContext";
 import { useAppContext } from "contexts/GlobalAppContext";
 
 import PropTypes from "prop-types";
 
-const defaultModals = {
-  login: false,
-  register: false,
-  reset: false,
-};
-function UserAccountDropdown({ showRegister = true }) {
-  const [modals, setModals] = useState({
-    ...defaultModals,
-  });
-
-  const toggle = (key) => () => {
-    setModals((prev) => ({ ...defaultModals, [key]: !prev[key] }));
-  };
-
-  const { t, getTranslatedErrorMessage } = useLanguage();
-  const { user } = useAppContext();
+function UserAccountDropdown() {
+  const { t } = useLanguage();
+  const { user, toggleUserSignInModal } = useAppContext();
 
   const truncateString = (str) => {
     if (str.length > 10) {
@@ -42,128 +19,47 @@ function UserAccountDropdown({ showRegister = true }) {
     return str;
   };
 
-  return (
-    <React.Fragment>
-      <HoverDropDown nav inNavbar className="mx-2">
-        <DropdownToggle
-          nav
-          className="ps-2 d-flex cursor-pointer align-items-center nav-link text-capitalize"
-        >
-          <FontAwesomeIcon icon={faUserCircle} size="lg" className="icon" />
-          {user.current?.isAuthenticated
-            ? truncateString(user.current.firstName)
-            : t("client.navbar.account")}
-          <FontAwesomeIcon
-            icon={faChevronDown}
-            size="xs"
-            className="down-arrow"
-          />
-        </DropdownToggle>
-        <DropdownMenu
-          flip
-          end={true}
-          className="border-0 shadow px-3 border-radius-xl min-width-auto"
-        >
-          <div className="hidden-box">{/* For hover effect */}</div>
-          <DropdownItems
-            user={user}
-            toggle={toggle}
-            t={t}
-            getTranslatedErrorMessage={getTranslatedErrorMessage}
-          />
-        </DropdownMenu>
-      </HoverDropDown>
-      <UserSignInModal
-        isOpen={modals.login}
-        toggle={toggle("login")}
-        onSignUp={showRegister ? toggle("register") : null}
-        onPasswordReset={toggle("reset")}
-      />
-      <SignUpFormModal
-        isOpen={modals.register}
-        toggle={toggle("register")}
-        onSignIn={toggle("login")}
-      />
-      <UserPasswordResetModal
-        isOpen={modals.reset}
-        toggle={toggle("reset")}
-        onSignIn={toggle("login")}
-      />
-    </React.Fragment>
-  );
-}
-
-function DropdownItems({ user, toggle, t, getTranslatedErrorMessage }) {
-  const handleLogout = () => {
-    const logoutAsync = async () => {
-      try {
-        await usersLogout();
-        return true;
-      } catch (error) {
-        Swal.showValidationMessage(getTranslatedErrorMessage(error));
-      }
-    };
-
-    Swal.fire({
-      title: t("client.navbar.logout"),
-      text: t("client.navbar.logoutConfirm"),
-      icon: "warning",
-      width: "25rem",
-      heightAuto: true,
-      showCancelButton: true,
-      confirmButtonText: t("common.yes"),
-      cancelButtonText: t("common.no"),
-      showLoaderOnConfirm: true,
-      allowOutsideClick: () => !Swal.isLoading(),
-      preConfirm: logoutAsync,
-    }).then((result) => {
-      if (result.isConfirmed && result.value) {
-        Swal.fire({
-          title: t("common.success"),
-          icon: "success",
-          showConfirmButton: true,
-          confirmButtonText: t("common.ok"),
-        });
-        user.logout();
-      }
-    });
+  const userdropdown = {
+    name: user.current?.isAuthenticated
+      ? truncateString(user.current.firstName)
+      : t("client.navbar.account"),
+    icon: faUserCircle,
+    capitalize: true,
+    end: true,
+    collapse: user.current.isAuthenticated
+      ? [
+          {
+            name: "Cuenta",
+            collapse: [
+              {
+                name: "Configuración",
+                path: "/profile/settings",
+              },
+            ],
+          },
+          {
+            name: "Acciones",
+            collapse: [
+              {
+                name: t("client.navbar.logout"),
+                action: user.logout,
+              },
+            ],
+          },
+        ]
+      : [
+          {
+            name: t("client.navbar.loginRegister"),
+            action: toggleUserSignInModal,
+          },
+        ],
   };
 
-  const items = user.current.isAuthenticated
-    ? [
-        {
-          key: "logout",
-          label: t("client.navbar.logout"),
-          action: handleLogout,
-        },
-      ]
-    : [
-        {
-          key: "login",
-          label: t("client.navbar.loginRegister"),
-          action: toggle("login"),
-        },
-      ];
-
-  return items.map((item, index) => (
-    <DropdownItem
-      key={`dropdown-item-${index}-${item.key}`}
-      className="text-center px-1"
-      onClick={item.action}
-    >
-      {item.label}
-    </DropdownItem>
-  ));
+  return <NavbarItem navItem={userdropdown} />;
 }
 
 export default UserAccountDropdown;
 
 UserAccountDropdown.propTypes = {
   showRegister: PropTypes.bool,
-};
-
-DropdownItems.proptypes = {
-  isAuthenticated: PropTypes.bool.isRequired,
-  toggle: PropTypes.func.isRequired,
-  t: PropTypes.func.isRequired,
 };

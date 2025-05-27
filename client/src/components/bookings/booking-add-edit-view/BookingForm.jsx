@@ -38,7 +38,7 @@ import {
   sanitizeBooking,
 } from "components/bookings/booking-add-edit-view/constants";
 
-import { errorCodes } from "constants/errorCodes";
+import { ERROR_CODES } from "constants/errorCodes";
 
 import useBookingFormData from "./hooks/useBookingFormData";
 import useBookingTotals from "./hooks/useBookingTotals";
@@ -539,7 +539,7 @@ export default withFormik({
     } catch (err) {
       let errorMessage =
         "Error al guardar la reserva. Por favor, inténtelo de nuevo. Si el problema persiste, contacte al soporte técnico.";
-      if (Number(err?.response?.data?.code) === errorCodes.IS_LOCKED) {
+      if (Number(err?.response?.data?.code) === ERROR_CODES.IS_LOCKED) {
         errorMessage = "No se puede actualizar reservas con estado terminado.";
       }
 

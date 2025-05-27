@@ -7,6 +7,7 @@ namespace TourGo.Services.Interfaces.Users
     {
         Guid CreateToken(int userId, UserTokenTypeEnum tokenType, DateTime expirationDate);
         void DeleteUserToken(UserToken userToken);
-        UserToken GetUserToken(string token);
+        UserToken? GetUserToken(string token);
+        UserToken? GetUserToken(int userId, UserTokenTypeEnum tokenType);
     }
 }

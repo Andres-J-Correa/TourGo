@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
 import { Button, Spinner } from "reactstrap";
 import CustomField from "components/commonUI/forms/CustomField";
@@ -10,16 +11,9 @@ import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
-import { useNavigate } from "react-router-dom";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 
-function UserSignIn({
-  toggle,
-  onSignUp,
-  onPasswordReset,
-  loading,
-  setLoading,
-}) {
+function UserSignIn({ toggle, onSignUp, loading, setLoading }) {
   const { user } = useAppContext();
   const { t, getTranslatedErrorMessage } = useLanguage();
   const formRef = useRef(null);
@@ -46,6 +40,11 @@ function UserSignIn({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    navigate("/users/password/reset");
+    toggle();
   };
 
   return (
@@ -92,9 +91,9 @@ function UserSignIn({
             <button
               type="button"
               className="btn btn-link m-0 p-0"
-              onClick={onPasswordReset}
+              onClick={handleForgotPassword}
               disabled={loading}>
-              Forgot your password?
+              {t("client.login.forgotPassword")}
             </button>
           </div>
           <div className="text-center">

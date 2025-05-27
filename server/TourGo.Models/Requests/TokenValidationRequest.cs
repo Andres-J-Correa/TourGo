@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TourGo.Models.Requests.Users
+namespace TourGo.Models.Requests
 {
-    public class UserUpdatePasswordRequest : PasswordValidateRequest
+    public class TokenValidationRequest
     {
-        [Required, MinLength(5)]
+        [Required]
+        [MinLength(5)]
         public string Token { get; set; }
     }
 }
