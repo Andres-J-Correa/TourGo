@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Options;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Enums;
 using TourGo.Web.Models.Responses;
@@ -15,6 +16,8 @@ namespace TourGo.Web.StartUp
         {
             IMvcBuilder mvc = services.AddControllersWithViews(o =>
             {
+                o.Filters.Add<CustomExceptionFilter>();
+
                 var policy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .Build();

@@ -44,7 +44,8 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 if (financePartners == null || financePartners.Count == 0)
                 {
-                    result = NotFound("No finance partners found for the specified hotel.");
+                    ErrorResponse errorResponse = new ErrorResponse("No finance partners found for the specified hotel.");
+                    result = NotFound404(errorResponse);
                 }
                 else
                 {

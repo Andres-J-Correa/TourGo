@@ -38,6 +38,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         #region hotel
         [HttpPost]
+        [VerifiedUser]
         public ActionResult<ItemResponse<int>> Create(HotelAddRequest model)
         {
             ObjectResult result = null;
@@ -103,7 +104,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
         [HttpGet]
         public ActionResult<ItemsResponse<Lookup>> GetUserHotels()
         {
-            int code = 200;
             BaseResponse response;
 
             try
@@ -114,22 +114,22 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 if (hotels == null)
                 {
-                    code = 404;
+                
                     response = new ErrorResponse("Application Resource not found.");
+                    return NotFound404(response);
                 }
                 else
                 {
                     response = new ItemsResponse<Lookup> { Items = hotels };
+                    return Ok200(response);
                 }
             }
             catch (Exception ex)
             {
-                code = 500;
                 Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 response = new ErrorResponse();
+                return StatusCode(500, response);
             }
-
-            return StatusCode(code, response);
         }
 
         [HttpGet("{id:int}")]
