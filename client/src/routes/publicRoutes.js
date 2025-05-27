@@ -15,9 +15,9 @@ const userRoutes = [
     component: lazy(() => import("components/LandingPage")),
   },
   {
-    name: "changePassword",
-    path: "/users/password/change",
-    component: lazy(() => import("components/users/UserPasswordChange")),
+    name: "resetPassowrd",
+    path: "/users/password/reset",
+    component: lazy(() => import("components/users/UserPasswordReset")),
   },
 ];
 

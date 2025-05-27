@@ -51,7 +51,7 @@ export const userSignUpSchema = Yup.object().shape({
     .required("La confirmación de la contraseña es obligatoria."),
 });
 
-export const userPasswordResetSchema = Yup.object().shape({
+export const userPasswordForgotSchema = Yup.object().shape({
   email: Yup.string()
     .email("Debe ingresar un correo electrónico válido.")
     .max(100, "El correo debe tener máximo 100 caracteres.")
@@ -79,4 +79,28 @@ export const userPasswordChangeSchema = Yup.object().shape({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Las contraseñas deben coincidir.")
     .required("La confirmación de la contraseña es obligatoria."),
+});
+
+export const userPasswordResetSchema = Yup.object().shape({
+  password: Yup.string()
+    .min(8, "La contraseña debe tener mínimo 8 caracteres.")
+    .max(50, "La contraseña debe tener máximo 50 caracteres.")
+    .matches(
+      /[a-z]/,
+      "La contraseña debe contener al menos una letra minúscula."
+    )
+    .matches(
+      /[A-Z]/,
+      "La contraseña debe contener al menos una letra mayúscula."
+    )
+    .matches(/\d/, "La contraseña debe contener al menos un número.")
+    .matches(
+      /[^A-Za-z\d]/,
+      "La contraseña debe contener al menos un carácter especial."
+    )
+    .required("La contraseña es obligatoria."),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Las contraseñas deben coincidir.")
+    .required("La confirmación de la contraseña es obligatoria."),
+  token: Yup.string().required("El token es obligatorio."),
 });

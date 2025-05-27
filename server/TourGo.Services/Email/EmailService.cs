@@ -41,7 +41,6 @@ namespace TourGo.Services.Email
                 var recipient = new SendSmtpEmailTo(user.Email, user.FirstName);
                 var recipients = new List<SendSmtpEmailTo> { recipient };
 
-                string customLink = $"{_emailConfig.DomainUrl}/users/password/change?tokenId={token}";
                 string htmlTemplate = _templateLoader.LoadTemplate("passwordReset.html");
 
                 if (string.IsNullOrEmpty(htmlTemplate))
@@ -49,7 +48,7 @@ namespace TourGo.Services.Email
                     throw new Exception("Error loading template");
                 }
 
-                htmlTemplate = htmlTemplate.Replace("Reset-Link-Insert", customLink)
+                htmlTemplate = htmlTemplate.Replace("Verification-Code", token)
                                            .Replace("User-Name", user.FirstName)
                                            .Replace("Expiration-Time", $"{_emailConfig.PasswordResetExpirationHours} horas");
 

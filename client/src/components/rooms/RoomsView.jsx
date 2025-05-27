@@ -39,7 +39,7 @@ import {
   updateById,
   deleteById,
 } from "services/roomService";
-import { errorCodes } from "constants/errorCodes";
+import { ERROR_CODES } from "constants/errorCodes";
 import { useAppContext } from "contexts/GlobalAppContext"; // Assuming you have this context
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
@@ -269,7 +269,7 @@ const RoomsView = () => {
         let errorMessage =
           "No se pudo eliminar la habitación, intente nuevamente.";
         if (
-          Number(error?.response.data?.code) === errorCodes.HAS_ACTIVE_BOOKINGS
+          Number(error?.response.data?.code) === ERROR_CODES.HAS_ACTIVE_BOOKINGS
         ) {
           errorMessage =
             "No se puede eliminar la habitación porque tiene reservas activas.";

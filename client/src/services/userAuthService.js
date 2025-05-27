@@ -156,7 +156,7 @@ export const phoneExists = async (phone) => {
 export const forgotPassword = async (payload) => {
   const config = {
     method: "POST",
-    url: `${api}/forgotPassword`,
+    url: `${api}/password/forgot`,
     data: payload,
   };
   try {
@@ -167,9 +167,15 @@ export const forgotPassword = async (payload) => {
     return onGlobalError(error);
   }
 };
+
+/**
+ *
+ * @param {{token: string, password: string, confirmPassword: string, email: string}} payload
+ * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
+ */
 export const resetPassword = async (payload) => {
   const config = {
-    method: "POST",
+    method: "PUT",
     url: `${api}/password/reset`,
     data: payload,
   };
@@ -198,26 +204,6 @@ export const validateToken = async (token) => {
     return response.data;
   } catch (error) {
     return onGlobalError(error);
-  }
-};
-
-/**
- *
- * @param {{token: string, password: string, confirmPassword: string}} payload
- * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
- */
-export const changePassword = async (payload) => {
-  const config = {
-    method: "PUT",
-    url: `${api}/password/change`,
-    data: payload,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError()(error);
   }
 };
 

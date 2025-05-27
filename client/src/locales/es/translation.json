@@ -45,7 +45,8 @@
       "password": "Contraseña",
       "button": "Iniciar sesión",
       "noAccount": "¿No tienes una cuenta?",
-      "register": "Registrarse"
+      "register": "Registrarse",
+      "forgotPassword": "¿Olvidaste tu contraseña?"
     },
     "register": {
       "title": "Registrarse",
@@ -62,7 +63,7 @@
     },
     "passwordReset": {
       "title": "Restablecer contraseña",
-      "subtitle": "Recibirá un correo en maximo 60 segundos",
+      "subtitle": "Recibirá un correo con un código de restablecimiento",
       "email": "Correo",
       "button": "Restablecer contraseña",
       "back": "Volver a"
@@ -73,6 +74,7 @@
       "oldPassword": "Contraseña anterior",
       "newPassword": "Nueva contraseña",
       "confirmPassword": "Confirmar contraseña",
+      "token": "Código de restablecimiento",
       "button": "Cambia tu contraseña"
     }
   },

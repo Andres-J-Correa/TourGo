@@ -50,7 +50,7 @@ import {
   EXTRA_CHARGE_TYPES,
   formatExtraChargeAmount,
 } from "components/extra-charges/constants";
-import { errorCodes } from "constants/errorCodes";
+import { ERROR_CODES } from "constants/errorCodes";
 
 // Validation Schema
 const validationSchema = Yup.object().shape({
@@ -285,7 +285,7 @@ const ExtraChargesView = () => {
       } catch (error) {
         let errorMessage = "No se pudo eliminar el cargo, intente nuevamente.";
         if (
-          Number(error?.response.data?.code) === errorCodes.HAS_ACTIVE_BOOKINGS
+          Number(error?.response.data?.code) === ERROR_CODES.HAS_ACTIVE_BOOKINGS
         ) {
           errorMessage =
             "No se puede eliminar el cargo porque tiene reservas activas asociadas.";

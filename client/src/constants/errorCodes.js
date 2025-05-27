@@ -1,4 +1,4 @@
-export const errorCodes = {
+export const ERROR_CODES = {
   UNKNOWN_ERROR: 1000,
   AUTHENTICATION_ERROR: 2000,
   USER_MANAGEMENT_ERROR: 3000,
@@ -7,6 +7,7 @@ export const errorCodes = {
   USER_NOT_FOUND: 2001,
   ACCOUNT_LOCKED: 2002,
   INCORRECT_CREDENTIALS: 2003,
+  TOKEN_NOT_FOUND: 2004,
 
   // User management-specific error codes
   USER_ALREADY_EXISTS: 3001,

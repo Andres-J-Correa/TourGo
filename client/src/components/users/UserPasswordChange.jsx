@@ -8,7 +8,7 @@ import AuthCard from "components/commonUI/forms/AuthCard";
 import { userPasswordChangeSchema } from "components/users/validationSchemas";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
-import { changePassword, validateToken } from "services/userAuthService";
+import { resetPassword, validateToken } from "services/userAuthService";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import backgroundImage from "assets/images/password-reset-bg.jpg";
 import NoRecords404 from "components/commonUI/errors/NoRecords404";
@@ -29,7 +29,7 @@ function UserPasswordChange() {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const response = await changePassword({ ...values, token: tokenId });
+      const response = await resetPassword({ ...values, token: tokenId });
       if (!response?.isSuccessful) {
         throw new Error("Error changing password");
       }

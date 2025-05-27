@@ -166,9 +166,9 @@ namespace TourGo.Web.Api.Controllers.Users
             }
         }
 
-        [HttpPost("password/reset")]
+        [HttpPost("password/forgot")]
         [AllowAnonymous]
-        public async Task<ActionResult<SuccessResponse>> ResetPassword(EmailValidateRequest model)
+        public async Task<ActionResult<SuccessResponse>> ForgotPassword(EmailValidateRequest model)
         {
             ObjectResult result = null;
 
@@ -182,15 +182,11 @@ namespace TourGo.Web.Api.Controllers.Users
                     Guid token = _userTokenService.CreateToken(user.Id, UserTokenTypeEnum.PasswordReset, TokenExpirationDate);
 
                     await _emailService.UserPasswordReset(user, token.ToString());
+                }
 
-                    SuccessResponse response = new SuccessResponse();
-                    result = Ok200(response);
-                }
-                else
-                {
-                    ErrorResponse response = new ErrorResponse("Email not found", AuthenticationErrorCode.UserNotFound);
-                    result = NotFound404(response);
-                }
+                SuccessResponse response = new SuccessResponse();
+                result = Ok200(response);
+
             }
             catch (Exception ex)
             {
@@ -204,43 +200,9 @@ namespace TourGo.Web.Api.Controllers.Users
             return result;
         }
 
-        [HttpGet("validateToken/{token}")]
+        [HttpPut("password/reset")]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<bool>> ValidateToken (string token)
-        {
-            int iCode = 200;
-            BaseResponse response;
-
-            try
-            {
-                UserToken? userToken = _userTokenService.GetUserToken(token);
-
-                if (userToken != null)
-                {
-                    bool isValid = DateTime.UtcNow <= userToken.Expiration;
-
-                    response = new ItemResponse<bool> { Item = isValid };
-                }
-                else
-                {
-                    iCode = 404;
-                    response = new ErrorResponse("Token not Found", AuthenticationErrorCode.TokenNotFound);
-                }
-            }
-            catch (Exception ex)
-            {
-
-                iCode = 500;
-                Logger.LogError(ex.ToString());
-                response = new ErrorResponse();
-            }
-
-            return StatusCode(iCode, response);
-        }
-
-        [HttpPut("password/change")]
-        [AllowAnonymous]
-        public ActionResult<SuccessResponse> ChangePassword (UserUpdatePasswordRequest model)
+        public ActionResult<SuccessResponse> ChangePassword (UserPasswordResetRequest model)
         {
             int iCode = 200;
             BaseResponse response = null;
@@ -249,7 +211,9 @@ namespace TourGo.Web.Api.Controllers.Users
             {
                 UserToken? userToken = _userTokenService.GetUserToken(model.Token);
 
-                if (userToken != null)
+                IUserAuthData user = _userService.Get(model.Email);
+
+                if (userToken != null && model.Email == user.Email)
                 {
                     _userService.ChangePassword(userToken.UserId, model.Password);
 
@@ -274,6 +238,10 @@ namespace TourGo.Web.Api.Controllers.Users
 
             return StatusCode(iCode, response);
         }
+
+        #endregion
+
+        #region Private Endpoints
 
         [HttpGet("current")]
         public ActionResult<ItemResponse<IUserAuthData>> GetCurrrent()
@@ -359,14 +327,14 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpGet("email/verify/{token}")]
         public ActionResult<SuccessResponse> VerifyEmail(string token)
-        { 
+        {
             try
             {
                 IUserAuthData user = _webAuthService.GetCurrentUser();
 
                 UserToken? userToken = _userTokenService.GetUserToken(user.Id, UserTokenTypeEnum.EmailVerification);
 
-                if(userToken == null)
+                if (userToken == null)
                 {
                     return NotFound404(new ErrorResponse("Token not found", AuthenticationErrorCode.TokenNotFound));
                 }
@@ -392,10 +360,6 @@ namespace TourGo.Web.Api.Controllers.Users
             }
         }
 
-
-        #endregion
-
-        #region Private Endpoints
 
         #endregion
 

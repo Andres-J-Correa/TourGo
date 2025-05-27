@@ -41,7 +41,7 @@ import {
   updateById,
 } from "services/bookingProviderService";
 import { useAppContext } from "contexts/GlobalAppContext";
-import { errorCodes } from "constants/errorCodes";
+import { ERROR_CODES } from "constants/errorCodes";
 
 // Components
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -265,7 +265,7 @@ function BookingProvidersView() {
         let errorMessage =
           "No se pudo eliminar el proveedor, intente nuevamente.";
         if (
-          Number(error?.response.data?.code) === errorCodes.HAS_ACTIVE_BOOKINGS
+          Number(error?.response.data?.code) === ERROR_CODES.HAS_ACTIVE_BOOKINGS
         ) {
           errorMessage =
             "No se puede eliminar el proveedor porque tiene reservas activas asociadas.";

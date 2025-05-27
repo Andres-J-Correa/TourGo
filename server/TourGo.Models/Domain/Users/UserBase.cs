@@ -10,7 +10,7 @@
 
         public string? Email { get; set; }
 
-        public IEnumerable<string>? Roles { get; set; }
+        public IEnumerable<string> Roles { get; set; } = new List<string>();
         public bool? IsVerified { get; set; }
     }
 }

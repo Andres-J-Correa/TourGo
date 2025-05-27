@@ -1,13 +1,20 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, usersLogout } from "services/userAuthService";
 import { getMinimalById } from "services/hotelService";
 import UserSignInModal from "components/users/UserSignInModal";
 import { SignUpFormModal } from "components/commonUI/forms/SignUpForm";
-import UserPasswordResetModal from "components/users/UserPasswordResetModal";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import axiosClient from "services/axiosClient";
+import { useLanguage } from "contexts/LanguageContext";
 
 const defaultUser = {
   id: 0,
@@ -26,7 +33,6 @@ const defaultHotel = {
 const defaultModals = {
   login: false,
   register: false,
-  reset: false,
 };
 
 const AppContext = createContext();
@@ -38,6 +44,9 @@ export const AppContextProvider = ({ children }) => {
   const [isLoadingHotel, setIsLoadingHotel] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(false);
   const [modals, setModals] = useState({ ...defaultModals });
+  const [isAuthError, setIsAuthError] = useState(false);
+
+  const { t } = useLanguage();
 
   const navigate = useNavigate();
 
@@ -105,8 +114,19 @@ export const AppContextProvider = ({ children }) => {
     },
     toggleUserSignInModal: toggleModal("login"),
     toggleUserSignUpModal: toggleModal("register"),
-    toggleUserPasswordResetModal: toggleModal("reset"),
   };
+
+  const handleGlobalError = useCallback(
+    (error) => {
+      if (error.response.status === 401 && currentUser.isAuthenticated) {
+        toggleModal("login")();
+        setIsAuthError(true);
+        toast.error(t("common.sessionExpired"));
+      }
+      return Promise.reject(error);
+    },
+    [currentUser, t]
+  );
 
   useEffect(() => {
     if (currentUser.id === 0) {
@@ -166,22 +186,29 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [location.pathname, hotel.id, currentUser]);
 
+  useEffect(() => {
+    const interceptor = axiosClient.interceptors.response.use(
+      (response) => response,
+      (error) => handleGlobalError(error)
+    );
+
+    return () => {
+      axiosClient.interceptors.response.eject(interceptor);
+    };
+  }, [handleGlobalError]);
+
   return (
     <AppContext.Provider value={contextValue}>
       <UserSignInModal
         isOpen={modals.login}
         toggle={toggleModal("login")}
-        onSignUp={toggleModal("register")}
-        onPasswordReset={toggleModal("reset")}
+        onSignUp={!isAuthError && toggleModal("register")}
+        backdrop={isAuthError && "static"}
+        keyboard={!isAuthError}
       />
       <SignUpFormModal
         isOpen={modals.register}
         toggle={toggleModal("register")}
-        onSignIn={toggleModal("login")}
-      />
-      <UserPasswordResetModal
-        isOpen={modals.reset}
-        toggle={toggleModal("reset")}
         onSignIn={toggleModal("login")}
       />
       {children}
