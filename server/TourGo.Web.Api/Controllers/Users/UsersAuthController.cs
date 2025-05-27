@@ -7,6 +7,7 @@ using TourGo.Models;
 using TourGo.Models.Domain.Config.Emails;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Enums;
+using TourGo.Models.Requests;
 using TourGo.Models.Requests.Users;
 using TourGo.Services;
 using TourGo.Services.Interfaces.Email;
@@ -325,8 +326,8 @@ namespace TourGo.Web.Api.Controllers.Users
             return result;
         }
 
-        [HttpGet("email/verify/{token}")]
-        public ActionResult<SuccessResponse> VerifyEmail(string token)
+        [HttpPost("email/verify")]
+        public ActionResult<SuccessResponse> VerifyEmail(TokenValidationRequest model)
         {
             try
             {
@@ -342,7 +343,7 @@ namespace TourGo.Web.Api.Controllers.Users
                 {
                     return StatusCode(400, new ErrorResponse("Token expired"));
                 }
-                else if (userToken.Token != token)
+                else if (userToken.Token != model.Token)
                 {
                     return StatusCode(400, new ErrorResponse("Invalid token"));
                 }

@@ -40,18 +40,18 @@ const UserSettingsView = () => {
                   active={activeTab === "email"}
                   onClick={() => setActiveTab("email")}
                   href="#">
-                  Email Verification
+                  Verificación de Email
                 </NavLink>
               </NavItem>
               {/* Placeholder for future menu items */}
               <NavItem>
                 <NavLink href="#" disabled>
-                  Change Password
+                  Cambiar Contraseña
                 </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink href="#" disabled>
-                  Notification Preferences
+                  Preferencias de Notificaciones
                 </NavLink>
               </NavItem>
             </Nav>

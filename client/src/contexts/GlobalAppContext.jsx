@@ -118,14 +118,21 @@ export const AppContextProvider = ({ children }) => {
 
   const handleGlobalError = useCallback(
     (error) => {
-      if (error.response.status === 401 && currentUser.isAuthenticated) {
-        toggleModal("login")();
+      if (
+        error.response.status === 401 &&
+        currentUser.isAuthenticated &&
+        !isAuthError
+      ) {
+        setModals((prev) => ({
+          ...prev,
+          login: true,
+        }));
         setIsAuthError(true);
         toast.error(t("common.sessionExpired"));
       }
       return Promise.reject(error);
     },
-    [currentUser, t]
+    [currentUser, t, isAuthError]
   );
 
   useEffect(() => {
@@ -143,6 +150,7 @@ export const AppContextProvider = ({ children }) => {
             ...data.item,
             isAuthenticated: true,
           }));
+          setIsAuthError(false);
         })
         .catch(() => {
           if (currentUser.isAuthenticated) {
@@ -153,7 +161,7 @@ export const AppContextProvider = ({ children }) => {
           setIsLoadingUser(false);
         });
     }
-  }, [currentUser, navigate]);
+  }, [currentUser.id, currentUser.isAuthenticated, navigate]);
 
   useEffect(() => {
     const pathRegex = /\/hotels\/([^/]+)/; // Matches /hotel/{hotelId}

@@ -223,8 +223,9 @@ export const requestEmailVerification = async () => {
 
 export const verifyEmail = async (token) => {
   const config = {
-    method: "GET",
-    url: `${api}/email/verify/${token}`,
+    method: "POST",
+    url: `${api}/email/verify`,
+    data: { token },
   };
   try {
     const response = await axiosClient(config);
