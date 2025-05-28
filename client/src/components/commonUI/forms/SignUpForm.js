@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 
 import { Col, Row, FormGroup, Button, Spinner } from "reactstrap";
 
@@ -33,9 +33,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
   const { t, getTranslatedErrorMessage } = useLanguage();
   const validationSchema = userSignUpSchema;
 
-  const formRef = useRef(null);
-
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, { setFieldError }) => {
     try {
       setLoading(true);
       const response = await usersRegister(values);
@@ -48,7 +46,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
       if (
         Number(error?.response.data?.code) === ERROR_CODES.EMAIL_ALREADY_EXISTS
       ) {
-        formRef?.current?.setFieldError(
+        setFieldError(
           "email",
           t(`errors.custom.${ERROR_CODES.EMAIL_ALREADY_EXISTS}`)
         );
@@ -56,7 +54,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
       if (
         Number(error?.response.data?.code) === ERROR_CODES.PHONE_ALREADY_EXISTS
       ) {
-        formRef?.current?.setFieldError(
+        setFieldError(
           "phone",
           t(`errors.custom.${ERROR_CODES.PHONE_ALREADY_EXISTS}`)
         );
@@ -72,8 +70,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
     <Formik
       initialValues={{ ...initialValues }}
       validationSchema={validationSchema}
-      onSubmit={handleSubmit}
-      innerRef={formRef}>
+      onSubmit={handleSubmit}>
       <Form>
         <Row>
           <Col md={6} sm={12}>

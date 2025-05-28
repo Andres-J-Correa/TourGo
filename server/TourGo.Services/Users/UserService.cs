@@ -44,7 +44,7 @@ namespace TourGo.Services.Users
             {
                 coll.AddWithValue("p_firstName", request.FirstName);
                 coll.AddWithValue("p_lastName", request.LastName);
-                coll.AddWithValue("p_email", request.Email);
+                coll.AddWithValue("p_email", request.Email.ToLower());
                 coll.AddWithValue("p_phone", request.Phone);
                 coll.AddWithValue("p_providerId", request.AuthProvider);
                 coll.AddWithValue("p_providerUserId", authProviderUserId);

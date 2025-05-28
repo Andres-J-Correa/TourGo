@@ -21,4 +21,22 @@
     <ProjectReference Include="..\TourGo.Web.Models\TourGo.Web.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resources\StaffRoleEnum.Designer.cs">
+      <DependentUpon>StaffRoleEnum.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\StaffRoleEnum.es.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\StaffRoleEnum.resx">
+      <LastGenOutput>StaffRoleEnum.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

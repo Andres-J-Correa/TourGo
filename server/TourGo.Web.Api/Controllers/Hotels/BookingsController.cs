@@ -65,6 +65,21 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 result = Created201(response);
             }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+
+                if (Enum.IsDefined(typeof(HotelManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((HotelManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                result = StatusCode(500, error);
+            }
             catch (Exception ex)
             {
                 Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
@@ -93,11 +108,17 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (MySqlException dbEx)
             {
-                ErrorResponse error = dbEx.Number == 1002 ?
-                    new ErrorResponse(HotelManagementErrorCode.IsLocked) :
-                    new ErrorResponse();
+                ErrorResponse error;
 
-                Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                if (Enum.IsDefined(typeof(HotelManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((HotelManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
                 result = StatusCode(500, error);
             }
             catch (Exception ex)

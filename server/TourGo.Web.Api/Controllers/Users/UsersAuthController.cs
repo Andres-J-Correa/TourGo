@@ -203,7 +203,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpPut("password/reset")]
         [AllowAnonymous]
-        public ActionResult<SuccessResponse> ChangePassword (UserPasswordResetRequest model)
+        public ActionResult<SuccessResponse> ResetPassword (UserPasswordResetRequest model)
         {
             int iCode = 200;
             BaseResponse response = null;
@@ -214,7 +214,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 IUserAuthData user = _userService.Get(model.Email);
 
-                if (userToken != null && model.Email == user.Email)
+                if (userToken != null && model.Email == user.Email && userToken.TokenType == UserTokenTypeEnum.PasswordReset)
                 {
                     _userService.ChangePassword(userToken.UserId, model.Password);
 

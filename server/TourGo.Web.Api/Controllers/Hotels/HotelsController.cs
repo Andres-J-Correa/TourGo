@@ -15,6 +15,9 @@ using TourGo.Services.Interfaces;
 using TourGo.Models.Domain.Finances;
 using TourGo.Services.Finances;
 using TourGo.Models.Requests.Finances;
+using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
+using TourGo.Web.Models.Enums;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
