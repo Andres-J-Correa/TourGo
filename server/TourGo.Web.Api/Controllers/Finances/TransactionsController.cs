@@ -83,11 +83,12 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 if (transactions == null)
                 {
-                    result = NotFound("No transactions found for the given entity ID.");
+                    ErrorResponse response = new ErrorResponse("No transactions found for the specified entity.");
+                    result = NotFound404(response);
                 } else
                 {
                     ItemsResponse<Transaction> response = new ItemsResponse<Transaction> { Items = transactions };
-                    result = Ok(response);
+                    result = Ok200(response);
                 }
             }
             catch (Exception ex)
@@ -112,7 +113,8 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 if (string.IsNullOrEmpty(fileKey))
                 {
-                    result = NotFound("File not found");
+                   ErrorResponse response = new ErrorResponse("No document URL found for the specified transaction.");
+                    result = NotFound404(response);
                 }
                 else
                 {
@@ -136,7 +138,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                     }
 
                     ItemResponse<string> response = new ItemResponse<string> { Item = url };
-                    result = Ok(response);
+                    result = Ok200(response);
                 }
             }
             catch (Exception ex)
@@ -169,7 +171,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                 _transactionService.UpdateDocumentUrl(model.Id, fileKey);
 
                 SuccessResponse response = new SuccessResponse();
-                result = Ok(response);
+                result = Ok200(response);
             }
             catch (Exception ex)
             {
@@ -238,12 +240,13 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 if (transactions == null)
                 {
-                    result = NotFound("No transactions found.");
+                    ErrorResponse response = new ErrorResponse("No transactions found for the specified criteria.");
+                    result = NotFound404(response);
                 }
                 else
                 {
                     ItemResponse<Paged<Transaction>> response = new ItemResponse<Paged<Transaction>> { Item = transactions };
-                    result = Ok(response);
+                    result = Ok200(response);
                 }
             }
             catch (Exception ex)

@@ -169,7 +169,7 @@ export const AppContextProvider = ({ children }) => {
     const hotelId = pathMatch ? Number(pathMatch[1]) : null;
 
     if (
-      Boolean(hotelId) &&
+      !isNaN(hotelId) &&
       Number(hotelId) !== Number(hotel.id) &&
       currentUser.isAuthenticated
     ) {

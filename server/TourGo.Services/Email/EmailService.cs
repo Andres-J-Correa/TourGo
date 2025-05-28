@@ -99,7 +99,7 @@ namespace TourGo.Services.Email
             }
         }
     
-        public async Task HotelStaffInvitation(string email, string hotel, string Role)
+        public async Task HotelStaffInvitation(string email, string hotel, string role)
         {
             try
             {
@@ -116,7 +116,7 @@ namespace TourGo.Services.Email
                 }
 
                 htmlTemplate = htmlTemplate.Replace("Hotel-Name", hotel)
-                                           .Replace("Role-Name", Role)
+                                           .Replace("Role-Name", role)
                                            .Replace("Invitation-Link", invitationLink);
 
                 var sendSmtpEmail = new SendSmtpEmail(sender, recipients)

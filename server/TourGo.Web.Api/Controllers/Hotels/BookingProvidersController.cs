@@ -77,7 +77,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 _bookingProviderService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();
-                result = Ok(response);
+                result = Ok200(response);
             }
             catch (Exception ex)
             {
@@ -101,7 +101,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 _bookingProviderService.Delete(id, userId);
 
                 SuccessResponse response = new SuccessResponse();
-                result = Ok(response);
+                result = Ok200(response);
             }
             catch (MySqlException dbEx)
             {
@@ -140,12 +140,13 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 if (bookingProviders == null)
                 {
-                    result = NotFound("No booking providers found for the given hotel ID.");
+                    ErrorResponse response = new ErrorResponse("No booking providers found for the specified hotel.");
+                    result = NotFound404(response);
                 }
                 else
                 {
                     ItemsResponse<Lookup> response = new ItemsResponse<Lookup> { Items = bookingProviders };
-                    result = Ok(response);
+                    result = Ok200(response);
                 }
             }
             catch (Exception ex)
@@ -170,12 +171,13 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 if (bookingProviders == null)
                 {
-                    result = NotFound("No booking providers found for the given hotel ID.");
+                    ErrorResponse response = new ErrorResponse("No booking providers found for the specified hotel.");
+                    result = NotFound404(response);
                 }
                 else
                 {
                     ItemsResponse<BookingProvider> response = new ItemsResponse<BookingProvider> { Items = bookingProviders };
-                    result = Ok(response);
+                    result = Ok200(response);
                 }
             }
             catch (Exception ex)

@@ -73,7 +73,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                 _transactionSubcategoryService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();
-                result = Ok(response);
+                result = Ok200(response);
             }
             catch (Exception ex)
             {
@@ -97,7 +97,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                 _transactionSubcategoryService.Delete(id, userId);
 
                 SuccessResponse response = new SuccessResponse();
-                result = Ok(response);
+                result = Ok200(response);
             }
             catch (Exception ex)
             {
@@ -121,12 +121,13 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 if (transactionSubcategories == null)
                 {
-                    result = NotFound("No transaction subcategories found for the given hotel ID.");
+                    ErrorResponse response = new ErrorResponse("No transaction subcategories found for the given hotel ID.");
+                    result = NotFound404(response);
                 }
                 else
                 {
                     ItemsResponse<TransactionSubcategoryBase> response = new ItemsResponse<TransactionSubcategoryBase> { Items = transactionSubcategories };
-                    result = Ok(response);
+                    result = Ok200(response);
                 }
             }
             catch (Exception ex)
@@ -151,12 +152,13 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 if (transactionSubcategories == null)
                 {
-                    result = NotFound("No transaction subcategories found for the given hotel ID.");
+                    ErrorResponse response = new ErrorResponse("No transaction subcategories found for the given hotel ID.");
+                    result = NotFound404(response);
                 }
                 else
                 {
                     ItemsResponse<TransactionSubcategory> response = new ItemsResponse<TransactionSubcategory> { Items = transactionSubcategories };
-                    result = Ok(response);
+                    result = Ok200(response);
                 }
             }
             catch (Exception ex)
