@@ -7,5 +7,6 @@ namespace TourGo.Services.Interfaces.Email
     {
         Task UserPasswordReset(IUserAuthData user, string token);
         Task UserEmailVerification(IUserAuthData user, string token);
+        Task HotelStaffInvitation(string email, string hotel, string role);
     }
 }

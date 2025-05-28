@@ -73,7 +73,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 _invoiceService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();
-                result = Ok(response);
+                result = Ok200(response);
             }
             catch (Exception ex)
             {

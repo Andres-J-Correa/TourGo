@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { Row, Col, Nav, NavItem, NavLink } from "reactstrap";
 import { useAppContext } from "contexts/GlobalAppContext";
 import EmailVerification from "components/users/EmailVerification";
@@ -13,16 +14,29 @@ const breadcrumbs = [
 
 const UserSettingsView = () => {
   const { user } = useAppContext();
-  const [activeTab, setActiveTab] = useState("email");
+  const [activeTab, setActiveTab] = useState("");
+
+  const location = useLocation();
+  const queryParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  );
 
   const renderContent = () => {
     switch (activeTab) {
       case "email":
         return <EmailVerification user={user} />;
       default:
-        return <div>Select an option</div>;
+        return <div>Seleccione una opción 👈</div>;
     }
   };
+
+  useEffect(() => {
+    const tabFromQuery = queryParams.get("tab");
+    if (tabFromQuery) {
+      setActiveTab(tabFromQuery);
+    }
+  }, [queryParams]);
 
   return (
     <>

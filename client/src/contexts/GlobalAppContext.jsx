@@ -166,10 +166,10 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     const pathRegex = /\/hotels\/([^/]+)/; // Matches /hotel/{hotelId}
     const pathMatch = location.pathname.match(pathRegex);
-    const hotelId = pathMatch ? pathMatch[1] : null;
+    const hotelId = pathMatch ? Number(pathMatch[1]) : null;
 
     if (
-      hotelId &&
+      !isNaN(hotelId) &&
       Number(hotelId) !== Number(hotel.id) &&
       currentUser.isAuthenticated
     ) {

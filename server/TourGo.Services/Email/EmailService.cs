@@ -98,5 +98,40 @@ namespace TourGo.Services.Email
                 throw;
             }
         }
+    
+        public async Task HotelStaffInvitation(string email, string hotel, string role)
+        {
+            try
+            {
+                var sender = new SendSmtpEmailSender(_brevoConfig.SenderName, _brevoConfig.SenderEmail);
+                var recipient = new SendSmtpEmailTo(email);
+                var recipients = new List<SendSmtpEmailTo> { recipient };
+                string invitationLink = $"{_emailConfig.DomainUrl}/profile/invites";
+
+                string htmlTemplate = _templateLoader.LoadTemplate("staffInvitation.html");
+
+                if (string.IsNullOrEmpty(htmlTemplate))
+                {
+                    throw new Exception("Error loading template");
+                }
+
+                htmlTemplate = htmlTemplate.Replace("Hotel-Name", hotel)
+                                           .Replace("Role-Name", role)
+                                           .Replace("Invitation-Link", invitationLink);
+
+                var sendSmtpEmail = new SendSmtpEmail(sender, recipients)
+                {
+                    Subject = "TourGo - Invitación a Hotel",
+                    HtmlContent = htmlTemplate,
+                };
+
+                await _emailsApi.SendTransacEmailAsync(sendSmtpEmail);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+        }
     }
 }

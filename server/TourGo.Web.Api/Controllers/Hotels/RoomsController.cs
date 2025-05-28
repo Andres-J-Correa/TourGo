@@ -138,11 +138,17 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
             catch (MySqlException dbEx)
             {
-                ErrorResponse error = dbEx.Number == 1001 ?
-                    new ErrorResponse(HotelManagementErrorCode.HasActiveBooking) :
-                    new ErrorResponse();
+                ErrorResponse error;
 
-                Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                if (Enum.IsDefined(typeof(HotelManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((HotelManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
                 result = StatusCode(500, error);
             }
             catch (Exception ex)

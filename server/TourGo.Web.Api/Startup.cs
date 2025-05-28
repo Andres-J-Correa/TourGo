@@ -1,4 +1,6 @@
-﻿using TourGo.Models.Domain.Config;
+﻿using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Config.Emails;
 using TourGo.Web.Api.Middleware;
 using TourGo.Web.Core;
@@ -17,6 +19,7 @@ namespace TourGo.Web.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
             services.AddMemoryCache();
             ConfigureAppSettings(services);
             DependencyInjection.ConfigureServices(services, Configuration);
@@ -39,6 +42,13 @@ namespace TourGo.Web.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en"),
+                SupportedCultures = new[] { new CultureInfo("en"), new CultureInfo("es") },
+                SupportedUICultures = new[] { new CultureInfo("en"), new CultureInfo("es") }
+            });
+
             app.UseMiddleware<ErrorLoggingMiddleware>();
             if (env.IsDevelopment())
             {
