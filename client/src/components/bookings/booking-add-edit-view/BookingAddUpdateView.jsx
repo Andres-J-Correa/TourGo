@@ -23,6 +23,7 @@ import CustomerForm from "components/bookings/booking-add-edit-view/CustomerForm
 import BookingForm from "components/bookings/booking-add-edit-view/BookingForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import EntityTransactionsView from "components/transactions/EntityTransactionsView";
+import ErrorBoundary from "components/commonUI/ErrorBoundary";
 
 const BookingAddUpdateView = () => {
   const { hotelId, bookingId } = useParams();
@@ -122,76 +123,78 @@ const BookingAddUpdateView = () => {
         breadcrumbs={breadcrumbs}
         active={bookingId ? "Editar Reserva" : "Nueva Reserva"}
       />
-      <TabNavigation
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-        isStepComplete={isStepComplete}
-      />
-      <TabContent activeTab={currentStep}>
-        <h4 className="mb-3">{tabs[currentStep].name} </h4>
-        <TabPane tabId={0}>
-          <CustomerForm
-            customer={customer}
-            setCustomer={setCustomer}
-            setCurrentStep={setCurrentStep}
-            submitting={submitting}
-            setCreating={setCreating}
-            setSubmitting={setSubmitting}
-            hotelId={hotelId}
-            creating={creating}
-            booking={booking}
-          />
-        </TabPane>
-        <TabPane tabId={1}>
-          <BookingForm
-            setCurrentStep={setCurrentStep}
-            submitting={submitting}
-            customer={customer}
-            booking={booking}
-            setBooking={setBooking}
-            setCustomer={setCustomer}
-            hotelId={hotelId}
-            bookingId={bookingId}
-            bookingCharges={booking?.extraCharges}
-            bookingRoomBookings={booking?.roomBookings}
-            modifiedBy={modifiedBy}
-            getTranslatedErrorMessage={getTranslatedErrorMessage}
-          />
-        </TabPane>
-        <TabPane tabId={2}>
-          <div className="d-flex mb-4">
-            <Button
-              type="button"
-              onClick={() => setCurrentStep(1)}
-              color="dark"
-              className="me-auto"
-              disabled={submitting}>
-              <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-              Anterior
-            </Button>
-            {isStepComplete[2] && !submitting && (
-              <Link
-                className="ms-auto btn btn-dark"
-                to={`/hotels/${hotelId}/bookings/${booking.id}`}>
-                Ir a Resumen
-                <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
-              </Link>
-            )}
-          </div>
-          <EntityTransactionsView
-            hotelId={hotelId}
-            submitting={submitting}
-            entity={booking}
-            setEntity={setBooking}
-            showAddButton={
-              booking?.status?.id !== BOOKING_STATUS_IDS.CANCELLED &&
-              booking?.status?.id !== BOOKING_STATUS_IDS.NO_SHOW &&
-              booking?.status?.id !== BOOKING_STATUS_IDS.COMPLETED
-            }
-          />
-        </TabPane>
-        <br />
-      </TabContent>
+      <ErrorBoundary>
+        <TabNavigation
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+          isStepComplete={isStepComplete}
+        />
+        <TabContent activeTab={currentStep}>
+          <h4 className="mb-3">{tabs[currentStep].name} </h4>
+          <TabPane tabId={0}>
+            <CustomerForm
+              customer={customer}
+              setCustomer={setCustomer}
+              setCurrentStep={setCurrentStep}
+              submitting={submitting}
+              setCreating={setCreating}
+              setSubmitting={setSubmitting}
+              hotelId={hotelId}
+              creating={creating}
+              booking={booking}
+            />
+          </TabPane>
+          <TabPane tabId={1}>
+            <BookingForm
+              setCurrentStep={setCurrentStep}
+              submitting={submitting}
+              customer={customer}
+              booking={booking}
+              setBooking={setBooking}
+              setCustomer={setCustomer}
+              hotelId={hotelId}
+              bookingId={bookingId}
+              bookingCharges={booking?.extraCharges}
+              bookingRoomBookings={booking?.roomBookings}
+              modifiedBy={modifiedBy}
+              getTranslatedErrorMessage={getTranslatedErrorMessage}
+            />
+          </TabPane>
+          <TabPane tabId={2}>
+            <div className="d-flex mb-4">
+              <Button
+                type="button"
+                onClick={() => setCurrentStep(1)}
+                color="dark"
+                className="me-auto"
+                disabled={submitting}>
+                <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+                Anterior
+              </Button>
+              {isStepComplete[2] && !submitting && (
+                <Link
+                  className="ms-auto btn btn-dark"
+                  to={`/hotels/${hotelId}/bookings/${booking.id}`}>
+                  Ir a Resumen
+                  <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+                </Link>
+              )}
+            </div>
+            <EntityTransactionsView
+              hotelId={hotelId}
+              submitting={submitting}
+              entity={booking}
+              setEntity={setBooking}
+              showAddButton={
+                booking?.status?.id !== BOOKING_STATUS_IDS.CANCELLED &&
+                booking?.status?.id !== BOOKING_STATUS_IDS.NO_SHOW &&
+                booking?.status?.id !== BOOKING_STATUS_IDS.COMPLETED
+              }
+            />
+          </TabPane>
+          <br />
+        </TabContent>
+      </ErrorBoundary>
     </>
   );
 };

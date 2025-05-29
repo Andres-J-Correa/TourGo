@@ -6,6 +6,7 @@ import CustomField from "components/commonUI/forms/CustomField";
 import { getDetailsById, updateById, deleteById } from "services/hotelService";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
+import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import { addValidationSchema } from "./constants";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -120,129 +121,131 @@ const HotelEdit = () => {
       <h1 className="display-6 mb-4">Detalles del Hotel</h1>
 
       <LoadingOverlay isVisible={isLoading} message="Cargando..." />
-      <div>
-        {" "}
-        {/* Form for Editable Fields */}
-        <Formik
-          initialValues={{
-            name: hotel?.name,
-            phone: hotel?.phone,
-            address: hotel?.address,
-            email: hotel?.email,
-            taxId: hotel?.taxId,
-          }}
-          validationSchema={addValidationSchema}
-          onSubmit={handleSubmit}
-          enableReinitialize>
-          {({ resetForm }) => (
-            <Form>
-              <Row>
-                <Col md="6">
-                  <CustomField
-                    name="name"
-                    type="text"
-                    placeholder="Nombre del Hotel"
-                    className="form-control"
-                    disabled={!isEditing || isUploading}
-                  />
-                </Col>
+      <ErrorBoundary>
+        <div>
+          {" "}
+          {/* Form for Editable Fields */}
+          <Formik
+            initialValues={{
+              name: hotel?.name,
+              phone: hotel?.phone,
+              address: hotel?.address,
+              email: hotel?.email,
+              taxId: hotel?.taxId,
+            }}
+            validationSchema={addValidationSchema}
+            onSubmit={handleSubmit}
+            enableReinitialize>
+            {({ resetForm }) => (
+              <Form>
+                <Row>
+                  <Col md="6">
+                    <CustomField
+                      name="name"
+                      type="text"
+                      placeholder="Nombre del Hotel"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
+                  </Col>
 
-                <Col md="6">
-                  <CustomField
-                    name="phone"
-                    type="text"
-                    placeholder="Teléfono"
-                    className="form-control"
-                    disabled={!isEditing || isUploading}
-                  />
-                </Col>
+                  <Col md="6">
+                    <CustomField
+                      name="phone"
+                      type="text"
+                      placeholder="Teléfono"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
+                  </Col>
 
-                <Col md="6">
-                  <CustomField
-                    name="address"
-                    type="text"
-                    placeholder="Dirección"
-                    className="form-control"
-                    disabled={!isEditing || isUploading}
-                  />
-                </Col>
+                  <Col md="6">
+                    <CustomField
+                      name="address"
+                      type="text"
+                      placeholder="Dirección"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
+                  </Col>
 
-                <Col md="6">
-                  <CustomField
-                    name="email"
-                    type="email"
-                    placeholder="Correo Electrónico"
-                    className="form-control"
-                    disabled={!isEditing || isUploading}
-                  />
-                </Col>
+                  <Col md="6">
+                    <CustomField
+                      name="email"
+                      type="email"
+                      placeholder="Correo Electrónico"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
+                  </Col>
 
-                <Col md="6">
-                  <CustomField
-                    name="taxId"
-                    type="text"
-                    placeholder="Identificación Fiscal (NIT)"
-                    className="form-control"
-                    disabled={!isEditing || isUploading}
-                  />
-                </Col>
-              </Row>
+                  <Col md="6">
+                    <CustomField
+                      name="taxId"
+                      type="text"
+                      placeholder="Identificación Fiscal (NIT)"
+                      className="form-control"
+                      disabled={!isEditing || isUploading}
+                    />
+                  </Col>
+                </Row>
 
-              {/* Action Buttons */}
-              <div className="mt-3">
-                {isEditing && (
-                  <>
-                    <Button
-                      type="submit"
-                      className="me-2 bg-success text-white"
-                      disabled={isUploading}>
-                      {isUploading ? <Spinner size="sm" /> : "Guardar"}
-                    </Button>
-                    <Button
-                      type="button"
-                      className="me-2 bg-secondary text-white"
-                      disabled={isUploading}
-                      onClick={() => handleCancel(resetForm)}>
-                      Cancelar
-                    </Button>
-                  </>
-                )}
-              </div>
-            </Form>
+                {/* Action Buttons */}
+                <div className="mt-3">
+                  {isEditing && (
+                    <>
+                      <Button
+                        type="submit"
+                        className="me-2 bg-success text-white"
+                        disabled={isUploading}>
+                        {isUploading ? <Spinner size="sm" /> : "Guardar"}
+                      </Button>
+                      <Button
+                        type="button"
+                        className="me-2 bg-secondary text-white"
+                        disabled={isUploading}
+                        onClick={() => handleCancel(resetForm)}>
+                        Cancelar
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </Form>
+            )}
+          </Formik>
+          {!isEditing && (
+            <>
+              <Button
+                className="bg-dark text-white"
+                type="button"
+                disabled={isUploading}
+                onClick={() => setIsEditing(true)}>
+                Editar
+              </Button>
+              <Button
+                className="ms-2 bg-danger text-white"
+                type="button"
+                onClick={handleDelete}
+                disabled={isUploading}>
+                {isUploading ? <Spinner size="sm" /> : "Eliminar Hotel"}
+              </Button>
+            </>
           )}
-        </Formik>
-        {!isEditing && (
-          <>
-            <Button
-              className="bg-dark text-white"
-              type="button"
-              disabled={isUploading}
-              onClick={() => setIsEditing(true)}>
-              Editar
-            </Button>
-            <Button
-              className="ms-2 bg-danger text-white"
-              type="button"
-              onClick={handleDelete}
-              disabled={isUploading}>
-              {isUploading ? <Spinner size="sm" /> : "Eliminar Hotel"}
-            </Button>
-          </>
-        )}
-        {/* Hotel Info (Read-only Fields) */}
-        <Row className="mb-3">
-          <Col md="6">
-            <strong>Fecha de creación:</strong>{" "}
-            {new Date(hotel?.dateCreated).toLocaleDateString()}
-          </Col>
-          <Col md="6">
-            <strong>Propietario:</strong>{" "}
-            {hotel?.owner
-              ? `${hotel.owner.firstName} ${hotel.owner.lastName}`
-              : "N/A"}
-          </Col>
-        </Row>
-      </div>
+          {/* Hotel Info (Read-only Fields) */}
+          <Row className="mb-3">
+            <Col md="6">
+              <strong>Fecha de creación:</strong>{" "}
+              {new Date(hotel?.dateCreated).toLocaleDateString()}
+            </Col>
+            <Col md="6">
+              <strong>Propietario:</strong>{" "}
+              {hotel?.owner
+                ? `${hotel.owner.firstName} ${hotel.owner.lastName}`
+                : "N/A"}
+            </Col>
+          </Row>
+        </div>
+      </ErrorBoundary>
     </>
   );
 };

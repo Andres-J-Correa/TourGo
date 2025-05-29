@@ -6,6 +6,7 @@ import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
 import AuthCard from "components/commonUI/forms/AuthCard";
 import DefaultHeader from "components/commonUI/headers/DefaultHeader";
+import ErrorBoundary from "components/commonUI/ErrorBoundary";
 
 import {
   userPasswordForgotSchema,
@@ -211,30 +212,33 @@ function UserPasswordReset() {
 
   return (
     <>
-      <DefaultHeader
-        backgroundImage={backgroundImage}
-        className="m-3 border-radius-xl min-vh-50"
-      />
-      <Container className="mt-n5">
-        <AuthCard
-          title={
-            isCodeSent
-              ? t("client.passwordChange.title")
-              : t("client.passwordReset.title")
-          }
-          subtitle={
-            isCodeSent
-              ? t("client.passwordChange.subtitle")
-              : t("client.passwordReset.subtitle")
-          }
-          xl={4}
-          lg={6}
-          md={8}
-          sm={10}
-          xs={12}>
-          {renderform()}
-        </AuthCard>
-      </Container>
+      <ErrorBoundary>
+        <DefaultHeader
+          backgroundImage={backgroundImage}
+          className="m-3 border-radius-xl min-vh-50"
+        />
+
+        <Container className="mt-n5">
+          <AuthCard
+            title={
+              isCodeSent
+                ? t("client.passwordChange.title")
+                : t("client.passwordReset.title")
+            }
+            subtitle={
+              isCodeSent
+                ? t("client.passwordChange.subtitle")
+                : t("client.passwordReset.subtitle")
+            }
+            xl={4}
+            lg={6}
+            md={8}
+            sm={10}
+            xs={12}>
+            {renderform()}
+          </AuthCard>
+        </Container>
+      </ErrorBoundary>
     </>
   );
 }

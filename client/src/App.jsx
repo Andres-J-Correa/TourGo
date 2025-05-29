@@ -58,10 +58,10 @@ const App = () => {
         fallback={<LoadingOverlay isVisible={true} message="cargando" />}>
         <LoadingOverlay isVisible={user.isLoading} message="cargando usuario" />
         <NavbarContainer />
-        <Container className="mt-4 main-container">
+        <Container className="my-4 main-container">
           <Routes>{routes}</Routes>
-          <Footer />
         </Container>
+        <Footer />
       </Suspense>
 
       <ToastContainer
