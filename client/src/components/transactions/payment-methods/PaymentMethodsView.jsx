@@ -522,7 +522,7 @@ function PaymentMethodsView() {
               ) : table.getRowModel().rows.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center">
-                    no hay registros
+                    No hay registros
                   </td>
                 </tr>
               ) : (

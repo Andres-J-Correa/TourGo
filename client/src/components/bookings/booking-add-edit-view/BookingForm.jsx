@@ -85,7 +85,7 @@ function BookingForm({
     bookingProviderOptions,
     isLoadingBookings,
     isLoadingHotelData,
-    IsHotelDataInitialFetch,
+    isHotelDataInitialFetch,
   } = useBookingFormData(hotelId, dates);
 
   const navigate = useNavigate();
@@ -376,7 +376,7 @@ function BookingForm({
   }, [bookingId, autoCompleteForm]);
 
   useEffect(() => {
-    if (rooms.length === 0 && !IsHotelDataInitialFetch) {
+    if (rooms.length === 0 && !isHotelDataInitialFetch) {
       Swal.fire({
         title: "No hay habitaciones disponibles",
         text: "Por favor, asegúrese de crear habitaciones antes de realizar una reserva.",
@@ -389,7 +389,7 @@ function BookingForm({
         }
       });
     }
-  }, [rooms.length, hotelId, navigate, IsHotelDataInitialFetch]);
+  }, [rooms.length, hotelId, navigate, isHotelDataInitialFetch]);
 
   return (
     <>

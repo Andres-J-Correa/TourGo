@@ -14,7 +14,7 @@ export default function useBookingFormData(hotelId, dates) {
   const [isLoadingBookings, setIsLoadingBookings] = useState(false);
   const [isLoadingHotelData, setIsLoadingHotelData] = useState(false);
   const [bookingProviderOptions, setBookingProviderOptions] = useState([]);
-  const [IsHotelDataInitialFetch, setIsHotelDataInitialFetch] = useState(true);
+  const [isHotelDataInitialFetch, setIsHotelDataInitialFetch] = useState(true);
 
   const onGetRoomBookingsSuccess = (res) =>
     res.items?.length > 0
@@ -88,6 +88,6 @@ export default function useBookingFormData(hotelId, dates) {
     bookingProviderOptions,
     isLoadingHotelData,
     isLoadingBookings,
-    IsHotelDataInitialFetch,
+    isHotelDataInitialFetch,
   };
 }
