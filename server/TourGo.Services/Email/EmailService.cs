@@ -19,22 +19,19 @@ namespace TourGo.Services.Email
         private readonly EmailConfig _emailConfig;
         private readonly TransactionalEmailsApi _emailsApi;
         private readonly ITemplateLoader _templateLoader;
-        private readonly IErrorLoggingService _errorLoggingService;
 
         public EmailService(
             IWebHostEnvironment environment,
             IOptions<EmailConfig> emailConfig,
             IOptions<BrevoConfig> brevoConfig,
             TransactionalEmailsApi emailsApi,
-            ITemplateLoader templateLoader,
-            IErrorLoggingService errorLoggingService)
+            ITemplateLoader templateLoader)
         {
             _environment = environment;
             _emailConfig = emailConfig.Value;
             _brevoConfig = brevoConfig.Value;
             _templateLoader = templateLoader;
             _emailsApi = emailsApi;
-            _errorLoggingService = errorLoggingService;
         }
 
         public async Task UserPasswordReset(IUserAuthData user, string token)
@@ -129,16 +126,7 @@ namespace TourGo.Services.Email
                     HtmlContent = htmlTemplate,
                 };
 
-                CreateSmtpEmail something = await _emailsApi.SendTransacEmailAsync(sendSmtpEmail);
-                ErrorLogRequest request =
-                new ErrorLogRequest
-                {
-                    Message = "Email sent successfully",
-                    StackTrace = something.ToJson(),
-                    Source = "EmailService.UserPasswordReset",
-                    Method = "Post"
-                };
-                _errorLoggingService.LogError(request);
+                await _emailsApi.SendTransacEmailAsync(sendSmtpEmail);
             }
             catch (Exception)
             {
