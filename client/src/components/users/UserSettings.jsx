@@ -49,7 +49,7 @@ const UserSettingsView = () => {
               vertical
               pills
               className="flex-column bg-light p-3 rounded shadow-sm sticky-top"
-              style={{ top: "80px", zIndex: 1020 }}>
+              style={{ top: "40px", zIndex: 1020 }}>
               <NavItem>
                 <NavLink
                   active={activeTab === "email"}

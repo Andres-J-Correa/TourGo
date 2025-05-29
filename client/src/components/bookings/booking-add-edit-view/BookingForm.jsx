@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 import RoomBookingTable from "components/bookings/booking-add-edit-view/room-booking-table/RoomBookingTable";
 import ExtraChargesSelector from "components/bookings/booking-add-edit-view/ExtraChargesSelector";
@@ -84,7 +85,10 @@ function BookingForm({
     bookingProviderOptions,
     isLoadingBookings,
     isLoadingHotelData,
+    IsHotelDataInitialFetch,
   } = useBookingFormData(hotelId, dates);
+
+  const navigate = useNavigate();
 
   const totals = useBookingTotals(selectedRoomBookings, selectedCharges);
 
@@ -371,6 +375,22 @@ function BookingForm({
     }
   }, [bookingId, autoCompleteForm]);
 
+  useEffect(() => {
+    if (rooms.length === 0 && !IsHotelDataInitialFetch) {
+      Swal.fire({
+        title: "No hay habitaciones disponibles",
+        text: "Por favor, asegúrese de crear habitaciones antes de realizar una reserva.",
+        icon: "warning",
+        confirmButtonText: "Ir a habitaciones",
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate(`/hotels/${hotelId}/rooms`);
+        }
+      });
+    }
+  }, [rooms.length, hotelId, navigate, IsHotelDataInitialFetch]);
+
   return (
     <>
       <LoadingOverlay isVisible={isLoading} message="Cargando información." />
@@ -425,6 +445,7 @@ function BookingForm({
           selectedCharges={selectedCharges}
           toggleCharge={toggleCharge}
           submitting={submitting || isSubmitting}
+          hotelId={hotelId}
         />
 
         <TotalsDisplay totals={totals} />

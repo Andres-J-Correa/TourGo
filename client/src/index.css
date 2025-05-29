@@ -2263,3 +2263,8 @@ p {
   --bs-nav-pills-link-active-color: #fff;
   --bs-nav-pills-link-active-bg: var(--bs-dark);
 }
+
+.modal-open {
+  overflow: auto;
+  padding-right: 0 !important;
+}

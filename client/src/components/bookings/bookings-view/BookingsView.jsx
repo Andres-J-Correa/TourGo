@@ -388,7 +388,7 @@ const BookingsView = () => {
               ) : table.getRowModel().rows.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center">
-                    No hay reservas
+                    no hay registros
                   </td>
                 </tr>
               ) : (

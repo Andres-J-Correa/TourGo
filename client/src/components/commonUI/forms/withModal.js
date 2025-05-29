@@ -11,17 +11,16 @@ const withModal = (WrappedComponent) => {
         isOpen={isOpen}
         toggle={toggle}
         centered={true}
-        className="px-sm-5"
+        className="px-sm-5 mt-5"
         backdrop={backdrop || loading ? "static" : true}
         keyboard={keyboard || !loading}
-        zIndex={2000}
-      >
+        zIndex={2000}>
         <ModalBody className="p-0">
           <WrappedComponent
+            {...props}
             toggle={toggle}
             loading={loading}
             setLoading={setLoading}
-            {...props}
           />
         </ModalBody>
       </Modal>

@@ -45,10 +45,10 @@ function StaffCard({ staff, handleDeleteClick, handleUpdateRoleClick }) {
         {!isOwner && (
           <div className="mt-auto">
             <Button
-              color="primary"
+              color="dark"
               className="me-2"
               onClick={() => handleUpdateRoleClick(staff.id, staff.roleId)}>
-              Editar Rol
+              Cambiar Rol
             </Button>
             <Button color="danger" onClick={() => handleDeleteClick(staff.id)}>
               Eliminar

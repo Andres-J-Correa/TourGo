@@ -126,7 +126,13 @@ const StaffInvites = () => {
   return (
     <Row>
       <LoadingOverlay isVisible={loading} />
-      {invites.mapped}
+      {invites.mapped.length > 0 ? (
+        invites.mapped
+      ) : (
+        <Col xs="12" className="text-center">
+          <p>No hay invitaciones pendientes para este hotel.</p>
+        </Col>
+      )}
     </Row>
   );
 };
