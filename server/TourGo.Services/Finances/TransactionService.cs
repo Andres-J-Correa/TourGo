@@ -90,7 +90,7 @@ namespace TourGo.Services.Finances
         }
 
         public Paged<Transaction>? GetPaginated(int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
-            DateTime? startDate, DateTime? endDate, int? id, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
+            DateOnly? startDate, DateOnly? endDate, int? id, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
             string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
         {
             string proc = "transactions_select_paginated";

@@ -12,6 +12,9 @@ import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 
 export const useNavbarItems = () => {
   const { hotel } = useAppContext();
+  const isUserAdmin =
+    hotel.current.roleId === HOTEL_ROLES_IDS.ADMIN ||
+    hotel.current.roleId === HOTEL_ROLES_IDS.OWNER;
 
   const hotelsItems = [
     {
@@ -24,13 +27,18 @@ export const useNavbarItems = () => {
           capitalize: true,
           collapse: [
             {
-              name: "Registra un alojamiento",
-              path: "/hotels/add",
+              name: "Invitaciones",
+              path: "/hotels/invites",
               capitalize: true,
             },
             {
               name: "Lista de alojamientos",
               path: "/hotels",
+              capitalize: true,
+            },
+            {
+              name: "Registra un alojamiento",
+              path: "/hotels/add",
               capitalize: true,
             },
           ],
@@ -153,11 +161,15 @@ export const useNavbarItems = () => {
             name: "Accesos directos",
             capitalize: true,
             collapse: [
-              {
-                name: "Panel de Finanzas",
-                path: `/hotels/${hotel.current.id}/finances`,
-                capitalize: true,
-              },
+              ...(isUserAdmin
+                ? [
+                    {
+                      name: "Panel de Finanzas",
+                      path: `/hotels/${hotel.current.id}/finances`,
+                      capitalize: true,
+                    },
+                  ]
+                : []),
               {
                 name: "Transacciones",
                 path: `/hotels/${hotel.current.id}/transactions`,

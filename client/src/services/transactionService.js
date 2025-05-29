@@ -140,3 +140,36 @@ export const getPagedTransactions = async (
     return onGlobalError(error);
   }
 };
+
+export const getFixedPagination = async (
+  hotelId,
+  pageIndex,
+  pageSize,
+  sortColumn,
+  sortDirection
+) => {
+  const queryParams = new URLSearchParams({
+    pageIndex,
+    pageSize,
+  });
+
+  if (sortColumn) queryParams.append("sortColumn", sortColumn);
+  if (sortDirection) queryParams.append("sortDirection", sortDirection);
+
+  const url = `${api}/hotel/${hotelId}/pagination?${queryParams.toString()}`;
+
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: url,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

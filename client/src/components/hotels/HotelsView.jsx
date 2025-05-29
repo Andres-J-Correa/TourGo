@@ -43,16 +43,26 @@ const HotelsView = () => {
       <Breadcrumb breadcrumbs={breadcrumbs} active="Hoteles" />
       <LoadingOverlay isVisible={isLoading} message="Cargando..." />
       <Row>
-        {hotels.map((hotel) => (
-          <Col key={hotel.id} xs="12" sm="6" md="4" lg="3" className="mb-3">
-            <Card
-              className="p-3 text-center hotel-card shadow bg-dark text-white"
-              onClick={() => handleCardClick(hotel.id)}
-              role="button">
-              {hotel.name}
-            </Card>
+        {hotels.length > 0 ? (
+          hotels.map((hotel) => (
+            <Col key={hotel.id} xs="12" sm="6" md="4" lg="3" className="mb-3">
+              <Card
+                className="p-3 text-center hotel-card shadow bg-dark text-white"
+                onClick={() => handleCardClick(hotel.id)}
+                role="button">
+                {hotel.name}
+              </Card>
+            </Col>
+          ))
+        ) : (
+          <Col xs="12" className="text-center">
+            <h5>No hay hoteles disponibles</h5>
+            <p>
+              Ve a la sección de "Alojamientos" en el menú superior para ver tus
+              invitaciones pendientes o agregar nuevos hoteles.
+            </p>
           </Col>
-        ))}
+        )}
       </Row>
     </>
   );

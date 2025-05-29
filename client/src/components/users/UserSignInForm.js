@@ -13,7 +13,7 @@ import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 
-function UserSignIn({ toggle, onSignUp, loading, setLoading }) {
+function UserSignInForm({ toggle, onSignUp, loading, setLoading }) {
   const { user } = useAppContext();
   const { t, getTranslatedErrorMessage } = useLanguage();
   const formRef = useRef(null);
@@ -111,11 +111,13 @@ function UserSignIn({ toggle, onSignUp, loading, setLoading }) {
   );
 }
 
-UserSignIn.propTypes = {
+UserSignInForm.propTypes = {
   toggle: PropTypes.func.isRequired,
   onSignUp: PropTypes.func,
   loading: PropTypes.bool.isRequired,
   setLoading: PropTypes.func.isRequired,
 };
 
-export default withModal(UserSignIn);
+const UserSignInFormModal = withModal(UserSignInForm);
+
+export { UserSignInForm, UserSignInFormModal };

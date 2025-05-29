@@ -23,13 +23,13 @@ export const getFlagBadges = (flags) => {
     );
   if (flags & INVITE_FLAGS_IDS.REJECTED)
     result.push(
-      <Badge color="danger" key="rejected">
+      <Badge color="danger" key="rejected" className="me-1">
         Rechazada
       </Badge>
     );
   if (flags === INVITE_FLAGS_IDS.CANCELLED)
     result.push(
-      <Badge color="secondary" key="none">
+      <Badge color="secondary" key="none" className="me-1">
         Anulada
       </Badge>
     );

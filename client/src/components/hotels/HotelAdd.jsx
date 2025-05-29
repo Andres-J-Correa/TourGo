@@ -9,6 +9,7 @@ import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import { addValidationSchema } from "./constants";
 import { useAppContext } from "contexts/GlobalAppContext";
+import VerifyAccountFallback from "components/commonUI/VerifyAccountFallback";
 
 const breadcrumbs = [
   { label: "Inicio", path: "/" },
@@ -38,20 +39,12 @@ const HotelAdd = () => {
     }
   };
 
-  if (!user.isVerified) {
+  if (!user.current.isVerified) {
     return (
       <>
         <Breadcrumb breadcrumbs={breadcrumbs} active="Agregar Hotel" />
         <h1 className="display-6 mb-4">Agregar Nuevo Hotel</h1>
-        <div className="text-center mt-5">
-          <h2>Verifica tu correo electrónico</h2>
-          <p>Para agregar un hotel, primero debes verificar tu cuenta.</p>
-          <Button
-            color="dark"
-            onClick={() => navigate("/profile/settings?tab=email")}>
-            Verificar Correo
-          </Button>
-        </div>
+        <VerifyAccountFallback />
       </>
     );
   }

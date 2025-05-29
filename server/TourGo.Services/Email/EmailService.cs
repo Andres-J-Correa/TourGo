@@ -106,7 +106,7 @@ namespace TourGo.Services.Email
                 var sender = new SendSmtpEmailSender(_brevoConfig.SenderName, _brevoConfig.SenderEmail);
                 var recipient = new SendSmtpEmailTo(email);
                 var recipients = new List<SendSmtpEmailTo> { recipient };
-                string invitationLink = $"{_emailConfig.DomainUrl}/profile/invites";
+                string invitationLink = $"{_emailConfig.DomainUrl}/hotels/invites";
 
                 string htmlTemplate = _templateLoader.LoadTemplate("staffInvitation.html");
 

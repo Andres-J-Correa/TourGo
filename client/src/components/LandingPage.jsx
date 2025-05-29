@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container } from "reactstrap";
 import Breadcrumb from "components/commonUI/Breadcrumb";
+import { UserSignInForm } from "components/users/UserSignInForm";
 
 const LandingPage = () => {
+  const [loading, setLoading] = useState(false);
   return (
     <div>
       <Container className="text-center mt-5">
@@ -13,10 +15,12 @@ const LandingPage = () => {
             Tu plataforma para administrar tu alojamiento de manera facil!
           </p>
           <hr className="my-4" />
-          <p className="fs-5">
-            Por favor, inicia sesión o regístrate desde la barra de navegacion
-            ☝️.
-          </p>
+          {/* < UserSignInForm
+          toggle={() => {}}
+          onSignUp={() => {}}
+          loading={loading}
+          setLoading={setLoading}
+        /> */}
         </div>
       </Container>
     </div>

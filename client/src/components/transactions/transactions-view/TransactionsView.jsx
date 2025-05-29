@@ -8,7 +8,10 @@ import TransactionDetails from "components/transactions/TransactionDetails";
 import TransactionsTableFilters from "components/transactions/transactions-view/TransactionsTableFilters";
 import TransactionAddForm from "components/transactions/TransactionAddForm";
 
-import { getPagedTransactions } from "services/transactionService";
+import {
+  getPagedTransactions,
+  getFixedPagination,
+} from "services/transactionService";
 import { transactionsTableColumns } from "./constants";
 import { formatCurrency } from "utils/currencyHelper";
 import { useAppContext } from "contexts/GlobalAppContext";
@@ -60,15 +63,18 @@ function TransactionsView() {
     [hotel]
   );
 
+  const fetchTransactions = useMemo(
+    () => (isUserAdmin ? getPagedTransactions : getFixedPagination),
+    [isUserAdmin]
+  );
+
   const [paginationData, setPaginationData] = useState({
     pageIndex: 0,
     pageSize: 5,
     sortBy: [],
     dates: {
-      start: !isUserAdmin
-        ? dayjs().subtract(1, "week").format("YYYY-MM-DD")
-        : "",
-      end: !isUserAdmin ? dayjs().format("YYYY-MM-DD") : "",
+      start: "",
+      end: "",
     },
     categoryId: "",
     statusId: "",
@@ -302,57 +308,60 @@ function TransactionsView() {
     table.setExpanded({});
   };
 
-  const fetchData = useCallback(async (hotelId, values) => {
-    setLoading(true);
-    const sortColumn = values.sortBy[0]?.id;
-    const sortDirection = values.sortBy[0]
-      ? values.sortBy[0].desc
-        ? "DESC"
-        : "ASC"
-      : undefined;
-    const startDate = values.dates.start
-      ? dayjs(values.dates.start).format("YYYY-MM-DD")
-      : null;
-    const endDate = values.dates.end
-      ? dayjs(values.dates.end).format("YYYY-MM-DD")
-      : null;
+  const fetchData = useCallback(
+    async (hotelId, values) => {
+      setLoading(true);
+      const sortColumn = values.sortBy[0]?.id;
+      const sortDirection = values.sortBy[0]
+        ? values.sortBy[0].desc
+          ? "DESC"
+          : "ASC"
+        : undefined;
+      const startDate = values.dates.start
+        ? dayjs(values.dates.start).format("YYYY-MM-DD")
+        : null;
+      const endDate = values.dates.end
+        ? dayjs(values.dates.end).format("YYYY-MM-DD")
+        : null;
 
-    try {
-      const res = await getPagedTransactions(
-        hotelId,
-        values.pageIndex,
-        values.pageSize,
-        sortColumn,
-        sortDirection,
-        startDate,
-        endDate,
-        values.categoryId,
-        values.statusId,
-        values.subcategoryId,
-        values.financePartnerId,
-        values.paymentMethodId,
-        values.txnId,
-        values.referenceNumber,
-        values.description,
-        values.entityId,
-        values.hasDocumentUrl
-      );
+      try {
+        const res = await fetchTransactions(
+          hotelId,
+          values.pageIndex,
+          values.pageSize,
+          sortColumn,
+          sortDirection,
+          startDate,
+          endDate,
+          values.categoryId,
+          values.statusId,
+          values.subcategoryId,
+          values.financePartnerId,
+          values.paymentMethodId,
+          values.txnId,
+          values.referenceNumber,
+          values.description,
+          values.entityId,
+          values.hasDocumentUrl
+        );
 
-      if (res.isSuccessful) {
-        setData({
-          items: res.item.pagedItems,
-          totalCount: res.item.totalCount,
-          totalPages: res.item.totalPages,
-          hasPreviousPage: res.item.hasPreviousPage,
-          hasNextPage: res.item.hasNextPage,
-        });
+        if (res.isSuccessful) {
+          setData({
+            items: res.item.pagedItems,
+            totalCount: res.item.totalCount,
+            totalPages: res.item.totalPages,
+            hasPreviousPage: res.item.hasPreviousPage,
+            hasNextPage: res.item.hasNextPage,
+          });
+        }
+      } catch (err) {
+        setData({ ...defaultData });
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setData({ ...defaultData });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [fetchTransactions]
+  );
 
   const updateHasDocumentUrl = useCallback((id, hasDocumentUrl) => {
     setData((prev) => {
@@ -484,7 +493,7 @@ function TransactionsView() {
             {!data.hasNextPage
               ? data.totalCount
               : paginationData.pageSize * (paginationData.pageIndex + 1)}{" "}
-            de {data.totalCount} reservas
+            de {data.totalCount} transacciones
           </span>
 
           <table className="table table-bordered table-hover table-striped mb-1">
