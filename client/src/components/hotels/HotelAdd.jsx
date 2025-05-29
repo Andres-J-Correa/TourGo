@@ -11,6 +11,7 @@ import { useAppContext } from "contexts/GlobalAppContext";
 import VerifyAccountFallback from "components/commonUI/VerifyAccountFallback";
 import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
+import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import Swal from "sweetalert2";
 
 const breadcrumbs = [
@@ -70,83 +71,84 @@ const HotelAdd = () => {
     <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Agregar Hotel" />
       <h1 className="display-6 mb-4">Agregar Nuevo Hotel</h1>
-
-      <Formik
-        initialValues={{
-          name: "",
-          phone: "",
-          address: "",
-          email: "",
-          taxId: "",
-        }}
-        validationSchema={addValidationSchema}
-        onSubmit={handleAddHotel}>
-        <Form>
-          <Row>
-            <Col md="6">
-              <CustomField
-                name="name"
-                type="text"
-                className="form-control"
-                placeholder="Nombre"
-                isRequired={true}
-              />
-            </Col>
-
-            <Col md="6">
-              <CustomField
-                name="address"
-                type="text"
-                className="form-control"
-                placeholder="Dirección"
-                isRequired={true}
-              />
-            </Col>
-
-            <Col md="6">
-              <CustomField
-                name="email"
-                type="email"
-                className="form-control"
-                placeholder="Correo Electrónico"
-                isRequired={true}
-              />
-            </Col>
-
-            <Col md="6">
-              <FormGroup className="position-relative">
-                <PhoneInputField
-                  name="phone"
+      <ErrorBoundary>
+        <Formik
+          initialValues={{
+            name: "",
+            phone: "",
+            address: "",
+            email: "",
+            taxId: "",
+          }}
+          validationSchema={addValidationSchema}
+          onSubmit={handleAddHotel}>
+          <Form>
+            <Row>
+              <Col md="6">
+                <CustomField
+                  name="name"
                   type="text"
-                  className="form-control d-flex"
-                  placeholder="Teléfono"
-                  autoComplete="tel"
+                  className="form-control"
+                  placeholder="Nombre"
                   isRequired={true}
                 />
-                <CustomErrorMessage name="phone" />
-              </FormGroup>
-            </Col>
+              </Col>
 
-            <Col md="6">
-              <CustomField
-                name="taxId"
-                type="text"
-                className="form-control"
-                placeholder="Identificación Fiscal (NIT)"
-                isRequired={true}
-              />
-            </Col>
-            <ErrorAlert />
-          </Row>
+              <Col md="6">
+                <CustomField
+                  name="address"
+                  type="text"
+                  className="form-control"
+                  placeholder="Dirección"
+                  isRequired={true}
+                />
+              </Col>
 
-          {/* Submit Button */}
-          <div className="mt-3 text-center">
-            <Button type="submit" className="bg-dark text-white">
-              Agregar Hotel
-            </Button>
-          </div>
-        </Form>
-      </Formik>
+              <Col md="6">
+                <CustomField
+                  name="email"
+                  type="email"
+                  className="form-control"
+                  placeholder="Correo Electrónico"
+                  isRequired={true}
+                />
+              </Col>
+
+              <Col md="6">
+                <FormGroup className="position-relative">
+                  <PhoneInputField
+                    name="phone"
+                    type="text"
+                    className="form-control d-flex"
+                    placeholder="Teléfono"
+                    autoComplete="tel"
+                    isRequired={true}
+                  />
+                  <CustomErrorMessage name="phone" />
+                </FormGroup>
+              </Col>
+
+              <Col md="6">
+                <CustomField
+                  name="taxId"
+                  type="text"
+                  className="form-control"
+                  placeholder="Identificación Fiscal (NIT)"
+                  isRequired={true}
+                />
+              </Col>
+              <ErrorAlert />
+            </Row>
+
+            {/* Submit Button */}
+            <div className="mt-3 text-center">
+              <Button type="submit" className="bg-dark text-white">
+                Agregar Hotel
+              </Button>
+            </div>
+          </Form>
+        </Formik>
+      </ErrorBoundary>
     </>
   );
 };

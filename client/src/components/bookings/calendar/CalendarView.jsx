@@ -16,6 +16,7 @@ import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Popover from "components/commonUI/popover/Popover";
 import MinimalBookingCard from "components/bookings/BookingMinimalCard";
+import ErrorBoundary from "components/commonUI/ErrorBoundary";
 
 import { formatCurrency } from "utils/currencyHelper";
 import { getColorForId } from "utils/colorHelper";
@@ -330,115 +331,117 @@ function CalendarView() {
       />
       <Breadcrumb breadcrumbs={breadcrumbs} active="Calendario" />
       <h3>Calendario</h3>
-      <div
-        ref={tableContainerRef}
-        style={{
-          minHeight: "70vh",
-          maxHeight: "70vh",
-          overflowY: "auto",
-        }}>
-        <table style={{ display: "grid" }} className="table table-bordered">
-          <thead
-            className="border"
-            style={{
-              display: "grid",
-              position: "sticky",
-              top: 0,
-              zIndex: 1,
-            }}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  const isDateColumn = header.id.includes("date");
-                  return (
-                    <th
-                      className="text-center align-content-center bg-dark text-white fw-bold"
-                      key={header.id}
-                      style={{
-                        border: "1px solid black",
-                        padding: "8px",
-                        minWidth: header.getSize(),
-                        maxWidth: header.getSize(),
-                        position: isDateColumn ? "sticky" : "static",
-                        left: isDateColumn ? 0 : "auto",
-                      }}>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                    </th>
-                  );
-                })}
-              </tr>
-            ))}
-          </thead>
-          <tbody
-            className="border"
-            style={{
-              display: "grid",
-              height: `${rowVirtualizer.getTotalSize()}px`, //tells scrollbar how big the table is
-              position: "relative", //needed for absolute positioning of rows
-            }}>
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const row = rows[virtualRow.index];
-              return (
-                <tr
-                  data-index={virtualRow.index}
-                  key={row.id}
-                  ref={
-                    rowVirtualizer.measureElement
-                      ? (node) => node && rowVirtualizer.measureElement(node)
-                      : undefined
-                  }
-                  style={{
-                    display: "flex",
-                    position: "absolute",
-                    transform: `translateY(${virtualRow.start}px)`, //this should always be a `style` as it changes on scroll
-                    width: "100%",
-                  }}>
-                  {row.getVisibleCells().map((cell) => {
-                    const isDateColumn = cell.column.id.includes("date");
-                    const dataAttributes =
-                      cell.column.columnDef.meta?.getDataAttributes(cell);
-                    const bookingId = dataAttributes?.["data-booking-id"];
-                    const bgColor = bookingId
-                      ? getColorForId(bookingId, cellColors)
-                      : "";
+      <ErrorBoundary>
+        <div
+          ref={tableContainerRef}
+          style={{
+            minHeight: "70vh",
+            maxHeight: "70vh",
+            overflowY: "auto",
+          }}>
+          <table style={{ display: "grid" }} className="table table-bordered">
+            <thead
+              className="border"
+              style={{
+                display: "grid",
+                position: "sticky",
+                top: 0,
+                zIndex: 1,
+              }}>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    const isDateColumn = header.id.includes("date");
                     return (
-                      <td
-                        data-booking-id={bookingId || undefined}
-                        className={classNames(
-                          `text-center align-items-center justify-content-center calendar-cell p-1 ${bgColor}`,
-                          {
-                            "bg-dark text-white fw-bold": isDateColumn,
-                            "has-value": Boolean(bookingId),
-                          }
-                        )}
-                        key={cell.id}
+                      <th
+                        className="text-center align-content-center bg-dark text-white fw-bold"
+                        key={header.id}
                         style={{
-                          display: "flex",
                           border: "1px solid black",
                           padding: "8px",
-                          minWidth: cell.column.getSize(),
-                          maxWidth: cell.column.getSize(),
+                          minWidth: header.getSize(),
+                          maxWidth: header.getSize(),
                           position: isDateColumn ? "sticky" : "static",
                           left: isDateColumn ? 0 : "auto",
-                          minHeight: ROW_HEIGHT,
-                          maxHeight: ROW_HEIGHT,
                         }}>
                         {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
+                          header.column.columnDef.header,
+                          header.getContext()
                         )}
-                      </td>
+                      </th>
                     );
                   })}
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </thead>
+            <tbody
+              className="border"
+              style={{
+                display: "grid",
+                height: `${rowVirtualizer.getTotalSize()}px`, //tells scrollbar how big the table is
+                position: "relative", //needed for absolute positioning of rows
+              }}>
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const row = rows[virtualRow.index];
+                return (
+                  <tr
+                    data-index={virtualRow.index}
+                    key={row.id}
+                    ref={
+                      rowVirtualizer.measureElement
+                        ? (node) => node && rowVirtualizer.measureElement(node)
+                        : undefined
+                    }
+                    style={{
+                      display: "flex",
+                      position: "absolute",
+                      transform: `translateY(${virtualRow.start}px)`, //this should always be a `style` as it changes on scroll
+                      width: "100%",
+                    }}>
+                    {row.getVisibleCells().map((cell) => {
+                      const isDateColumn = cell.column.id.includes("date");
+                      const dataAttributes =
+                        cell.column.columnDef.meta?.getDataAttributes(cell);
+                      const bookingId = dataAttributes?.["data-booking-id"];
+                      const bgColor = bookingId
+                        ? getColorForId(bookingId, cellColors)
+                        : "";
+                      return (
+                        <td
+                          data-booking-id={bookingId || undefined}
+                          className={classNames(
+                            `text-center align-items-center justify-content-center calendar-cell p-1 ${bgColor}`,
+                            {
+                              "bg-dark text-white fw-bold": isDateColumn,
+                              "has-value": Boolean(bookingId),
+                            }
+                          )}
+                          key={cell.id}
+                          style={{
+                            display: "flex",
+                            border: "1px solid black",
+                            padding: "8px",
+                            minWidth: cell.column.getSize(),
+                            maxWidth: cell.column.getSize(),
+                            position: isDateColumn ? "sticky" : "static",
+                            left: isDateColumn ? 0 : "auto",
+                            minHeight: ROW_HEIGHT,
+                            maxHeight: ROW_HEIGHT,
+                          }}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </ErrorBoundary>
     </>
   );
 }
