@@ -41,9 +41,7 @@ const hotelRoutes = [
   {
     name: "staff",
     path: "/hotels/:hotelId/staff",
-    component: lazy(() =>
-      import("components/commonUI/fallback/SiteUnderConstruction")
-    ),
+    component: lazy(() => import("components/staff/StaffView")),
   },
   {
     name: "paymentMethods",
@@ -63,6 +61,11 @@ const hotelRoutes = [
     name: "bookingProviders",
     path: "/hotels/:hotelId/booking-providers",
     component: lazy(() => import("components/bookings/BookingProvidersView")),
+  },
+  {
+    name: "hotelInvites",
+    path: "/hotels/invites",
+    component: lazy(() => import("components/hotels/HotelInvites")),
   },
 ];
 

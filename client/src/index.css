@@ -2257,3 +2257,14 @@ p {
   background-color: var(--bs-list-group-active-bg);
   border-color: var(--bs-list-group-active-border-color);
 }
+
+.nav-pills {
+  --bs-nav-pills-border-radius: var(--bs-border-radius);
+  --bs-nav-pills-link-active-color: #fff;
+  --bs-nav-pills-link-active-bg: var(--bs-dark);
+}
+
+.modal-open {
+  overflow: auto;
+  padding-right: 0 !important;
+}

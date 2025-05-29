@@ -8,9 +8,13 @@ import {
   faMoneyBillTrendUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 
 export const useNavbarItems = () => {
   const { hotel } = useAppContext();
+  const isUserAdmin =
+    hotel.current.roleId === HOTEL_ROLES_IDS.ADMIN ||
+    hotel.current.roleId === HOTEL_ROLES_IDS.OWNER;
 
   const hotelsItems = [
     {
@@ -23,13 +27,18 @@ export const useNavbarItems = () => {
           capitalize: true,
           collapse: [
             {
-              name: "Registra un alojamiento",
-              path: "/hotels/add",
+              name: "Invitaciones",
+              path: "/hotels/invites",
               capitalize: true,
             },
             {
               name: "Lista de alojamientos",
               path: "/hotels",
+              capitalize: true,
+            },
+            {
+              name: "Registra un alojamiento",
+              path: "/hotels/add",
               capitalize: true,
             },
           ],
@@ -131,13 +140,17 @@ export const useNavbarItems = () => {
         path: `/hotels/${hotel.current.id}/customers`,
         capitalize: true,
       },
-      {
-        name: "Empleados",
-        icon: faUsers,
-        position: "left",
-        path: `/hotels/${hotel.current.id}/staff`,
-        capitalize: true,
-      },
+      ...(hotel.current.roleId === HOTEL_ROLES_IDS.OWNER
+        ? [
+            {
+              name: "Personal",
+              icon: faUsers,
+              position: "left",
+              path: `/hotels/${hotel.current.id}/staff`,
+              capitalize: true,
+            },
+          ]
+        : []),
       {
         name: "Finanzas",
         icon: faMoneyBillTrendUp,
@@ -148,11 +161,15 @@ export const useNavbarItems = () => {
             name: "Accesos directos",
             capitalize: true,
             collapse: [
-              {
-                name: "Panel de Finanzas",
-                path: `/hotels/${hotel.current.id}/finances`,
-                capitalize: true,
-              },
+              ...(isUserAdmin
+                ? [
+                    {
+                      name: "Panel de Finanzas",
+                      path: `/hotels/${hotel.current.id}/finances`,
+                      capitalize: true,
+                    },
+                  ]
+                : []),
               {
                 name: "Transacciones",
                 path: `/hotels/${hotel.current.id}/transactions`,

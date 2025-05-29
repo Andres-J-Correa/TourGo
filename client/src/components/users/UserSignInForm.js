@@ -13,7 +13,7 @@ import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 
-function UserSignIn({ toggle, onSignUp, loading, setLoading }) {
+function UserSignInForm({ onSignUp, loading, setLoading, toggle }) {
   const { user } = useAppContext();
   const { t, getTranslatedErrorMessage } = useLanguage();
   const formRef = useRef(null);
@@ -29,11 +29,10 @@ function UserSignIn({ toggle, onSignUp, loading, setLoading }) {
       }
       toast.success(t("common.success"));
       navigate("/hotels");
-      toggle();
+      if (toggle) toggle();
       user.set((prev) => ({ ...prev, isAuthenticated: true }));
     } catch (error) {
       const errorMessage = getTranslatedErrorMessage(error);
-
       formRef.current?.setFieldError("email", errorMessage);
       formRef.current?.setFieldError("password", errorMessage);
       toast.error(errorMessage);
@@ -44,7 +43,7 @@ function UserSignIn({ toggle, onSignUp, loading, setLoading }) {
 
   const handleForgotPassword = () => {
     navigate("/users/password/reset");
-    toggle();
+    if (toggle) toggle();
   };
 
   return (
@@ -111,12 +110,31 @@ function UserSignIn({ toggle, onSignUp, loading, setLoading }) {
   );
 }
 
-UserSignIn.propTypes = {
-  toggle: PropTypes.func.isRequired,
+UserSignInForm.propTypes = {
   onSignUp: PropTypes.func,
-  onPasswordReset: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   setLoading: PropTypes.func.isRequired,
+  toggle: PropTypes.func,
 };
 
-export default withModal(UserSignIn);
+function _UserSignInFormModal({ onSignUp, loading, setLoading, toggle }) {
+  return (
+    <UserSignInForm
+      onSignUp={onSignUp}
+      loading={loading}
+      setLoading={setLoading}
+      toggle={toggle}
+    />
+  );
+}
+
+_UserSignInFormModal.propTypes = {
+  onSignUp: PropTypes.func,
+  loading: PropTypes.bool.isRequired,
+  setLoading: PropTypes.func.isRequired,
+  toggle: PropTypes.func,
+};
+
+const UserSignInFormModal = withModal(_UserSignInFormModal);
+
+export { UserSignInForm, UserSignInFormModal };

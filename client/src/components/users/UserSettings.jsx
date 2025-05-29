@@ -48,7 +48,8 @@ const UserSettingsView = () => {
             <Nav
               vertical
               pills
-              className="flex-column bg-light p-3 rounded shadow-sm">
+              className="flex-column bg-light p-3 rounded shadow-sm sticky-top"
+              style={{ top: "40px", zIndex: 1020 }}>
               <NavItem>
                 <NavLink
                   active={activeTab === "email"}

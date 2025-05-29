@@ -143,19 +143,19 @@ namespace TourGo.Web.Api.Controllers.Users
             {
                 if (!_userService.UserExists(model.Email))
                 {
-                    return StatusCode(401, new ErrorResponse("User not found.", AuthenticationErrorCode.UserNotFound));
+                    return StatusCode(400, new ErrorResponse("Incorrect email or password.", AuthenticationErrorCode.IncorrectCredentials));
                 }
 
                 if (_userAuthService.IsLoginBlocked(model.Email))
                 {
-                    return StatusCode(401, new ErrorResponse("Account is locked, please reset the password.", AuthenticationErrorCode.AccountLocked));
+                    return StatusCode(403, new ErrorResponse("Account is locked, please reset the password.", AuthenticationErrorCode.AccountLocked));
                 }
 
                 bool isSuccess = await _userAuthService.LogInAsync(model.Email, model.Password);
 
                 if (!isSuccess)
                 {
-                    return StatusCode(401, new ErrorResponse("Incorrect email or password.", AuthenticationErrorCode.IncorrectCredentials));
+                    return StatusCode(400, new ErrorResponse("Incorrect email or password.", AuthenticationErrorCode.IncorrectCredentials));
                 }
 
                 return Created201(new ItemResponse<bool> { Item = isSuccess });

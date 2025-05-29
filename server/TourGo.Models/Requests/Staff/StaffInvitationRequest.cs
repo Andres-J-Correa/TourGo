@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourGo.Models.Attributes;
+using TourGo.Models.Enums;
 
 namespace TourGo.Models.Requests.Staff
 {
@@ -15,7 +16,7 @@ namespace TourGo.Models.Requests.Staff
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        [Range(1, 3)]
+        [ValidEnum(typeof(StaffRoleEnum))]
         public int RoleId { get; set; }
     }
 }

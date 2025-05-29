@@ -7,9 +7,9 @@ import React, {
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, usersLogout } from "services/userAuthService";
-import { getMinimalById } from "services/hotelService";
-import UserSignInModal from "components/users/UserSignInModal";
-import { SignUpFormModal } from "components/commonUI/forms/SignUpForm";
+import { getMinimalWithUserRoleById } from "services/hotelService";
+import { UserSignInFormModal } from "components/users/UserSignInForm";
+import { SignUpFormModal } from "components/users/SignUpForm";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -28,6 +28,7 @@ const defaultUser = {
 const defaultHotel = {
   id: 0,
   name: "",
+  roleId: 0,
 };
 
 const defaultModals = {
@@ -174,7 +175,7 @@ export const AppContextProvider = ({ children }) => {
       currentUser.isAuthenticated
     ) {
       setIsLoadingHotel(true);
-      getMinimalById(hotelId)
+      getMinimalWithUserRoleById(hotelId)
         .then((res) => {
           if (res.isSuccessful) {
             setHotel(res.item);
@@ -189,7 +190,7 @@ export const AppContextProvider = ({ children }) => {
         .finally(() => {
           setIsLoadingHotel(false);
         });
-    } else if (!hotelId) {
+    } else if (hotel.id !== 0 && !currentUser.isAuthenticated) {
       setHotel({ ...defaultHotel });
     }
   }, [location.pathname, hotel.id, currentUser]);
@@ -207,7 +208,7 @@ export const AppContextProvider = ({ children }) => {
 
   return (
     <AppContext.Provider value={contextValue}>
-      <UserSignInModal
+      <UserSignInFormModal
         isOpen={modals.login}
         toggle={toggleModal("login")}
         onSignUp={!isAuthError && toggleModal("register")}

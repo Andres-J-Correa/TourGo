@@ -191,8 +191,8 @@ namespace TourGo.Web.Api.Controllers.Finances
             [FromQuery] int pageSize,
             [FromQuery] string? sortColumn, 
             [FromQuery] string? sortDirection,
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate,
+            [FromQuery] DateOnly? startDate,
+            [FromQuery] DateOnly? endDate,
             [FromQuery] int? txnId,
             [FromQuery] int? parentId,
             [FromQuery] int? entityId,
@@ -237,6 +237,72 @@ namespace TourGo.Web.Api.Controllers.Finances
                     paymentMethodId, 
                     subcategoryId, 
                     financePartnerId);
+
+                if (transactions == null)
+                {
+                    ErrorResponse response = new ErrorResponse("No transactions found for the specified criteria.");
+                    result = NotFound404(response);
+                }
+                else
+                {
+                    ItemResponse<Paged<Transaction>> response = new ItemResponse<Paged<Transaction>> { Item = transactions };
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("hotel/{id:int}/pagination")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemResponse<Paged<Transaction>>> GetPaginated(
+            int id,
+            [FromQuery] int pageIndex, 
+            [FromQuery] int pageSize,
+            [FromQuery] string? sortColumn, 
+            [FromQuery] string? sortDirection)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(sortColumn) && !_transactionService.IsValidSortColumn(sortColumn))
+                {
+                    return BadRequest(new ErrorResponse($"Invalid sort column: {sortColumn}"));
+                }
+
+                if (!string.IsNullOrEmpty(sortDirection) && !_transactionService.IsValidSortDirection(sortDirection))
+                {
+                    return BadRequest(new ErrorResponse($"Invalid sort direction: {sortDirection}"));
+                }
+
+                DateOnly starDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
+                DateOnly endDate = DateOnly.FromDateTime(DateTime.UtcNow);
+
+                Paged<Transaction>? transactions = _transactionService.GetPaginated(
+                    pageIndex,
+                    pageSize,
+                    sortColumn,
+                    sortDirection,
+                    starDate,
+                    endDate,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
 
                 if (transactions == null)
                 {

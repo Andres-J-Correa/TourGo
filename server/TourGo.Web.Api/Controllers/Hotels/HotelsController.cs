@@ -166,6 +166,38 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return StatusCode(code, response);
         }
 
+        [HttpGet("minimal/{id:int}")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemResponse<HotelMinimalWithUserRole>> GetMinimalWithUserRole(int id)
+        {
+            int code = 200;
+            BaseResponse response;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                HotelMinimalWithUserRole? hotel = _hotelService.GetMinimalWithUserRole(id, userId);
+
+                if (hotel == null)
+                {
+                    code = 404;
+                    response = new ErrorResponse("Application Resource not found.");
+                }
+                else
+                {
+                    response = new ItemResponse<HotelMinimalWithUserRole> { Item = hotel };
+                }
+            }
+            catch (Exception ex)
+            {
+                code = 500;
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                response = new ErrorResponse();
+            }
+
+            return StatusCode(code, response);
+        }
+
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Update)]
         public ActionResult<SuccessResponse> Update(HotelUpdateRequest model)
@@ -210,6 +242,36 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 code = 500;
                 response = new ErrorResponse();
                 Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+            }
+
+            return StatusCode(code, response);
+        }
+
+        [HttpGet("roles/permissions")]
+        public ActionResult<ItemsResponse<RolePermission>> GetRolePermissions()
+        {
+            int code = 200;
+            BaseResponse response;
+
+            try
+            {
+                List<RolePermission>? permissions = _hotelService.GetRolePermissions();
+
+                if (permissions == null)
+                {
+                    code = 404;
+                    response = new ErrorResponse("Application Resource not found.");
+                }
+                else
+                {
+                    response = new ItemsResponse<RolePermission> { Items = permissions };
+                }
+            }
+            catch (Exception ex)
+            {
+                code = 500;
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                response = new ErrorResponse();
             }
 
             return StatusCode(code, response);

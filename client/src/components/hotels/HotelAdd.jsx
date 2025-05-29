@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
-import { Button, Spinner, Row, Col } from "reactstrap";
+import { Button, Row, Col, FormGroup } from "reactstrap";
 import { add } from "services/hotelService";
-import { toast } from "react-toastify";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import { addValidationSchema } from "./constants";
 import { useAppContext } from "contexts/GlobalAppContext";
+import VerifyAccountFallback from "components/commonUI/VerifyAccountFallback";
+import PhoneInputField from "components/commonUI/forms/PhoneInputField";
+import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
+import Swal from "sweetalert2";
 
 const breadcrumbs = [
   { label: "Inicio", path: "/" },
@@ -17,41 +20,48 @@ const breadcrumbs = [
 
 const HotelAdd = () => {
   const navigate = useNavigate();
-  const [isUploading, setIsUploading] = useState(false);
   const { user } = useAppContext();
 
   // Form Submission
   const handleAddHotel = async (values) => {
-    setIsUploading(true);
     try {
+      Swal.fire({
+        title: "Agregando hotel",
+        text: "Por favor espera",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
       const response = await add(values);
+      Swal.close();
+
       if (response.isSuccessful && response.item > 0) {
-        toast.success("Hotel agregado exitosamente. Redirigiendo...");
-        setTimeout(() => {
-          navigate(`/hotels/${response.item}`);
-        }, 2000);
+        await Swal.fire({
+          icon: "success",
+          title: "Hotel agregado exitosamente",
+          text: "Redirigiendo...",
+          timer: 2000,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+        });
+        navigate(`/hotels/${response.item}`);
       }
     } catch (error) {
-      toast.error("Error al agregar el hotel");
-    } finally {
-      setIsUploading(false);
+      Swal.close();
+      await Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error al agregar el hotel",
+      });
     }
   };
 
-  if (!user.isVerified) {
+  if (!user.current.isVerified) {
     return (
       <>
         <Breadcrumb breadcrumbs={breadcrumbs} active="Agregar Hotel" />
         <h1 className="display-6 mb-4">Agregar Nuevo Hotel</h1>
-        <div className="text-center mt-5">
-          <h2>Verifica tu correo electrónico</h2>
-          <p>Para agregar un hotel, primero debes verificar tu cuenta.</p>
-          <Button
-            color="dark"
-            onClick={() => navigate("/profile/settings?tab=email")}>
-            Verificar Correo
-          </Button>
-        </div>
+        <VerifyAccountFallback />
       </>
     );
   }
@@ -79,15 +89,7 @@ const HotelAdd = () => {
                 type="text"
                 className="form-control"
                 placeholder="Nombre"
-              />
-            </Col>
-
-            <Col md="6">
-              <CustomField
-                name="phone"
-                type="text"
-                className="form-control"
-                placeholder="Teléfono"
+                isRequired={true}
               />
             </Col>
 
@@ -97,6 +99,7 @@ const HotelAdd = () => {
                 type="text"
                 className="form-control"
                 placeholder="Dirección"
+                isRequired={true}
               />
             </Col>
 
@@ -106,7 +109,22 @@ const HotelAdd = () => {
                 type="email"
                 className="form-control"
                 placeholder="Correo Electrónico"
+                isRequired={true}
               />
+            </Col>
+
+            <Col md="6">
+              <FormGroup className="position-relative">
+                <PhoneInputField
+                  name="phone"
+                  type="text"
+                  className="form-control d-flex"
+                  placeholder="Teléfono"
+                  autoComplete="tel"
+                  isRequired={true}
+                />
+                <CustomErrorMessage name="phone" />
+              </FormGroup>
             </Col>
 
             <Col md="6">
@@ -115,6 +133,7 @@ const HotelAdd = () => {
                 type="text"
                 className="form-control"
                 placeholder="Identificación Fiscal (NIT)"
+                isRequired={true}
               />
             </Col>
             <ErrorAlert />
@@ -122,11 +141,8 @@ const HotelAdd = () => {
 
           {/* Submit Button */}
           <div className="mt-3 text-center">
-            <Button
-              type="submit"
-              className="bg-dark text-white"
-              disabled={isUploading}>
-              {isUploading ? <Spinner size="sm" /> : "Agregar Hotel"}
+            <Button type="submit" className="bg-dark text-white">
+              Agregar Hotel
             </Button>
           </div>
         </Form>

@@ -47,7 +47,7 @@ const BookingsView = () => {
     sortBy: [],
     dates: {
       start: dayjs().format("YYYY-MM-DD"),
-      end: dayjs().endOf("week").format("YYYY-MM-DD"),
+      end: dayjs().add(1, "week").format("YYYY-MM-DD"),
     },
     isArrivalDate: true,
     customerNameFilters: {
@@ -388,7 +388,7 @@ const BookingsView = () => {
               ) : table.getRowModel().rows.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center">
-                    No hay reservas
+                    No hay registros
                   </td>
                 </tr>
               ) : (

@@ -112,10 +112,17 @@
       "2002": "La cuenta está bloqueada. Por favor, restablezca la contraseña.",
       "2003": "Correo electrónico o contraseña incorrectos.",
       "2004": "Token no encontrado",
+      "2005": "No tienes permisos suficientes para realizar esta acción",
       "3000": "Error de gestión de usuarios",
       "3001": "El usuario ya existe",
       "3002": "El correo ya existe",
-      "3003": "El número de telefono ya existe"
+      "3003": "El número de telefono ya existe",
+      "4000": "Error de gestión de hotel",
+      "4001": "Hay reservas activas asociadas",
+      "4002": "Los cambios no están permitidos en este momento",
+      "4003": "Ya hay un registro de éste tipo",
+      "4004": "No se encontraron registros",
+      "4005": "No tiene permisos suficientes para realizar esta acción"
     }
   }
 }

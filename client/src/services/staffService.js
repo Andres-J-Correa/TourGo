@@ -5,25 +5,15 @@ import {
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-const api = `${API_HOST_PREFIX}/hotels`;
+const api = `${API_HOST_PREFIX}/staff`;
 
-/**
- *
- * @param {{name: string,
- * phone: string,
- * address: string,
- * email: string,
- * taxId: string}} payload
- * @returns {Promise<{ item: number ,isSuccessful: boolean, transactionId: string}>}
- */
-export const add = async (payload) => {
+export const getByHotelId = async (hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "POST",
-    url: `${api}`,
-    data: payload,
+    method: "GET",
+    url: `${api}/hotel/${hotelId}`,
   };
   try {
     const response = await axiosClient(config);
@@ -34,23 +24,13 @@ export const add = async (payload) => {
   }
 };
 
-/**
- *
- * @param {{name: string,
- * phone: string,
- * address: string,
- * email: string,
- * taxId: string}} payload
- * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
- */
-export const updateById = async (payload, id) => {
+export const updateStaffRole = async (hotelId, staffId, roleId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "PUT",
-    url: `${api}/${id}`,
-    data: payload,
+    method: "PATCH",
+    url: `${api}/hotel/${hotelId}/user/${staffId}/role/${roleId}`,
   };
   try {
     const response = await axiosClient(config);
@@ -61,13 +41,13 @@ export const updateById = async (payload, id) => {
   }
 };
 
-export const deleteById = async (id) => {
+export const deleteStaff = async (hotelId, staffId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "DELETE",
-    url: `${api}/${id}`,
+    url: `${api}/hotel/${hotelId}/user/${staffId}`,
   };
   try {
     const response = await axiosClient(config);
@@ -78,17 +58,14 @@ export const deleteById = async (id) => {
   }
 };
 
-/**
- * returns a list of hotels with id and name
- * @returns {Promise<{id: number, name: string}[]>}
- */
-export const getAll = async () => {
+export const inviteStaff = async (hotelId, payload) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "GET",
-    url: `${api}`,
+    method: "POST",
+    url: `${api}/hotel/${hotelId}/invites?culture=es-ES`,
+    data: payload,
   };
   try {
     const response = await axiosClient(config);
@@ -99,29 +76,13 @@ export const getAll = async () => {
   }
 };
 
-/**
- *
- * @param {number} id
- * @returns {Promise<{
- *  id: number,
- *  name: string,
- *  phone: string,
- *  address: string,
- *  email: string,
- *  taxId: string,
- *  dateCreated: string,
- *  owner : {
- *   id: number,
- *  firstName: string,
- *  lastName: string}}>}
- */
-export const getDetailsById = async (id) => {
+export const deleteInvite = async (inviteId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "GET",
-    url: `${api}/details/${id}`,
+    method: "DELETE",
+    url: `${api}/invites/${inviteId}`,
   };
   try {
     const response = await axiosClient(config);
@@ -132,17 +93,13 @@ export const getDetailsById = async (id) => {
   }
 };
 
-/**
- * @param {number} id
- * @returns {Promise<{id: number, name: string}>}
- */
-export const getMinimalById = async (id) => {
+export const getStaffInvitesByHotelId = async (hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url: `${api}/${id}`,
+    url: `${api}/hotel/${hotelId}/invites`,
   };
   try {
     const response = await axiosClient(config);
@@ -153,17 +110,13 @@ export const getMinimalById = async (id) => {
   }
 };
 
-/**
- * @param {number} id
- * @returns {Promise<{id: number, name: string, roleId: number}>}
- */
-export const getMinimalWithUserRoleById = async (id) => {
+export const getUserInvites = async () => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url: `${api}/minimal/${id}`,
+    url: `${api}/invites`,
   };
   try {
     const response = await axiosClient(config);
@@ -174,13 +127,30 @@ export const getMinimalWithUserRoleById = async (id) => {
   }
 };
 
-export const getAllRolePermissions = async () => {
+export const acceptInvite = async (inviteId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "GET",
-    url: `${api}/roles/permissions`,
+    method: "POST",
+    url: `${api}/invites/${inviteId}/accept`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const rejectInvite = async (inviteId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    url: `${api}/invites/${inviteId}/reject`,
   };
   try {
     const response = await axiosClient(config);

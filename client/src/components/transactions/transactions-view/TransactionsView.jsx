@@ -8,9 +8,14 @@ import TransactionDetails from "components/transactions/TransactionDetails";
 import TransactionsTableFilters from "components/transactions/transactions-view/TransactionsTableFilters";
 import TransactionAddForm from "components/transactions/TransactionAddForm";
 
-import { getPagedTransactions } from "services/transactionService";
+import {
+  getPagedTransactions,
+  getFixedPagination,
+} from "services/transactionService";
 import { transactionsTableColumns } from "./constants";
 import { formatCurrency } from "utils/currencyHelper";
+import { useAppContext } from "contexts/GlobalAppContext";
+import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 
 import { Button, Col, Label, Row, Spinner } from "reactstrap";
 import classNames from "classnames";
@@ -48,6 +53,20 @@ function TransactionsView() {
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(false);
+
+  const { hotel } = useAppContext();
+
+  const isUserAdmin = useMemo(
+    () =>
+      hotel.current.roleId === HOTEL_ROLES_IDS.ADMIN ||
+      hotel.current.roleId === HOTEL_ROLES_IDS.OWNER,
+    [hotel]
+  );
+
+  const fetchTransactions = useMemo(
+    () => (isUserAdmin ? getPagedTransactions : getFixedPagination),
+    [isUserAdmin]
+  );
 
   const [paginationData, setPaginationData] = useState({
     pageIndex: 0,
@@ -289,57 +308,60 @@ function TransactionsView() {
     table.setExpanded({});
   };
 
-  const fetchData = useCallback(async (hotelId, values) => {
-    setLoading(true);
-    const sortColumn = values.sortBy[0]?.id;
-    const sortDirection = values.sortBy[0]
-      ? values.sortBy[0].desc
-        ? "DESC"
-        : "ASC"
-      : undefined;
-    const startDate = values.dates.start
-      ? dayjs(values.dates.start).format("YYYY-MM-DD")
-      : null;
-    const endDate = values.dates.end
-      ? dayjs(values.dates.end).format("YYYY-MM-DD")
-      : null;
+  const fetchData = useCallback(
+    async (hotelId, values) => {
+      setLoading(true);
+      const sortColumn = values.sortBy[0]?.id;
+      const sortDirection = values.sortBy[0]
+        ? values.sortBy[0].desc
+          ? "DESC"
+          : "ASC"
+        : undefined;
+      const startDate = values.dates.start
+        ? dayjs(values.dates.start).format("YYYY-MM-DD")
+        : null;
+      const endDate = values.dates.end
+        ? dayjs(values.dates.end).format("YYYY-MM-DD")
+        : null;
 
-    try {
-      const res = await getPagedTransactions(
-        hotelId,
-        values.pageIndex,
-        values.pageSize,
-        sortColumn,
-        sortDirection,
-        startDate,
-        endDate,
-        values.categoryId,
-        values.statusId,
-        values.subcategoryId,
-        values.financePartnerId,
-        values.paymentMethodId,
-        values.txnId,
-        values.referenceNumber,
-        values.description,
-        values.entityId,
-        values.hasDocumentUrl
-      );
+      try {
+        const res = await fetchTransactions(
+          hotelId,
+          values.pageIndex,
+          values.pageSize,
+          sortColumn,
+          sortDirection,
+          startDate,
+          endDate,
+          values.categoryId,
+          values.statusId,
+          values.subcategoryId,
+          values.financePartnerId,
+          values.paymentMethodId,
+          values.txnId,
+          values.referenceNumber,
+          values.description,
+          values.entityId,
+          values.hasDocumentUrl
+        );
 
-      if (res.isSuccessful) {
-        setData({
-          items: res.item.pagedItems,
-          totalCount: res.item.totalCount,
-          totalPages: res.item.totalPages,
-          hasPreviousPage: res.item.hasPreviousPage,
-          hasNextPage: res.item.hasNextPage,
-        });
+        if (res.isSuccessful) {
+          setData({
+            items: res.item.pagedItems,
+            totalCount: res.item.totalCount,
+            totalPages: res.item.totalPages,
+            hasPreviousPage: res.item.hasPreviousPage,
+            hasNextPage: res.item.hasNextPage,
+          });
+        }
+      } catch (err) {
+        setData({ ...defaultData });
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setData({ ...defaultData });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [fetchTransactions]
+  );
 
   const updateHasDocumentUrl = useCallback((id, hasDocumentUrl) => {
     setData((prev) => {
@@ -376,18 +398,20 @@ function TransactionsView() {
       <h3>Transacciones</h3>
       <ErrorBoundary>
         <div>
-          <div
-            className="text-dark cursor-pointer fw-bold fs-4 mb-2 ms-auto"
-            style={{ maxWidth: "max-content" }}
-            onClick={handleToggleFilters}>
-            Filtros
-            <span className="ms-2">
-              <FontAwesomeIcon
-                size="lg"
-                icon={showFilters ? faSquareMinus : faSquarePlus}
-              />
-            </span>
-          </div>
+          {isUserAdmin && (
+            <div
+              className="text-dark cursor-pointer fw-bold fs-4 mb-2 ms-auto"
+              style={{ maxWidth: "max-content" }}
+              onClick={handleToggleFilters}>
+              Filtros
+              <span className="ms-2">
+                <FontAwesomeIcon
+                  size="lg"
+                  icon={showFilters ? faSquareMinus : faSquarePlus}
+                />
+              </span>
+            </div>
+          )}
 
           <div
             className={classNames(
@@ -469,7 +493,7 @@ function TransactionsView() {
             {!data.hasNextPage
               ? data.totalCount
               : paginationData.pageSize * (paginationData.pageIndex + 1)}{" "}
-            de {data.totalCount} reservas
+            de {data.totalCount} transacciones
           </span>
 
           <table className="table table-bordered table-hover table-striped mb-1">
@@ -539,7 +563,7 @@ function TransactionsView() {
               ) : table.getRowModel().rows.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center">
-                    No hay reservas
+                    No hay registros
                   </td>
                 </tr>
               ) : (

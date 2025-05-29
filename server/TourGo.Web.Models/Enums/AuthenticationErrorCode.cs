@@ -12,6 +12,7 @@ namespace TourGo.Web.Models.Enums
         AccountLocked = BaseErrorCode.AuthenticationError + 2,
         IncorrectCredentials = BaseErrorCode.AuthenticationError + 3,
         TokenNotFound = BaseErrorCode.AuthenticationError + 4,
+        Forbidden = BaseErrorCode.AuthenticationError + 5,
         // Add other authentication-related error codes here
     }
 
