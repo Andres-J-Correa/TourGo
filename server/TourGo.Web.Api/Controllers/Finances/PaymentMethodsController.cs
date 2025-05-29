@@ -44,7 +44,8 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 if (paymentMethods == null || paymentMethods.Count == 0)
                 {
-                    result = NotFound("No payment methods found for the specified hotel.");
+                    ErrorResponse response = new ErrorResponse("No payment methods found for the specified hotel.");
+                    result = NotFound404(response);
                 }
                 else
                 {
@@ -74,7 +75,8 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 if (paymentMethods == null || paymentMethods.Count == 0)
                 {
-                    result = NotFound("No payment methods found for the specified hotel.");
+                    ErrorResponse response = new ErrorResponse("No payment methods found for the specified hotel.");
+                    result = NotFound404(response);
                 }
                 else
                 {

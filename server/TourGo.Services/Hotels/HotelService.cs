@@ -133,6 +133,30 @@ namespace TourGo.Services.Hotels
             return lookup;
         }
 
+        public HotelMinimalWithUserRole? GetMinimalWithUserRole(int id, int userId)
+        {
+
+            string proc = "hotels_select_minimal_by_id_with_user_role";
+
+            HotelMinimalWithUserRole? hotel = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", id);
+                param.AddWithValue("p_userId", userId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+
+                hotel = new HotelMinimalWithUserRole();
+                hotel.Id = reader.GetSafeInt32(index++);
+                hotel.Name = reader.GetSafeString(index++);
+                hotel.RoleId = reader.GetSafeInt32(index++);
+            });
+
+            return hotel;
+        }
+
         public List<Lookup>? GetUserHotelsMinimal(int userId)
         {
             string proc = "hotels_select_minimal_by_user";
@@ -154,6 +178,28 @@ namespace TourGo.Services.Hotels
             });
 
             return hotels;
+        }
+
+        public List<RolePermission>? GetRolePermissions()
+        {
+            string proc = "hotel_roles_permissions_select_all";
+            List<RolePermission>? permissions = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, null, (reader, set) =>
+            {
+                int index = 0;
+                RolePermission permission = new();
+                permission.RoleId = reader.GetSafeInt32(index++);
+                permission.ResourceTypeId = reader.GetSafeInt32(index++);
+                permission.Create = reader.GetSafeBool(index++);
+                permission.Read = reader.GetSafeBool(index++);
+                permission.Update = reader.GetSafeBool(index++);
+                permission.Delete = reader.GetSafeBool(index++);
+
+                permissions ??= new List<RolePermission>();
+                permissions.Add(permission);
+            });
+            return permissions;
         }
 
         private static Hotel MapHotel(IDataReader reader, ref int index)

@@ -38,8 +38,6 @@ import {
   sanitizeBooking,
 } from "components/bookings/booking-add-edit-view/constants";
 
-import { ERROR_CODES } from "constants/errorCodes";
-
 import useBookingFormData from "./hooks/useBookingFormData";
 import useBookingTotals from "./hooks/useBookingTotals";
 
@@ -64,6 +62,7 @@ function BookingForm({
   bookingCharges = [],
   bookingRoomBookings = [],
   modifiedBy,
+  getTranslatedErrorMessage,
   //formik props
   values,
   setValues,
@@ -457,7 +456,14 @@ export default withFormik({
   validationSchema: bookingSchema,
   enableReinitialize: true,
   handleSubmit: async (values, { props, setSubmitting }) => {
-    const { hotelId, customer, setBooking, setCurrentStep, modifiedBy } = props;
+    const {
+      hotelId,
+      customer,
+      setBooking,
+      setCurrentStep,
+      modifiedBy,
+      getTranslatedErrorMessage,
+    } = props;
 
     const result = await Swal.fire({
       title: "¿Está seguro de que desea guardar la reserva?",
@@ -537,17 +543,15 @@ export default withFormik({
         throw new Error("Error al guardar la reserva");
       }
     } catch (err) {
-      let errorMessage =
-        "Error al guardar la reserva. Por favor, inténtelo de nuevo. Si el problema persiste, contacte al soporte técnico.";
-      if (Number(err?.response?.data?.code) === ERROR_CODES.IS_LOCKED) {
-        errorMessage = "No se puede actualizar reservas con estado terminado.";
-      }
+      const errorMessage = getTranslatedErrorMessage(err);
 
       Swal.close();
-      await Swal.fire({
-        icon: "error",
+
+      Swal.fire({
         title: "Error",
         text: errorMessage,
+        icon: "error",
+        confirmButtonText: "OK",
       });
     }
   },

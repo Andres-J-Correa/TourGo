@@ -8,6 +8,7 @@ import {
   faMoneyBillTrendUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 
 export const useNavbarItems = () => {
   const { hotel } = useAppContext();
@@ -131,13 +132,17 @@ export const useNavbarItems = () => {
         path: `/hotels/${hotel.current.id}/customers`,
         capitalize: true,
       },
-      {
-        name: "Empleados",
-        icon: faUsers,
-        position: "left",
-        path: `/hotels/${hotel.current.id}/staff`,
-        capitalize: true,
-      },
+      ...(hotel.current.roleId === HOTEL_ROLES_IDS.OWNER
+        ? [
+            {
+              name: "Personal",
+              icon: faUsers,
+              position: "left",
+              path: `/hotels/${hotel.current.id}/staff`,
+              capitalize: true,
+            },
+          ]
+        : []),
       {
         name: "Finanzas",
         icon: faMoneyBillTrendUp,

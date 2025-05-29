@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getCurrentUser, usersLogout } from "services/userAuthService";
-import { getMinimalById } from "services/hotelService";
+import { getMinimalWithUserRoleById } from "services/hotelService";
 import UserSignInModal from "components/users/UserSignInModal";
 import { SignUpFormModal } from "components/commonUI/forms/SignUpForm";
 import PropTypes from "prop-types";
@@ -28,6 +28,7 @@ const defaultUser = {
 const defaultHotel = {
   id: 0,
   name: "",
+  roleId: 0,
 };
 
 const defaultModals = {
@@ -174,7 +175,7 @@ export const AppContextProvider = ({ children }) => {
       currentUser.isAuthenticated
     ) {
       setIsLoadingHotel(true);
-      getMinimalById(hotelId)
+      getMinimalWithUserRoleById(hotelId)
         .then((res) => {
           if (res.isSuccessful) {
             setHotel(res.item);
@@ -189,7 +190,7 @@ export const AppContextProvider = ({ children }) => {
         .finally(() => {
           setIsLoadingHotel(false);
         });
-    } else if (!hotelId) {
+    } else if (hotel.id !== 0 && !currentUser.isAuthenticated) {
       setHotel({ ...defaultHotel });
     }
   }, [location.pathname, hotel.id, currentUser]);

@@ -12,7 +12,9 @@ namespace TourGo.Services.Interfaces.Hotels
         Hotel? GetDetails(int id);
         List<Lookup>? GetUserHotelsMinimal(int userId);
         Lookup? GetMinimal(int id);
+        HotelMinimalWithUserRole? GetMinimalWithUserRole(int id, int userId);
         void Update(HotelUpdateRequest model, int userId);
         void Delete(int id, int userId);
+        List<RolePermission>? GetRolePermissions();
     }
 }

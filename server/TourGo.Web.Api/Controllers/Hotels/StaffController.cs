@@ -15,7 +15,6 @@ using MySql.Data.MySqlClient;
 using TourGo.Web.Models.Enums;
 using TourGo.Models.Domain;
 using TourGo.Services.Interfaces.Email;
-using TourGo.Web.Api.Enums.Staff;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -206,7 +205,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 if( hotel != null)
                 {
-                    string roleName = EnumLocalizationHelper.GetLocalizedEnumDisplayName((StaffRoleEnum)model.RoleId);
+                    string roleName = EnumLocalizationHelper.GetLocalizedEnumDisplayName((Enums.Staff.StaffRoleEnum)model.RoleId);
                     _emailService.HotelStaffInvitation(model.Email, hotel.Name, roleName);
                 }
 
@@ -237,7 +236,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpDelete("invites/{id:int}")]
-        [EntityAuth(EntityTypeEnum.HotelInvites, EntityActionTypeEnum.Delete)]
         public ActionResult<SuccessResponse> DeleteInvite(int id)
         {
             try
@@ -268,6 +266,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
+        [VerifiedUser]
         [HttpPost("invites/{id:int}/accept")]
         public ActionResult<SuccessResponse> AcceptInvite(int id)
         {
@@ -301,6 +300,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
+        [VerifiedUser]
         [HttpPost("invites/{id:int}/reject")]
         public ActionResult<SuccessResponse> RejectInvite(int id)
         {

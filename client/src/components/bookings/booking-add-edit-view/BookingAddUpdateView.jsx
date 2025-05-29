@@ -10,6 +10,7 @@ import TabNavigation from "components/bookings/booking-add-edit-view/TabNavigati
 import { toast } from "react-toastify";
 import { getById as getBookingById } from "services/bookingService";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 
 import { BOOKING_STATUS_IDS } from "../constants";
 
@@ -36,6 +37,7 @@ const BookingAddUpdateView = () => {
   ];
 
   const { user } = useAppContext();
+  const { getTranslatedErrorMessage } = useLanguage();
 
   const modifiedBy = useMemo(
     () => ({
@@ -153,6 +155,7 @@ const BookingAddUpdateView = () => {
             bookingCharges={booking?.extraCharges}
             bookingRoomBookings={booking?.roomBookings}
             modifiedBy={modifiedBy}
+            getTranslatedErrorMessage={getTranslatedErrorMessage}
           />
         </TabPane>
         <TabPane tabId={2}>

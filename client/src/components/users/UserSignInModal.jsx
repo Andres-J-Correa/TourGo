@@ -114,7 +114,6 @@ function UserSignIn({ toggle, onSignUp, loading, setLoading }) {
 UserSignIn.propTypes = {
   toggle: PropTypes.func.isRequired,
   onSignUp: PropTypes.func,
-  onPasswordReset: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   setLoading: PropTypes.func.isRequired,
 };

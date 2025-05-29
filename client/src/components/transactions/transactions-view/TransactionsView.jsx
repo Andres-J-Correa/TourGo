@@ -11,6 +11,8 @@ import TransactionAddForm from "components/transactions/TransactionAddForm";
 import { getPagedTransactions } from "services/transactionService";
 import { transactionsTableColumns } from "./constants";
 import { formatCurrency } from "utils/currencyHelper";
+import { useAppContext } from "contexts/GlobalAppContext";
+import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 
 import { Button, Col, Label, Row, Spinner } from "reactstrap";
 import classNames from "classnames";
@@ -49,13 +51,24 @@ function TransactionsView() {
   const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
+  const { hotel } = useAppContext();
+
+  const isUserAdmin = useMemo(
+    () =>
+      hotel.current.roleId === HOTEL_ROLES_IDS.ADMIN ||
+      hotel.current.roleId === HOTEL_ROLES_IDS.OWNER,
+    [hotel]
+  );
+
   const [paginationData, setPaginationData] = useState({
     pageIndex: 0,
     pageSize: 5,
     sortBy: [],
     dates: {
-      start: "",
-      end: "",
+      start: !isUserAdmin
+        ? dayjs().subtract(1, "week").format("YYYY-MM-DD")
+        : "",
+      end: !isUserAdmin ? dayjs().format("YYYY-MM-DD") : "",
     },
     categoryId: "",
     statusId: "",
@@ -376,18 +389,20 @@ function TransactionsView() {
       <h3>Transacciones</h3>
       <ErrorBoundary>
         <div>
-          <div
-            className="text-dark cursor-pointer fw-bold fs-4 mb-2 ms-auto"
-            style={{ maxWidth: "max-content" }}
-            onClick={handleToggleFilters}>
-            Filtros
-            <span className="ms-2">
-              <FontAwesomeIcon
-                size="lg"
-                icon={showFilters ? faSquareMinus : faSquarePlus}
-              />
-            </span>
-          </div>
+          {isUserAdmin && (
+            <div
+              className="text-dark cursor-pointer fw-bold fs-4 mb-2 ms-auto"
+              style={{ maxWidth: "max-content" }}
+              onClick={handleToggleFilters}>
+              Filtros
+              <span className="ms-2">
+                <FontAwesomeIcon
+                  size="lg"
+                  icon={showFilters ? faSquareMinus : faSquarePlus}
+                />
+              </span>
+            </div>
+          )}
 
           <div
             className={classNames(

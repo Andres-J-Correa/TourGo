@@ -39,8 +39,8 @@ import {
   updateById,
   deleteById,
 } from "services/roomService";
-import { ERROR_CODES } from "constants/errorCodes";
-import { useAppContext } from "contexts/GlobalAppContext"; // Assuming you have this context
+import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
@@ -74,6 +74,8 @@ const RoomsView = () => {
     capacity: "",
     description: "",
   });
+
+  const { getTranslatedErrorMessage } = useLanguage();
 
   const breadcrumbs = [
     { label: "Inicio", path: "/" },
@@ -266,26 +268,21 @@ const RoomsView = () => {
           });
         }
       } catch (error) {
-        let errorMessage =
-          "No se pudo eliminar la habitación, intente nuevamente.";
-        if (
-          Number(error?.response.data?.code) === ERROR_CODES.HAS_ACTIVE_BOOKINGS
-        ) {
-          errorMessage =
-            "No se puede eliminar la habitación porque tiene reservas activas.";
-        }
+        const errorMessage = getTranslatedErrorMessage(error);
 
         Swal.close();
-        await Swal.fire({
-          icon: "error",
+
+        Swal.fire({
           title: "Error",
           text: errorMessage,
+          icon: "error",
+          confirmButtonText: "OK",
         });
       } finally {
         setIsUploading(false);
       }
     },
-    [currentUser]
+    [currentUser, getTranslatedErrorMessage]
   );
 
   const columns = useMemo(

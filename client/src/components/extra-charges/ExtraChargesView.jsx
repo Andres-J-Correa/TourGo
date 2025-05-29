@@ -50,7 +50,7 @@ import {
   EXTRA_CHARGE_TYPES,
   formatExtraChargeAmount,
 } from "components/extra-charges/constants";
-import { ERROR_CODES } from "constants/errorCodes";
+import { useLanguage } from "contexts/LanguageContext";
 
 // Validation Schema
 const validationSchema = Yup.object().shape({
@@ -83,6 +83,8 @@ const ExtraChargesView = () => {
     typeId: "",
     amount: "",
   });
+
+  const { getTranslatedErrorMessage } = useLanguage();
 
   const breadcrumbs = [
     { label: "Inicio", path: "/" },
@@ -283,25 +285,21 @@ const ExtraChargesView = () => {
           });
         }
       } catch (error) {
-        let errorMessage = "No se pudo eliminar el cargo, intente nuevamente.";
-        if (
-          Number(error?.response.data?.code) === ERROR_CODES.HAS_ACTIVE_BOOKINGS
-        ) {
-          errorMessage =
-            "No se puede eliminar el cargo porque tiene reservas activas asociadas.";
-        }
+        const errorMessage = getTranslatedErrorMessage(error);
 
         Swal.close();
-        await Swal.fire({
-          icon: "error",
+
+        Swal.fire({
           title: "Error",
           text: errorMessage,
+          icon: "error",
+          confirmButtonText: "OK",
         });
       } finally {
         setIsUploading(false);
       }
     },
-    [currentUser]
+    [currentUser, getTranslatedErrorMessage]
   );
 
   const columns = useMemo(

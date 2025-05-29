@@ -5,6 +5,8 @@ using TourGo.Models.Enums;
 using TourGo.Models.Interfaces;
 using TourGo.Services;
 using TourGo.Services.Interfaces.Security;
+using TourGo.Web.Models.Enums;
+using TourGo.Web.Models.Responses;
 
 namespace TourGo.Web.Core.Filters
 {
@@ -111,10 +113,12 @@ namespace TourGo.Web.Core.Filters
 
             private void HandleUnauthorizedRequest(ActionExecutingContext context)
             {
-                var unauthorizedResponse = new ObjectResult(new { Message = "Unauthorized Access" })
+                ErrorResponse response = new ErrorResponse(AuthenticationErrorCode.Forbidden);
+                var unauthorizedResponse = new ObjectResult(response)
                 {
                     StatusCode = (int)HttpStatusCode.Forbidden
                 };
+
                 context.Result = unauthorizedResponse;
             }
         }
