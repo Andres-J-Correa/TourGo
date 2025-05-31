@@ -116,9 +116,16 @@ const RoomsView = () => {
   const roomsTotalCapacity = useMemo(() => {
     return rooms?.length > 0
       ? rooms.reduce((total, room) => {
-          return total + (room.capacity || 0);
+          if (room.isActive) {
+            return total + (room.capacity || 0);
+          }
+          return total;
         }, 0)
       : 0;
+  }, [rooms]);
+
+  const roomsCount = useMemo(() => {
+    return rooms?.length > 0 ? rooms.filter((room) => room.isActive).length : 0;
   }, [rooms]);
 
   const handleSubmit = async (values) => {
@@ -478,7 +485,7 @@ const RoomsView = () => {
         <Row>
           <Col md="auto" className="align-content-end">
             <p className="text-dark fw-bold fs-5 mb-0">
-              Total de habitaciones: {rooms?.length > 0 ? rooms.length : 0}
+              Total de habitaciones: {roomsCount}
             </p>
             <p className="text-dark fw-bold fs-5 mb-0">
               Capacidad total: {roomsTotalCapacity} personas
