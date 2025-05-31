@@ -13,26 +13,53 @@ export const EXTRA_CHARGE_TYPES = [
     description: "Se aplica un monto fijo por cada noche de cada habitación",
   },
   {
-    label: "General",
+    label: "Por habitación",
     value: 3,
     description: "Se aplica un monto fijo por cada habitación",
+  },
+  {
+    label: "General",
+    value: 4,
+    description: "Se aplica un monto fijo a la reserva completa",
+  },
+  {
+    label: "Por persona",
+    value: 5,
+    description: "Se aplica un monto fijo por cada persona en la reserva",
+  },
+  {
+    label: "Personalizado",
+    value: 6,
+    description: "Se aplica un monto personalizado al total de la reserva",
   },
 ];
 
 export const EXTRA_CHARGE_TYPES_BY_ID = {
   1: "Porcentaje",
   2: "Diario",
-  3: "General",
+  3: "Por habitación",
+  4: "General",
+  5: "Por persona",
+  6: "Personalizado",
 };
 
-export const EXTRA_CHARGE_IDS = {
+export const EXTRA_CHARGE_TYPE_IDS = {
   PERCENTAGE: 1,
   DAILY: 2,
-  GENERAL: 3,
+  PER_ROOM: 3,
+  GENERAL: 4,
+  PER_PERSON: 5,
+  CUSTOM: 6,
 };
 
+export const GENERAL_CHARGE_TYPES = [
+  EXTRA_CHARGE_TYPE_IDS.GENERAL,
+  EXTRA_CHARGE_TYPE_IDS.PER_PERSON,
+  EXTRA_CHARGE_TYPE_IDS.CUSTOM,
+];
+
 export const formatExtraChargeAmount = (amount, typeId) => {
-  if (typeId === EXTRA_CHARGE_IDS.PERCENTAGE)
+  if (typeId === EXTRA_CHARGE_TYPE_IDS.PERCENTAGE)
     return `${(amount * 100).toFixed(0)}%`;
   return formatCurrency(amount, "COP");
 };

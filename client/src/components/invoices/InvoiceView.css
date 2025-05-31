@@ -35,7 +35,7 @@
     color: var(--bs-dark) !important;
   }
 
-  .booking-card {
+  .booking-card-content {
     break-inside: avoid; /* Prevents the card from being split across pages */
     page-break-inside: avoid; /* Fallback for older browsers */
     margin-bottom: 1rem; /* Ensure spacing between cards */

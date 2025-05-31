@@ -16,6 +16,8 @@ import { formatCurrency } from "utils/currencyHelper";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
+import BookingGeneralCharges from "components/bookings/booking-summary/BookingGeneralCharges";
+import BookingFinancials from "components/bookings/booking-summary/BookingFinancials";
 import { toast } from "react-toastify";
 import { INVOICE_TYPES_BY_ID } from "components/invoices/constants";
 import classNames from "classnames";
@@ -254,7 +256,7 @@ const InvoiceView = () => {
             <Card
               id={`booking_${booking.id}-${index}`}
               key={`booking_${booking.id}-${index}`}
-              className="mb-4 bg-body-tertiary shadow booking-card ">
+              className="mb-4 bg-body-tertiary shadow ">
               <CardHeader tag="h5" className="text-bg-dark text-center">
                 <Link
                   to={`/hotels/${hotelId}/bookings/${booking.id}`}
@@ -264,7 +266,7 @@ const InvoiceView = () => {
                 </Link>
               </CardHeader>
               <CardBody>
-                <Row className="mb-3">
+                <Row className="mb-3 booking-card-content">
                   <Col>
                     <Row>
                       <Col>
@@ -294,6 +296,16 @@ const InvoiceView = () => {
                       </Col>
                     </Row>
                   </Col>
+                </Row>
+                <hr />
+                <Row className="mb-3 booking-card-content">
+                  <h5>Totales de la reserva</h5>
+                  <BookingFinancials
+                    bookingData={booking}
+                    isInvoiceView={true}
+                  />
+                  <BookingGeneralCharges bookingData={booking} />
+                  <hr />
                 </Row>
 
                 <RoomList

@@ -228,11 +228,13 @@ export const bookingKeysToCompare = [
   "charges",
   "extraCharges",
   "roomBookings",
+  "personalizedCharges",
 ];
 
 export const currentFormKeysToCompare = [
   "roomBookings",
   "extraCharges",
+  "personalizedCharges",
   "subtotal",
   "charges",
   "arrivalDate",
@@ -319,6 +321,15 @@ export const deepCompareBooking = (obj1, obj2, keysToCompare) => {
           "roomId",
           "date",
           "price",
+        ])
+      ) {
+        return false;
+      }
+    } else if (key === "personalizedCharges") {
+      if (
+        !compareArrays(obj1?.personalizedCharges, obj2?.personalizedCharges, [
+          "name",
+          "amount",
         ])
       ) {
         return false;
