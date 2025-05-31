@@ -41,6 +41,7 @@ import {
 
 import useBookingFormData from "./hooks/useBookingFormData";
 import useBookingTotals from "./hooks/useBookingTotals";
+import ChargeTypesExplanationIcon from "components/extra-charges/ChargeTypesExplanationIcon";
 
 const emptyFormData = {
   customerId: "",
@@ -439,7 +440,10 @@ function BookingForm({
           bookingId={bookingId}
         />
 
-        <h5 className="mt-4 mb-3">Seleccione los cargos extras</h5>
+        <h5 className="mt-4 mb-3">
+          Seleccione los cargos extras
+          <ChargeTypesExplanationIcon />
+        </h5>
         <ExtraChargesSelector
           charges={charges}
           selectedCharges={selectedCharges}

@@ -41,11 +41,12 @@ import {
   updateById,
   deleteById,
 } from "services/extraChargeService";
-import { useAppContext } from "contexts/GlobalAppContext"; // Assuming you have this context
+import { useAppContext } from "contexts/GlobalAppContext";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
+import ChargeTypesExplanationIcon from "components/extra-charges/ChargeTypesExplanationIcon";
 import {
   EXTRA_CHARGE_TYPES,
   formatExtraChargeAmount,
@@ -416,9 +417,12 @@ const ExtraChargesView = () => {
   return (
     <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Cargos Adicionales" />
-      <ErrorBoundary>
-        <h3>Cargos Adicionales</h3>
+      <h3>
+        Cargos Adicionales
+        <ChargeTypesExplanationIcon />
+      </h3>
 
+      <ErrorBoundary>
         {showForm && (
           <Card className="border-0 shadow-lg mt-3">
             <CardBody className="p-3">

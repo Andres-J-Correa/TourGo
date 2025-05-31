@@ -49,10 +49,7 @@ function DateSelector({
       if (!confirmed) return;
       setSelectedRoomBookings((prev) => {
         const newState = prev.filter((booking) => {
-          const bookignDate = dayjs(booking.date);
-          const newEndDate = dayjs(value);
-          const isSameOrBefore = bookignDate.isBefore(newEndDate, "day");
-          return isSameOrBefore;
+          return dayjs(booking.date).isBefore(dayjs(value), "day");
         });
         return newState;
       });

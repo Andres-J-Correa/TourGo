@@ -2,9 +2,21 @@ import * as Yup from "yup";
 import { formatCurrency } from "utils/currencyHelper";
 
 export const EXTRA_CHARGE_TYPES = [
-  { label: "Porcentaje", value: 1 },
-  { label: "Diario", value: 2 },
-  { label: "General", value: 3 },
+  {
+    label: "Porcentaje",
+    value: 1,
+    description: "Se aplica el porcentaje a los subtotales de cada habitación",
+  },
+  {
+    label: "Diario",
+    value: 2,
+    description: "Se aplica un monto fijo por cada noche de cada habitación",
+  },
+  {
+    label: "General",
+    value: 3,
+    description: "Se aplica un monto fijo por cada habitación",
+  },
 ];
 
 export const EXTRA_CHARGE_TYPES_BY_ID = {
