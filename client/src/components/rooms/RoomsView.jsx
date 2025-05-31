@@ -113,6 +113,14 @@ const RoomsView = () => {
     };
   }, [user]);
 
+  const roomsTotalCapacity = useMemo(() => {
+    return rooms?.length > 0
+      ? rooms.reduce((total, room) => {
+          return total + (room.capacity || 0);
+        }, 0)
+      : 0;
+  }, [rooms]);
+
   const handleSubmit = async (values) => {
     const { id, ...data } = values;
 
@@ -467,21 +475,34 @@ const RoomsView = () => {
             {showForm ? "Cancelar" : "Agregar Habitación"}
           </Button>
         </div>
-        <div className="mb-3 float-end">
-          <Label for="isActiveFilter" className="text-dark">
-            Filtrar por Estado
-          </Label>
-          <Input
-            id="isActiveFilter"
-            type="select"
-            style={{ width: "auto" }}
-            value={isActiveFilter}
-            onChange={(e) => setIsActiveFilter(e.target.value)}>
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
-            <option value="all">Todos</option>
-          </Input>
-        </div>
+        <Row>
+          <Col md="auto" className="align-content-end">
+            <p className="text-dark fw-bold fs-5 mb-0">
+              Total de habitaciones: {rooms?.length > 0 ? rooms.length : 0}
+            </p>
+            <p className="text-dark fw-bold fs-5 mb-0">
+              Capacidad total: {roomsTotalCapacity} personas
+            </p>
+          </Col>
+          <Col>
+            <div className="mb-3 float-end">
+              <Label for="isActiveFilter" className="text-dark">
+                Filtrar por Estado
+              </Label>
+              <Input
+                id="isActiveFilter"
+                type="select"
+                style={{ width: "auto" }}
+                value={isActiveFilter}
+                onChange={(e) => setIsActiveFilter(e.target.value)}>
+                <option value="active">Activo</option>
+                <option value="inactive">Inactivo</option>
+                <option value="all">Todos</option>
+              </Input>
+            </div>
+          </Col>
+        </Row>
+
         <div className="table-responsive w-100">
           <table className="table table-bordered table-striped table-hover">
             <thead>
