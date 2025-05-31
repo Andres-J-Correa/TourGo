@@ -29,12 +29,23 @@ const DatePickers = ({
   const showClearButton = typeof handleClearDates === "function";
 
   const onStartDateChange = (date) => {
+    const currentDate = dayjs(startDate);
+    const newDate = dayjs(date);
+    const isSameDate = currentDate.isSame(newDate, "day");
+
+    if (isSameDate) return;
+
     if (date) {
       handleStartChange(getDate(date));
     }
   };
 
   const onEndDateChange = (date) => {
+    const currentDate = dayjs(endDate);
+    const newDate = dayjs(date);
+    const isSameDate = currentDate.isSame(newDate, "day");
+
+    if (isSameDate) return;
     if (date) {
       handleEndChange(getDate(date));
     }

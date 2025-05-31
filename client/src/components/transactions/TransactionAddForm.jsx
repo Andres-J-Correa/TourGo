@@ -149,7 +149,7 @@ function TransactionAddForm({
         invoiceId: entity?.invoiceId,
       };
 
-      Swal.fire({
+      await Swal.fire({
         icon: "success",
         title: "Transacción agregada",
         timer: 1500,

@@ -89,11 +89,11 @@ namespace TourGo.Services.Finances
             return transactions;
         }
 
-        public Paged<Transaction>? GetPaginated(int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
-            DateOnly? startDate, DateOnly? endDate, int? id, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
+        public Paged<Transaction>? GetPaginated(int id, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
+            DateOnly? startDate, DateOnly? endDate, int? txnId, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
             string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
         {
-            string proc = "transactions_select_paginated";
+            string proc = "transactions_select_paginated_v2";
             Paged<Transaction>? paged = null;
             List<Transaction>? transactions = null;
             int totalCount = 0;
@@ -104,12 +104,13 @@ namespace TourGo.Services.Finances
             {
                 col.AddWithValue("p_pageIndex", pageIndex);
                 col.AddWithValue("p_pageSize", pageSize);
+                col.AddWithValue("p_hotelId", id);
 
                 col.AddWithValue("p_sortColumn", string.IsNullOrEmpty(mappedColumn) ? DBNull.Value: mappedColumn);
                 col.AddWithValue("p_sortDirection", string.IsNullOrEmpty(sortDirection) ? DBNull.Value : sortDirection);
                 col.AddWithValue("p_startDate", startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
                 col.AddWithValue("p_endDate", endDate.HasValue ? endDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
-                col.AddWithValue("p_id", id > 0 ? id : DBNull.Value);
+                col.AddWithValue("p_id", txnId > 0 ? txnId : DBNull.Value);
                 col.AddWithValue("p_parentId", parentId > 0 ? parentId : DBNull.Value);
                 col.AddWithValue("p_entityId", entityId > 0 ? entityId : DBNull.Value);
                 col.AddWithValue("p_categoryId", categoryId > 0 ? categoryId : DBNull.Value);

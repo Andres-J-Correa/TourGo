@@ -61,5 +61,8 @@ namespace TourGo.Models.Requests.Bookings
         public List<RoomBookingsAddRequest> RoomBookings { get; set; }
 
 		public List<BookingExtraChargesAddRequest>? ExtraCharges { get; set; }
+
+		public List<BookingPersonalizedChargeAddRequest>? PersonalizedCharges { get; set; }
+
     }
 }

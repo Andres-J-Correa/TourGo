@@ -6,6 +6,12 @@ export const transactionCategories = [
   { id: 3, name: "Ajuste" },
 ];
 
+export const TRANSACTION_CATEGORIES_BY_ID = {
+  1: "Ingreso",
+  2: "Gasto",
+  3: "Ajuste",
+};
+
 export const transactionStatuses = [
   { id: 1, name: "Pendiente" },
   { id: 2, name: "Completado" },
@@ -20,6 +26,14 @@ export const TRANSACTION_STATUS_DICT = {
   FAILED: 3,
   ADJUSTED: 4,
   REVERTED: 5,
+};
+
+export const TRANSACTION_STATUS_BY_ID = {
+  1: "Pendiente",
+  2: "Completado",
+  3: "Fallído",
+  4: "Ajustado",
+  5: "Revertido",
 };
 
 export const transactionAddValidationSchema = Yup.object({

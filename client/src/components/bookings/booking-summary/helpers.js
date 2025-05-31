@@ -1,4 +1,8 @@
 import dayjs from "dayjs";
+import {
+  EXTRA_CHARGE_TYPE_IDS,
+  GENERAL_CHARGE_TYPES,
+} from "components/extra-charges/constants";
 
 export function groupRoomBookings(roomBookings) {
   const grouped = {};
@@ -11,31 +15,35 @@ export function groupRoomBookings(roomBookings) {
 
   return Object.values(grouped).map((bookings) => {
     const roomName = bookings[0]?.room?.name;
+    const roomDescription = bookings[0]?.room?.description || "";
     bookings.sort((a, b) => dayjs(a.date) - dayjs(b.date));
     return {
       roomName,
+      roomDescription,
       segments: bookings.map((b) => ({ date: b.date, price: b.price })),
     };
   });
 }
 
 export function calculateRoomCharges(extraCharges, subtotal, nights) {
-  return extraCharges?.map((charge) => {
-    let amount = 0;
-    switch (Number(charge.type.id)) {
-      case 1:
-        amount = subtotal * charge.amount;
-        break;
-      case 2:
-        amount = charge.amount * nights;
-        break;
-      case 3:
-        amount = charge.amount;
-        break;
-      default:
-        amount = 0;
-        break;
-    }
-    return { ...charge, total: amount };
-  });
+  return extraCharges
+    ?.filter((charge) => !GENERAL_CHARGE_TYPES.includes(charge.type.id))
+    ?.map((charge) => {
+      let amount = 0;
+      switch (Number(charge.type.id)) {
+        case EXTRA_CHARGE_TYPE_IDS.PERCENTAGE:
+          amount = subtotal * charge.amount;
+          break;
+        case EXTRA_CHARGE_TYPE_IDS.DAILY:
+          amount = charge.amount * nights;
+          break;
+        case EXTRA_CHARGE_TYPE_IDS.PER_ROOM:
+          amount = charge.amount;
+          break;
+        default:
+          amount = 0;
+          break;
+      }
+      return { ...charge, total: amount };
+    });
 }

@@ -9,6 +9,7 @@ import RoomList from "components/bookings/booking-summary/RoomList";
 import BookingTransactions from "components/bookings/booking-summary/BookingTransactions";
 import BookingAuditableInfo from "components/bookings/booking-summary/BookingAuditableInfo";
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
+import BookingGeneralCharges from "components/bookings/booking-summary/BookingGeneralCharges";
 
 const BookingSummary = ({
   bookingData,
@@ -61,6 +62,8 @@ const BookingSummary = ({
         <RoomList rooms={groupedRooms} extraCharges={extraCharges} />
 
         <hr />
+
+        <BookingGeneralCharges bookingData={bookingData} />
 
         <BookingTransactions
           hotelId={hotelId}

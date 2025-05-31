@@ -12,7 +12,7 @@ import { getById as getBookingById } from "services/bookingService";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 
-import { BOOKING_STATUS_IDS } from "../constants";
+import { LOCKED_BOOKING_STATUSES } from "../constants";
 
 import {
   defaultBooking,
@@ -79,6 +79,7 @@ const BookingAddUpdateView = () => {
       ...bookingData,
       roomBookings: mappedRoomBookings,
       extraCharges: mappedExtraCharges,
+      personalizedCharges: bookingData.personalizedCharges || [],
     });
     setCustomer(bookingData.customer);
   }, []);
@@ -158,6 +159,7 @@ const BookingAddUpdateView = () => {
               bookingId={bookingId}
               bookingCharges={booking?.extraCharges}
               bookingRoomBookings={booking?.roomBookings}
+              bookingPersonalizedCharges={booking?.personalizedCharges}
               modifiedBy={modifiedBy}
               getTranslatedErrorMessage={getTranslatedErrorMessage}
             />
@@ -188,9 +190,7 @@ const BookingAddUpdateView = () => {
               entity={booking}
               setEntity={setBooking}
               showAddButton={
-                booking?.status?.id !== BOOKING_STATUS_IDS.CANCELLED &&
-                booking?.status?.id !== BOOKING_STATUS_IDS.NO_SHOW &&
-                booking?.status?.id !== BOOKING_STATUS_IDS.COMPLETED
+                !LOCKED_BOOKING_STATUSES.includes(booking?.status?.id)
               }
             />
           </TabPane>

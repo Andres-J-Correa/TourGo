@@ -41,6 +41,8 @@ import {
 
 import useBookingFormData from "./hooks/useBookingFormData";
 import useBookingTotals from "./hooks/useBookingTotals";
+import ChargeTypesExplanationIcon from "components/extra-charges/ChargeTypesExplanationIcon";
+import PersonalizedCharges from "./PersonalizedCharges";
 
 const emptyFormData = {
   customerId: "",
@@ -48,6 +50,7 @@ const emptyFormData = {
   departureDate: null,
   roomBookings: [],
   extraCharges: [],
+  personalizedCharges: [],
   subtotal: 0,
   charges: 0,
 };
@@ -62,8 +65,7 @@ function BookingForm({
   bookingId,
   bookingCharges = [],
   bookingRoomBookings = [],
-  modifiedBy,
-  getTranslatedErrorMessage,
+  bookingPersonalizedCharges = [],
   //formik props
   values,
   setValues,
@@ -77,6 +79,7 @@ function BookingForm({
   });
   const [selectedCharges, setSelectedCharges] = useState([]);
   const [selectedRoomBookings, setSelectedRoomBookings] = useState([]);
+  const [personalizedCharges, setPersonalizedCharges] = useState([]);
 
   const {
     rooms,
@@ -90,7 +93,12 @@ function BookingForm({
 
   const navigate = useNavigate();
 
-  const totals = useBookingTotals(selectedRoomBookings, selectedCharges);
+  const totals = useBookingTotals(
+    values,
+    selectedRoomBookings,
+    selectedCharges,
+    personalizedCharges
+  );
 
   const isLoading = isLoadingBookings || isLoadingHotelData || isSubmitting;
 
@@ -246,20 +254,35 @@ function BookingForm({
         setSelectedRoomBookings([...currentRoomBookings]);
       }
 
-      let currentExtraCharges =
+      const currentExtraCharges =
         initialValues.extraCharges?.length > 0
           ? initialValues.extraCharges
           : bookingCharges?.length > 0
           ? bookingCharges
           : [];
 
+      const currentPersonalizedCharges =
+        initialValues.personalizedCharges?.length > 0
+          ? initialValues.personalizedCharges
+          : bookingPersonalizedCharges?.length > 0
+          ? bookingPersonalizedCharges
+          : [];
+
       setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
         ...sanitizeBooking(booking),
         extraCharges: currentExtraCharges,
         roomBookings: currentRoomBookings,
+        personalizedCharges: currentPersonalizedCharges,
       });
     }
-  }, [booking, dates, bookingCharges, initialValues, bookingRoomBookings]);
+  }, [
+    booking,
+    dates,
+    bookingCharges,
+    initialValues,
+    bookingRoomBookings,
+    bookingPersonalizedCharges,
+  ]);
 
   useEffect(() => {
     const newFormData = {
@@ -268,6 +291,7 @@ function BookingForm({
       departureDate: dates.end,
       roomBookings: [...selectedRoomBookings],
       extraCharges: [...selectedCharges],
+      personalizedCharges: [...personalizedCharges],
       subtotal: totals.subtotal,
       charges: totals.charges,
       customer: { ...customer },
@@ -318,6 +342,7 @@ function BookingForm({
     dates,
     selectedCharges,
     selectedRoomBookings,
+    personalizedCharges,
     totals,
     isLoading,
     setValues,
@@ -330,9 +355,16 @@ function BookingForm({
   }, [bookingCharges]);
 
   useEffect(() => {
+    if (bookingPersonalizedCharges.length > 0) {
+      setPersonalizedCharges(bookingPersonalizedCharges);
+    }
+  }, [bookingPersonalizedCharges]);
+
+  useEffect(() => {
     if (!bookingId) {
       setSelectedRoomBookings([]);
       setSelectedCharges([]);
+      setPersonalizedCharges([]);
       setDates({
         start: null,
         end: null,
@@ -439,13 +471,21 @@ function BookingForm({
           bookingId={bookingId}
         />
 
-        <h5 className="mt-4 mb-3">Seleccione los cargos extras</h5>
+        <h5 className="mt-4 mb-3">
+          Seleccione los cargos extras
+          <ChargeTypesExplanationIcon />
+        </h5>
         <ExtraChargesSelector
           charges={charges}
           selectedCharges={selectedCharges}
           toggleCharge={toggleCharge}
           submitting={submitting || isSubmitting}
           hotelId={hotelId}
+        />
+
+        <PersonalizedCharges
+          personalizedCharges={personalizedCharges}
+          setPersonalizedCharges={setPersonalizedCharges}
         />
 
         <TotalsDisplay totals={totals} />

@@ -4,7 +4,7 @@ import { formatCurrency } from "utils/currencyHelper";
 import classNames from "classnames";
 import "./BookingSummary.css";
 
-const BookingFinancials = ({ bookingData }) => {
+const BookingFinancials = ({ bookingData, isInvoiceView }) => {
   const {
     transactions = [],
     subtotal = 0,
@@ -46,43 +46,45 @@ const BookingFinancials = ({ bookingData }) => {
           </div>
         </Col>
       </Row>
-      <Row className="mb-2">
-        <Col md={4}>
-          <div className="line-item">
-            <span className="line-label fw-bold">Total Pagado</span>
-            <div className="line-fill" />
-            <span className="line-amount">
-              {formatCurrency(totalPaid, "COP")}
-            </span>
-          </div>
-        </Col>
-        <Col md={4}>
-          <div className="line-item">
-            <span className="line-label fw-bold">Saldo</span>
-            <div className="line-fill" />
-            <span
-              className={classNames("line-amount", {
-                "text-danger": balance < 0,
-              })}>
-              {formatCurrency(balance, "COP")}
-            </span>
-          </div>
-        </Col>
-        <Col>
-          <div className="line-item">
-            <span className="line-label fw-bold">Comisión</span>
-            <div className="line-fill" />
-            <span
-              className={classNames("line-amount", {
-                "text-danger": bookingData?.externalCommission < 0,
-              })}>
-              {bookingData?.externalCommission > 0
-                ? formatCurrency(bookingData?.externalCommission, "COP")
-                : "-"}
-            </span>
-          </div>
-        </Col>
-      </Row>
+      {!isInvoiceView && (
+        <Row className="mb-2">
+          <Col md={4}>
+            <div className="line-item">
+              <span className="line-label fw-bold">Total Pagado</span>
+              <div className="line-fill" />
+              <span className="line-amount">
+                {formatCurrency(totalPaid, "COP")}
+              </span>
+            </div>
+          </Col>
+          <Col md={4}>
+            <div className="line-item">
+              <span className="line-label fw-bold">Saldo</span>
+              <div className="line-fill" />
+              <span
+                className={classNames("line-amount", {
+                  "text-danger": balance < 0,
+                })}>
+                {formatCurrency(balance, "COP")}
+              </span>
+            </div>
+          </Col>
+          <Col>
+            <div className="line-item">
+              <span className="line-label fw-bold">Comisión</span>
+              <div className="line-fill" />
+              <span
+                className={classNames("line-amount", {
+                  "text-danger": bookingData?.externalCommission < 0,
+                })}>
+                {bookingData?.externalCommission > 0
+                  ? formatCurrency(bookingData?.externalCommission, "COP")
+                  : "-"}
+              </span>
+            </div>
+          </Col>
+        </Row>
+      )}
     </>
   );
 };

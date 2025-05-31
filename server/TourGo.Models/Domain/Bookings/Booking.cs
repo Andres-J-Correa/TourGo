@@ -27,5 +27,6 @@ namespace TourGo.Models.Domain.Bookings
         public List<RoomBooking>? RoomBookings { get; set; }
 
         public List<ExtraCharge>? ExtraCharges { get; set; }
+        public List<ExtraCharge>? PersonalizedCharges { get; set; }
     }
 }

@@ -15,6 +15,7 @@ const RoomCard = ({ room, bookingNights, extraCharges }) => {
     <Card className="mb-3 flex-fill shadow bg-light room-card-print">
       <CardBody className="d-flex flex-column text-dark">
         <h5 className="text-center">{room.roomName}</h5>
+        <p className="text-center">{room.roomDescription}</p>
 
         <ListGroup className="mt-2 flex-grow-1">
           {room?.segments?.map((seg, i) => (

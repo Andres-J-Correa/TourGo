@@ -83,7 +83,7 @@ namespace TourGo.Services.Hotels
 
         public InvoiceWithEntities? GetWithEntitiesById(int invoiceId)
         {
-            string proc = "invoices_select_with_entities_by_id";
+            string proc = "invoices_select_with_entities_by_id_v2";
             InvoiceWithEntities? invoiceWithEntities = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -113,6 +113,7 @@ namespace TourGo.Services.Hotels
                     Booking booking = BookingService.MapBooking(reader, ref index);
                     booking.RoomBookings = reader.DeserializeObjectSafely<List<RoomBooking>>(index++, ()=> null);
                     booking.ExtraCharges = reader.DeserializeObjectSafely<List<ExtraCharge>>(index++, () => null);
+                    booking.PersonalizedCharges = reader.DeserializeObjectSafely<List<ExtraCharge>>(index++, () => null);
                     invoiceWithEntities.Bookings ??= new List<Booking>();
                     invoiceWithEntities.Bookings.Add(booking);
                 }

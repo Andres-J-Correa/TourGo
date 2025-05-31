@@ -37,7 +37,7 @@ namespace TourGo.Services.Hotels
 
         public Booking? GetById(int id)
         {
-            string proc = "bookings_select_details_by_id_v4";
+            string proc = "bookings_select_details_by_id_v5";
             Booking? booking = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -81,6 +81,18 @@ namespace TourGo.Services.Hotels
                     ExtraCharge extraCharge = ExtraChargeService.MapExtraCharge(reader, ref index);
                     booking.ExtraCharges ??= new List<ExtraCharge>();
                     booking.ExtraCharges.Add(extraCharge);
+                }
+
+                if( set == 5 && booking != null) {
+                    index = 0;
+                    ExtraCharge personalizedCharge = new ExtraCharge()
+                    {
+                        Id = reader.GetSafeInt32(index++),
+                        Name = reader.GetSafeString(index++),
+                        Amount = reader.GetSafeDecimal(index++),
+                    };
+                    booking.PersonalizedCharges ??= new List<ExtraCharge>();
+                    booking.PersonalizedCharges.Add(personalizedCharge);
                 }
             });
 
@@ -163,7 +175,7 @@ namespace TourGo.Services.Hotels
         {
             BookingAddResponse? response = null;
 
-            string proc = "bookings_insert";
+            string proc = "bookings_insert_v2";
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
                 coll.AddWithValue("p_customerId", model.CustomerId);
@@ -180,6 +192,7 @@ namespace TourGo.Services.Hotels
                 coll.AddWithValue("p_externalComission", model.ExternalCommission > 0 ? model.ExternalCommission: 0);
                 coll.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
                 coll.AddWithValue("p_extraChargesJson", model.ExtraCharges?.Count > 0 ? JsonConvert.SerializeObject(model.ExtraCharges) : DBNull.Value);
+                coll.AddWithValue("p_personalizedChargesJson", model.PersonalizedCharges?.Count > 0 ? JsonConvert.SerializeObject(model.PersonalizedCharges) : DBNull.Value);
                 coll.AddWithValue("p_subtotal", model.Subtotal);
                 coll.AddWithValue("p_charges", model.Charges);
                 coll.AddWithValue("p_total", model.Total);
@@ -197,7 +210,7 @@ namespace TourGo.Services.Hotels
 
         public void Update(BookingAddUpdateRequest model, int userId)
         {
-            string proc = "bookings_update";
+            string proc = "bookings_update_v2";
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
                 coll.AddWithValue("p_id", model.Id);
@@ -213,6 +226,7 @@ namespace TourGo.Services.Hotels
                 coll.AddWithValue("p_externalComission", model.ExternalCommission > 0 ? model.ExternalCommission : 0);
                 coll.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
                 coll.AddWithValue("p_extraChargesJson", model.ExtraCharges?.Count > 0 ? JsonConvert.SerializeObject(model.ExtraCharges) : DBNull.Value);
+                coll.AddWithValue("p_personalizedChargesJson", model.PersonalizedCharges?.Count > 0 ? JsonConvert.SerializeObject(model.PersonalizedCharges) : DBNull.Value);
                 coll.AddWithValue("p_subtotal", model.Subtotal);
                 coll.AddWithValue("p_charges", model.Charges);
                 coll.AddWithValue("p_total", model.Total);

@@ -324,7 +324,7 @@ function CalendarView() {
   }, [dates, rowVirtualizer]);
 
   return (
-    <>
+    <div className="mx-n5">
       <LoadingOverlay
         isVisible={isLoadingRooms || isLoadingBookings}
         message={isLoadingBookings ? "Cargando Reservas" : undefined}
@@ -442,7 +442,7 @@ function CalendarView() {
           </table>
         </div>
       </ErrorBoundary>
-    </>
+    </div>
   );
 }
 

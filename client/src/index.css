@@ -2268,3 +2268,8 @@ p {
   overflow: auto;
   padding-right: 0 !important;
 }
+
+.mx-n5 {
+  margin-right: -3rem !important;
+  margin-left: -3rem !important;
+}

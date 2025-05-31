@@ -220,6 +220,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                 }
 
                 Paged<Transaction>? transactions = _transactionService.GetPaginated(
+                    id,
                     pageIndex,
                     pageSize,
                     sortColumn,
@@ -286,6 +287,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                 DateOnly endDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
                 Paged<Transaction>? transactions = _transactionService.GetPaginated(
+                    id,
                     pageIndex,
                     pageSize,
                     sortColumn,
