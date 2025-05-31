@@ -64,15 +64,17 @@ const BookingAddUpdateView = () => {
   };
 
   const mapBookingData = useCallback((bookingData) => {
-    const mappedRoomBookings = bookingData.roomBookings.map((booking) => ({
-      ...booking,
-      roomId: booking.room.id,
-    }));
+    const mappedRoomBookings =
+      bookingData.roomBookings?.map((booking) => ({
+        ...booking,
+        roomId: booking.room.id,
+      })) || [];
 
-    const mappedExtraCharges = bookingData.extraCharges.map((charge) => ({
-      ...charge,
-      extraChargeId: charge.id,
-    }));
+    const mappedExtraCharges =
+      bookingData.extraCharges?.map((charge) => ({
+        ...charge,
+        extraChargeId: charge.id,
+      })) || [];
     setBooking({
       ...bookingData,
       roomBookings: mappedRoomBookings,
