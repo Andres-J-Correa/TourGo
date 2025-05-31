@@ -7,6 +7,7 @@ import Pagination from "components/commonUI/Pagination";
 import TransactionDetails from "components/transactions/TransactionDetails";
 import TransactionsTableFilters from "components/transactions/transactions-view/TransactionsTableFilters";
 import TransactionAddForm from "components/transactions/TransactionAddForm";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
 import {
   getPagedTransactions,
@@ -16,6 +17,10 @@ import { transactionsTableColumns } from "./constants";
 import { formatCurrency } from "utils/currencyHelper";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
+import {
+  TRANSACTION_CATEGORIES_BY_ID,
+  TRANSACTION_STATUS_BY_ID,
+} from "components/transactions/constants";
 
 import { Button, Col, Label, Row, Spinner } from "reactstrap";
 import classNames from "classnames";
@@ -34,10 +39,37 @@ import {
   faSort,
   faSquarePlus,
   faSquareMinus,
+  faFileCsv,
 } from "@fortawesome/free-solid-svg-icons";
+import { flattenObject } from "utils/objectHelper";
 import dayjs from "dayjs";
+import { mkConfig, generateCsv, download } from "export-to-csv";
 
 import "./TransactionsView.css";
+
+const columnOrder = [
+  "id",
+  "transactionDate",
+  "amount",
+  "currencyCode",
+  "category",
+  "subcategory",
+  "paymentMethod-name",
+  "description",
+  "referenceNumber",
+  "status",
+  "entityId",
+  "financePartner",
+  "parentId",
+  "hasDocumentUrl",
+];
+
+const csvConfig = mkConfig({
+  fieldSeparator: ";",
+  filename: "transacciones",
+  decimalSeparator: ".",
+  useKeysAsHeaders: true,
+});
 
 const defaultData = {
   items: [],
@@ -139,6 +171,32 @@ function TransactionsView() {
     getExpandedRowModel: getExpandedRowModel(), // Enable row expansion
     getRowCanExpand: () => true,
   });
+
+  const exportExcel = (rows) => {
+    let rowData = rows.map((row) => {
+      let copy = { ...row.original };
+      delete copy.createdBy;
+      delete copy.approvedBy;
+      copy = flattenObject(copy);
+      delete copy["paymentMethod-id"];
+      copy.category = TRANSACTION_CATEGORIES_BY_ID[copy.categoryId] || "";
+      delete copy.categoryId;
+      copy.status = TRANSACTION_STATUS_BY_ID[copy.statusId] || "";
+      delete copy.statusId;
+      delete copy.total;
+      delete copy.dateCreated;
+
+      return copy;
+    });
+    rowData = rowData.map((row) =>
+      columnOrder.reduce((acc, key) => {
+        acc[key] = row[key] ?? "";
+        return acc;
+      }, {})
+    );
+    const csv = generateCsv(csvConfig)(rowData);
+    download(csvConfig)(csv);
+  };
 
   const onPageSizeChange = (e) =>
     setPaginationData((prev) => ({
@@ -387,14 +445,15 @@ function TransactionsView() {
 
     const shouldFetchData = (hasDates && isValidDateRange) || !hasDates;
 
-    if (hotelId && shouldFetchData) {
+    if (hotelId && shouldFetchData && hotel.current.roleId !== 0) {
       fetchData(hotelId, paginationData);
     }
-  }, [hotelId, paginationData, fetchData]);
+  }, [hotelId, paginationData, fetchData, hotel]);
 
   return (
     <>
       <Breadcrumb breadcrumbs={breadcrumbs} active={"Transacciones"} />
+      <LoadingOverlay isVisible={hotel.isLoading} />
       <h3>Transacciones</h3>
       <ErrorBoundary>
         <div>
@@ -466,11 +525,17 @@ function TransactionsView() {
                 value={paginationData.pageSize}
                 disabled={loading}
                 onChange={onPageSizeChange}>
-                {[5, 10, 20, 50].map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
+                {[5, 10, 20, 50]
+                  .concat(
+                    Boolean(data.totalCount) && data.totalCount > 50
+                      ? [data.totalCount]
+                      : []
+                  )
+                  .map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
               </select>
             </div>
           </Col>
@@ -483,6 +548,16 @@ function TransactionsView() {
               </Button>
             </div>
           )}
+          <div>
+            <Button
+              color="success"
+              className="float-end"
+              onClick={() => exportExcel(table.getRowModel().rows)}
+              disabled={loading || table.getRowModel().rows.length === 0}>
+              <FontAwesomeIcon icon={faFileCsv} className="me-2" />
+              Exportar a CSV
+            </Button>
+          </div>
         </Row>
         <div className="table-responsive">
           <span
