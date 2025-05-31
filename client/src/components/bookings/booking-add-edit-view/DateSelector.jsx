@@ -1,8 +1,11 @@
 import React from "react";
 import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import DatePickers from "components/commonUI/forms/DatePickers";
 import Alert from "components/commonUI/Alert";
 import Swal from "sweetalert2";
+
+dayjs.extend(isSameOrAfter);
 
 function DateSelector({
   dates,
@@ -16,7 +19,7 @@ function DateSelector({
 
   const confirmChange = async () => {
     const result = await Swal.fire({
-      title: "Cambiar las fechas eliminará las celdas seleccionadas.",
+      title: "Cambiar las fechas podría eliminar las celdas seleccionadas.",
       text: "¿Está seguro de que desea continuar?",
       icon: "warning",
       showCancelButton: true,
@@ -30,7 +33,12 @@ function DateSelector({
     if (selectedRoomBookings.length > 0) {
       const confirmed = await confirmChange();
       if (!confirmed) return;
-      setSelectedRoomBookings([]);
+      setSelectedRoomBookings((prev) => {
+        const newState = prev.filter((booking) => {
+          return dayjs(booking.date).isSameOrAfter(dayjs(value), "day");
+        });
+        return newState;
+      });
     }
     onDateChange("start")(value);
   };
@@ -39,7 +47,15 @@ function DateSelector({
     if (selectedRoomBookings.length > 0) {
       const confirmed = await confirmChange();
       if (!confirmed) return;
-      setSelectedRoomBookings([]);
+      setSelectedRoomBookings((prev) => {
+        const newState = prev.filter((booking) => {
+          const bookignDate = dayjs(booking.date);
+          const newEndDate = dayjs(value);
+          const isSameOrBefore = bookignDate.isBefore(newEndDate, "day");
+          return isSameOrBefore;
+        });
+        return newState;
+      });
     }
     onDateChange("end")(value);
   };
