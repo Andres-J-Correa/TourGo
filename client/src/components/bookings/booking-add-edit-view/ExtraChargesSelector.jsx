@@ -1,11 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, Card, CardBody, CardTitle, CardText } from "reactstrap";
-import {
-  EXTRA_CHARGE_TYPES_BY_ID,
-  formatExtraChargeAmount,
-} from "components/extra-charges/constants";
+import { Row, Col } from "reactstrap";
 import PropTypes from "prop-types";
+import ExtraChargeCard from "components/bookings/booking-add-edit-view/ExtraChargeCard";
 import "./ExtraChargesSelector.css"; // Assuming you have some CSS for styling
 
 const ExtraChargesSelector = ({
@@ -15,7 +12,7 @@ const ExtraChargesSelector = ({
   hotelId,
 }) => {
   return (
-    <Row className="justify-content-evenly">
+    <Row className="justify-content-center">
       {charges?.length > 0 ? (
         charges.map((charge) => {
           const isSelected = selectedCharges.some(
@@ -24,28 +21,12 @@ const ExtraChargesSelector = ({
 
           return (
             <Col sm="6" md="4" lg="2" key={charge.id} className="mb-3">
-              <Card
+              <ExtraChargeCard
+                key={charge.id}
+                charge={charge}
                 onClick={() => toggleCharge(charge)}
-                className={`h-100 cursor-pointer extra-charge-card ${
-                  isSelected
-                    ? "border-success bg-success-subtle shadow-success"
-                    : ""
-                }`}
-                type="button">
-                <CardBody>
-                  <CardTitle tag="h5" className="mb-2">
-                    {charge.name}
-                  </CardTitle>
-                  <CardText className="mb-1">
-                    <strong>Tipo:</strong>{" "}
-                    {EXTRA_CHARGE_TYPES_BY_ID[charge.type?.id] || "N/A"}
-                  </CardText>
-                  <CardText>
-                    <strong>Monto:</strong>{" "}
-                    {formatExtraChargeAmount(charge.amount, charge.type?.id)}
-                  </CardText>
-                </CardBody>
-              </Card>
+                isSelected={isSelected}
+              />
             </Col>
           );
         })

@@ -1,13 +1,10 @@
 import React from "react";
-import { Row, Col, Card, CardBody, CardTitle, CardText } from "reactstrap";
+import { Row, Col } from "reactstrap";
 
 import PersonalizedChargeForm from "components/bookings/booking-add-edit-view/PersonalizedChargeForm";
+import ExtraChargeCard from "components/bookings/booking-add-edit-view/ExtraChargeCard";
 
-import {
-  EXTRA_CHARGE_TYPE_IDS,
-  EXTRA_CHARGE_TYPES_BY_ID,
-  formatExtraChargeAmount,
-} from "components/extra-charges/constants";
+import { EXTRA_CHARGE_TYPE_IDS } from "components/extra-charges/constants";
 
 function PersonalizedCharges({ personalizedCharges, setPersonalizedCharges }) {
   const removeCharge = (charge) => {
@@ -36,30 +33,18 @@ function PersonalizedCharges({ personalizedCharges, setPersonalizedCharges }) {
   return (
     <div>
       <h5 className="mb-3">Cargos Personalizados</h5>
-      <Row className="justify-content-evenly">
+      <Row className="justify-content-center">
         {personalizedCharges.length > 0 &&
           personalizedCharges.map((charge) => {
             return (
               <Col sm="6" md="4" lg="2" key={charge.id} className="mb-3">
-                <Card
+                <ExtraChargeCard
+                  key={charge.id}
+                  charge={charge}
                   onClick={() => removeCharge(charge)}
-                  className="h-100 cursor-pointer extra-charge-card border-success bg-success-subtle shadow-success"
-                  type="button">
-                  <CardBody>
-                    <CardTitle tag="h5" className="mb-2">
-                      {charge.name}
-                    </CardTitle>
-                    <CardText className="mb-1">
-                      <strong>Tipo:</strong>{" "}
-                      {EXTRA_CHARGE_TYPES_BY_ID[EXTRA_CHARGE_TYPE_IDS.CUSTOM] ||
-                        "N/A"}
-                    </CardText>
-                    <CardText>
-                      <strong>Monto:</strong>{" "}
-                      {formatExtraChargeAmount(charge.amount)}
-                    </CardText>
-                  </CardBody>
-                </Card>
+                  isSelected={true}
+                  typeIdOverride={EXTRA_CHARGE_TYPE_IDS.CUSTOM}
+                />
               </Col>
             );
           })}

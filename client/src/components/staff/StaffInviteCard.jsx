@@ -13,8 +13,7 @@ const StaffInviteCard = ({ invite, handleDeleteClick }) => {
     <Card className="w-100">
       {(invite.flags & INVITE_FLAGS_IDS.PENDING) !== 0 && (
         <span
-          className="position-absolute cursor-pointer"
-          style={{ top: "-0.75rem", right: "-0.6rem", zIndex: 1 }}
+          className="position-absolute cursor-pointer top-right-icon"
           title="Anular invitación"
           onClick={() => handleDeleteClick(invite.id)}>
           <FontAwesomeIcon icon={faCircleXmark} color="tomato" size="lg" />

@@ -2273,3 +2273,13 @@ p {
   margin-right: -3rem !important;
   margin-left: -3rem !important;
 }
+
+.fs-7 {
+  font-size: 0.875rem !important;
+}
+
+.top-right-icon {
+  top: -0.75rem;
+  right: -0.6rem;
+  z-index: 1;
+}

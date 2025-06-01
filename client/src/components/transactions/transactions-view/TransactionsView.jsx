@@ -47,21 +47,21 @@ import { mkConfig, generateCsv, download } from "export-to-csv";
 
 import "./TransactionsView.css";
 
-const columnOrder = [
-  "id",
-  "transactionDate",
-  "amount",
-  "currencyCode",
-  "category",
-  "subcategory",
-  "paymentMethod-name",
-  "description",
-  "referenceNumber",
-  "status",
-  "entityId",
-  "financePartner",
-  "parentId",
-  "hasDocumentUrl",
+const columnOrderTranslated = [
+  { id: "id", label: "ID" },
+  { id: "transactionDate", label: "Fecha de Transacción" },
+  { id: "amount", label: "Monto" },
+  { id: "currencyCode", label: "Moneda" },
+  { id: "category", label: "Categoría" },
+  { id: "subcategory", label: "Subcategoría" },
+  { id: "paymentMethod-name", label: "Método de Pago" },
+  { id: "description", label: "Descripción" },
+  { id: "referenceNumber", label: "Número de Referencia" },
+  { id: "status", label: "Estado" },
+  { id: "entityId", label: "Entidad" },
+  { id: "financePartner-name", label: "Socio Financiero" },
+  { id: "parentId", label: "ID Padre" },
+  { id: "hasDocumentUrl", label: "Documento" },
 ];
 
 const csvConfig = mkConfig({
@@ -175,22 +175,17 @@ function TransactionsView() {
   const exportExcel = (rows) => {
     let rowData = rows.map((row) => {
       let copy = { ...row.original };
-      delete copy.createdBy;
-      delete copy.approvedBy;
       copy = flattenObject(copy);
-      delete copy["paymentMethod-id"];
       copy.category = TRANSACTION_CATEGORIES_BY_ID[copy.categoryId] || "";
-      delete copy.categoryId;
       copy.status = TRANSACTION_STATUS_BY_ID[copy.statusId] || "";
-      delete copy.statusId;
-      delete copy.total;
-      delete copy.dateCreated;
+      copy.transactionDate = dayjs(copy.transactionDate).format("YYYY-MM-DD");
 
       return copy;
     });
+
     rowData = rowData.map((row) =>
-      columnOrder.reduce((acc, key) => {
-        acc[key] = row[key] ?? "";
+      columnOrderTranslated.reduce((acc, obj) => {
+        acc[obj.label] = row[obj.id] ?? "";
         return acc;
       }, {})
     );
