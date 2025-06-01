@@ -13,7 +13,13 @@ import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 
-function UserSignInForm({ onSignUp, loading, setLoading, toggle }) {
+function UserSignInForm({
+  onSignUp,
+  loading,
+  setLoading,
+  toggle,
+  redirect = true,
+}) {
   const { user } = useAppContext();
   const { t, getTranslatedErrorMessage } = useLanguage();
   const formRef = useRef(null);
@@ -28,9 +34,13 @@ function UserSignInForm({ onSignUp, loading, setLoading, toggle }) {
         throw new Error("User not found");
       }
       toast.success(t("common.success"));
-      navigate("/hotels");
+      if (redirect) navigate("/hotels");
       if (toggle) toggle();
-      user.set((prev) => ({ ...prev, isAuthenticated: true }));
+      user.set((prev) => ({
+        ...prev,
+        isAuthenticated: true,
+        hasFetched: false,
+      }));
     } catch (error) {
       const errorMessage = getTranslatedErrorMessage(error);
       formRef.current?.setFieldError("email", errorMessage);
@@ -115,15 +125,23 @@ UserSignInForm.propTypes = {
   loading: PropTypes.bool.isRequired,
   setLoading: PropTypes.func.isRequired,
   toggle: PropTypes.func,
+  redirect: PropTypes.bool,
 };
 
-function _UserSignInFormModal({ onSignUp, loading, setLoading, toggle }) {
+function _UserSignInFormModal({
+  onSignUp,
+  loading,
+  setLoading,
+  toggle,
+  redirect,
+}) {
   return (
     <UserSignInForm
       onSignUp={onSignUp}
       loading={loading}
       setLoading={setLoading}
       toggle={toggle}
+      redirect={redirect}
     />
   );
 }

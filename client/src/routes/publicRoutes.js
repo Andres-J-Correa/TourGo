@@ -19,6 +19,11 @@ const userRoutes = [
     path: "/users/password/reset",
     component: lazy(() => import("components/users/UserPasswordReset")),
   },
+  {
+    name: "hotelInvites",
+    path: "/hotels/invites",
+    component: lazy(() => import("components/hotels/HotelInvites")),
+  },
 ];
 
 export const publicRoutes = [...userRoutes, ...generalRoutes];

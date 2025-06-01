@@ -124,6 +124,7 @@ function BookingForm({
     const previousForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
     setSelectedCharges(previousForm.extraCharges || []);
     setSelectedRoomBookings(previousForm.roomBookings || []);
+    setPersonalizedCharges(previousForm.personalizedCharges || []);
 
     const isSameStartDate = isSameDate(dates.start, previousForm.arrivalDate);
     const isSameEndDate = isSameDate(dates.end, previousForm.departureDate);
@@ -153,6 +154,10 @@ function BookingForm({
 
       if (formData.roomBookings?.length > 0) {
         setSelectedRoomBookings(formData.roomBookings);
+      }
+
+      if (formData.personalizedCharges?.length > 0) {
+        setPersonalizedCharges(formData.personalizedCharges);
       }
 
       const isDateStartValid = dayjs(formData.arrivalDate).isValid();

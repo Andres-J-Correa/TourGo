@@ -160,6 +160,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpGet("invites")]
+        [VerifiedUser]
         public ActionResult<ItemsResponse<StaffInvite>> GetCurrentUserInvites()
         {
             try
