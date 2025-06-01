@@ -14,11 +14,13 @@ import reportWebVitals from "./reportWebVitals";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
-    <LanguageProvider>
-      <AppContextProvider>
-        <App />
-      </AppContextProvider>
-    </LanguageProvider>
+    <React.StrictMode>
+      <LanguageProvider>
+        <AppContextProvider>
+          <App />
+        </AppContextProvider>
+      </LanguageProvider>
+    </React.StrictMode>
   </BrowserRouter>
 );
 

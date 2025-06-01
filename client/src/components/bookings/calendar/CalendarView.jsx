@@ -109,7 +109,7 @@ function CalendarView() {
                 <p
                   title={name}
                   className="text-truncate m-0"
-                  style={{ maxWidth: 120 }}>
+                  style={{ maxWidth: 110 }}>
                   {name}
                 </p>
                 <span className={`text-center cursor-pointer`}>
@@ -119,7 +119,7 @@ function CalendarView() {
             </Popover>
           );
         },
-        size: 150,
+        size: 120,
         meta: {
           getDataAttributes: (info) => {
             const date = info.row.original.date;
@@ -335,8 +335,8 @@ function CalendarView() {
         <div
           ref={tableContainerRef}
           style={{
-            minHeight: "70vh",
-            maxHeight: "70vh",
+            minHeight: "90vh",
+            maxHeight: "90vh",
             overflowY: "auto",
           }}>
           <table style={{ display: "grid" }} className="table table-bordered">

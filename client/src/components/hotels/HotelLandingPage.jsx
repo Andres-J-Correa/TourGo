@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Row, Col, Table, Card } from "reactstrap";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Breadcrumb from "components/commonUI/Breadcrumb";
-import { useAppContext } from "contexts/GlobalAppContext";
+
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
+
+import { HOTEL_ROLES_IDS } from "components/hotels/constants";
+import { useAppContext } from "contexts/GlobalAppContext";
 
 // Sample data for demonstration
 const reservationsToday = [
@@ -55,6 +58,13 @@ const HotelLandingPage = () => {
   const navigate = useNavigate();
   const { hotel } = useAppContext();
 
+  const isUserAdmin = useMemo(
+    () =>
+      hotel.current.roleId === HOTEL_ROLES_IDS.ADMIN ||
+      hotel.current.roleId === HOTEL_ROLES_IDS.OWNER,
+    [hotel]
+  );
+
   return (
     <>
       <LoadingOverlay isVisible={hotel.isLoading} />
@@ -65,14 +75,16 @@ const HotelLandingPage = () => {
           <Col>
             <h1 className="display-4">{hotel.current.name}</h1>
           </Col>
-          <Col className="text-end">
-            <Link
-              className="btn btn-outline-dark"
-              to={`/hotels/${hotelId}/edit`}
-              title="Editar Hotel">
-              <FontAwesomeIcon icon={faEdit} size="lg" />
-            </Link>
-          </Col>
+          {isUserAdmin && (
+            <Col className="text-end">
+              <Link
+                className="btn btn-outline-dark"
+                to={`/hotels/${hotelId}/edit`}
+                title="Editar Hotel">
+                <FontAwesomeIcon icon={faEdit} size="lg" />
+              </Link>
+            </Col>
+          )}
         </Row>
 
         {/* Panel with Reservations */}
