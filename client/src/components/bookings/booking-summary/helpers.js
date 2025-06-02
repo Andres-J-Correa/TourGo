@@ -25,15 +25,16 @@ export function groupRoomBookings(roomBookings) {
 
   // Sort by the earliest date in each room's segments
   groupedRooms.sort((a, b) => {
+    if (!a.segments.length || !b.segments.length) return 0;
     const aEarliest = a.segments.reduce(
-      (min, seg) => (seg.date < min ? seg.date : min),
+      (min, seg) => (new Date(seg.date) < new Date(min) ? seg.date : min),
       a.segments[0].date
     );
     const bEarliest = b.segments.reduce(
-      (min, seg) => (seg.date < min ? seg.date : min),
+      (min, seg) => (new Date(seg.date) < new Date(min) ? seg.date : min),
       b.segments[0].date
     );
-    return aEarliest.localeCompare(bEarliest);
+    return new Date(aEarliest) - new Date(bEarliest);
   });
 
   return groupedRooms;

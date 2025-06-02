@@ -27,7 +27,7 @@ function HotelInvites() {
   const [invites, setInvites] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const userToggleCount = useRef(0);
+  const userSignInToggleCount = useRef(0);
 
   const { user, toggleUserSignInModal } = useAppContext();
 
@@ -58,9 +58,9 @@ function HotelInvites() {
     if (
       !user.current.isAuthenticated &&
       user.current.hasFetched &&
-      userToggleCount.current === 0
+      userSignInToggleCount.current === 0
     ) {
-      userToggleCount.current += 1;
+      userSignInToggleCount.current += 1;
       toggleUserSignInModal({
         backdrop: "static",
         keyboard: false,

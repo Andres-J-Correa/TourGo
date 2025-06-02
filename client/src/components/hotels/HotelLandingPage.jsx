@@ -160,178 +160,265 @@ const HotelLandingPage = () => {
       />
       <Breadcrumb breadcrumbs={breadcrumbs} active="Hotel" />
       <ErrorBoundary>
-        {/* Header with Hotel Name and Edit Button */}
-        <Row className="align-items-center my-3">
-          <Col>
-            <h2>{hotel.current.name}</h2>
-          </Col>
-          {isUserAdmin && (
-            <Col className="text-end">
-              <Link
-                className="btn btn-outline-dark"
-                to={`/hotels/${hotelId}/edit`}
-                title="Editar Hotel">
-                <FontAwesomeIcon icon={faEdit} size="lg" />
-              </Link>
+        <div className="hotel-landing-page">
+          <Row className="align-items-center my-3">
+            <Col>
+              <h2>{hotel.current.name}</h2>
             </Col>
-          )}
-        </Row>
+            {isUserAdmin && (
+              <Col className="text-end">
+                <Link
+                  className="btn btn-outline-dark"
+                  to={`/hotels/${hotelId}/edit`}
+                  title="Editar Hotel">
+                  <FontAwesomeIcon icon={faEdit} size="lg" />
+                </Link>
+              </Col>
+            )}
+          </Row>
 
-        <div className="mb-4">
-          <Label for="date-select" className="text-dark">
-            Fecha
-          </Label>
-          <Input
-            id="date-select"
-            type="select"
-            value={date}
-            onChange={handleDateChange}
-            className="w-auto">
-            <option value={dateOptions.yesterday}>Ayer</option>
-            <option value={dateOptions.today}>Hoy</option>
-            <option value={dateOptions.tomorrow}>Mañana</option>
-            <option value="more">Ver más fechas</option>
-          </Input>
-        </div>
+          <div className="mb-4">
+            <Label for="date-select" className="text-dark">
+              Fecha
+            </Label>
+            <Input
+              id="date-select"
+              type="select"
+              value={date}
+              onChange={handleDateChange}
+              className="w-auto">
+              <option value={dateOptions.yesterday}>Ayer</option>
+              <option value={dateOptions.today}>Hoy</option>
+              <option value={dateOptions.tomorrow}>Mañana</option>
+              <option value="more">Ver más fechas</option>
+            </Input>
+          </div>
 
-        <Row className="mb-4">
-          <Card>
-            <CardBody>
-              <h5>Reservas y Habitaciones</h5>
+          <Row className="mb-4">
+            <Card>
+              <CardBody>
+                <h5>Reservas y Habitaciones</h5>
 
-              {/* Tabs for Arrivals and Departures */}
-              <Nav tabs className="mt-3">
-                <NavItem>
-                  <NavLink
-                    className={classnames({ active: activeTab === "arrivals" })}
-                    onClick={() => toggleTab("arrivals")}
-                    style={{ cursor: "pointer" }}>
-                    Llegadas
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink
-                    className={classnames({
-                      active: activeTab === "departures",
-                    })}
-                    onClick={() => toggleTab("departures")}
-                    style={{ cursor: "pointer" }}>
-                    Salidas
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink
-                    className={classnames({ active: activeTab === "rooms" })}
-                    onClick={() => toggleTab("rooms")}
-                    style={{ cursor: "pointer" }}>
-                    Habitaciones
-                  </NavLink>
-                </NavItem>
-              </Nav>
-              <TabContent activeTab={activeTab} className="w-100 mt-3">
-                <TabPane tabId="arrivals">
-                  {data.arrivals.length === 0 ? (
-                    <div className="text-muted">
-                      No hay llegadas para esta fecha.
-                    </div>
-                  ) : (
-                    data.arrivals.map((arrival, i) => {
-                      const { arrivingRooms, otherRooms } = arrival;
-                      const arrivingRoomIds = new Set(
-                        arrivingRooms.map((ar) => ar.id)
-                      );
-                      const filteredRooms =
-                        otherRooms?.length > 0
-                          ? otherRooms.filter((r) => !arrivingRoomIds.has(r.id))
-                          : [];
+                {/* Tabs for Arrivals and Departures */}
+                <Nav tabs className="mt-3">
+                  <NavItem>
+                    <NavLink
+                      className={classnames({
+                        active: activeTab === "arrivals",
+                      })}
+                      onClick={() => toggleTab("arrivals")}
+                      style={{ cursor: "pointer" }}>
+                      Llegadas
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
+                      className={classnames({
+                        active: activeTab === "departures",
+                      })}
+                      onClick={() => toggleTab("departures")}
+                      style={{ cursor: "pointer" }}>
+                      Salidas
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
+                      className={classnames({ active: activeTab === "rooms" })}
+                      onClick={() => toggleTab("rooms")}
+                      style={{ cursor: "pointer" }}>
+                      Habitaciones
+                    </NavLink>
+                  </NavItem>
+                </Nav>
+                <TabContent activeTab={activeTab} className="w-100 mt-3">
+                  <TabPane tabId="arrivals">
+                    {data.arrivals.length === 0 ? (
+                      <div className="text-muted">
+                        No hay llegadas para esta fecha.
+                      </div>
+                    ) : (
+                      data.arrivals.map((arrival, i) => {
+                        const { arrivingRooms, otherRooms } = arrival;
+                        const arrivingRoomIds = new Set(
+                          arrivingRooms.map((ar) => ar.id)
+                        );
+                        const filteredRooms =
+                          otherRooms?.length > 0
+                            ? otherRooms.filter(
+                                (r) => !arrivingRoomIds.has(r.id)
+                              )
+                            : [];
 
-                      return (
+                        return (
+                          <div
+                            key={`arrival-${arrival.id}-${i}`}
+                            className={classnames(
+                              "w-100 border-dark-subtle text-dark-subtle py-3",
+                              {
+                                "border-bottom": i < data.arrivals.length - 1,
+                              }
+                            )}>
+                            <div>
+                              <Row>
+                                <Col md={2}>
+                                  <strong>Reserva #:</strong> {arrival.id}
+                                </Col>
+                                <Col md={3}>
+                                  <strong>ID externa:</strong>{" "}
+                                  {arrival.externalBookingId}
+                                </Col>
+                                <Col md={3}>
+                                  <strong>Proveedor:</strong>{" "}
+                                  {arrival.bookingProviderName || "N/A"}
+                                </Col>
+                                <Col className="text-end">
+                                  <BookingStatusBadge
+                                    statusId={arrival.statusId}
+                                  />
+                                </Col>
+                              </Row>
+                              <Row className="justify-content-between">
+                                <Col md={9}>
+                                  <strong>Cliente:</strong>{" "}
+                                  {arrival.customer?.firstName}{" "}
+                                  {arrival.customer?.lastName}
+                                  <br />
+                                  <strong>Teléfono:</strong>{" "}
+                                  {arrival.customer?.phone || "N/A"}
+                                  <br />
+                                  <strong>Documento:</strong>{" "}
+                                  {arrival.customer?.documentNumber || "N/A"}
+                                </Col>
+                                <Col md="auto">
+                                  <strong>Noches:</strong> {arrival.nights}
+                                  <br />
+                                  <strong>Total:</strong>{" "}
+                                  {formatCurrency(arrival.total, "COP")}
+                                  <br />
+                                  <strong>Saldo:</strong>{" "}
+                                  {formatCurrency(arrival.balanceDue, "COP")}
+                                </Col>
+                              </Row>
+                              {dayjs(arrival.eta).isValid() && (
+                                <Row>
+                                  <Col>
+                                    <strong>Fecha y hora de llegada:</strong>{" "}
+                                    {dayjs().format("DD/MM/YYYY h:mm")}
+                                  </Col>
+                                </Row>
+                              )}
+                              {arrival.notes && (
+                                <Row>
+                                  <strong>Notas:</strong>
+                                  <p className="mb-0">{arrival.notes}</p>
+                                </Row>
+                              )}
+                              <Row>
+                                <Col md={5}>
+                                  <strong>Habitaciones que llegan:</strong>{" "}
+                                  <ul className="mb-0">
+                                    {renderRooms(arrivingRooms)}
+                                  </ul>
+                                </Col>
+                                <Col md={5}>
+                                  <strong>
+                                    Habitaciones que llegan otro día:
+                                  </strong>{" "}
+                                  <ul className="mb-0">
+                                    {filteredRooms.length > 0
+                                      ? renderRooms(filteredRooms)
+                                      : "Ninguna"}
+                                  </ul>
+                                </Col>
+                                <Col className="text-end align-content-end">
+                                  <Link
+                                    to={`/hotels/${hotelId}/bookings/${arrival.id}`}
+                                    className="btn btn-outline-dark"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="Ver detalles de la reserva">
+                                    Ver Detales
+                                  </Link>
+                                </Col>
+                              </Row>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </TabPane>
+                  <TabPane tabId="departures">
+                    {data.departures.length === 0 ? (
+                      <div className="text-muted">
+                        No hay salidas para esta fecha.
+                      </div>
+                    ) : (
+                      data.departures.map((departure, i) => (
                         <div
-                          key={`arrival-${arrival.id}-${i}`}
+                          key={`arrival-${departure.id}-${i}`}
                           className={classnames(
-                            "w-100 border-dark-subtle text-dark-subtle py-3",
+                            "w-100 border-dark-subtle py-3",
                             {
-                              "border-bottom": i < data.arrivals.length - 1,
+                              "border-bottom": i < data.departures.length - 1,
                             }
                           )}>
                           <div>
                             <Row>
                               <Col md={2}>
-                                <strong>Reserva #:</strong> {arrival.id}
+                                <strong>Reserva #:</strong> {departure.id}
                               </Col>
                               <Col md={3}>
                                 <strong>ID externa:</strong>{" "}
-                                {arrival.externalBookingId}
+                                {departure.externalBookingId}
                               </Col>
                               <Col md={3}>
                                 <strong>Proveedor:</strong>{" "}
-                                {arrival.bookingProviderName || "N/A"}
+                                {departure.bookingProviderName || "N/A"}
                               </Col>
                               <Col className="text-end">
                                 <BookingStatusBadge
-                                  statusId={arrival.statusId}
+                                  statusId={departure.statusId}
                                 />
                               </Col>
                             </Row>
                             <Row className="justify-content-between">
                               <Col md={9}>
                                 <strong>Cliente:</strong>{" "}
-                                {arrival.customer?.firstName}{" "}
-                                {arrival.customer?.lastName}
+                                {departure.customer?.firstName}{" "}
+                                {departure.customer?.lastName}
                                 <br />
                                 <strong>Teléfono:</strong>{" "}
-                                {arrival.customer?.phone || "N/A"}
+                                {departure.customer?.phone || "N/A"}
                                 <br />
                                 <strong>Documento:</strong>{" "}
-                                {arrival.customer?.documentNumber || "N/A"}
+                                {departure.customer?.documentNumber || "N/A"}
                               </Col>
                               <Col md="auto">
-                                <strong>Noches:</strong> {arrival.nights}
+                                <strong>Noches:</strong> {departure.nights}
                                 <br />
-                                <strong>Total:</strong>{" "}
-                                {formatCurrency(arrival.total, "COP")}
-                                <br />
-                                <strong>Saldo:</strong>{" "}
-                                {formatCurrency(arrival.balanceDue, "COP")}
                               </Col>
                             </Row>
-                            {dayjs(arrival.eta).isValid() && (
-                              <Row>
-                                <Col>
-                                  <strong>Fecha y hora de llegada:</strong>{" "}
-                                  {dayjs().format("DD/MM/YYYY h:mm")}
-                                </Col>
-                              </Row>
-                            )}
-                            {arrival.notes && (
-                              <Row>
-                                <strong>Notas:</strong>
-                                <p className="mb-0">{arrival.notes}</p>
-                              </Row>
-                            )}
                             <Row>
                               <Col md={5}>
-                                <strong>Habitaciones que llegan:</strong>{" "}
+                                <strong>Habitaciones que salen:</strong>{" "}
                                 <ul className="mb-0">
-                                  {renderRooms(arrivingRooms)}
+                                  {renderRooms(departure.departingRooms)}
                                 </ul>
                               </Col>
-                              <Col md={5}>
-                                <strong>
-                                  Habitaciones que llegan otro día:
-                                </strong>{" "}
-                                <ul className="mb-0">
-                                  {filteredRooms.length > 0
-                                    ? renderRooms(filteredRooms)
-                                    : "Ninguna"}
-                                </ul>
+                              <Col>
+                                {departure.notes && (
+                                  <>
+                                    <strong>Notas:</strong>
+                                    <p className="mb-0">{departure.notes}</p>
+                                  </>
+                                )}
                               </Col>
                               <Col className="text-end align-content-end">
                                 <Link
-                                  to={`/hotels/${hotelId}/bookings/${arrival.id}`}
-                                  className="btn btn-outline-dark"
+                                  to={`/hotels/${hotelId}/bookings/${departure.id}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
+                                  className="btn btn-outline-dark"
                                   title="Ver detalles de la reserva">
                                   Ver Detales
                                 </Link>
@@ -339,158 +426,79 @@ const HotelLandingPage = () => {
                             </Row>
                           </div>
                         </div>
-                      );
-                    })
-                  )}
-                </TabPane>
-                <TabPane tabId="departures">
-                  {data.departures.length === 0 ? (
-                    <div className="text-muted">
-                      No hay salidas para esta fecha.
-                    </div>
-                  ) : (
-                    data.departures.map((departure, i) => (
-                      <div
-                        key={`arrival-${departure.id}-${i}`}
-                        className={classnames("w-100 border-dark-subtle py-3", {
-                          "border-bottom": i < data.departures.length - 1,
-                        })}>
-                        <div>
-                          <Row>
-                            <Col md={2}>
-                              <strong>Reserva #:</strong> {departure.id}
-                            </Col>
-                            <Col md={3}>
-                              <strong>ID externa:</strong>{" "}
-                              {departure.externalBookingId}
-                            </Col>
-                            <Col md={3}>
-                              <strong>Proveedor:</strong>{" "}
-                              {departure.bookingProviderName || "N/A"}
-                            </Col>
-                            <Col className="text-end">
-                              <BookingStatusBadge
-                                statusId={departure.statusId}
-                              />
-                            </Col>
-                          </Row>
-                          <Row className="justify-content-between">
-                            <Col md={9}>
-                              <strong>Cliente:</strong>{" "}
-                              {departure.customer?.firstName}{" "}
-                              {departure.customer?.lastName}
-                              <br />
-                              <strong>Teléfono:</strong>{" "}
-                              {departure.customer?.phone || "N/A"}
-                              <br />
-                              <strong>Documento:</strong>{" "}
-                              {departure.customer?.documentNumber || "N/A"}
-                            </Col>
-                            <Col md="auto">
-                              <strong>Noches:</strong> {departure.nights}
-                              <br />
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col md={5}>
-                              <strong>Habitaciones que salen:</strong>{" "}
-                              <ul className="mb-0">
-                                {renderRooms(departure.departingRooms)}
-                              </ul>
-                            </Col>
-                            <Col>
-                              {departure.notes && (
-                                <>
-                                  <strong>Notas:</strong>
-                                  <p className="mb-0">{departure.notes}</p>
-                                </>
-                              )}
-                            </Col>
-                            <Col className="text-end align-content-end">
-                              <Link
-                                to={`/hotels/${hotelId}/bookings/${departure.id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-outline-dark"
-                                title="Ver detalles de la reserva">
-                                Ver Detales
-                              </Link>
-                            </Col>
-                          </Row>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </TabPane>
-                <TabPane tabId="rooms">
-                  <Row className="mb-4">
-                    <Col md={12}>
-                      <strong>Información</strong>
-                      <p className="mb-0 text-dark">
-                        Esta sección muestra habitaciones que se ocupan o salen,
-                        incluyendo:
-                      </p>
-                      <ul>
-                        <li>
-                          Habitaciones con fechas de llegada o salida diferentes
-                          a la de la reserva principal.
-                        </li>
-                        <li>Cambios de habitación.</li>
-                      </ul>
-                    </Col>
+                      ))
+                    )}
+                  </TabPane>
+                  <TabPane tabId="rooms">
+                    <Row className="mb-4">
+                      <Col md={12}>
+                        <strong>Información</strong>
+                        <p className="mb-0 text-dark">
+                          Esta sección muestra habitaciones que se ocupan o
+                          salen, incluyendo:
+                        </p>
+                        <ul>
+                          <li>
+                            Habitaciones con fechas de llegada o salida
+                            diferentes a la de la reserva principal.
+                          </li>
+                          <li>Cambios de habitación.</li>
+                        </ul>
+                      </Col>
 
-                    <Col md={6}>
-                      <strong>Llegando</strong>
-                      <ul>
-                        {data.arrivingRooms?.length === 0 ? (
-                          <li className="text-muted">Ninguna</li>
-                        ) : (
-                          data.arrivingRooms.map((item) => (
-                            <li
-                              key={`arriving-${item.room.id}-${item.bookingId}`}>
-                              <strong>{item.room.name}</strong> —{" "}
-                              {item.firstName} {item.lastName}{" "}
-                              <Link
-                                to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                title="Ver detalles de la reserva">
-                                (Reserva # {item.bookingId})
-                              </Link>
-                            </li>
-                          ))
-                        )}
-                      </ul>
-                    </Col>
-                    <Col md={6}>
-                      <strong>Saliendo</strong>
-                      <ul>
-                        {data.departingRooms?.length === 0 ? (
-                          <li className="text-muted">Ninguna</li>
-                        ) : (
-                          data.departingRooms.map((item) => (
-                            <li
-                              key={`departing-${item.room.id}-${item.bookingId}`}>
-                              <strong>{item.room.name}</strong> —{" "}
-                              {item.firstName} {item.lastName}{" "}
-                              <Link
-                                to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                title="Ver detalles de la reserva">
-                                (Reserva # {item.bookingId})
-                              </Link>
-                            </li>
-                          ))
-                        )}
-                      </ul>
-                    </Col>
-                  </Row>
-                </TabPane>
-              </TabContent>
-            </CardBody>
-          </Card>
-        </Row>
+                      <Col md={6}>
+                        <strong>Llegando</strong>
+                        <ul>
+                          {data.arrivingRooms?.length === 0 ? (
+                            <li className="text-muted">Ninguna</li>
+                          ) : (
+                            data.arrivingRooms.map((item) => (
+                              <li
+                                key={`arriving-${item.room.id}-${item.bookingId}`}>
+                                <strong>{item.room.name}</strong> —{" "}
+                                {item.firstName} {item.lastName}{" "}
+                                <Link
+                                  to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Ver detalles de la reserva">
+                                  (Reserva # {item.bookingId})
+                                </Link>
+                              </li>
+                            ))
+                          )}
+                        </ul>
+                      </Col>
+                      <Col md={6}>
+                        <strong>Saliendo</strong>
+                        <ul>
+                          {data.departingRooms?.length === 0 ? (
+                            <li className="text-muted">Ninguna</li>
+                          ) : (
+                            data.departingRooms.map((item) => (
+                              <li
+                                key={`departing-${item.room.id}-${item.bookingId}`}>
+                                <strong>{item.room.name}</strong> —{" "}
+                                {item.firstName} {item.lastName}{" "}
+                                <Link
+                                  to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Ver detalles de la reserva">
+                                  (Reserva # {item.bookingId})
+                                </Link>
+                              </li>
+                            ))
+                          )}
+                        </ul>
+                      </Col>
+                    </Row>
+                  </TabPane>
+                </TabContent>
+              </CardBody>
+            </Card>
+          </Row>
+        </div>
       </ErrorBoundary>
     </>
   );

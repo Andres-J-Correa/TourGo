@@ -5,6 +5,6 @@
   border-color: var(--bs-nav-tabs-link-active-border-color);
 }
 
-strong {
+.hotel-landing-page strong {
   color: var(--bs-dark);
 }
