@@ -424,60 +424,67 @@ const HotelLandingPage = () => {
                 </TabPane>
                 <TabPane tabId="rooms">
                   <Row className="mb-4">
-                    <Row>
+                    <Col md={12}>
                       <strong>Información</strong>
-                      <p>
-                        Esta sección muestra las habitaciones que llegan y salen
-                        hoy, incluyendo reservas que ya llegaron en días
-                        anteriores o que saldrán en días posteriores.
+                      <p className="mb-0 text-dark">
+                        Esta sección muestra habitaciones que se ocupan o salen,
+                        incluyendo:
                       </p>
-                      <Col md={6}>
-                        <strong>Llegando</strong>
-                        <ul>
-                          {data.arrivingRooms?.length === 0 ? (
-                            <li className="text-muted">Ninguna</li>
-                          ) : (
-                            data.arrivingRooms.map((item) => (
-                              <li
-                                key={`arriving-${item.room.id}-${item.bookingId}`}>
-                                <strong>{item.room.name}</strong> —{" "}
-                                {item.firstName} {item.lastName}{" "}
-                                <Link
-                                  to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  title="Ver detalles de la reserva">
-                                  (Reserva # {item.bookingId})
-                                </Link>
-                              </li>
-                            ))
-                          )}
-                        </ul>
-                      </Col>
-                      <Col md={6}>
-                        <strong>Saliendo</strong>
-                        <ul>
-                          {data.departingRooms?.length === 0 ? (
-                            <li className="text-muted">Ninguna</li>
-                          ) : (
-                            data.departingRooms.map((item) => (
-                              <li
-                                key={`departing-${item.room.id}-${item.bookingId}`}>
-                                <strong>{item.room.name}</strong> —{" "}
-                                {item.firstName} {item.lastName}{" "}
-                                <Link
-                                  to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  title="Ver detalles de la reserva">
-                                  (Reserva # {item.bookingId})
-                                </Link>
-                              </li>
-                            ))
-                          )}
-                        </ul>
-                      </Col>
-                    </Row>
+                      <ul>
+                        <li>
+                          Habitaciones con fechas de llegada o salida diferentes
+                          a la de la reserva principal.
+                        </li>
+                        <li>Cambios de habitación.</li>
+                      </ul>
+                    </Col>
+
+                    <Col md={6}>
+                      <strong>Llegando</strong>
+                      <ul>
+                        {data.arrivingRooms?.length === 0 ? (
+                          <li className="text-muted">Ninguna</li>
+                        ) : (
+                          data.arrivingRooms.map((item) => (
+                            <li
+                              key={`arriving-${item.room.id}-${item.bookingId}`}>
+                              <strong>{item.room.name}</strong> —{" "}
+                              {item.firstName} {item.lastName}{" "}
+                              <Link
+                                to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Ver detalles de la reserva">
+                                (Reserva # {item.bookingId})
+                              </Link>
+                            </li>
+                          ))
+                        )}
+                      </ul>
+                    </Col>
+                    <Col md={6}>
+                      <strong>Saliendo</strong>
+                      <ul>
+                        {data.departingRooms?.length === 0 ? (
+                          <li className="text-muted">Ninguna</li>
+                        ) : (
+                          data.departingRooms.map((item) => (
+                            <li
+                              key={`departing-${item.room.id}-${item.bookingId}`}>
+                              <strong>{item.room.name}</strong> —{" "}
+                              {item.firstName} {item.lastName}{" "}
+                              <Link
+                                to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Ver detalles de la reserva">
+                                (Reserva # {item.bookingId})
+                              </Link>
+                            </li>
+                          ))
+                        )}
+                      </ul>
+                    </Col>
                   </Row>
                 </TabPane>
               </TabContent>
