@@ -451,5 +451,129 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return result;
         }
+
+        [HttpGet("hotel/{id:int}/arrivals")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<BookingArrival>> GetArrivingToday(int id, [FromQuery] DateOnly date)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<BookingArrival>? arrivals = _bookingService.GetArrivalsByDate(date, id);
+
+                if (arrivals == null)
+                {
+                    result = NotFound404(new ErrorResponse("No arrivals found"));
+                }
+                else
+                {
+                    ItemsResponse<BookingArrival> response = new ItemsResponse<BookingArrival>() { Items = arrivals };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("hotel/{id:int}/departures")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<BookingDeparture>> GetLeavingToday(int id, [FromQuery] DateOnly date)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<BookingDeparture>? departures = _bookingService.GetDeparturesByDate(date, id);
+
+                if (departures == null || departures.Count == 0)
+                {
+                    result = NotFound404(new ErrorResponse("No departures found for today"));
+                }
+                else
+                {
+                    ItemsResponse<BookingDeparture> response = new ItemsResponse<BookingDeparture>() { Items = departures };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("hotel/{id:int}/departures/rooms")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<RoomBooking>> GetDepartingRoomBookings(int id, [FromQuery] DateOnly date)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<RoomBooking>? departingRooms = _bookingService.GetDepartingRoomBookings(date, id);
+
+                if (departingRooms == null)
+                {
+                    result = NotFound404(new ErrorResponse("No departing room bookings found for today"));
+                }
+                else
+                {
+                    ItemsResponse<RoomBooking> response = new ItemsResponse<RoomBooking>() { Items = departingRooms };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("hotel/{id:int}/arrivals/rooms")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<RoomBooking>> GetArrivingRoomBookings(int id, [FromQuery] DateOnly date)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                List<RoomBooking>? arrivingRooms = _bookingService.GetArrivingRoomBookings(date, id);
+
+                if (arrivingRooms == null)
+                {
+                    result = NotFound404(new ErrorResponse("No arriving room bookings found for today"));
+                }
+                else
+                {
+                    ItemsResponse<RoomBooking> response = new ItemsResponse<RoomBooking>() { Items = arrivingRooms };
+
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
     }
 }

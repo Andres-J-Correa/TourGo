@@ -41,6 +41,7 @@ const BookingMinimalCard = ({ bookingId, hotelId }) => {
               <Link
                 to={`/hotels/${hotelId}/bookings/${booking.id}`}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="btn btn-link text-decoration-none float-end p-0"
                 title="Ver detalles">
                 <FontAwesomeIcon icon={faArrowUpRightFromSquare} />

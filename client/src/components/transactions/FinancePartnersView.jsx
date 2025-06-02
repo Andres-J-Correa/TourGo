@@ -3,19 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  flexRender,
-  getExpandedRowModel,
-} from "@tanstack/react-table";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowUpShortWide,
-  faArrowDownWideShort,
-  faSort,
-} from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import {
   Button,
@@ -31,7 +18,6 @@ import {
 import { isEqual } from "lodash";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
-import classNames from "classnames";
 
 // Internal Services/Utilities
 import {
@@ -47,6 +33,7 @@ import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
+import DataTable from "components/commonUI/tables/DataTable";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -334,24 +321,6 @@ function FinancePartnersView() {
     [handleDeleteClick]
   );
 
-  const table = useReactTable({
-    data: filteredData,
-    columns,
-    defaultColumn: {
-      maxSize: "none",
-      minSize: 50,
-      size: "auto",
-    },
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getExpandedRowModel: getExpandedRowModel(), // Enable row expansion
-    getRowCanExpand: () => true,
-  });
-
   const onGetFinancePartnersSuccess = (response) => {
     if (response.isSuccessful) {
       setFinancePartners(response.items);
@@ -460,141 +429,43 @@ function FinancePartnersView() {
           </Input>
         </div>
         <div className="table-responsive w-100">
-          <table className="table table-bordered table-striped table-hover">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      onClick={
-                        !loading
-                          ? header.column.getToggleSortingHandler()
-                          : () => {}
-                      }
-                      className={classNames(
-                        "text-bg-dark text-center align-content-center",
-                        {
-                          "cursor-pointer": header.column.getCanSort(),
-                          "cursor-not-allowed": loading,
-                        }
-                      )}
-                      style={{
-                        maxWidth: header.column.columnDef.maxSize || "none",
-                        minWidth: header.column.columnDef.minSize || "none",
-                        width: header.column.getSize() || "auto",
-                      }}>
-                      {
-                        <div
-                          style={{ minWidth: "max-content" }}
-                          className="align-items-center">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          <span className="float-end ms-2">
-                            {{
-                              asc: (
-                                <FontAwesomeIcon icon={faArrowUpShortWide} />
-                              ),
-                              desc: (
-                                <FontAwesomeIcon icon={faArrowDownWideShort} />
-                              ),
-                            }[header.column.getIsSorted()] ||
-                              (header.column.getCanSort() && (
-                                <FontAwesomeIcon icon={faSort} />
-                              ))}
-                          </span>
-                        </div>
-                      }
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={columns.length} className="text-center">
-                    <Spinner size="sm" /> Cargando...
-                  </td>
-                </tr>
-              ) : table.getRowModel().rows.length === 0 ? (
-                <tr>
-                  <td colSpan={columns.length} className="text-center">
-                    No hay registros
-                  </td>
-                </tr>
-              ) : (
-                table.getRowModel().rows.map((row) => (
-                  <React.Fragment key={row.id}>
-                    <tr
-                      onClick={() =>
-                        table.setExpanded({ [row.id]: !row.getIsExpanded() })
-                      }
-                      className="cursor-pointer">
-                      {row.getVisibleCells().map((cell) => (
-                        <td
-                          className={classNames(
-                            "text-center align-content-center",
-                            {
-                              "bg-info-subtle": row.getIsExpanded(),
-                            }
-                          )}
-                          style={{
-                            maxWidth: cell.column.columnDef.maxSize || "none",
-                            minWidth: cell.column.columnDef.minSize || "none",
-                            width: cell.column.getSize() || "auto",
-                          }}
-                          key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                    {row.getIsExpanded() && (
-                      <tr>
-                        <td
-                          colSpan={row.getVisibleCells().length}
-                          className="p-0">
-                          <div className="p-2 border border-info-subtle bg-light">
-                            <Row>
-                              <Col md={6}>
-                                <strong>Creado por:</strong>{" "}
-                                {row.original.createdBy?.firstName}{" "}
-                                {row.original.createdBy?.lastName}
-                              </Col>
-                              <Col md={6}>
-                                <strong>Fecha de creación:</strong>{" "}
-                                {dayjs(row.original.dateCreated).format(
-                                  "DD/MM/YYYY - h:mm A"
-                                )}
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col md={6}>
-                                <strong>Modificado por:</strong>{" "}
-                                {row.original.modifiedBy?.firstName}{" "}
-                                {row.original.modifiedBy?.lastName}
-                              </Col>
-                              <Col md={6}>
-                                <strong>Fecha de modificación:</strong>{" "}
-                                {dayjs(row.original.dateModified).format(
-                                  "DD/MM/YYYY - h:mm A"
-                                )}
-                              </Col>
-                            </Row>
-                          </div>
-                        </td>
-                      </tr>
+          <DataTable
+            data={filteredData}
+            columns={columns}
+            loading={loading}
+            sorting={sorting}
+            onSortingChange={setSorting}
+            expandedRowRender={(row) => (
+              <div className="p-2 border border-info-subtle bg-light">
+                <Row>
+                  <Col md={6}>
+                    <strong>Creado por:</strong>{" "}
+                    {row.original.createdBy?.firstName}{" "}
+                    {row.original.createdBy?.lastName}
+                  </Col>
+                  <Col md={6}>
+                    <strong>Fecha de creación:</strong>{" "}
+                    {dayjs(row.original.dateCreated).format(
+                      "DD/MM/YYYY - h:mm A"
                     )}
-                  </React.Fragment>
-                ))
-              )}
-            </tbody>
-          </table>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={6}>
+                    <strong>Modificado por:</strong>{" "}
+                    {row.original.modifiedBy?.firstName}{" "}
+                    {row.original.modifiedBy?.lastName}
+                  </Col>
+                  <Col md={6}>
+                    <strong>Fecha de modificación:</strong>{" "}
+                    {dayjs(row.original.dateModified).format(
+                      "DD/MM/YYYY - h:mm A"
+                    )}
+                  </Col>
+                </Row>
+              </div>
+            )}
+          />
         </div>
       </ErrorBoundary>
     </>

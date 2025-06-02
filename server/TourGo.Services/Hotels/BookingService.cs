@@ -304,6 +304,99 @@ namespace TourGo.Services.Hotels
             });
         }
 
+        public List<BookingArrival>? GetArrivalsByDate(DateOnly arrivalDate, int hotelId)
+        {
+            string proc = "bookings_select_by_arrival_date";
+            List<BookingArrival>? bookings = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_date", arrivalDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                BookingArrival booking = MapBookingArrival(reader, ref index);
+
+                bookings ??= new List<BookingArrival>();
+                bookings.Add(booking);
+            });
+
+            return bookings;
+        }
+
+        public List<BookingDeparture>? GetDeparturesByDate(DateOnly departureDate, int hotelId)
+        {
+            string proc = "bookings_select_by_departure_date";
+            List<BookingDeparture>? bookings = null;
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_date", departureDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                BookingDeparture booking = MapBookingDeparture(reader, ref index);
+
+                bookings ??= new List<BookingDeparture>();
+                bookings.Add(booking);
+            });
+
+            return bookings;
+        }
+
+        public List<RoomBooking>? GetDepartingRoomBookings(DateOnly departureDate, int hotelId)
+        {
+            string proc = "room_bookings_select_departing_by_date";
+            List<RoomBooking>? list = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_departureDate", departureDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                RoomBooking roomBooking = new RoomBooking();
+                roomBooking.Room.Id = reader.GetSafeInt32(index++);
+                roomBooking.Room.Name = reader.GetSafeString(index++);
+                roomBooking.FirstName = reader.GetSafeString(index++);
+                roomBooking.LastName = reader.GetSafeString(index++);
+                roomBooking.BookingId = reader.GetSafeInt32(index++);
+
+                list ??= new List<RoomBooking>();
+                list.Add(roomBooking);
+            });
+            return list;
+        }
+
+        public List<RoomBooking>? GetArrivingRoomBookings(DateOnly arrivalDate, int hotelId)
+        {
+
+            string proc = "room_bookings_select_arriving_by_date";
+            List<RoomBooking>? list = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_arrivalDate", arrivalDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                RoomBooking roomBooking = new RoomBooking();
+                roomBooking.Room.Id = reader.GetSafeInt32(index++);
+                roomBooking.Room.Name = reader.GetSafeString(index++);
+                roomBooking.FirstName = reader.GetSafeString(index++);
+                roomBooking.LastName = reader.GetSafeString(index++);
+                roomBooking.BookingId = reader.GetSafeInt32(index++);
+
+                list ??= new List<RoomBooking>();
+                list.Add(roomBooking);
+            });
+
+            return list;
+        }
+
         public bool IsValidSortDirection(string? direction)
         {
             return string.Equals(direction, "ASC", StringComparison.OrdinalIgnoreCase)
@@ -314,6 +407,19 @@ namespace TourGo.Services.Hotels
         {
             return !string.IsNullOrWhiteSpace(column) && BookingSortColumns.ContainsKey(column);
         }
+
+        private readonly Dictionary<string, string> BookingSortColumns = new(StringComparer.OrdinalIgnoreCase)
+            {
+                {"Id", "b.Id"},
+                {"ArrivalDate", "b.ArrivalDate"},
+                {"DepartureDate", "b.DepartureDate"},
+                {"Total", "b.Total"},
+                {"BalanceDue", "i.BalanceDue"},
+                {"FirstName", "c.FirstName"},
+                {"LastName", "c.LastName"},
+                {"ExternalBookingId", "b.ExternalBookingId"},
+                {"StatusId", "b.StatusId" }
+            };
 
         private static RoomBooking MapRoomBooking(IDataReader reader, ref int index)
         {
@@ -379,17 +485,44 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
-        private readonly Dictionary<string, string> BookingSortColumns = new(StringComparer.OrdinalIgnoreCase)
-            {
-                {"Id", "b.Id"},
-                {"ArrivalDate", "b.ArrivalDate"},
-                {"DepartureDate", "b.DepartureDate"},
-                {"Total", "b.Total"},
-                {"BalanceDue", "i.BalanceDue"},
-                {"FirstName", "c.FirstName"},
-                {"LastName", "c.LastName"},
-                {"ExternalBookingId", "b.ExternalBookingId"},
-                {"StatusId", "b.StatusId" }
-            };
+        private static BookingDeparture MapBookingDeparture(IDataReader reader, ref int index)
+        {
+            BookingDeparture booking = new BookingDeparture();
+            booking.Id = reader.GetSafeInt32(index++);
+            booking.ExternalBookingId = reader.GetSafeString(index++);
+            booking.BookingProviderName = reader.GetSafeString(index++);
+            booking.StatusId = reader.GetSafeInt32(index++);
+            booking.Notes = reader.GetSafeString(index++);
+            booking.Nights = reader.GetSafeInt32(index++);
+            booking.DepartingRooms = reader.DeserializeObjectSafely<List<Lookup>>(index++, () => null);
+            booking.Customer.Id = reader.GetSafeInt32(index++);
+            booking.Customer.FirstName = reader.GetSafeString(index++);
+            booking.Customer.LastName = reader.GetSafeString(index++);
+            booking.Customer.Phone = reader.GetSafeString(index++);
+            booking.Customer.DocumentNumber = reader.GetSafeString(index++);
+            return booking;
+        }
+
+        private static BookingArrival MapBookingArrival(IDataReader reader, ref int index)
+        {
+            BookingArrival booking = new BookingArrival();
+            booking.Id = reader.GetSafeInt32(index++);
+            booking.ExternalBookingId = reader.GetSafeString(index++);
+            booking.BookingProviderName = reader.GetSafeString(index++);
+            booking.ETA = reader.GetSafeDateTimeNullable(index++);
+            booking.StatusId = reader.GetSafeInt32(index++);
+            booking.Notes = reader.GetSafeString(index++);
+            booking.Nights = reader.GetSafeInt32(index++);
+            booking.Total = reader.GetSafeDecimal(index++);
+            booking.BalanceDue = reader.GetSafeDecimal(index++);
+            booking.ArrivingRooms = reader.DeserializeObjectSafely<List<Lookup>>(index++, () => null);
+            booking.OtherRooms = reader.DeserializeObjectSafely<List<Lookup>>(index++, () => null);
+            booking.Customer.Id = reader.GetSafeInt32(index++);
+            booking.Customer.FirstName = reader.GetSafeString(index++);
+            booking.Customer.LastName = reader.GetSafeString(index++);
+            booking.Customer.Phone = reader.GetSafeString(index++);
+            booking.Customer.DocumentNumber = reader.GetSafeString(index++);
+            return booking;
+        }
     }
 }

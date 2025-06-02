@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import {
   EXTRA_CHARGE_TYPE_IDS,
   GENERAL_CHARGE_TYPES,
@@ -13,16 +12,31 @@ export function groupRoomBookings(roomBookings) {
     grouped[roomId].push(b);
   });
 
-  return Object.values(grouped).map((bookings) => {
+  // Map to grouped room objects
+  const groupedRooms = Object.values(grouped).map((bookings) => {
     const roomName = bookings[0]?.room?.name;
     const roomDescription = bookings[0]?.room?.description || "";
-    bookings.sort((a, b) => dayjs(a.date) - dayjs(b.date));
     return {
       roomName,
       roomDescription,
       segments: bookings.map((b) => ({ date: b.date, price: b.price })),
     };
   });
+
+  // Sort by the earliest date in each room's segments
+  groupedRooms.sort((a, b) => {
+    const aEarliest = a.segments.reduce(
+      (min, seg) => (seg.date < min ? seg.date : min),
+      a.segments[0].date
+    );
+    const bEarliest = b.segments.reduce(
+      (min, seg) => (seg.date < min ? seg.date : min),
+      b.segments[0].date
+    );
+    return aEarliest.localeCompare(bEarliest);
+  });
+
+  return groupedRooms;
 }
 
 export function calculateRoomCharges(extraCharges, subtotal, nights) {
