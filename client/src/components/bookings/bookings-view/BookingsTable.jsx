@@ -10,7 +10,7 @@ import classNames from "classnames";
 import { flexRender } from "@tanstack/react-table";
 import dayjs from "dayjs";
 
-const BookingsTable = ({ table, columns, data, loading, paginationData }) => (
+const BookingsTable = ({ table, columns, loading }) => (
   <table className="table table-bordered table-hover table-striped mb-1">
     <thead>
       {table.getHeaderGroups().map((headerGroup) => (

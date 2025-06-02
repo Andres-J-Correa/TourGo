@@ -316,13 +316,7 @@ const BookingsView = () => {
             de {data.totalCount} reservas
           </span>
 
-          <BookingsTable
-            table={table}
-            columns={columns}
-            data={data}
-            loading={loading}
-            paginationData={paginationData}
-          />
+          <BookingsTable table={table} columns={columns} loading={loading} />
 
           <p
             className={classNames("mb-0 text-center text-dark", {
