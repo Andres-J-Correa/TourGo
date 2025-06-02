@@ -26,16 +26,18 @@ export default function useHotelFormData(hotelId) {
           financePartnersResult,
           transactionSubcategoriesResult,
         ]) => {
+          const errors = [];
+
           if (paymentMethodsResult.status === "fulfilled") {
             setPaymentMethods(paymentMethodsResult.value.items || []);
           } else if (paymentMethodsResult.reason?.response?.status !== 404) {
-            toast.error("Error al cargar métodos de pago");
+            errors.push("Error al cargar métodos de pago");
           }
 
           if (financePartnersResult.status === "fulfilled") {
             setFinancePartners(financePartnersResult.value.items || []);
           } else if (financePartnersResult.reason?.response?.status !== 404) {
-            toast.error("Error al cargar socios financieros");
+            errors.push("Error al cargar socios financieros");
           }
 
           if (transactionSubcategoriesResult.status === "fulfilled") {
@@ -45,7 +47,11 @@ export default function useHotelFormData(hotelId) {
           } else if (
             transactionSubcategoriesResult.reason?.response?.status !== 404
           ) {
-            toast.error("Error al cargar subcategorías de transacciones");
+            errors.push("Error al cargar subcategorías de transacciones");
+          }
+
+          if (errors.length > 0) {
+            toast.error(errors.join(" | "));
           }
         }
       )

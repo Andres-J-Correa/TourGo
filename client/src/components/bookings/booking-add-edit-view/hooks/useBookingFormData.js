@@ -35,22 +35,28 @@ export default function useBookingFormData(hotelId, dates) {
       getBookingProvidersMinimalByHotelId(hotelId),
     ])
       .then(([roomsResult, chargesResult, bookingProvidersResult]) => {
+        const errors = [];
+
         if (roomsResult.status === "fulfilled") {
           setRooms(roomsResult.value.items || []);
         } else if (roomsResult.reason?.response?.status !== 404) {
-          toast.error("Error al cargar habitaciones");
+          errors.push("Error al cargar habitaciones");
         }
 
         if (chargesResult.status === "fulfilled") {
           setCharges(chargesResult.value.items || []);
         } else if (chargesResult.reason?.response?.status !== 404) {
-          toast.error("Error al cargar cargos extras");
+          errors.push("Error al cargar cargos extras");
         }
 
         if (bookingProvidersResult.status === "fulfilled") {
           setBookingProviderOptions(bookingProvidersResult.value.items || []);
         } else if (bookingProvidersResult.reason?.response?.status !== 404) {
-          toast.error("Error al cargar proveedores de reservas");
+          errors.push("Error al cargar proveedores de reservas");
+        }
+
+        if (errors.length > 0) {
+          toast.error(errors.join(" | "));
         }
       })
       .finally(() => {

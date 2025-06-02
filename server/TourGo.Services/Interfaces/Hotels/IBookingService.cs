@@ -23,5 +23,9 @@ namespace TourGo.Services.Interfaces
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
         void UpdateStatus(int bookingId, int userId, BookingStatusEnum status);
+        List<BookingArrival>? GetArrivalsByDate(DateOnly arrivalDate, int hotelId);
+        List<BookingDeparture>? GetDeparturesByDate(DateOnly departureDate, int hotelId);
+        List<RoomBooking>? GetDepartingRoomBookings(DateOnly departureDate, int hotelId);
+        List<RoomBooking>? GetArrivingRoomBookings(DateOnly arrivalDate, int hotelId);
     }
 }

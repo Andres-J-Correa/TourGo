@@ -1,157 +1,504 @@
-import React from "react";
-import { Row, Col, Table, Card } from "reactstrap";
+import React, { useMemo, useEffect, useState } from "react";
+import {
+  Row,
+  Col,
+  Card,
+  Input,
+  Nav,
+  NavItem,
+  NavLink,
+  TabContent,
+  TabPane,
+  Label,
+  CardBody,
+} from "reactstrap";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Breadcrumb from "components/commonUI/Breadcrumb";
-import { useAppContext } from "contexts/GlobalAppContext";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
-
-// Sample data for demonstration
-const reservationsToday = [
-  {
-    id: 1,
-    guest: "Juan Pérez",
-    room: "101",
-    amountDue: "$200",
-    eta: "14:00",
-    arrived: false,
-  },
-  {
-    id: 2,
-    guest: "María López",
-    room: "202",
-    amountDue: "$350",
-    eta: null,
-    arrived: false,
-  },
-];
-
-const departuresToday = [
-  {
-    id: 3,
-    guest: "Carlos Gómez",
-    room: "305",
-    note: "Solicitó transporte",
-    departed: false,
-  },
-  { id: 4, guest: "Ana Martínez", room: "401", note: null, departed: false },
-];
-
-const todoList = [
-  "Verificar inventario de limpieza",
-  "Confirmar llegada del proveedor de alimentos",
-  "Preparar facturas para las salidas del día",
-];
+import { HOTEL_ROLES_IDS } from "components/hotels/constants";
+import { useAppContext } from "contexts/GlobalAppContext";
+import {
+  getArrivals,
+  getDepartures,
+  getArrivingRooms,
+  getDepartingRooms,
+} from "services/bookingService";
+import { formatCurrency } from "utils/currencyHelper";
+import { toast } from "react-toastify";
+import dayjs from "dayjs";
+import classnames from "classnames";
+import BookingStatusBadge from "components/bookings/BookingStatusBadge";
+import "./HotelLandingPage.css";
 
 const breadcrumbs = [
   { label: "Inicio", path: "/" },
   { label: "Hoteles", path: "/hotels" },
 ];
 
+const dateOptions = {
+  yesterday: dayjs().subtract(1, "day").format("YYYY-MM-DD"),
+  today: dayjs().format("YYYY-MM-DD"),
+  tomorrow: dayjs().add(1, "day").format("YYYY-MM-DD"),
+};
+
 const HotelLandingPage = () => {
-  const { hotelId } = useParams();
+  const [data, setData] = useState({
+    arrivals: [],
+    departures: [],
+    arrivingRooms: [],
+    departingRooms: [],
+  });
+  const [date, setDate] = useState(dateOptions.today);
+  const [loadingArrivalsDepartures, setLoadingArrivalsDepartures] =
+    useState(false);
+  const [activeTab, setActiveTab] = useState("arrivals");
+
   const navigate = useNavigate();
+
+  const { hotelId } = useParams();
   const { hotel } = useAppContext();
+
+  const isUserAdmin = useMemo(
+    () =>
+      hotel.current.roleId === HOTEL_ROLES_IDS.ADMIN ||
+      hotel.current.roleId === HOTEL_ROLES_IDS.OWNER,
+    [hotel]
+  );
+
+  const handleDateChange = (e) => {
+    if (e.target.value === "more") {
+      navigate(`/hotels/${hotelId}/bookings`);
+    } else {
+      setDate(e.target.value);
+    }
+  };
+
+  const toggleTab = (tab) => {
+    if (activeTab !== tab) setActiveTab(tab);
+  };
+
+  // Helper to render room names separated by " - "
+  const renderRooms = (rooms) =>
+    rooms && rooms.length > 0
+      ? rooms.map((r) => (
+          <li key={r.id} className="mb-1">
+            {r.name}
+          </li>
+        ))
+      : "Sin habitaciones";
+
+  useEffect(() => {
+    setLoadingArrivalsDepartures(true);
+
+    Promise.allSettled([
+      getArrivals(hotelId, date),
+      getDepartures(hotelId, date),
+      getArrivingRooms(hotelId, date),
+      getDepartingRooms(hotelId, date),
+    ])
+      .then(
+        ([
+          arrivalsResult,
+          departuresResult,
+          arrivingRoomsResult,
+          departingRoomsResult,
+        ]) => {
+          const errors = [];
+          let arrivals = [];
+          let departures = [];
+          let arrivingRooms = [];
+          let departingRooms = [];
+
+          if (arrivalsResult.status === "fulfilled") {
+            arrivals = arrivalsResult.value?.items || [];
+          } else if (arrivalsResult.reason?.response?.status !== 404) {
+            errors.push("Error al cargar llegadas de hoy");
+          }
+
+          if (departuresResult.status === "fulfilled") {
+            departures = departuresResult.value?.items || [];
+          } else if (departuresResult.reason?.response?.status !== 404) {
+            errors.push("Error al cargar salidas de hoy");
+          }
+
+          if (arrivingRoomsResult.status === "fulfilled") {
+            arrivingRooms = arrivingRoomsResult.value?.items || [];
+          } else if (arrivingRoomsResult.reason?.response?.status !== 404) {
+            errors.push("Error al cargar habitaciones que llegan hoy");
+          }
+
+          if (departingRoomsResult.status === "fulfilled") {
+            departingRooms = departingRoomsResult.value?.items || [];
+          } else if (departingRoomsResult.reason?.response?.status !== 404) {
+            errors.push("Error al cargar habitaciones que salen hoy");
+          }
+
+          setData({
+            arrivals,
+            departures,
+            arrivingRooms,
+            departingRooms,
+          });
+
+          if (errors.length > 0) {
+            toast.error(errors.join(" | "));
+          }
+        }
+      )
+      .finally(() => {
+        setLoadingArrivalsDepartures(false);
+      });
+  }, [hotelId, date]);
 
   return (
     <>
-      <LoadingOverlay isVisible={hotel.isLoading} />
+      <LoadingOverlay
+        isVisible={hotel.isLoading || loadingArrivalsDepartures}
+      />
       <Breadcrumb breadcrumbs={breadcrumbs} active="Hotel" />
       <ErrorBoundary>
-        {/* Header with Hotel Name and Edit Button */}
-        <Row className="align-items-center mb-3">
-          <Col>
-            <h1 className="display-4">{hotel.current.name}</h1>
-          </Col>
-          <Col className="text-end">
-            <Link
-              className="btn btn-outline-dark"
-              to={`/hotels/${hotelId}/edit`}
-              title="Editar Hotel">
-              <FontAwesomeIcon icon={faEdit} size="lg" />
-            </Link>
-          </Col>
-        </Row>
+        <div className="hotel-landing-page">
+          <Row className="align-items-center my-3">
+            <Col>
+              <h2>{hotel.current.name}</h2>
+            </Col>
+            {isUserAdmin && (
+              <Col className="text-end">
+                <Link
+                  className="btn btn-outline-dark"
+                  to={`/hotels/${hotelId}/edit`}
+                  title="Editar Hotel">
+                  <FontAwesomeIcon icon={faEdit} size="lg" />
+                </Link>
+              </Col>
+            )}
+          </Row>
 
-        {/* Panel with Reservations */}
-        <Row>
-          <Col md="6">
-            <Card body>
-              <h5 className="mb-3">Reservas que llegan hoy</h5>
-              <Table bordered>
-                <thead>
-                  <tr>
-                    <th>Huésped</th>
-                    <th>Habitación</th>
-                    <th>Deuda</th>
-                    <th>Hora Estimada</th>
-                    <th>¿Llegó?</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reservationsToday.map((res) => (
-                    <tr
-                      key={res.id}
-                      onClick={() => navigate(`/bookings/${res.id}`)}
+          <div className="mb-4">
+            <Label for="date-select" className="text-dark">
+              Fecha
+            </Label>
+            <Input
+              id="date-select"
+              type="select"
+              value={date}
+              onChange={handleDateChange}
+              className="w-auto">
+              <option value={dateOptions.yesterday}>Ayer</option>
+              <option value={dateOptions.today}>Hoy</option>
+              <option value={dateOptions.tomorrow}>Mañana</option>
+              <option value="more">Ver más fechas</option>
+            </Input>
+          </div>
+
+          <Row className="mb-4">
+            <Card>
+              <CardBody>
+                <h5>Reservas y Habitaciones</h5>
+
+                {/* Tabs for Arrivals and Departures */}
+                <Nav tabs className="mt-3">
+                  <NavItem>
+                    <NavLink
+                      className={classnames({
+                        active: activeTab === "arrivals",
+                      })}
+                      onClick={() => toggleTab("arrivals")}
                       style={{ cursor: "pointer" }}>
-                      <td>{res.guest}</td>
-                      <td>{res.room}</td>
-                      <td>{res.amountDue}</td>
-                      <td>{res.eta || "N/A"}</td>
-                      <td>
-                        <input type="checkbox" checked={res.arrived} readOnly />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card>
-          </Col>
+                      Llegadas
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
+                      className={classnames({
+                        active: activeTab === "departures",
+                      })}
+                      onClick={() => toggleTab("departures")}
+                      style={{ cursor: "pointer" }}>
+                      Salidas
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
+                      className={classnames({ active: activeTab === "rooms" })}
+                      onClick={() => toggleTab("rooms")}
+                      style={{ cursor: "pointer" }}>
+                      Habitaciones
+                    </NavLink>
+                  </NavItem>
+                </Nav>
+                <TabContent activeTab={activeTab} className="w-100 mt-3">
+                  <TabPane tabId="arrivals">
+                    {data.arrivals.length === 0 ? (
+                      <div className="text-muted">
+                        No hay llegadas para esta fecha.
+                      </div>
+                    ) : (
+                      data.arrivals.map((arrival, i) => {
+                        const { arrivingRooms, otherRooms } = arrival;
+                        const arrivingRoomIds = new Set(
+                          arrivingRooms.map((ar) => ar.id)
+                        );
+                        const filteredRooms =
+                          otherRooms?.length > 0
+                            ? otherRooms.filter(
+                                (r) => !arrivingRoomIds.has(r.id)
+                              )
+                            : [];
 
-          <Col md="6">
-            <Card body>
-              <h5 className="mb-3">Reservas que salen hoy</h5>
-              <Table bordered>
-                <thead>
-                  <tr>
-                    <th>Huésped</th>
-                    <th>Habitación</th>
-                    <th>Nota</th>
-                    <th>¿Salió?</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {departuresToday.map((dep) => (
-                    <tr key={dep.id}>
-                      <td>{dep.guest}</td>
-                      <td>{dep.room}</td>
-                      <td>{dep.note || "N/A"}</td>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={dep.departed}
-                          readOnly
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card>
-          </Col>
-        </Row>
+                        return (
+                          <div
+                            key={`arrival-${arrival.id}-${i}`}
+                            className={classnames(
+                              "w-100 border-dark-subtle text-dark-subtle py-3",
+                              {
+                                "border-bottom": i < data.arrivals.length - 1,
+                              }
+                            )}>
+                            <div>
+                              <Row>
+                                <Col md={2}>
+                                  <strong>Reserva #:</strong> {arrival.id}
+                                </Col>
+                                <Col md={3}>
+                                  <strong>ID externa:</strong>{" "}
+                                  {arrival.externalBookingId}
+                                </Col>
+                                <Col md={3}>
+                                  <strong>Proveedor:</strong>{" "}
+                                  {arrival.bookingProviderName || "N/A"}
+                                </Col>
+                                <Col className="text-end">
+                                  <BookingStatusBadge
+                                    statusId={arrival.statusId}
+                                  />
+                                </Col>
+                              </Row>
+                              <Row className="justify-content-between">
+                                <Col md={9}>
+                                  <strong>Cliente:</strong>{" "}
+                                  {arrival.customer?.firstName}{" "}
+                                  {arrival.customer?.lastName}
+                                  <br />
+                                  <strong>Teléfono:</strong>{" "}
+                                  {arrival.customer?.phone || "N/A"}
+                                  <br />
+                                  <strong>Documento:</strong>{" "}
+                                  {arrival.customer?.documentNumber || "N/A"}
+                                </Col>
+                                <Col md="auto">
+                                  <strong>Noches:</strong> {arrival.nights}
+                                  <br />
+                                  <strong>Total:</strong>{" "}
+                                  {formatCurrency(arrival.total, "COP")}
+                                  <br />
+                                  <strong>Saldo:</strong>{" "}
+                                  {formatCurrency(arrival.balanceDue, "COP")}
+                                </Col>
+                              </Row>
+                              {dayjs(arrival.eta).isValid() && (
+                                <Row>
+                                  <Col>
+                                    <strong>Fecha y hora de llegada:</strong>{" "}
+                                    {dayjs().format("DD/MM/YYYY h:mm")}
+                                  </Col>
+                                </Row>
+                              )}
+                              {arrival.notes && (
+                                <Row>
+                                  <strong>Notas:</strong>
+                                  <p className="mb-0">{arrival.notes}</p>
+                                </Row>
+                              )}
+                              <Row>
+                                <Col md={5}>
+                                  <strong>Habitaciones que llegan:</strong>{" "}
+                                  <ul className="mb-0">
+                                    {renderRooms(arrivingRooms)}
+                                  </ul>
+                                </Col>
+                                <Col md={5}>
+                                  <strong>
+                                    Habitaciones que llegan otro día:
+                                  </strong>{" "}
+                                  <ul className="mb-0">
+                                    {filteredRooms.length > 0
+                                      ? renderRooms(filteredRooms)
+                                      : "Ninguna"}
+                                  </ul>
+                                </Col>
+                                <Col className="text-end align-content-end">
+                                  <Link
+                                    to={`/hotels/${hotelId}/bookings/${arrival.id}`}
+                                    className="btn btn-outline-dark"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="Ver detalles de la reserva">
+                                    Ver Detales
+                                  </Link>
+                                </Col>
+                              </Row>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </TabPane>
+                  <TabPane tabId="departures">
+                    {data.departures.length === 0 ? (
+                      <div className="text-muted">
+                        No hay salidas para esta fecha.
+                      </div>
+                    ) : (
+                      data.departures.map((departure, i) => (
+                        <div
+                          key={`arrival-${departure.id}-${i}`}
+                          className={classnames(
+                            "w-100 border-dark-subtle py-3",
+                            {
+                              "border-bottom": i < data.departures.length - 1,
+                            }
+                          )}>
+                          <div>
+                            <Row>
+                              <Col md={2}>
+                                <strong>Reserva #:</strong> {departure.id}
+                              </Col>
+                              <Col md={3}>
+                                <strong>ID externa:</strong>{" "}
+                                {departure.externalBookingId}
+                              </Col>
+                              <Col md={3}>
+                                <strong>Proveedor:</strong>{" "}
+                                {departure.bookingProviderName || "N/A"}
+                              </Col>
+                              <Col className="text-end">
+                                <BookingStatusBadge
+                                  statusId={departure.statusId}
+                                />
+                              </Col>
+                            </Row>
+                            <Row className="justify-content-between">
+                              <Col md={9}>
+                                <strong>Cliente:</strong>{" "}
+                                {departure.customer?.firstName}{" "}
+                                {departure.customer?.lastName}
+                                <br />
+                                <strong>Teléfono:</strong>{" "}
+                                {departure.customer?.phone || "N/A"}
+                                <br />
+                                <strong>Documento:</strong>{" "}
+                                {departure.customer?.documentNumber || "N/A"}
+                              </Col>
+                              <Col md="auto">
+                                <strong>Noches:</strong> {departure.nights}
+                                <br />
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col md={5}>
+                                <strong>Habitaciones que salen:</strong>{" "}
+                                <ul className="mb-0">
+                                  {renderRooms(departure.departingRooms)}
+                                </ul>
+                              </Col>
+                              <Col>
+                                {departure.notes && (
+                                  <>
+                                    <strong>Notas:</strong>
+                                    <p className="mb-0">{departure.notes}</p>
+                                  </>
+                                )}
+                              </Col>
+                              <Col className="text-end align-content-end">
+                                <Link
+                                  to={`/hotels/${hotelId}/bookings/${departure.id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="btn btn-outline-dark"
+                                  title="Ver detalles de la reserva">
+                                  Ver Detales
+                                </Link>
+                              </Col>
+                            </Row>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </TabPane>
+                  <TabPane tabId="rooms">
+                    <Row className="mb-4">
+                      <Col md={12}>
+                        <strong>Información</strong>
+                        <p className="mb-0 text-dark">
+                          Esta sección muestra habitaciones que se ocupan o
+                          salen, incluyendo:
+                        </p>
+                        <ul>
+                          <li>
+                            Habitaciones con fechas de llegada o salida
+                            diferentes a la de la reserva principal.
+                          </li>
+                          <li>Cambios de habitación.</li>
+                        </ul>
+                      </Col>
 
-        {/* To-Do List */}
-        <Card body className="mt-4">
-          <h5 className="mb-3">Lista de Tareas</h5>
-          <ul>
-            {todoList.map((task, index) => (
-              <li key={index}>{task}</li>
-            ))}
-          </ul>
-        </Card>
+                      <Col md={6}>
+                        <strong>Llegando</strong>
+                        <ul>
+                          {data.arrivingRooms?.length === 0 ? (
+                            <li className="text-muted">Ninguna</li>
+                          ) : (
+                            data.arrivingRooms.map((item) => (
+                              <li
+                                key={`arriving-${item.room.id}-${item.bookingId}`}>
+                                <strong>{item.room.name}</strong> —{" "}
+                                {item.firstName} {item.lastName}{" "}
+                                <Link
+                                  to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Ver detalles de la reserva">
+                                  (Reserva # {item.bookingId})
+                                </Link>
+                              </li>
+                            ))
+                          )}
+                        </ul>
+                      </Col>
+                      <Col md={6}>
+                        <strong>Saliendo</strong>
+                        <ul>
+                          {data.departingRooms?.length === 0 ? (
+                            <li className="text-muted">Ninguna</li>
+                          ) : (
+                            data.departingRooms.map((item) => (
+                              <li
+                                key={`departing-${item.room.id}-${item.bookingId}`}>
+                                <strong>{item.room.name}</strong> —{" "}
+                                {item.firstName} {item.lastName}{" "}
+                                <Link
+                                  to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Ver detalles de la reserva">
+                                  (Reserva # {item.bookingId})
+                                </Link>
+                              </li>
+                            ))
+                          )}
+                        </ul>
+                      </Col>
+                    </Row>
+                  </TabPane>
+                </TabContent>
+              </CardBody>
+            </Card>
+          </Row>
+        </div>
       </ErrorBoundary>
     </>
   );

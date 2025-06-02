@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 
 import { toast } from "react-toastify";
@@ -25,27 +25,50 @@ const breadcrumbs = [
 
 function HotelInvites() {
   const [invites, setInvites] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const { user } = useAppContext();
+  const userSignInToggleCount = useRef(0);
+
+  const { user, toggleUserSignInModal } = useAppContext();
 
   useEffect(() => {
-    setLoading(true);
-    getUserInvites()
-      .then((res) => {
-        if (res.isSuccessful) {
-          setInvites(res.items);
-        }
-      })
-      .catch((error) => {
-        if (error?.response?.status !== 404) {
-          toast.error("Error al cargar las invitaciones");
-        }
-      })
-      .finally(() => {
-        setLoading(false);
+    if (user.current.isAuthenticated && user.current.hasFetched) {
+      setLoading(true);
+      getUserInvites()
+        .then((res) => {
+          if (res.isSuccessful) {
+            setInvites(res.items);
+          }
+        })
+        .catch((error) => {
+          if (
+            error?.response?.status !== 404 &&
+            error?.response?.status !== 403
+          ) {
+            toast.error("Error al cargar las invitaciones");
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (
+      !user.current.isAuthenticated &&
+      user.current.hasFetched &&
+      userSignInToggleCount.current === 0
+    ) {
+      userSignInToggleCount.current += 1;
+      toggleUserSignInModal({
+        backdrop: "static",
+        keyboard: false,
+        onSignUp: false,
+        redirect: false,
       });
-  }, []);
+    }
+  }, [user, toggleUserSignInModal]);
 
   const handleAccept = async (inviteId) => {
     const result = await Swal.fire({

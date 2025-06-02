@@ -45,7 +45,7 @@ const InvoiceView = () => {
       getInvoiceDetailsById(invoiceId),
     ])
       .then(([hotelResult, invoiceResult]) => {
-        let errorMessage = "";
+        const errors = [];
 
         if (hotelResult.status === "fulfilled") {
           setInvoiceData((prev) => ({
@@ -53,7 +53,7 @@ const InvoiceView = () => {
             hotel: hotelResult.value.item,
           }));
         } else if (hotelResult.reason?.response?.status !== 404) {
-          errorMessage = "Error al cargar el hotel";
+          errors.push("Error al cargar el hotel");
         }
 
         if (invoiceResult.status === "fulfilled") {
@@ -62,12 +62,11 @@ const InvoiceView = () => {
             details: invoiceResult.value.item,
           }));
         } else if (invoiceResult.reason?.response?.status !== 404) {
-          errorMessage = errorMessage
-            ? errorMessage + "y los detalles de la factura"
-            : "Error al cargar los detalles de la factura";
+          errors.push("Error al cargar los detalles de la factura");
         }
-        if (errorMessage) {
-          toast.error(errorMessage);
+
+        if (errors.length > 0) {
+          toast.error(errors.join(" | "));
         }
       })
       .finally(() => {
@@ -261,6 +260,7 @@ const InvoiceView = () => {
                 <Link
                   to={`/hotels/${hotelId}/bookings/${booking.id}`}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-white text-decoration-none  booking-card-header-print">
                   Reserva # {booking?.id}
                 </Link>
@@ -299,12 +299,12 @@ const InvoiceView = () => {
                 </Row>
                 <hr />
                 <Row className="mb-3 booking-card-content">
+                  <BookingGeneralCharges bookingData={booking} />
                   <h5>Totales de la reserva</h5>
                   <BookingFinancials
                     bookingData={booking}
                     isInvoiceView={true}
                   />
-                  <BookingGeneralCharges bookingData={booking} />
                   <hr />
                 </Row>
 

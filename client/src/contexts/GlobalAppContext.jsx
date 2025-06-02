@@ -23,6 +23,7 @@ const defaultUser = {
   roles: [],
   isAuthenticated: false,
   isVerified: false,
+  hasFetched: false,
 };
 
 const defaultHotel = {
@@ -32,8 +33,22 @@ const defaultHotel = {
 };
 
 const defaultModals = {
-  login: false,
-  register: false,
+  login: {
+    isOpen: false,
+    options: {
+      backdrop: true,
+      keyboard: true,
+      onSignUp: true,
+      redirect: true,
+    },
+  },
+  register: {
+    isOpen: false,
+    options: {
+      backdrop: true,
+      keyboard: true,
+    },
+  },
 };
 
 const AppContext = createContext();
@@ -51,9 +66,23 @@ export const AppContextProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
-  const toggleModal = (key) => () => {
-    setModals((prev) => ({ ...defaultModals, [key]: !prev[key] }));
-  };
+  const toggleModal =
+    (key) =>
+    (options = {}) => {
+      setModals((prev) => {
+        const isOptionsEmpty = Object.keys(options).length === 0;
+        return {
+          ...defaultModals,
+          [key]: {
+            ...prev[key],
+            isOpen: !prev[key].isOpen,
+            options: isOptionsEmpty
+              ? { ...defaultModals[key].options, ...prev[key].options }
+              : { ...prev[key].options, ...options },
+          },
+        };
+      });
+    };
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -126,7 +155,17 @@ export const AppContextProvider = ({ children }) => {
       ) {
         setModals((prev) => ({
           ...prev,
-          login: true,
+          login: {
+            ...prev.login,
+            isOpen: true,
+            options: {
+              ...prev.login.options,
+              backdrop: "static",
+              keyboard: false,
+              onSignUp: false,
+              redirect: false,
+            },
+          },
         }));
         setIsAuthError(true);
         toast.error(t("common.sessionExpired"));
@@ -137,7 +176,7 @@ export const AppContextProvider = ({ children }) => {
   );
 
   useEffect(() => {
-    if (currentUser.id === 0) {
+    if (currentUser.id === 0 && !currentUser.hasFetched) {
       setIsLoadingUser(true);
       getCurrentUser()
         .then((data) => {
@@ -150,19 +189,23 @@ export const AppContextProvider = ({ children }) => {
             ...prev,
             ...data.item,
             isAuthenticated: true,
+            hasFetched: true,
           }));
           setIsAuthError(false);
         })
         .catch(() => {
-          if (currentUser.isAuthenticated) {
-            setCurrentUser({ ...defaultUser });
-          }
+          setCurrentUser({ ...defaultUser, hasFetched: true });
         })
         .finally(() => {
           setIsLoadingUser(false);
         });
     }
-  }, [currentUser.id, currentUser.isAuthenticated, navigate]);
+  }, [
+    currentUser.id,
+    currentUser.isAuthenticated,
+    navigate,
+    currentUser.hasFetched,
+  ]);
 
   useEffect(() => {
     const pathRegex = /\/hotels\/([^/]+)/; // Matches /hotel/{hotelId}
@@ -209,16 +252,21 @@ export const AppContextProvider = ({ children }) => {
   return (
     <AppContext.Provider value={contextValue}>
       <UserSignInFormModal
-        isOpen={modals.login}
+        isOpen={modals.login.isOpen}
         toggle={toggleModal("login")}
-        onSignUp={!isAuthError && toggleModal("register")}
-        backdrop={isAuthError && "static"}
-        keyboard={!isAuthError}
+        onSignUp={
+          modals.login.options.onSignUp ? toggleModal("register") : null
+        }
+        backdrop={modals.login.options.backdrop}
+        keyboard={modals.login.options.keyboard}
+        redirect={modals.login.options.redirect}
       />
       <SignUpFormModal
-        isOpen={modals.register}
+        isOpen={modals.register.isOpen}
         toggle={toggleModal("register")}
         onSignIn={toggleModal("login")}
+        backdrop={modals.register.options.backdrop}
+        keyboard={modals.register.options.keyboard}
       />
       {children}
     </AppContext.Provider>

@@ -197,7 +197,7 @@ function TransactionsTableFilters({
             financePartnersResult,
             transactionSubcategoriesResult,
           ]) => {
-            let errorMessage = "";
+            const errors = [];
 
             if (paymentMethodsResult.status === "fulfilled") {
               setSelectData((prev) => ({
@@ -205,7 +205,7 @@ function TransactionsTableFilters({
                 paymentMethods: paymentMethodsResult.value.items,
               }));
             } else if (paymentMethodsResult.reason?.response?.status !== 404) {
-              errorMessage += "Error al cargar los métodos de pago";
+              errors.push("Error al cargar los métodos de pago");
             }
 
             if (financePartnersResult.status === "fulfilled") {
@@ -214,9 +214,7 @@ function TransactionsTableFilters({
                 financePartners: financePartnersResult.value.items,
               }));
             } else if (financePartnersResult.reason?.response?.status !== 404) {
-              errorMessage = errorMessage
-                ? errorMessage + ", los socios financieros"
-                : "Error al cargar los socios financieros";
+              errors.push("Error al cargar los socios financieros");
             }
 
             if (transactionSubcategoriesResult.status === "fulfilled") {
@@ -225,14 +223,14 @@ function TransactionsTableFilters({
                 transactionSubcategories:
                   transactionSubcategoriesResult.value.items,
               }));
-            } else if (financePartnersResult.reason?.response?.status !== 404) {
-              errorMessage = errorMessage
-                ? errorMessage + "y las subcategorías de transacción"
-                : "Error al cargar las subcategorías de transacción";
+            } else if (
+              transactionSubcategoriesResult.reason?.response?.status !== 404
+            ) {
+              errors.push("Error al cargar las subcategorías de transacción");
             }
 
-            if (errorMessage) {
-              toast.error(errorMessage);
+            if (errors.length > 0) {
+              toast.error(errors.join(" | "));
             }
           }
         )
