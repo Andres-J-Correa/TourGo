@@ -94,7 +94,7 @@ export const TRANSACTION_CATEGORIES_BY_ID = {
 export const TRANSACTION_STATUSES = [
   { id: 1, name: "Pendiente" },
   { id: 2, name: "Completado" },
-  { id: 3, name: "Fallído" },
+  { id: 3, name: "Fallido" },
   { id: 5, name: "Revertido" },
 ];
 
@@ -108,7 +108,7 @@ export const TRANSACTION_STATUS_IDS = {
 export const TRANSACTION_STATUS_BY_ID = {
   1: "Pendiente",
   2: "Completado",
-  3: "Fallído",
+  3: "Fallido",
   5: "Revertido",
 };
 
