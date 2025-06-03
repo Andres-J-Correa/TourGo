@@ -8,7 +8,7 @@ import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import SupportDocumentModal from "components/transactions/SupportDocumentModal";
 
 import {
-  transactionCategories,
+  TRANSACTION_CATEGORIES,
   TRANSACTION_STATUSES,
   TRANSACTION_STATUS_IDS,
 } from "components/transactions/constants";
@@ -34,7 +34,7 @@ const TransactionDetails = ({
 
   const { getTranslatedErrorMessage } = useLanguage();
 
-  const category = transactionCategories.find(
+  const category = TRANSACTION_CATEGORIES.find(
     (cat) => cat.id === txn.categoryId
   )?.name;
 
@@ -85,8 +85,8 @@ const TransactionDetails = ({
 
       const uploadResponse = await updateDocumentUrl(
         compressedFile,
-        txn.categoryId,
-        txn.id
+        txn.id,
+        txn.amount
       );
 
       if (uploadResponse.isSuccessful) {

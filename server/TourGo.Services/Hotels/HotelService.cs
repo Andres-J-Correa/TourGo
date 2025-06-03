@@ -133,6 +133,26 @@ namespace TourGo.Services.Hotels
             return lookup;
         }
 
+        public Lookup? GetMinimalByTransactionId(int txnId)
+        {
+            string proc = "hotels_select_minimal_by_transaction_id";
+
+            Lookup? lookup = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_txnId", txnId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+
+                lookup = new Lookup();
+                lookup.Id = reader.GetSafeInt32(index++);
+                lookup.Name = reader.GetSafeString(index++);
+            });
+
+            return lookup;
+        }
         public HotelMinimalWithUserRole? GetMinimalWithUserRole(int id, int userId)
         {
 

@@ -76,10 +76,10 @@ export const getSupportDocumentUrl = async (transactionId) => {
   }
 };
 
-export const updateDocumentUrl = async (file, categoryId, transactionId) => {
+export const updateDocumentUrl = async (file, transactionId, amount) => {
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("categoryId", categoryId);
+  formData.append("amount", amount);
   const config = {
     headers: {
       "Content-Type": "multipart/form-data",

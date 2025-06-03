@@ -8,7 +8,7 @@ import { useAppContext } from "contexts/GlobalAppContext";
 import { getDate } from "utils/dateHelper";
 import { compressImage } from "utils/fileHelper";
 import {
-  transactionCategories,
+  TRANSACTION_CATEGORIES,
   transactionAddValidationSchema,
   sanitizeNewTransaction,
 } from "components/transactions/constants";
@@ -106,8 +106,8 @@ function TransactionAddForm({
 
       const response = await updateDocumentUrl(
         compressedFile,
-        transaction.categoryId,
-        transaction.id
+        transaction.id,
+        transaction.amount
       );
       return Promise.resolve(response);
     } catch (error) {
@@ -307,7 +307,7 @@ function TransactionAddForm({
                   placeholder="Categoría"
                   isRequired={true}>
                   <option value="">Seleccionar</option>
-                  {transactionCategories.map((cat) => (
+                  {TRANSACTION_CATEGORIES.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>

@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 import {
-  transactionCategories,
+  TRANSACTION_CATEGORIES,
   TRANSACTION_STATUSES,
 } from "components/transactions/constants";
 import { getPaymentMethodsByHotelId } from "services/paymentMethodService";
@@ -47,7 +47,7 @@ function TransactionsTableFilters({
   const [entityIdInput, setEntityIdInput] = useState("");
 
   const selectOptions = useMemo(() => {
-    const transactionCategoriesOptions = transactionCategories.map(
+    const transactionCategoriesOptions = TRANSACTION_CATEGORIES.map(
       (category) => (
         <option key={`transaction-category-${category.id}`} value={category.id}>
           {category.name}

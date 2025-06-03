@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { transactionCategories } from "../constants";
+import { TRANSACTION_CATEGORIES } from "../constants";
 import { formatCurrency } from "utils/currencyHelper";
 import TransactionStatusBadge from "components/transactions/TransactionStatusBadge";
 
@@ -34,7 +34,7 @@ export const transactionsTableColumns = [
     accessorKey: "categoryId",
     cell: ({ getValue }) => {
       const categoryId = getValue();
-      const category = transactionCategories.find(
+      const category = TRANSACTION_CATEGORIES.find(
         (category) => Number(category.id) === Number(categoryId)
       );
       return category ? category.name : "No definido";

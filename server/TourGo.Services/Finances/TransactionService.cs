@@ -204,12 +204,12 @@ namespace TourGo.Services.Finances
             return fileKey;
         }
 
-        public string GetFileKey(TransactionFileAddRequest model)
+        public string GetFileKey(TransactionFileAddRequest model, int hotelId)
         {
-            string folder = GetFolderName((TransactionCategoryEnum)model.CategoryId);
+            string folder = GetFolderName(model.Amount);
             string fileExtension = Path.GetExtension(model.File.FileName).ToLower();
             string date = DateTime.UtcNow.ToString("yyyy-MM-dd");
-            string fileKey = $"{folder}/transaction-{model.Id}-date-{date}{fileExtension}";
+            string fileKey = $"hotels/{hotelId}/{folder}/transaction-{model.Id}-date-{date}{fileExtension}";
             return fileKey;
         }
 
@@ -224,19 +224,12 @@ namespace TourGo.Services.Finances
             return !string.IsNullOrWhiteSpace(column) && TransactionSortColumns.ContainsKey(column);
         }
 
-        private string GetFolderName (TransactionCategoryEnum category)
+        private string GetFolderName(decimal amount)
         {
-            switch (category)
-            {
-                case TransactionCategoryEnum.Income:
-                    return "payments-received";
-                case TransactionCategoryEnum.Expense:
-                    return "payments-made";
-                case TransactionCategoryEnum.Adjustments:
-                    return "adjustments";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(category), category, null);
-            }
+            if (amount >= 0)
+                return "payments-received";
+            else
+                return "payments-made";
         }
 
         public static Transaction MapTransaction(IDataReader reader, ref int index)
