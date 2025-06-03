@@ -1,21 +1,21 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
-import ChargeTypesExplanation from "components/extra-charges/ChargeTypesExplanation";
+import TransactionCategoriesExplanation from "components/transactions/TransactionCategoriesExplanation";
 
 import Popover from "components/commonUI/popover/Popover";
 
-function ChargeTypesExplanationIcon() {
+function TransactionCategoriesExplanationIcon() {
   return (
     <Popover
-      content={<ChargeTypesExplanation />}
+      content={<TransactionCategoriesExplanation />}
       placement="bottom"
       className="charge-types-explanation-popover">
-      <div className="question-icon-container ms-2">
+      <div className="question-icon-container">
         <FontAwesomeIcon
           icon={faCircleQuestion}
           className="question-icon"
-          size="sm"
+          size="lg"
           title="Explicación"
         />
       </div>
@@ -23,4 +23,4 @@ function ChargeTypesExplanationIcon() {
   );
 }
 
-export default ChargeTypesExplanationIcon;
+export default TransactionCategoriesExplanationIcon;

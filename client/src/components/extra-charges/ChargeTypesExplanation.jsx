@@ -3,7 +3,7 @@ import { EXTRA_CHARGE_TYPES } from "components/extra-charges/constants";
 
 function ChargeTypesExplanation() {
   return (
-    <div className="p-3">
+    <div style={{ maxHeight: "50vh", overflow: "auto" }} className="p-3">
       <h4>Tipos de cargos extra</h4>
       <ul>
         {EXTRA_CHARGE_TYPES.map((type) => (

@@ -5,79 +5,73 @@ export const TRANSACTION_CATEGORIES = [
     id: 1,
     name: "Ingresos por Habitaciones",
     description:
-      "Ingresos generados por la venta de habitaciones, incluyendo reservas individuales, grupales o de larga estancia. Ejemplos: pago por habitación estándar, tarifa de suite de lujo, reserva de grupo para conferencia.",
+      "Ingresos por venta de habitaciones: reservas individuales, grupales o largas estancias.",
   },
   {
     id: 3,
     name: "Ingresos por Alimentos y Bebidas",
     description:
-      "Ingresos de restaurantes, bares, servicio a la habitación y banquetes. Ejemplos: venta en el restaurante del hotel, ingresos por bar, facturación de banquete de boda.",
+      "Ingresos de restaurantes, bares, servicio a la habitación y banquetes.",
   },
   {
     id: 4,
     name: "Ingresos por Servicios Complementarios",
     description:
-      "Ingresos de servicios adicionales como spa, estacionamiento, tours o tiendas. Ejemplos: venta de toures, tarifa de estacionamiento, venta de souvenirs en la tienda.",
+      "Ingresos por servicios adicionales: spa, estacionamiento, tours o tiendas.",
   },
   {
     id: 5,
     name: "Otros Ingresos",
     description:
-      "Ingresos no relacionados con departamentos principales, como ingresos diversos. Ejemplos: reembolsos creditados a el hotel, ingresos de máquinas expendedoras, intereses bancarios.",
+      "Ingresos diversos no relacionados con departamentos principales.",
   },
   {
     id: 2,
     name: "Gastos por Habitaciones",
     description:
-      "Costos asociados con la operación del departamento de habitaciones, como limpieza y suministros. Ejemplos: compra de productos de limpieza, reposición de sábanas, costos de software de reservas.",
+      "Costos de operación del departamento de habitaciones: limpieza y suministros.",
   },
   {
     id: 6,
     name: "Gastos por Alimentos y Bebidas",
-    description:
-      "Costos relacionados con la operación de restaurantes, bares y banquetes. Ejemplos: compra de ingredientes para el restaurante, mantenimiento de equipos de cocina, costos de bebidas para el bar.",
+    description: "Costos de operación de restaurantes, bares y banquetes.",
   },
   {
     id: 7,
     name: "Gastos por Servicios Complementarios",
-    description:
-      "Costos de operación de servicios como spa, estacionamiento o tours. Ejemplos: productos para el spa, mantenimiento del estacionamiento, pago a guías turísticos.",
+    description: "Costos de operación de spa, estacionamiento o tours.",
   },
   {
     id: 8,
     name: "Gastos por Reparaciones y Mantenimiento",
-    description:
-      "Costos para reparaciones y mantenimiento de la propiedad del hotel. Ejemplos: reparación de una puerta, mantenimiento del sistema de aire acondicionado, pintura de áreas comunes.",
+    description: "Costos de reparaciones y mantenimiento de la propiedad.",
   },
   {
     id: 9,
     name: "Gastos Administrativos",
     description:
-      "Costos generales de administración, como suministros de oficina y servicios profesionales. Ejemplos: honorarios de contabilidad, suscripción a software administrativo, seguros del hotel.",
+      "Costos generales de administración y servicios profesionales.",
   },
   {
     id: 10,
     name: "Gastos de Marketing y Ventas",
-    description:
-      "Costos de promoción y ventas, incluyendo publicidad y programas de lealtad. Ejemplos: comisiones de Booking/Airbnb/Agoda, campaña publicitaria en redes sociales, comisiones a agencias de viajes.",
+    description: "Costos de promoción, publicidad y comisiones de ventas.",
   },
   {
     id: 11,
     name: "Gastos de Personal",
-    description:
-      "Costos de salarios, beneficios y capacitación para el personal del hotel. Ejemplos: sueldos de recepcionistas, bonos para el personal de cocina, costos de capacitación.",
+    description: "Costos de salarios, beneficios y capacitación del personal.",
   },
   {
     id: 12,
     name: "Gastos por Servicios Públicos",
-    description:
-      "Costos de servicios como electricidad, agua, gas y gestión de residuos. Ejemplos: factura de electricidad, factura de agua, servicio de recolección de basura.",
+    description: "Costos de electricidad, agua, gas y gestión de residuos.",
   },
   {
     id: 13,
     name: "Otros Gastos",
     description:
-      "Gastos diversos no relacionados con departamentos específicos. Ejemplos: multas legales, donaciones, costos de eventos especiales no recurrentes.",
+      "Gastos diversos no relacionados con departamentos específicos.",
   },
 ];
 

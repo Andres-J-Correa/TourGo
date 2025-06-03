@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import CustomField from "components/commonUI/forms/CustomField";
 import Dropzone from "components/commonUI/forms/Dropzone";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
+import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
 
 import { useAppContext } from "contexts/GlobalAppContext";
 import { getDate } from "utils/dateHelper";
@@ -16,7 +17,7 @@ import { add, updateDocumentUrl } from "services/transactionService";
 import useHotelFormData from "components/transactions/hooks/useHotelFormData";
 
 import { Formik, Form } from "formik";
-import { Button, Col, Row } from "reactstrap";
+import { Button, Col, InputGroup, InputGroupText, Row } from "reactstrap";
 
 import classNames from "classnames";
 import dayjs from "dayjs";
@@ -299,20 +300,25 @@ function TransactionAddForm({
                 </CustomField>
               </Col>
               <Col md={3}>
-                <CustomField
-                  name="categoryId"
-                  as="select"
-                  className="form-control"
-                  disabled={values.subcategoryId}
-                  placeholder="Categoría"
-                  isRequired={true}>
-                  <option value="">Seleccionar</option>
-                  {TRANSACTION_CATEGORIES.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </CustomField>
+                <InputGroup>
+                  <CustomField
+                    name="categoryId"
+                    as="select"
+                    className="form-control"
+                    disabled={values.subcategoryId}
+                    placeholder="Categoría"
+                    isRequired={true}>
+                    <option value="">Seleccionar</option>
+                    {TRANSACTION_CATEGORIES.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </CustomField>
+                  <InputGroupText className="mb-3">
+                    <TransactionCategoriesExplanationIcon />
+                  </InputGroupText>
+                </InputGroup>
               </Col>
               <Col md={3}>
                 <CustomField
