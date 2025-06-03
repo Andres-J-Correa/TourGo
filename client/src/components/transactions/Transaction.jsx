@@ -5,6 +5,8 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import TransactionDetails from "components/transactions/TransactionDetails";
 import TransactionStatusBadge from "components/transactions/TransactionStatusBadge";
+import { TRANSACTION_STATUS_IDS } from "components/transactions/constants";
+
 import "./Transaction.css";
 
 function Transaction({ txn, updateHasDocumentUrl, onReverseSuccess }) {
@@ -18,9 +20,11 @@ function Transaction({ txn, updateHasDocumentUrl, onReverseSuccess }) {
   });
 
   const cardHeaderClass = classNames("transaction-card-header", {
-    "bg-success-subtle": txn.categoryId === 1,
-    "bg-danger-subtle": txn.categoryId === 2,
-    "bg-warning-subtle": txn.categoryId === 3,
+    "bg-success-subtle":
+      txn.amount >= 0 && txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED,
+    "bg-warning-subtle":
+      txn.amount < 0 && txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED,
+    "bg-secondary-subtle": txn.statusId === TRANSACTION_STATUS_IDS.REVERSED,
     "text-dark": expanded,
   });
 
