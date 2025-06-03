@@ -15,6 +15,8 @@ using Microsoft.Extensions.Caching.Memory;
 using TourGo.Models.Domain;
 using TourGo.Models;
 using TourGo.Services.Hotels;
+using MySql.Data.MySqlClient;
+using TourGo.Web.Models.Enums;
 
 namespace TourGo.Web.Api.Controllers.Finances
 {
@@ -172,6 +174,53 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPut("{id:int}/reverse")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
+        public ActionResult<ItemResponse<int>> Reverse(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                int txnId = _transactionService.Reverse(id, userId);
+
+                if (txnId == 0)
+                {
+                    ErrorResponse response = new ErrorResponse("Transaction reversal failed.");
+                    result = BadRequest400(response);
+                }
+                else
+                {
+                    ItemResponse<int> response = new ItemResponse<int> { Item = txnId };
+                    result = Ok200(response);
+                }
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+
+                if (Enum.IsDefined(typeof(TransactionManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((TransactionManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                result = StatusCode(500, error);
             }
             catch (Exception ex)
             {

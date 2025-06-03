@@ -1,21 +1,30 @@
 import React, { useState } from "react";
 import { Row, Col, Button } from "reactstrap";
+import dayjs from "dayjs";
+import Swal from "sweetalert2";
+
+import Dropzone from "components/commonUI/forms/Dropzone";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
+import SupportDocumentModal from "components/transactions/SupportDocumentModal";
+
 import {
   transactionCategories,
-  transactionStatuses,
+  TRANSACTION_STATUSES,
+  TRANSACTION_STATUS_IDS,
 } from "components/transactions/constants";
 import {
   getSupportDocumentUrl,
   updateDocumentUrl,
+  reverse,
 } from "services/transactionService";
 import { compressImage } from "utils/fileHelper";
-import Dropzone from "components/commonUI/forms/Dropzone";
-import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
-import SupportDocumentModal from "components/transactions/SupportDocumentModal";
-import dayjs from "dayjs";
-import Swal from "sweetalert2";
+import { useLanguage } from "contexts/LanguageContext";
 
-const TransactionDetails = ({ txn, updateHasDocumentUrl }) => {
+const TransactionDetails = ({
+  txn,
+  updateHasDocumentUrl,
+  onReverseSuccess,
+}) => {
   const [files, setFiles] = useState([]);
   const [showUploader, setShowUploader] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -23,11 +32,13 @@ const TransactionDetails = ({ txn, updateHasDocumentUrl }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [documentUrl, setDocumentUrl] = useState(null);
 
+  const { getTranslatedErrorMessage } = useLanguage();
+
   const category = transactionCategories.find(
     (cat) => cat.id === txn.categoryId
   )?.name;
 
-  const status = transactionStatuses.find((s) => s.id === txn.statusId)?.name;
+  const status = TRANSACTION_STATUSES.find((s) => s.id === txn.statusId)?.name;
 
   const handleViewDocument = async () => {
     setIsLoading(true);
@@ -89,6 +100,67 @@ const TransactionDetails = ({ txn, updateHasDocumentUrl }) => {
       Swal.fire("Error", "No se pudo subir el comprobante", "error");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleReverseTransaction = async (e) => {
+    e.preventDefault();
+    const result = await Swal.fire({
+      title: "¿Revertir transacción?",
+      text: "Esta acción creará una transacción de reversión. ¿Estás seguro?",
+      icon: "warning",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: true,
+      showCancelButton: true,
+      confirmButtonText: "Sí, revertir",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "red",
+      reverseButtons: true,
+      didOpen: () => {
+        // Hide buttons initially
+        Swal.getConfirmButton().style.display = "none";
+        Swal.showLoading();
+        setTimeout(() => {
+          Swal.getConfirmButton().style.display = "inline-block";
+          Swal.hideLoading();
+        }, 2000);
+      },
+    });
+
+    if (!result.isConfirmed) return;
+
+    Swal.fire({
+      title: "Revirtiendo transacción",
+      text: "Por favor espera",
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    try {
+      const response = await reverse(txn.id);
+      if (response.isSuccessful) {
+        onReverseSuccess(txn.id, response.item);
+        Swal.fire({
+          title: "Éxito",
+          text: "Transacción revertida correctamente",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+      } else {
+        throw new Error("Error reverting transaction");
+      }
+    } catch (error) {
+      const errorMessage = getTranslatedErrorMessage(error);
+
+      Swal.close();
+
+      Swal.fire({
+        title: "Error",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -155,13 +227,23 @@ const TransactionDetails = ({ txn, updateHasDocumentUrl }) => {
               Ver comprobante
             </Button>
           ) : (
+            txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
+              <Button
+                color={showUploader ? "warning" : "primary"}
+                onClick={() => {
+                  setFiles([]);
+                  setShowUploader((prev) => !prev);
+                }}>
+                {showUploader ? "Cancelar" : "Agregar comprobante"}
+              </Button>
+            )
+          )}
+          {txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
             <Button
-              color={showUploader ? "warning" : "primary"}
-              onClick={() => {
-                setFiles([]);
-                setShowUploader((prev) => !prev);
-              }}>
-              {showUploader ? "Cancelar" : "Agregar comprobante"}
+              color="outline-danger"
+              className="ms-5"
+              onClick={handleReverseTransaction}>
+              Revertir
             </Button>
           )}
         </Col>

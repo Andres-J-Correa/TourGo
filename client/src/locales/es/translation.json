@@ -122,7 +122,9 @@
       "4002": "Los cambios no están permitidos en este momento",
       "4003": "Ya hay un registro de éste tipo",
       "4004": "No se encontraron registros",
-      "4005": "No tiene permisos suficientes para realizar esta acción"
+      "4005": "No tiene permisos suficientes para realizar esta acción",
+      "5000": "Error de gestión de transacciones",
+      "5001": "La solicitud no es válida"
     }
   }
 }

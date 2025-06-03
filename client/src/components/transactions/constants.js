@@ -12,27 +12,24 @@ export const TRANSACTION_CATEGORIES_BY_ID = {
   3: "Ajuste",
 };
 
-export const transactionStatuses = [
+export const TRANSACTION_STATUSES = [
   { id: 1, name: "Pendiente" },
   { id: 2, name: "Completado" },
   { id: 3, name: "Fallído" },
-  { id: 4, name: "Ajustado" },
   { id: 5, name: "Revertido" },
 ];
 
-export const TRANSACTION_STATUS_DICT = {
+export const TRANSACTION_STATUS_IDS = {
   PENDING: 1,
   COMPLETED: 2,
   FAILED: 3,
-  ADJUSTED: 4,
-  REVERTED: 5,
+  REVERSED: 5,
 };
 
 export const TRANSACTION_STATUS_BY_ID = {
   1: "Pendiente",
   2: "Completado",
   3: "Fallído",
-  4: "Ajustado",
   5: "Revertido",
 };
 

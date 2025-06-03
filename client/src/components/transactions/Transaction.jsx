@@ -7,7 +7,7 @@ import TransactionDetails from "components/transactions/TransactionDetails";
 import TransactionStatusBadge from "components/transactions/TransactionStatusBadge";
 import "./Transaction.css";
 
-function Transaction({ txn, updateHasDocumentUrl }) {
+function Transaction({ txn, updateHasDocumentUrl, onReverseSuccess }) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpanded = () => setExpanded((prev) => !prev);
@@ -44,6 +44,7 @@ function Transaction({ txn, updateHasDocumentUrl }) {
             <TransactionDetails
               txn={txn}
               updateHasDocumentUrl={updateHasDocumentUrl}
+              onReverseSuccess={onReverseSuccess}
             />
           </CardBody>
         )}

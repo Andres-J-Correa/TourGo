@@ -29,7 +29,7 @@ namespace TourGo.Services.Finances
 
         public int Add(TransactionAddRequest request, int userId)
         {
-            string proc = "transactions_insert";
+            string proc = "transactions_insert_v2";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
@@ -62,6 +62,31 @@ namespace TourGo.Services.Finances
                 newId = int.TryParse(newIdObj.ToString(), out newId) ? newId : 0;
 
             }));
+
+            return newId;
+        }
+
+        public int Reverse(int txnId, int userId)
+        {
+            string proc = "transactions_reverse";
+            int newId = 0;
+
+            _dataProvider.ExecuteNonQuery(proc, (col) =>
+            {
+                col.AddWithValue("p_txnId", txnId);
+                col.AddWithValue("p_reversedBy", userId);
+
+                MySqlParameter resultOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
+                resultOut.Direction = ParameterDirection.Output;
+                col.Add(resultOut);
+
+            }, (returnCol) =>
+            {
+                object newIdObj = returnCol["p_newId"].Value;
+
+                newId = int.TryParse(newIdObj.ToString(), out newId) ? newId : 0;
+
+            });
 
             return newId;
         }

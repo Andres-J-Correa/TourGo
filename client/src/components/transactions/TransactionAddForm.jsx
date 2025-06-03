@@ -88,7 +88,6 @@ function TransactionAddForm({
       showCancelButton: true,
       confirmButtonText: "Sí, guardar",
       cancelButtonText: "Cancelar",
-      reverseButtons: true,
     });
   };
 

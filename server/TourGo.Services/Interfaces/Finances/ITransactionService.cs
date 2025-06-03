@@ -18,5 +18,6 @@ namespace TourGo.Services.Interfaces
             string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId);
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
+        int Reverse(int txnId, int userId);
     }
 }

@@ -33,6 +33,11 @@ namespace TourGo.Web.Controllers
             return base.NotFound(response);
         }
 
+        protected BadRequestObjectResult BadRequest400(BaseResponse response)
+        {
+            return base.BadRequest(response);
+        }
+
         protected ObjectResult CustomResponse(HttpStatusCode code, BaseResponse response)
         {
             return StatusCode((int)code, response);

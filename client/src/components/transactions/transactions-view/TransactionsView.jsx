@@ -430,6 +430,10 @@ function TransactionsView() {
     });
   }, []);
 
+  const onReverseSuccess = useCallback(() => {
+    setPaginationData((prev) => ({ ...prev }));
+  }, []);
+
   useEffect(() => {
     const hasDates =
       Boolean(paginationData.dates.start) || Boolean(paginationData.dates.end);
@@ -674,6 +678,7 @@ function TransactionsView() {
                             <TransactionDetails
                               txn={row.original}
                               updateHasDocumentUrl={updateHasDocumentUrl}
+                              onReverseSuccess={onReverseSuccess}
                             />
                           </div>
                         </td>

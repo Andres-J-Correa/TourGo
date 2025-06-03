@@ -5,6 +5,9 @@ import Transaction from "components/transactions/Transaction";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import { formatCurrency } from "utils/currencyHelper";
 import TransactionAddForm from "components/transactions/TransactionAddForm";
+import { TRANSACTION_STATUS_IDS } from "components/transactions/constants";
+import dayjs from "dayjs";
+import { useAppContext } from "contexts/GlobalAppContext";
 
 const EntityTransactionsView = ({
   hotelId,
@@ -17,9 +20,55 @@ const EntityTransactionsView = ({
   const [mappedTransactions, setMappedTransactions] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
+  const { user } = useAppContext();
+
   const paid = entity?.transactions?.reduce((acc, txn) => acc + txn.amount, 0);
 
   const balance = entity?.total - (isNaN(paid) ? 0 : paid);
+
+  const onReverseSuccess = useCallback(
+    (reversedId, newId) => {
+      setEntity((prev) => {
+        const newTransactions = [...prev.transactions];
+        const indexOfReversed = newTransactions.findIndex(
+          (txn) => txn.id === reversedId
+        );
+
+        if (indexOfReversed !== -1) {
+          const copyOfReversed = { ...newTransactions[indexOfReversed] };
+          copyOfReversed.statusId = TRANSACTION_STATUS_IDS.REVERSED;
+          const reversedTransaction = {
+            ...copyOfReversed,
+            id: newId,
+            parentId: reversedId,
+            amount: -copyOfReversed.amount,
+            description: "Reversal",
+            dateCreated: dayjs().format("DD/MM/YYYY - h:mm a"),
+            createdBy: {
+              id: user.current.id,
+              firstName: user.current.firstName,
+              lastName: user.current.lastName,
+            },
+            approvedBy: {
+              id: user.current.id,
+              firstName: user.current.firstName,
+              lastName: user.current.lastName,
+            },
+          };
+
+          newTransactions[indexOfReversed] = copyOfReversed;
+          newTransactions.splice(indexOfReversed, 0, reversedTransaction);
+
+          return {
+            ...prev,
+            transactions: newTransactions,
+          };
+        }
+        return prev;
+      });
+    },
+    [setEntity, user]
+  );
 
   const handleAddTransactionClick = () => {
     setShowForm(true);
@@ -67,9 +116,10 @@ const EntityTransactionsView = ({
         key={`transaction-${txn.id}`}
         txn={txn}
         updateHasDocumentUrl={updateHasDocumentUrl}
+        onReverseSuccess={onReverseSuccess}
       />
     ),
-    [updateHasDocumentUrl]
+    [updateHasDocumentUrl, onReverseSuccess]
   );
 
   useEffect(() => {
