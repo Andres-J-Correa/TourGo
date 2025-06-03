@@ -19,7 +19,6 @@ namespace TourGo.Models.Requests.Finances
         public IFormFile File { get; set; }
 
         [Required]
-        [ValidEnum(typeof(TransactionCategoryEnum))]
-        public int CategoryId { get; set; }
+        public decimal Amount { get; set; }
     }
 }

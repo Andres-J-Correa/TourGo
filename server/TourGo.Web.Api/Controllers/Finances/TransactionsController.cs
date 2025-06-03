@@ -15,6 +15,9 @@ using Microsoft.Extensions.Caching.Memory;
 using TourGo.Models.Domain;
 using TourGo.Models;
 using TourGo.Services.Hotels;
+using MySql.Data.MySqlClient;
+using TourGo.Web.Models.Enums;
+using TourGo.Services.Interfaces.Hotels;
 
 namespace TourGo.Web.Api.Controllers.Finances
 {
@@ -27,19 +30,22 @@ namespace TourGo.Web.Api.Controllers.Finances
         private readonly IErrorLoggingService _errorLoggingService;
         private readonly IFileService _fileService;
         private readonly IMemoryCache _cache;
+        private readonly IHotelService _hotelService;
 
         public TransactionsController(ILogger<TransactionsController> logger, 
             ITransactionService transactionService, 
             IWebAuthenticationService<int> webAuthenticationService,
             IErrorLoggingService errorLoggingService,
             IFileService fileService,
-            IMemoryCache memoryCache) : base(logger)
+            IMemoryCache memoryCache,
+            IHotelService hotelService) : base(logger)
         {
             _transactionService = transactionService;
             _webAuthService = webAuthenticationService;
             _errorLoggingService = errorLoggingService;
             _fileService = fileService;
             _cache = memoryCache;
+            _hotelService = hotelService;
         }
 
         [HttpPost("hotel/{id:int}")]
@@ -165,13 +171,61 @@ namespace TourGo.Web.Api.Controllers.Finances
                     return BadRequest("File is empty");
                 }
 
-                string fileKey = _transactionService.GetFileKey(model);
+                int hotelId = _hotelService.GetMinimalByTransactionId(model.Id)?.Id ?? 0;
+                string fileKey = _transactionService.GetFileKey(model, hotelId);
 
                 _fileService.Upload(model.File, AWSS3BucketEnum.TransactionsFiles, fileKey);
                 _transactionService.UpdateDocumentUrl(model.Id, fileKey);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPut("{id:int}/reverse")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
+        public ActionResult<ItemResponse<int>> Reverse(int id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                int txnId = _transactionService.Reverse(id, userId);
+
+                if (txnId == 0)
+                {
+                    ErrorResponse response = new ErrorResponse("Transaction reversal failed.");
+                    result = BadRequest400(response);
+                }
+                else
+                {
+                    ItemResponse<int> response = new ItemResponse<int> { Item = txnId };
+                    result = Ok200(response);
+                }
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+
+                if (Enum.IsDefined(typeof(TransactionManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((TransactionManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                result = StatusCode(500, error);
             }
             catch (Exception ex)
             {

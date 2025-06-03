@@ -26,6 +26,22 @@ export const add = async (payload, hotelId) => {
   }
 };
 
+export const reverse = (txnId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${api}/${txnId}/reverse`,
+  };
+  return axiosClient(config)
+    .then((response) => {
+      onGlobalSuccess(response);
+      return response.data;
+    })
+    .catch((error) => onGlobalError(error));
+};
+
 export const getByEntityId = async (entityId, hotelId) => {
   const config = {
     headers: {
@@ -60,10 +76,10 @@ export const getSupportDocumentUrl = async (transactionId) => {
   }
 };
 
-export const updateDocumentUrl = async (file, categoryId, transactionId) => {
+export const updateDocumentUrl = async (file, transactionId, amount) => {
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("categoryId", categoryId);
+  formData.append("amount", amount);
   const config = {
     headers: {
       "Content-Type": "multipart/form-data",

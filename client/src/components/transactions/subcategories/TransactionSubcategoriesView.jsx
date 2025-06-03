@@ -36,7 +36,7 @@ import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import DataTable from "components/commonUI/tables/DataTable"; // Add this import
 
 // Constants/Static Data
-import { transactionCategories } from "components/transactions/constants";
+import { TRANSACTION_CATEGORIES } from "components/transactions/constants";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -290,7 +290,7 @@ function TransactionSubcategoriesView() {
         header: "Categoría",
         maxSize: 150,
         cell: (info) => {
-          const category = transactionCategories.find(
+          const category = TRANSACTION_CATEGORIES.find(
             (cat) => Number(cat.id) === Number(info.getValue())
           );
           return category ? category.name : "N/A";
@@ -408,7 +408,7 @@ function TransactionSubcategoriesView() {
                           placeholder="Categoría"
                           isRequired={true}>
                           <option value="">Seleccionar</option>
-                          {transactionCategories.map((cat) => (
+                          {TRANSACTION_CATEGORIES.map((cat) => (
                             <option key={cat.id} value={cat.id}>
                               {cat.name}
                             </option>

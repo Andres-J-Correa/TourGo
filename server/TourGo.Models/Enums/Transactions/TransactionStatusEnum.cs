@@ -11,7 +11,6 @@ namespace TourGo.Models.Enums.Transactions
         Pending = 1,
         Completed = 2,
         Failed = 3,
-        Adjusted = 4,
         Reversed = 5,
     }
 }
