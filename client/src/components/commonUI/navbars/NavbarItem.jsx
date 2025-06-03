@@ -96,6 +96,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
   const renderNavLink = () => {
     return (
       <NavLink
+        end
         to={navItem.path}
         className={classNames("nav-action-item", {
           "text-uppercase": navItem.uppercase,

@@ -334,9 +334,9 @@ function TransactionsView() {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      randomIdForUpdate: Math.random(),
     }));
-  }, [setPaginationData]);
+    table.setExpanded({});
+  }, [setPaginationData, table]);
 
   const handleClearAllFilters = () => {
     setPaginationData((prev) => ({
@@ -356,7 +356,6 @@ function TransactionsView() {
       description: "",
       entityId: "",
       hasDocumentUrl: "",
-      randomIdForUpdate: "",
     }));
     table.setExpanded({});
   };
@@ -431,8 +430,11 @@ function TransactionsView() {
   }, []);
 
   const onReverseSuccess = useCallback(() => {
-    setPaginationData((prev) => ({ ...prev }));
-  }, []);
+    setPaginationData((prev) => ({
+      ...prev,
+    }));
+    table.setExpanded({});
+  }, [table]);
 
   useEffect(() => {
     const hasDates =
