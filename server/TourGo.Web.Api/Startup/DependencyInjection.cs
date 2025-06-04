@@ -84,6 +84,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IBookingProviderService, BookingProviderService>();
             services.AddSingleton<IFinancePartnerService, FinancePartnerService>();
             services.AddSingleton<IStaffService, StaffService>();
+            services.AddSingleton<IFinancialReportService, FinancialReportService>();
 
             GetAllEntities().ForEach(tt =>
             {

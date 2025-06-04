@@ -57,4 +57,5 @@ export const HOTEL_RESOURCES_BY_ID = {
   10: "Proveedores de Reservas",
   11: "Socios financieros",
   12: "Invitaciones de Personal",
+  13: "Reportes financieros",
 };

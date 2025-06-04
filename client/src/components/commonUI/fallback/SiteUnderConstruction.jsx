@@ -11,7 +11,7 @@ const SiteUnderConstruction = () => {
       className="d-flex flex-wrap align-content-center justify-content-center">
       <LazyLoadImage
         src={underConstruction}
-        alt="404 not found"
+        alt="site under construction"
         className="img-fluid border-radius-lg"
         effect="blur"
         height={"auto"}

@@ -10,6 +10,7 @@ import { getDate } from "utils/dateHelper";
 import { compressImage } from "utils/fileHelper";
 import {
   TRANSACTION_CATEGORIES,
+  TRANSACTION_CATEGORY_TYPES_IDS,
   transactionAddValidationSchema,
   sanitizeNewTransaction,
 } from "components/transactions/constants";
@@ -57,6 +58,7 @@ function TransactionAddForm({
     transactionDate: dayjs().format("YYYY-MM-DD"),
     paymentMethodId: "",
     categoryId: "",
+    categoryTypeId: "",
     subcategoryId: "",
     referenceNumber: "",
     statusId: 2,
@@ -65,6 +67,30 @@ function TransactionAddForm({
     financePartnerId: "",
     invoiceId: entity?.invoiceId || undefined,
     entityId: entity?.id || undefined,
+  };
+
+  const confirmProceedWithMismatchedCategoryAmount = (
+    amount,
+    categoryTypeId
+  ) => {
+    let message = "";
+    const isIncome = categoryTypeId === TRANSACTION_CATEGORY_TYPES_IDS.INCOME;
+    if (amount >= 0 && !isIncome) {
+      message = "El monto es positivo, pero la categoría es de tipo Gasto.";
+    } else if (amount < 0 && isIncome) {
+      message = "El monto es negativo, pero la categoría es de tipo Ingreso.";
+    }
+    return Swal.fire({
+      icon: "warning",
+      title: "Categoría y Monto no coinciden",
+      text: message,
+      showCancelButton: true,
+      confirmButtonText: "Continuar",
+      confirmButtonColor: "red",
+      cancelButtonText: "Revisar categoría",
+      reverseButtons: true,
+      cancelButtonColor: "green",
+    });
   };
 
   const confirmProceedWithoutFile = () => {
@@ -84,7 +110,7 @@ function TransactionAddForm({
   const confirmTransactionSave = () => {
     return Swal.fire({
       title: "¿Guardar Transacción?",
-      html: "Esta transacción no podrá modificarse después.<br/><strong>¿Estás seguro de que deseas continuar?</strong>",
+      html: "Esta transacción no podrá modificarse después.<br/><strong>Revisa los datos antes de continuar.</strong>",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Sí, guardar",
@@ -120,6 +146,22 @@ function TransactionAddForm({
     let newTransaction = null;
 
     try {
+      if (
+        (values.amount >= 0 &&
+          Number(values.categoryTypeId) !==
+            TRANSACTION_CATEGORY_TYPES_IDS.INCOME) ||
+        (values.amount < 0 &&
+          Number(values.categoryTypeId) !==
+            TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE)
+      ) {
+        const { isConfirmed } =
+          await confirmProceedWithMismatchedCategoryAmount(
+            values.amount,
+            Number(values.categoryTypeId)
+          );
+        if (!isConfirmed) return;
+      }
+
       if (files.length === 0) {
         const { isConfirmed } = await confirmProceedWithoutFile();
         if (!isConfirmed) return;
@@ -210,10 +252,23 @@ function TransactionAddForm({
           const selectedSubcategoryId = e.target.value;
           const subcategoryCategoryId =
             e.target.options[e.target.selectedIndex].dataset.category;
+          const subcategoryTypeId = TRANSACTION_CATEGORIES.find(
+            (cat) => cat.id === Number(subcategoryCategoryId)
+          )?.typeId;
+
           setFieldValue("subcategoryId", selectedSubcategoryId);
           if (subcategoryCategoryId) {
             setFieldValue("categoryId", subcategoryCategoryId);
+            setFieldValue("categoryTypeId", subcategoryTypeId);
           }
+        };
+
+        const handleCategoryChange = (e) => {
+          const selectedCategoryId = e.target.value;
+          const categoryTypeId =
+            e.target.options[e.target.selectedIndex].dataset.type;
+          setFieldValue("categoryId", selectedCategoryId);
+          setFieldValue("categoryTypeId", categoryTypeId);
         };
 
         return (
@@ -307,10 +362,14 @@ function TransactionAddForm({
                     className="form-control"
                     disabled={values.subcategoryId}
                     placeholder="Categoría"
+                    onChange={handleCategoryChange}
                     isRequired={true}>
                     <option value="">Seleccionar</option>
                     {TRANSACTION_CATEGORIES.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
+                      <option
+                        key={cat.id}
+                        value={cat.id}
+                        data-type={cat.typeId}>
                         {cat.name}
                       </option>
                     ))}

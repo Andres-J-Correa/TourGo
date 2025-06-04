@@ -165,7 +165,7 @@ export const useNavbarItems = () => {
                 ? [
                     {
                       name: "Panel de Finanzas",
-                      path: `/hotels/${hotel.current.id}/finances`,
+                      path: `/hotels/${hotel.current.id}/finance-dashboard`,
                       capitalize: true,
                     },
                   ]

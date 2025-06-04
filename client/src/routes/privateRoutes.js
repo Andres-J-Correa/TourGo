@@ -106,10 +106,10 @@ const bookings = [
 
 const finances = [
   {
-    name: "financesView",
-    path: "/hotels/:hotelId/finances",
+    name: "financeDashboard",
+    path: "/hotels/:hotelId/finance-dashboard",
     component: lazy(() =>
-      import("components/commonUI/fallback/SiteUnderConstruction")
+      import("components/financial-reports/FinanceDashboard")
     ),
   },
   {

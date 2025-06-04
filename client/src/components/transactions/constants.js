@@ -1,77 +1,105 @@
 import * as Yup from "yup";
 
+export const TRANSACTION_CATEGORY_TYPES_BY_ID = {
+  1: "Ingresos",
+  2: "Gastos",
+};
+
+export const TRANSACTION_CATEGORY_TYPES_IDS = {
+  INCOME: 1,
+  EXPENSE: 2,
+};
+
+export const TRANSACTION_CATEGORY_TYPES = [
+  { id: 1, name: "Ingresos" },
+  { id: 2, name: "Gastos" },
+];
+
 export const TRANSACTION_CATEGORIES = [
   {
     id: 1,
     name: "Ingresos por Habitaciones",
     description:
       "Ingresos por venta de habitaciones: reservas individuales, grupales o largas estancias.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.INCOME,
   },
   {
     id: 3,
     name: "Ingresos por Alimentos y Bebidas",
     description:
       "Ingresos de restaurantes, bares, servicio a la habitación y banquetes.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.INCOME,
   },
   {
     id: 4,
     name: "Ingresos por Servicios Complementarios",
     description:
       "Ingresos por servicios adicionales: spa, estacionamiento, tours o tiendas.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.INCOME,
   },
   {
     id: 5,
     name: "Otros Ingresos",
     description:
       "Ingresos diversos no relacionados con departamentos principales.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.INCOME,
   },
   {
     id: 2,
     name: "Gastos por Habitaciones",
     description:
-      "Costos de operación del departamento de habitaciones: limpieza y suministros.",
+      "Costos de operación del departamento de habitaciones: suministros de limpieza, compra de sábanas etc.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
     id: 6,
     name: "Gastos por Alimentos y Bebidas",
     description: "Costos de operación de restaurantes, bares y banquetes.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
     id: 7,
     name: "Gastos por Servicios Complementarios",
     description: "Costos de operación de spa, estacionamiento o tours.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
     id: 8,
     name: "Gastos por Reparaciones y Mantenimiento",
     description: "Costos de reparaciones y mantenimiento de la propiedad.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
     id: 9,
     name: "Gastos Administrativos",
     description:
       "Costos generales de administración y servicios profesionales.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
     id: 10,
     name: "Gastos de Marketing y Ventas",
     description: "Costos de promoción, publicidad y comisiones de ventas.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
     id: 11,
     name: "Gastos de Personal",
     description: "Costos de salarios, beneficios y capacitación del personal.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
     id: 12,
     name: "Gastos por Servicios Públicos",
     description: "Costos de electricidad, agua, gas y gestión de residuos.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
     id: 13,
     name: "Otros Gastos",
     description:
       "Gastos diversos no relacionados con departamentos específicos.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
 ];
 
