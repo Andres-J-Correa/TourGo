@@ -48,7 +48,7 @@ export const TRANSACTION_CATEGORIES = [
     id: 2,
     name: "Gastos por Habitaciones",
     description:
-      "Costos de operación del departamento de habitaciones: suministros de limpieza, compra sabanas etc.",
+      "Costos de operación del departamento de habitaciones: suministros de limpieza, compra de sábanas etc.",
     typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {

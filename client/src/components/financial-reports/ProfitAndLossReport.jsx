@@ -33,7 +33,7 @@ function ProfitAndLossReport({ hotelId }) {
     [
       "Gastos",
       totals.totalExpenses,
-      `color: #f44335;; opacity:0.5`,
+      `color: #f44335; opacity:0.5`,
       totals.totalExpenses,
     ],
     ["Utilidad Neta", totals.netProfit, `opacity:0.5`, totals.netProfit],
@@ -82,7 +82,7 @@ function ProfitAndLossReport({ hotelId }) {
   }, [dates.start, dates.end, hotelId]);
   return (
     <div>
-      <h4>Ganancias y Perdidas</h4>
+      <h4>Ganancias y Pérdidas</h4>
       <div className="mb-3">
         <DatePickers
           startDate={dates.start}

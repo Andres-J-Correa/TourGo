@@ -106,7 +106,7 @@ const bookings = [
 
 const finances = [
   {
-    name: "financesView",
+    name: "financeDashboard",
     path: "/hotels/:hotelId/finance-dashboard",
     component: lazy(() =>
       import("components/financial-reports/FinanceDashboard")
