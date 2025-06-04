@@ -11,6 +11,8 @@ import {
   CardTitle,
   Col,
   Input,
+  InputGroup,
+  InputGroupText,
   Label,
   Row,
   Spinner,
@@ -34,6 +36,7 @@ import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import DataTable from "components/commonUI/tables/DataTable"; // Add this import
+import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
 
 // Constants/Static Data
 import { TRANSACTION_CATEGORIES } from "components/transactions/constants";
@@ -401,19 +404,24 @@ function TransactionSubcategoriesView() {
                       </Col>
 
                       <Col md="4">
-                        <CustomField
-                          name="categoryId"
-                          as="select"
-                          className="form-control"
-                          placeholder="Categoría"
-                          isRequired={true}>
-                          <option value="">Seleccionar</option>
-                          {TRANSACTION_CATEGORIES.map((cat) => (
-                            <option key={cat.id} value={cat.id}>
-                              {cat.name}
-                            </option>
-                          ))}
-                        </CustomField>
+                        <InputGroup>
+                          <CustomField
+                            name="categoryId"
+                            as="select"
+                            className="form-control"
+                            placeholder="Categoría"
+                            isRequired={true}>
+                            <option value="">Seleccionar</option>
+                            {TRANSACTION_CATEGORIES.map((cat) => (
+                              <option key={cat.id} value={cat.id}>
+                                {cat.name}
+                              </option>
+                            ))}
+                          </CustomField>
+                          <InputGroupText className="mb-3">
+                            <TransactionCategoriesExplanationIcon />
+                          </InputGroupText>
+                        </InputGroup>
                       </Col>
 
                       <Col md="4" className="align-content-center">

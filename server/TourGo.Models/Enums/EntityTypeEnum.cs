@@ -20,5 +20,6 @@ namespace TourGo.Models.Enums
         BookingProviders = 10,
         FinancePartners = 11,
         HotelInvites = 12,
+        FinancialReports = 13,
     }
 }
