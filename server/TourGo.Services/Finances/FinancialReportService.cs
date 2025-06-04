@@ -89,6 +89,7 @@ namespace TourGo.Services.Finances
                 int index = 0;
                 var item = new ExpenseBreakdownResponse
                 {
+                    CategoryId = reader.GetSafeInt32(index++),
                     Category = reader.GetSafeString(index++),
                     TotalExpenses = reader.GetSafeDecimal(index++)
                 };

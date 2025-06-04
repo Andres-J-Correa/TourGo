@@ -1,9 +1,11 @@
 import React from "react";
 import { Row, Spinner } from "reactstrap";
 
-function SimpleLoader() {
+function SimpleLoader({ isVisible }) {
+  if (!isVisible) return null;
+
   return (
-    <Row className="justify-content-center">
+    <Row className="justify-content-center py-5">
       <Spinner color="dark" style={{ scale: "2" }} />
     </Row>
   );
