@@ -28,7 +28,7 @@ function SubcategoryAnalysisReport({ hotelId }) {
       item.subcategory,
       item.total,
       item.total,
-      item.total < 0 ? "color: f44335;opacity:0.5;" : "opacity:0.5;",
+      item.total < 0 ? "color: #f44335; opacity:0.5;" : "opacity:0.5;",
     ]),
   ];
 

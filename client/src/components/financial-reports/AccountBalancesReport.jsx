@@ -21,7 +21,7 @@ function AccountBalancesReport({ hotelId }) {
               item.paymentMethod,
               item.total,
               formatCurrency(item.total, "COP"),
-              item.total < 0 ? "color: f44335;opacity:0.5;" : "opacity:0.5;", // Red if negative
+              item.total < 0 ? "color: #f44335; opacity:0.5;" : "opacity:0.5;", // Red if negative
             ]),
           ];
           setData(chartData);

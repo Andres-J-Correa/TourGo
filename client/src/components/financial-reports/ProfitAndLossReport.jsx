@@ -27,13 +27,13 @@ function ProfitAndLossReport({ hotelId }) {
     [
       "Ingresos",
       totals.totalRevenue,
-      `color: #4caf50;opacity:0.5`,
+      `color: #4caf50; opacity:0.5`,
       totals.totalRevenue,
     ],
     [
       "Gastos",
       totals.totalExpenses,
-      `color: #f44335;;opacity:0.5`,
+      `color: #f44335;; opacity:0.5`,
       totals.totalExpenses,
     ],
     ["Utilidad Neta", totals.netProfit, `opacity:0.5`, totals.netProfit],
