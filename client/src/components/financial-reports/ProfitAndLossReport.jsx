@@ -37,7 +37,12 @@ function ProfitAndLossReport({ hotelId }) {
       `color: #f44335; opacity:0.5`,
       formatCurrency(totals.totalExpenses, "COP"),
     ],
-    ["Utilidad Neta", totals.netProfit, `opacity:0.5`, totals.netProfit],
+    [
+      "Utilidad Neta",
+      totals.netProfit,
+      `opacity:0.5`,
+      formatCurrency(totals.netProfit, "COP"),
+    ],
   ];
 
   const handleDateChange = (type) => (date) => {

@@ -18,13 +18,17 @@ function HotelOccupancyOverTimeReport({ hotelId }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
+  const [goal, setGoal] = useState(70); // New state
+  const [showBars, setShowBars] = useState(false); // New state for bars
 
+  // Build chart data with aspirational line
   const chartData = [
-    ["Mes", "Ocupación (%)", "Habitaciones Totales"],
+    ["Mes", "Ocupación (%)", "Habitaciones Totales", "Meta (%)"],
     ...data.map((item) => [
       dayjs(item.monthLabel).format("MMM YYYY"),
       item.occupancyRate * 100, // Convert to percentage
       item.totalRooms,
+      goal, // Aspirational line
     ]),
   ];
 
@@ -66,12 +70,38 @@ function HotelOccupancyOverTimeReport({ hotelId }) {
     }
   }, [hotelId, dates.start, dates.end]);
 
+  // Chart options with conditional bars
+  const chartOptions = {
+    title: "Ocupación (%) y Habitaciones Totales por Mes",
+    legend: { position: "bottom" },
+    hAxis: { title: "Mes" },
+    vAxes: {
+      0: { title: "Ocupación (%)" },
+      1: { title: "Habitaciones Totales" },
+    },
+    seriesType: "line",
+    series: {
+      0: { type: "line", targetAxisIndex: 0, color: "#4caf50" }, // Ocupación (%)
+      1: showBars
+        ? { type: "bars", targetAxisIndex: 1, areaOpacity: 0.5 }
+        : { type: "line", color: "transparent", targetAxisIndex: 1 }, // Hide bars
+      2: {
+        type: "line",
+        targetAxisIndex: 0,
+        lineDashStyle: [4, 4],
+        color: "#FF9800",
+      }, // Aspirational line
+    },
+    curveType: "function",
+    pointSize: 5,
+  };
+
   return (
     <div>
       <h4>Ocupación del Hotel</h4>
       <p>Este reporte muestra la ocupación del hotel a lo largo del tiempo,</p>
       <Row className="mb-3">
-        <Col xs={12}>
+        <Col xs={12} md={8}>
           <DatePickers
             startDate={dates.start}
             endDate={dates.end}
@@ -82,7 +112,30 @@ function HotelOccupancyOverTimeReport({ hotelId }) {
             handleClearDates={handleClearDateFilter}
           />
         </Col>
+        <Col xs={12} md={4} className="d-flex align-items-center">
+          <label className="me-2 mb-0">Meta de ocupación (%):</label>
+          <input
+            type="number"
+            min={0}
+            max={100}
+            value={goal}
+            onChange={(e) => setGoal(Number(e.target.value))}
+            className="form-control"
+            style={{ width: 80 }}
+            disabled={loading}
+          />
+        </Col>
       </Row>
+      <div className="mb-3">
+        <button
+          className="btn btn-outline-dark btn-sm"
+          onClick={() => setShowBars((prev) => !prev)}
+          disabled={loading}>
+          {showBars
+            ? "Ocultar barras de habitaciones"
+            : "Mostrar barras de habitaciones"}
+        </button>
+      </div>
       <SimpleLoader isVisible={loading} />
       {showPrompt && (
         <Alert
@@ -98,25 +151,11 @@ function HotelOccupancyOverTimeReport({ hotelId }) {
       )}
       {!showPrompt && !loading && data.length > 0 && (
         <Chart
-          chartType="LineChart"
+          chartType="ComboChart"
           width="100%"
           height="350px"
           data={chartData}
-          options={{
-            title: "Ocupación (%) y Habitaciones Totales por Mes",
-            legend: { position: "bottom" },
-            hAxis: { title: "Mes" },
-            vAxes: {
-              0: { title: "Ocupación (%)" },
-              1: { title: "Habitaciones Totales" },
-            },
-            series: {
-              0: { targetAxisIndex: 0 }, // Ocupación (%) on left axis
-              1: { targetAxisIndex: 1 }, // Habitaciones Totales on right axis
-            },
-            curveType: "function",
-            pointSize: 5,
-          }}
+          options={chartOptions}
         />
       )}
     </div>

@@ -18,13 +18,17 @@ function RevPAROverTimeReport({ hotelId }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
+  const [goal, setGoal] = useState(500000); // New state for RevPAR goal
+  const [showBars, setShowBars] = useState(false); // New state for bars
 
+  // Combo chart data: RevPAR (line), Habitaciones Disponibles (bars), Meta RevPAR (line)
   const chartData = [
-    ["Mes", "RevPAR", "Habitaciones Disponibles"],
+    ["Mes", "RevPAR", "Habitaciones Disponibles", "Meta RevPAR"],
     ...data.map((item) => [
       dayjs(item.monthLabel).format("MMM YYYY"),
       item.revPAR,
       item.totalRooms,
+      goal,
     ]),
   ];
 
@@ -66,6 +70,32 @@ function RevPAROverTimeReport({ hotelId }) {
     }
   }, [hotelId, dates.start, dates.end]);
 
+  // Chart options with conditional bars
+  const chartOptions = {
+    title: "RevPAR y Habitaciones Totales por Mes",
+    legend: { position: "bottom" },
+    hAxis: { title: "Mes" },
+    vAxes: {
+      0: { title: "RevPAR" },
+      1: { title: "Habitaciones Totales" },
+    },
+    seriesType: "line",
+    series: {
+      0: { type: "line", targetAxisIndex: 0, color: "#4caf50" }, // RevPAR
+      1: showBars
+        ? { type: "bars", targetAxisIndex: 1 }
+        : { type: "line", color: "transparent", targetAxisIndex: 1 }, // Hide bars
+      2: {
+        type: "line",
+        targetAxisIndex: 0,
+        lineDashStyle: [4, 4],
+        color: "#FF9800",
+      }, // Meta RevPAR
+    },
+    curveType: "function",
+    pointSize: 5,
+  };
+
   return (
     <div>
       <h4>Ingresos por Habitación Disponible</h4>
@@ -74,7 +104,7 @@ function RevPAROverTimeReport({ hotelId }) {
         disponible (RevPAR) a lo largo del tiempo.
       </p>
       <Row className="mb-3">
-        <Col xs={12}>
+        <Col xs={12} md={8}>
           <DatePickers
             startDate={dates.start}
             endDate={dates.end}
@@ -85,7 +115,29 @@ function RevPAROverTimeReport({ hotelId }) {
             handleClearDates={handleClearDateFilter}
           />
         </Col>
+        <Col xs={12} md={4} className="d-flex align-items-center">
+          <label className="me-2 mb-0">Meta RevPAR:</label>
+          <input
+            type="number"
+            min={0}
+            value={goal}
+            onChange={(e) => setGoal(Number(e.target.value))}
+            className="form-control"
+            style={{ width: 120 }}
+            disabled={loading}
+          />
+        </Col>
       </Row>
+      <div className="mb-3">
+        <button
+          className="btn btn-outline-dark btn-sm"
+          onClick={() => setShowBars((prev) => !prev)}
+          disabled={loading}>
+          {showBars
+            ? "Ocultar barras de habitaciones"
+            : "Mostrar barras de habitaciones"}
+        </button>
+      </div>
       <SimpleLoader isVisible={loading} />
       {showPrompt && (
         <Alert
@@ -101,25 +153,11 @@ function RevPAROverTimeReport({ hotelId }) {
       )}
       {!showPrompt && !loading && data.length > 0 && (
         <Chart
-          chartType="LineChart"
+          chartType="ComboChart"
           width="100%"
           height="350px"
           data={chartData}
-          options={{
-            title: "RevPAR y Habitaciones Totales por Mes",
-            legend: { position: "bottom" },
-            hAxis: { title: "Mes" },
-            vAxes: {
-              0: { title: "RevPAR" },
-              1: { title: "Habitaciones Totales" },
-            },
-            series: {
-              0: { targetAxisIndex: 0 }, // RevPAR on left axis
-              1: { targetAxisIndex: 1 }, // totalRooms on right axis
-            },
-            curveType: "function",
-            pointSize: 5,
-          }}
+          options={chartOptions}
         />
       )}
     </div>
