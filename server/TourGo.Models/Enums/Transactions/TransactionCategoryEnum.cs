@@ -21,5 +21,6 @@ namespace TourGo.Models.Enums.Transactions
         ExpensesStaffing = 11,
         ExpensesUtilities = 12,
         ExpensesOthers = 13,
+        ExpensesNonOperatingRent = 14,
     }
 }

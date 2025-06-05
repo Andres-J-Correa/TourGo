@@ -2283,3 +2283,7 @@ p {
   right: -0.6rem;
   z-index: 1;
 }
+
+.display-inline {
+  display: inline !important;
+}

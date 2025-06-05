@@ -15,6 +15,23 @@ export const TRANSACTION_CATEGORY_TYPES = [
   { id: 2, name: "Gastos" },
 ];
 
+export const TRANSACTION_CATEGORIES_BY_ID = {
+  1: "Ingresos por Habitaciones",
+  2: "Gastos por Habitaciones",
+  3: "Ingresos por Alimentos y Bebidas",
+  4: "Ingresos por Servicios Complementarios",
+  5: "Otros Ingresos",
+  6: "Gastos por Alimentos y Bebidas",
+  7: "Gastos por Servicios Complementarios",
+  8: "Gastos por Reparaciones y Mantenimiento",
+  9: "Gastos Administrativos",
+  10: "Gastos de Marketing y Ventas",
+  11: "Gastos de Personal",
+  12: "Gastos por Servicios Públicos",
+  13: "Otros Gastos",
+  14: "Gastos No Operativos por Arrendamiento",
+};
+
 export const TRANSACTION_CATEGORIES = [
   {
     id: 1,
@@ -52,6 +69,31 @@ export const TRANSACTION_CATEGORIES = [
     typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
+    id: 11,
+    name: "Gastos de Personal",
+    description: "Costos de salarios, beneficios y capacitación del personal.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
+  },
+  {
+    id: 12,
+    name: "Gastos por Servicios Públicos",
+    description: "Costos de electricidad, agua, gas y gestión de residuos.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
+  },
+  {
+    id: 8,
+    name: "Gastos por Reparaciones y Mantenimiento",
+    description: "Costos de reparaciones y mantenimiento de la propiedad.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
+  },
+  {
+    id: 14,
+    name: "Gastos No Operativos por Arrendamiento",
+    description:
+      "Gastos relacionados con arrendamientos no operativos, como alquiler de locales comerciales.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
+  },
+  {
     id: 6,
     name: "Gastos por Alimentos y Bebidas",
     description: "Costos de operación de restaurantes, bares y banquetes.",
@@ -61,12 +103,6 @@ export const TRANSACTION_CATEGORIES = [
     id: 7,
     name: "Gastos por Servicios Complementarios",
     description: "Costos de operación de spa, estacionamiento o tours.",
-    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
-  },
-  {
-    id: 8,
-    name: "Gastos por Reparaciones y Mantenimiento",
-    description: "Costos de reparaciones y mantenimiento de la propiedad.",
     typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
@@ -83,18 +119,6 @@ export const TRANSACTION_CATEGORIES = [
     typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
-    id: 11,
-    name: "Gastos de Personal",
-    description: "Costos de salarios, beneficios y capacitación del personal.",
-    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
-  },
-  {
-    id: 12,
-    name: "Gastos por Servicios Públicos",
-    description: "Costos de electricidad, agua, gas y gestión de residuos.",
-    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
-  },
-  {
     id: 13,
     name: "Otros Gastos",
     description:
@@ -102,22 +126,6 @@ export const TRANSACTION_CATEGORIES = [
     typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
 ];
-
-export const TRANSACTION_CATEGORIES_BY_ID = {
-  1: "Ingresos por Habitaciones",
-  2: "Gastos por Habitaciones",
-  3: "Ingresos por Alimentos y Bebidas",
-  4: "Ingresos por Servicios Complementarios",
-  5: "Otros Ingresos",
-  6: "Gastos por Alimentos y Bebidas",
-  7: "Gastos por Servicios Complementarios",
-  8: "Gastos por Reparaciones y Mantenimiento",
-  9: "Gastos Administrativos",
-  10: "Gastos de Marketing y Ventas",
-  11: "Gastos de Personal",
-  12: "Gastos por Servicios Públicos",
-  13: "Otros Gastos",
-};
 
 export const TRANSACTION_STATUSES = [
   { id: 1, name: "Pendiente" },

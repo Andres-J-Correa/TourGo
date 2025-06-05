@@ -55,8 +55,8 @@ const thumb = {
   border: "1px solid #eaeaea",
   marginBottom: 8,
   marginRight: 8,
-  width: 200,
-  height: 200,
+  width: 400,
+  height: 400,
   padding: 4,
   boxSizing: "border-box",
   justifyContent: "center",
@@ -75,6 +75,8 @@ const img = {
   display: "block",
   width: "auto",
   height: "100%",
+  maxWidth: "100%",
+  objectFit: "contain",
 };
 
 function Dropzone({ files, setFiles, ...props }) {

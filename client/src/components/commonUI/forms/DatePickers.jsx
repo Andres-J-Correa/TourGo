@@ -52,6 +52,8 @@ const DatePickers = ({
   };
 
   const onClearDates = () => {
+    // If the date pickers are disabled, do not clear the dates
+    if (isDisabled) return;
     if (startDate || endDate) {
       handleClearDates();
     }
@@ -105,10 +107,10 @@ const DatePickers = ({
             <FontAwesomeIcon
               size="sm"
               color="tomato"
-              type="button"
               title="Limpiar fechas"
               onClick={onClearDates}
               icon={faRectangleXmark}
+              className={isDisabled ? "cursor-not-allowed" : "cursor-pointer"}
             />
           </div>
         )}

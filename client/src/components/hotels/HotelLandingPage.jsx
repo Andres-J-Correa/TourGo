@@ -25,6 +25,7 @@ import {
   getDepartures,
   getArrivingRooms,
   getDepartingRooms,
+  getStays,
 } from "services/bookingService";
 import { formatCurrency } from "utils/currencyHelper";
 import { toast } from "react-toastify";
@@ -50,6 +51,7 @@ const HotelLandingPage = () => {
     departures: [],
     arrivingRooms: [],
     departingRooms: [],
+    stays: [],
   });
   const [date, setDate] = useState(dateOptions.today);
   const [loadingArrivalsDepartures, setLoadingArrivalsDepartures] =
@@ -98,6 +100,7 @@ const HotelLandingPage = () => {
       getDepartures(hotelId, date),
       getArrivingRooms(hotelId, date),
       getDepartingRooms(hotelId, date),
+      getStays(hotelId, date),
     ])
       .then(
         ([
@@ -105,12 +108,14 @@ const HotelLandingPage = () => {
           departuresResult,
           arrivingRoomsResult,
           departingRoomsResult,
+          staysResult,
         ]) => {
           const errors = [];
           let arrivals = [];
           let departures = [];
           let arrivingRooms = [];
           let departingRooms = [];
+          let stays = [];
 
           if (arrivalsResult.status === "fulfilled") {
             arrivals = arrivalsResult.value?.items || [];
@@ -136,11 +141,18 @@ const HotelLandingPage = () => {
             errors.push("Error al cargar habitaciones que salen hoy");
           }
 
+          if (staysResult.status === "fulfilled") {
+            stays = staysResult.value?.items || [];
+          } else if (staysResult.reason?.response?.status !== 404) {
+            errors.push("Error al cargar estancias de hoy");
+          }
+
           setData({
             arrivals,
             departures,
             arrivingRooms,
             departingRooms,
+            stays,
           });
 
           if (errors.length > 0) {
@@ -223,6 +235,14 @@ const HotelLandingPage = () => {
                   </NavItem>
                   <NavItem>
                     <NavLink
+                      className={classnames({ active: activeTab === "stays" })}
+                      onClick={() => toggleTab("stays")}
+                      style={{ cursor: "pointer" }}>
+                      Estancias
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
                       className={classnames({ active: activeTab === "rooms" })}
                       onClick={() => toggleTab("rooms")}
                       style={{ cursor: "pointer" }}>
@@ -259,26 +279,15 @@ const HotelLandingPage = () => {
                               }
                             )}>
                             <div>
-                              <Row>
-                                <Col md={2}>
-                                  <strong>Reserva #:</strong> {arrival.id}
-                                </Col>
-                                <Col md={3}>
-                                  <strong>ID externa:</strong>{" "}
-                                  {arrival.externalBookingId}
-                                </Col>
-                                <Col md={3}>
-                                  <strong>Proveedor:</strong>{" "}
-                                  {arrival.bookingProviderName || "N/A"}
-                                </Col>
-                                <Col className="text-end">
-                                  <BookingStatusBadge
-                                    statusId={arrival.statusId}
-                                  />
-                                </Col>
-                              </Row>
                               <Row className="justify-content-between">
-                                <Col md={9}>
+                                <Col md={5}>
+                                  <strong>Reserva #:</strong> {arrival.id}
+                                  <div className="ms-3 display-inline">
+                                    <BookingStatusBadge
+                                      statusId={arrival.statusId}
+                                    />
+                                  </div>
+                                  <br />
                                   <strong>Cliente:</strong>{" "}
                                   {arrival.customer?.firstName}{" "}
                                   {arrival.customer?.lastName}
@@ -289,14 +298,29 @@ const HotelLandingPage = () => {
                                   <strong>Documento:</strong>{" "}
                                   {arrival.customer?.documentNumber || "N/A"}
                                 </Col>
-                                <Col md="auto">
-                                  <strong>Noches:</strong> {arrival.nights}
+                                <Col>
+                                  <strong>ID externa:</strong>{" "}
+                                  {arrival.externalBookingId}
+                                  <br />
+                                  <strong>Proveedor:</strong>{" "}
+                                  {arrival.bookingProviderName || "N/A"}
                                   <br />
                                   <strong>Total:</strong>{" "}
                                   {formatCurrency(arrival.total, "COP")}
                                   <br />
                                   <strong>Saldo:</strong>{" "}
                                   {formatCurrency(arrival.balanceDue, "COP")}
+                                </Col>
+                                <Col md="auto">
+                                  <strong>Fecha de llegada:</strong>{" "}
+                                  {dayjs(date).format("DD/MM/YYYY")}
+                                  <br />
+                                  <strong>Fecha de salida:</strong>{" "}
+                                  {dayjs(date)
+                                    .add(arrival.nights, "days")
+                                    .format("DD/MM/YYYY")}
+                                  <br />
+                                  <strong>Noches:</strong> {arrival.nights}
                                 </Col>
                               </Row>
                               {dayjs(arrival.eta).isValid() && (
@@ -337,7 +361,7 @@ const HotelLandingPage = () => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     title="Ver detalles de la reserva">
-                                    Ver Detales
+                                    Ver Detalles
                                   </Link>
                                 </Col>
                               </Row>
@@ -355,7 +379,7 @@ const HotelLandingPage = () => {
                     ) : (
                       data.departures.map((departure, i) => (
                         <div
-                          key={`arrival-${departure.id}-${i}`}
+                          key={`departure-${departure.id}-${i}`}
                           className={classnames(
                             "w-100 border-dark-subtle py-3",
                             {
@@ -363,26 +387,15 @@ const HotelLandingPage = () => {
                             }
                           )}>
                           <div>
-                            <Row>
-                              <Col md={2}>
-                                <strong>Reserva #:</strong> {departure.id}
-                              </Col>
-                              <Col md={3}>
-                                <strong>ID externa:</strong>{" "}
-                                {departure.externalBookingId}
-                              </Col>
-                              <Col md={3}>
-                                <strong>Proveedor:</strong>{" "}
-                                {departure.bookingProviderName || "N/A"}
-                              </Col>
-                              <Col className="text-end">
-                                <BookingStatusBadge
-                                  statusId={departure.statusId}
-                                />
-                              </Col>
-                            </Row>
                             <Row className="justify-content-between">
-                              <Col md={9}>
+                              <Col md={5}>
+                                <strong>Reserva #:</strong> {departure.id}
+                                <div className="ms-3 display-inline">
+                                  <BookingStatusBadge
+                                    statusId={departure.statusId}
+                                  />
+                                </div>
+                                <br />
                                 <strong>Cliente:</strong>{" "}
                                 {departure.customer?.firstName}{" "}
                                 {departure.customer?.lastName}
@@ -393,7 +406,22 @@ const HotelLandingPage = () => {
                                 <strong>Documento:</strong>{" "}
                                 {departure.customer?.documentNumber || "N/A"}
                               </Col>
+                              <Col>
+                                <strong>ID externa:</strong>{" "}
+                                {departure.externalBookingId}
+                                <br />
+                                <strong>Proveedor:</strong>{" "}
+                                {departure.bookingProviderName || "N/A"}
+                              </Col>
                               <Col md="auto">
+                                <strong>Fecha de llegada:</strong>{" "}
+                                {dayjs(date)
+                                  .subtract(departure.nights, "days")
+                                  .format("DD/MM/YYYY")}
+                                <br />
+                                <strong>Fecha de salida:</strong>{" "}
+                                {dayjs(date).format("DD/MM/YYYY")}
+                                <br />
                                 <strong>Noches:</strong> {departure.nights}
                                 <br />
                               </Col>
@@ -420,7 +448,91 @@ const HotelLandingPage = () => {
                                   rel="noopener noreferrer"
                                   className="btn btn-outline-dark"
                                   title="Ver detalles de la reserva">
-                                  Ver Detales
+                                  Ver Detalles
+                                </Link>
+                              </Col>
+                            </Row>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </TabPane>
+                  <TabPane tabId="stays">
+                    {data.stays.length === 0 ? (
+                      <div className="text-muted">
+                        No hay estancias para esta fecha.
+                      </div>
+                    ) : (
+                      data.stays.map((stay, i) => (
+                        <div
+                          key={`stays-${stay.id}-${i}`}
+                          className={classnames(
+                            "w-100 border-dark-subtle py-3",
+                            {
+                              "border-bottom": i < data.stays.length - 1,
+                            }
+                          )}>
+                          <div>
+                            <Row className="justify-content-between">
+                              <Col md={5}>
+                                <strong>Reserva #:</strong> {stay.id}
+                                <div className="ms-3 display-inline">
+                                  <BookingStatusBadge
+                                    statusId={stay.statusId}
+                                  />
+                                </div>
+                                <br />
+                                <strong>Cliente:</strong>{" "}
+                                {stay.customer?.firstName}{" "}
+                                {stay.customer?.lastName}
+                                <br />
+                                <strong>Teléfono:</strong>{" "}
+                                {stay.customer?.phone || "N/A"}
+                                <br />
+                                <strong>Documento:</strong>{" "}
+                                {stay.customer?.documentNumber || "N/A"}
+                              </Col>
+                              <Col>
+                                <strong>ID externa:</strong>{" "}
+                                {stay.externalBookingId}
+                                <br />
+                                <strong>Proveedor:</strong>{" "}
+                                {stay.bookingProviderName || "N/A"}
+                              </Col>
+                              <Col md="auto">
+                                <strong>Fecha de llegada:</strong>{" "}
+                                {dayjs(stay.arrivalDate).format("DD/MM/YYYY")}
+                                <br />
+                                <strong>Fecha de salida:</strong>{" "}
+                                {dayjs(stay.departureDate).format("DD/MM/YYYY")}
+                                <br />
+                                <strong>Noches:</strong> {stay.nights}
+                                <br />
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col md={5}>
+                                <strong>Habitaciones ocupadas:</strong>{" "}
+                                <ul className="mb-0">
+                                  {renderRooms(stay.rooms)}
+                                </ul>
+                              </Col>
+                              <Col>
+                                {stay.notes && (
+                                  <>
+                                    <strong>Notas:</strong>
+                                    <p className="mb-0">{stay.notes}</p>
+                                  </>
+                                )}
+                              </Col>
+                              <Col className="text-end align-content-end">
+                                <Link
+                                  to={`/hotels/${hotelId}/bookings/${stay.id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="btn btn-outline-dark"
+                                  title="Ver detalles de la reserva">
+                                  Ver Detalles
                                 </Link>
                               </Col>
                             </Row>

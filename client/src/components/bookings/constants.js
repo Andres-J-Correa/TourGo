@@ -3,17 +3,17 @@ import { formatCurrency } from "utils/currencyHelper";
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 
 export const BOOKING_STATUS_BY_ID = {
-  1: "Activo",
-  2: "Cancelado",
-  3: "Completado",
+  1: "Activa",
+  2: "Cancelada",
+  3: "Completada",
   4: "No Show",
   5: "Arribada",
 };
 
 export const BOOKING_STATUSES = [
-  { id: 1, name: "Activo" },
-  { id: 2, name: "Cancelado" },
-  { id: 3, name: "Completado" },
+  { id: 1, name: "Activa" },
+  { id: 2, name: "Cancelada" },
+  { id: 3, name: "Completada" },
   { id: 4, name: "No Show" },
   { id: 5, name: "Arribada" },
 ];

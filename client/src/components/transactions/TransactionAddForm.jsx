@@ -82,7 +82,7 @@ function TransactionAddForm({
     }
     return Swal.fire({
       icon: "warning",
-      title: "Categoría y Monto no coinciden",
+      title: "¡Posible error de categoría!",
       text: message,
       showCancelButton: true,
       confirmButtonText: "Continuar",
@@ -90,6 +90,17 @@ function TransactionAddForm({
       cancelButtonText: "Revisar categoría",
       reverseButtons: true,
       cancelButtonColor: "green",
+      didOpen: () => {
+        // Hide buttons initially
+        Swal.getConfirmButton().style.display = "none";
+        Swal.showLoading();
+        setTimeout(() => {
+          if (Swal.isVisible()) {
+            Swal.getConfirmButton().style.display = "inline-block";
+            Swal.hideLoading();
+          }
+        }, 2000);
+      },
     });
   };
 
