@@ -69,6 +69,7 @@ function HotelOccupancyOverTimeReport({ hotelId }) {
   return (
     <div>
       <h4>Ocupación del Hotel</h4>
+      <p>Este reporte muestra la ocupación del hotel a lo largo del tiempo,</p>
       <Row className="mb-3">
         <Col xs={12}>
           <DatePickers
