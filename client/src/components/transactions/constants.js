@@ -91,6 +91,7 @@ export const TRANSACTION_CATEGORIES = [
     name: "Gastos No Operativos por Arrendamiento",
     description:
       "Gastos relacionados con arrendamientos no operativos, como alquiler de locales comerciales.",
+    typeId: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
   },
   {
     id: 6,

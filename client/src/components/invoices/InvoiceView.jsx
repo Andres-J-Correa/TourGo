@@ -257,6 +257,7 @@ const InvoiceView = () => {
               key={`booking_${booking.id}-${index}`}
               className="mb-4 bg-body-tertiary shadow ">
               <CardHeader tag="h5" className="text-bg-dark text-center">
+                Concepto:{" "}
                 <Link
                   to={`/hotels/${hotelId}/bookings/${booking.id}`}
                   target="_blank"
