@@ -69,28 +69,6 @@ function TransactionAddForm({
     entityId: entity?.id || undefined,
   };
 
-  /*    const result = await Swal.fire({
-        title: "¿Revertir transacción?",
-        text: "Esta acción creará una transacción de reversión. ¿Estás seguro?",
-        icon: "warning",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        showConfirmButton: true,
-        showCancelButton: true,
-        confirmButtonText: "Sí, revertir",
-        cancelButtonText: "Cancelar",
-        confirmButtonColor: "red",
-        reverseButtons: true,
-        didOpen: () => {
-          // Hide buttons initially
-          Swal.getConfirmButton().style.display = "none";
-          Swal.showLoading();
-          setTimeout(() => {
-            Swal.getConfirmButton().style.display = "inline-block";
-            Swal.hideLoading();
-          }, 2000);
-        },
-      }); */
   const confirmProceedWithMismatchedCategoryAmount = (
     amount,
     categoryTypeId

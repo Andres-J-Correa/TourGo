@@ -52,6 +52,7 @@ const DatePickers = ({
   };
 
   const onClearDates = () => {
+    // If the date pickers are disabled, do not clear the dates
     if (isDisabled) return;
     if (startDate || endDate) {
       handleClearDates();
