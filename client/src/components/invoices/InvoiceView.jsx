@@ -34,7 +34,7 @@ const InvoiceView = () => {
   const { toPDF, targetRef } = usePDF({
     filename: `Factura-${invoiceData?.details?.invoiceNumber}-${invoiceData?.details?.customer?.firstName}-${invoiceData?.details?.customer?.lastName}.pdf`,
     page: {
-      margin: Margin.SMALL,
+      margin: Margin.MEDIUM,
       page: "letter",
     },
   });
