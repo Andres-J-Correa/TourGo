@@ -283,6 +283,23 @@ export const getDepartures = async (hotelId, date) => {
   }
 };
 
+export const getStays = async (hotelId, date) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/hotel/${hotelId}/stays?date=${date}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
 export const getArrivingRooms = async (hotelId, date) => {
   const config = {
     headers: {

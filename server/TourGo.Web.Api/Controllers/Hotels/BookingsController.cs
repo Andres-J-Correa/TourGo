@@ -514,6 +514,33 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
+        [HttpGet("hotel/{id:int}/stays")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<BookingStay>> GetStaysToday(int id, [FromQuery] DateOnly date)
+        {
+            ObjectResult result = null;
+            try
+            {
+                List<BookingStay>? stays = _bookingService.GetStaysByDate(date, id);
+                if (stays == null)
+                {
+                    result = NotFound404(new ErrorResponse("No stays found for today"));
+                }
+                else
+                {
+                    ItemsResponse<BookingStay> response = new ItemsResponse<BookingStay>() { Items = stays };
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
+
         [HttpGet("hotel/{id:int}/departures/rooms")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<RoomBooking>> GetDepartingRoomBookings(int id, [FromQuery] DateOnly date)

@@ -11,7 +11,7 @@
   "profiles": {
     "Debug": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "https://localhost:50001/api/ping",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
