@@ -107,10 +107,8 @@ const TransactionDetails = ({
     e.preventDefault();
     const result = await Swal.fire({
       title: "¿Revertir transacción?",
-      text: "Esta acción creará una transacción de reversión. ¿Estás seguro?",
+      text: "Esta acción generará una transacción de reversión que cancelará esta transacción. ¿Estás seguro?",
       icon: "warning",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
       showConfirmButton: true,
       showCancelButton: true,
       confirmButtonText: "Sí, revertir",
@@ -122,8 +120,10 @@ const TransactionDetails = ({
         Swal.getConfirmButton().style.display = "none";
         Swal.showLoading();
         setTimeout(() => {
-          Swal.getConfirmButton().style.display = "inline-block";
-          Swal.hideLoading();
+          if (Swal.isVisible()) {
+            Swal.getConfirmButton().style.display = "inline-block";
+            Swal.hideLoading();
+          }
         }, 2000);
       },
     });

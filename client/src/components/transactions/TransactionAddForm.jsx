@@ -69,6 +69,28 @@ function TransactionAddForm({
     entityId: entity?.id || undefined,
   };
 
+  /*    const result = await Swal.fire({
+        title: "¿Revertir transacción?",
+        text: "Esta acción creará una transacción de reversión. ¿Estás seguro?",
+        icon: "warning",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: true,
+        showCancelButton: true,
+        confirmButtonText: "Sí, revertir",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "red",
+        reverseButtons: true,
+        didOpen: () => {
+          // Hide buttons initially
+          Swal.getConfirmButton().style.display = "none";
+          Swal.showLoading();
+          setTimeout(() => {
+            Swal.getConfirmButton().style.display = "inline-block";
+            Swal.hideLoading();
+          }, 2000);
+        },
+      }); */
   const confirmProceedWithMismatchedCategoryAmount = (
     amount,
     categoryTypeId
@@ -82,7 +104,7 @@ function TransactionAddForm({
     }
     return Swal.fire({
       icon: "warning",
-      title: "Categoría y Monto no coinciden",
+      title: "¡Posible error de categoría!",
       text: message,
       showCancelButton: true,
       confirmButtonText: "Continuar",
@@ -90,6 +112,17 @@ function TransactionAddForm({
       cancelButtonText: "Revisar categoría",
       reverseButtons: true,
       cancelButtonColor: "green",
+      didOpen: () => {
+        // Hide buttons initially
+        Swal.getConfirmButton().style.display = "none";
+        Swal.showLoading();
+        setTimeout(() => {
+          if (Swal.isVisible()) {
+            Swal.getConfirmButton().style.display = "inline-block";
+            Swal.hideLoading();
+          }
+        }, 2000);
+      },
     });
   };
 
