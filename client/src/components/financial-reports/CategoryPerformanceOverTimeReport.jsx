@@ -82,6 +82,10 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
   return (
     <div>
       <h4>Desempeño de Categoría en el Tiempo</h4>
+      <p>
+        Permite ver cómo ha cambiado el total de ingresos o gastos de una
+        categoría específica a lo largo del tiempo.
+      </p>
       <Row className="mb-3">
         <Col xs={12}>
           <DatePickers

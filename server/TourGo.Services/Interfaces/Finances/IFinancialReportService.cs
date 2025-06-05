@@ -12,5 +12,8 @@ namespace TourGo.Services.Interfaces.Finances
         List<RevenueBreakdownResponse>? GetRevenueBreakdown(int hotelId, DateOnly startDate, DateOnly endDate, string currencyCode);
         List<SubcategoryAnalysisResponse>? GetSubcategoryAnalysis(int hotelId, int categoryId, DateOnly startDate, DateOnly endDate, string currencyCode);
         List<UtilityCostAnalysisResponse>? GetUtilityCostAnalysis(int hotelId, DateOnly startDate, DateOnly endDate, string currencyCode);
+        List<RevPAROverTimeResponse>? GetRevPAROverTime(int hotelId, DateOnly startDate, DateOnly endDate);
+        List<HotelOccupancyOverTimeResponse>? GetHotelOccupancyOverTime(int hotelId, DateOnly startDate, DateOnly endDate);
+        decimal GetRoomOccupancyByDateRange(DateOnly start, DateOnly end, int roomId);
     }
 }

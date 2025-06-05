@@ -6,6 +6,7 @@ import Alert from "components/commonUI/Alert";
 import { getUtilityCostAnalysis } from "services/financialReportService";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { toast } from "react-toastify";
+import { formatCurrency } from "utils/currencyHelper";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -24,7 +25,7 @@ function UtilityCostAnalysisReport({ hotelId }) {
       item.subcategory,
       item.total,
       "color: #2196f3; opacity: 0.7",
-      item.total,
+      formatCurrency(item.total, "COP"),
     ]),
   ];
 
@@ -71,6 +72,10 @@ function UtilityCostAnalysisReport({ hotelId }) {
   return (
     <div>
       <h4>Análisis de Costos de Servicios Públicos</h4>
+      <p>
+        Presenta cuánto se ha gastado en servicios públicos (agua, luz, etc.)
+        por cada subcategoría.
+      </p>
       <div className="mb-3">
         <DatePickers
           startDate={dates.start}

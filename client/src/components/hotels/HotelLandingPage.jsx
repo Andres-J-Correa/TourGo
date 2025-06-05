@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Row,
   Col,
@@ -13,12 +13,9 @@ import {
   CardBody,
 } from "reactstrap";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
-import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 import { useAppContext } from "contexts/GlobalAppContext";
 import {
   getArrivals,
@@ -62,13 +59,6 @@ const HotelLandingPage = () => {
 
   const { hotelId } = useParams();
   const { hotel } = useAppContext();
-
-  const isUserAdmin = useMemo(
-    () =>
-      hotel.current.roleId === HOTEL_ROLES_IDS.ADMIN ||
-      hotel.current.roleId === HOTEL_ROLES_IDS.OWNER,
-    [hotel]
-  );
 
   const handleDateChange = (e) => {
     if (e.target.value === "more") {
@@ -177,16 +167,6 @@ const HotelLandingPage = () => {
             <Col>
               <h2>{hotel.current.name}</h2>
             </Col>
-            {isUserAdmin && (
-              <Col className="text-end">
-                <Link
-                  className="btn btn-outline-dark"
-                  to={`/hotels/${hotelId}/edit`}
-                  title="Editar Hotel">
-                  <FontAwesomeIcon icon={faEdit} size="lg" />
-                </Link>
-              </Col>
-            )}
           </Row>
 
           <div className="mb-4">

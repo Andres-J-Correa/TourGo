@@ -6,6 +6,7 @@ import Alert from "components/commonUI/Alert";
 import { getProfitAndLossSummary } from "services/financialReportService";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { toast } from "react-toastify";
+import { formatCurrency } from "utils/currencyHelper";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -28,13 +29,13 @@ function ProfitAndLossReport({ hotelId }) {
       "Ingresos",
       totals.totalRevenue,
       `color: #4caf50; opacity:0.5`,
-      totals.totalRevenue,
+      formatCurrency(totals.totalRevenue, "COP"),
     ],
     [
       "Gastos",
       totals.totalExpenses,
       `color: #f44335; opacity:0.5`,
-      totals.totalExpenses,
+      formatCurrency(totals.totalExpenses, "COP"),
     ],
     ["Utilidad Neta", totals.netProfit, `opacity:0.5`, totals.netProfit],
   ];
@@ -83,6 +84,10 @@ function ProfitAndLossReport({ hotelId }) {
   return (
     <div>
       <h4>Ganancias y Pérdidas</h4>
+      <p>
+        Resume los ingresos, gastos y la utilidad neta del hotel en un periodo
+        determinado.
+      </p>
       <div className="mb-3">
         <DatePickers
           startDate={dates.start}

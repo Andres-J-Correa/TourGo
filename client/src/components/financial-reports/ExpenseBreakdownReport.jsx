@@ -68,6 +68,10 @@ function ExpenseBreakdownReport({ hotelId }) {
   return (
     <div>
       <h4>Desglose de Gastos</h4>
+      <p>
+        Presenta cómo se distribuyen los gastos del hotel entre las diferentes
+        categorías.
+      </p>
       <div className="mb-3">
         <DatePickers
           startDate={dates.start}

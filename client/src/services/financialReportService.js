@@ -276,3 +276,91 @@ export const getUtilityCostAnalysis = async (
     return onGlobalError(error);
   }
 };
+
+/**
+ * Gets RevPAR over time for a hotel.
+ * @param {number} hotelId - The hotel ID.
+ * @param {string} startDate - Start date (YYYY-MM-DD).
+ * @param {string} endDate - End date (YYYY-MM-DD).
+ * @returns {Promise<Object>} API response with items array.
+ */
+export const getRevPAROverTime = async (hotelId, startDate, endDate) => {
+  const queryParams = new URLSearchParams({
+    startDate,
+    endDate,
+  }).toString();
+  const config = {
+    headers: { "Content-Type": "application/json" },
+    method: "GET",
+    url: `${api}/${hotelId}/revpar-over-time?${queryParams}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+/**
+ * Gets hotel occupancy over time.
+ * @param {number} hotelId - The hotel ID.
+ * @param {string} startDate - Start date (YYYY-MM-DD).
+ * @param {string} endDate - End date (YYYY-MM-DD).
+ * @returns {Promise<Object>} API response with items array.
+ */
+export const getHotelOccupancyOverTime = async (
+  hotelId,
+  startDate,
+  endDate
+) => {
+  const queryParams = new URLSearchParams({
+    startDate,
+    endDate,
+  }).toString();
+  const config = {
+    headers: { "Content-Type": "application/json" },
+    method: "GET",
+    url: `${api}/${hotelId}/occupancy-over-time?${queryParams}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+/**
+ * Gets room occupancy by date range.
+ * @param {number} hotelId - The hotel ID.
+ * @param {number} roomId - The room ID.
+ * @param {string} startDate - Start date (YYYY-MM-DD).
+ * @param {string} endDate - End date (YYYY-MM-DD).
+ * @returns {Promise<Object>} API response with item (decimal).
+ */
+export const getRoomOccupancyByDateRange = async (
+  hotelId,
+  roomId,
+  startDate,
+  endDate
+) => {
+  const queryParams = new URLSearchParams({
+    startDate,
+    endDate,
+  }).toString();
+  const config = {
+    headers: { "Content-Type": "application/json" },
+    method: "GET",
+    url: `${api}/${hotelId}/occupancy/room/${roomId}?${queryParams}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

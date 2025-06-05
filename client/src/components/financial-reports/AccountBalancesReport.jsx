@@ -38,6 +38,10 @@ function AccountBalancesReport({ hotelId }) {
   return (
     <div>
       <h4>Balance en Cuentas</h4>
+      <p>
+        Muestra el saldo actual de dinero en cada cuenta o método de pago del
+        hotel.
+      </p>
       <SimpleLoader isVisible={loading} />
       {!loading && data.length > 1 && (
         <Chart
