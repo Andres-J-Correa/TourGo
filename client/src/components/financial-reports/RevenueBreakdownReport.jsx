@@ -68,6 +68,10 @@ function RevenueBreakdownReport({ hotelId }) {
   return (
     <div>
       <h4>Desglose de Ingresos</h4>
+      <p>
+        Muestra de dónde provienen los ingresos del hotel, desglosados por
+        categorías.
+      </p>
       <div className="mb-3">
         <DatePickers
           startDate={dates.start}

@@ -232,5 +232,76 @@ namespace TourGo.Services.Finances
 
             return list;
         }
+
+        public List<RevPAROverTimeResponse>? GetRevPAROverTime(int hotelId, DateOnly startDate, DateOnly endDate)
+        {
+            string proc = "financial_reports_get_revpar_over_time";
+            List<RevPAROverTimeResponse>? list = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_startDate", startDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_endDate", endDate.ToString("yyyy-MM-dd"));
+            }, (reader, set) =>
+            {
+                int index = 0;
+                var item = new RevPAROverTimeResponse
+                {
+                    MonthLabel = reader.GetSafeString(index++),
+                    TotalRooms = reader.GetSafeInt32(index++),
+                    RevPAR = reader.GetSafeDecimal(index++)
+                };
+                list ??= new List<RevPAROverTimeResponse>();
+                list.Add(item);
+            });
+
+            return list;
+        }
+
+        public List<HotelOccupancyOverTimeResponse>? GetHotelOccupancyOverTime(int hotelId, DateOnly startDate, DateOnly endDate)
+        {
+            string proc = "financial_reports_get_hotel_occupancy_over_time";
+            List<HotelOccupancyOverTimeResponse>? list = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_startDate", startDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_endDate", endDate.ToString("yyyy-MM-dd"));
+            }, (reader, set) =>
+            {
+                int index = 0;
+                var item = new HotelOccupancyOverTimeResponse
+                {
+                    MonthLabel = reader.GetSafeString(index++),
+                    TotalRooms = reader.GetSafeInt32(index++),
+                    OccupancyRate = reader.GetSafeDecimal(index++)
+                };
+                list ??= new List<HotelOccupancyOverTimeResponse>();
+                list.Add(item);
+            });
+
+            return list;
+        }
+
+        public decimal GetRoomOccupancyByDateRange(DateOnly start, DateOnly end, int roomId)
+        {
+            string proc = "financial_reports_get_room_occupancy_by_date_range";
+            decimal occupancyRate = 0;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_start", start.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_end", end.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_roomId", roomId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                occupancyRate = reader.GetSafeDecimal(index++);
+            });
+
+            return occupancyRate;
+        }
     }
 }

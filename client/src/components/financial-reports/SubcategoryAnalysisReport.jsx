@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { Input, Row, Col, InputGroup, InputGroupText } from "reactstrap";
 import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
 import dayjs from "dayjs";
+import { formatCurrency } from "utils/currencyHelper";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("year").format("YYYY-MM-DD"),
@@ -27,7 +28,7 @@ function SubcategoryAnalysisReport({ hotelId }) {
     ...data.map((item) => [
       item.subcategory,
       item.total,
-      item.total,
+      formatCurrency(item.total, "COP"),
       item.total < 0 ? "color: #f44335; opacity:0.5;" : "opacity:0.5;",
     ]),
   ];
@@ -82,6 +83,10 @@ function SubcategoryAnalysisReport({ hotelId }) {
   return (
     <div>
       <h4>Análisis de Subcategorías</h4>
+      <p>
+        Permite analizar el total de ingresos o gastos por subcategoría dentro
+        de una categoría seleccionada.
+      </p>
       <Row className="mb-3">
         <Col xs={12}>
           <DatePickers

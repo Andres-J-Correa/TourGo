@@ -11,13 +11,13 @@ import {
 } from "components/transactions/constants";
 import dayjs from "dayjs";
 
-const getYearRange = () => ({
-  start: dayjs().startOf("year").format("YYYY-MM-DD"),
-  end: dayjs().endOf("year").format("YYYY-MM-DD"),
+const getMonthRange = () => ({
+  start: dayjs().startOf("month").format("YYYY-MM-DD"),
+  end: dayjs().endOf("month").format("YYYY-MM-DD"),
 });
 
 function CostToRevenueRatioReport({ hotelId }) {
-  const [dates, setDates] = useState(getYearRange());
+  const [dates, setDates] = useState(getMonthRange());
   const [revenueCategoryId, setRevenueCategoryId] = useState("");
   const [expenseCategoryId, setExpenseCategoryId] = useState("");
   const [data, setData] = useState(null);
@@ -117,7 +117,11 @@ function CostToRevenueRatioReport({ hotelId }) {
 
   return (
     <div>
-      <h4>Relación Costo a Ingreso</h4>
+      <h4>Relación Gasto a Ingreso</h4>
+      <p>
+        Muestra la relación entre una categoría de gastos y una categoría de
+        ingresos del hotel, mostrando qué porcentaje de los ingresos se gasta.
+      </p>
       <Row>
         <Col xs={12}>
           <DatePickers

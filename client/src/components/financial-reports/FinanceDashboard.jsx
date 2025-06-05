@@ -4,13 +4,16 @@ import { Row, Col, Nav, NavItem, NavLink } from "reactstrap";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import AccountBalancesReport from "components/financial-reports/AccountBalancesReport";
-import ProfitAndLossReport from "./ProfitAndLossReport";
-import RevenueBreakdownReport from "./RevenueBreakdownReport";
-import ExpenseBreakdownReport from "./ExpenseBreakdownReport";
+import ProfitAndLossReport from "components/financial-reports/ProfitAndLossReport";
+import RevenueBreakdownReport from "components/financial-reports/RevenueBreakdownReport";
+import ExpenseBreakdownReport from "components/financial-reports/ExpenseBreakdownReport";
+import RevPAROverTimeReport from "components/financial-reports/RevPAROverTimeReport";
 import CategoryPerformanceOverTimeReport from "components/financial-reports/CategoryPerformanceOverTimeReport";
 import SubcategoryAnalysisReport from "components/financial-reports/SubcategoryAnalysisReport";
 import CostToRevenueRatioReport from "components/financial-reports/CostToRevenueRatioReport";
 import UtilityCostAnalysisReport from "components/financial-reports/UtilityCostAnalysisReport";
+import HotelOccupancyOverTimeReport from "components/financial-reports/HotelOccupancyOverTimeReport";
+import RoomOccupancyReport from "components/financial-reports/RoomOccupancyReport";
 
 const TABS = [
   { key: "balance", label: "Balance en cuentas" },
@@ -18,11 +21,23 @@ const TABS = [
   { key: "revenue", label: "Desglose de Ingresos" },
   { key: "expenses", label: "Desglose de Gastos" },
   {
+    key: "revPAROverTime",
+    label: "RevPAR en el Tiempo",
+  },
+  {
+    key: "hotelOccupancyOverTime",
+    label: "Ocupación del Hotel en el Tiempo",
+  },
+  {
+    key: "roomOccupancy",
+    label: "Ocupación de Habitaciones",
+  },
+  {
     key: "categoryPerformance",
-    label: "Desempeño de Categoría a lo Largo del Tiempo",
+    label: "Desempeño de Categoría en el Tiempo",
   },
   { key: "subcategoryAnalysis", label: "Análisis por Subcategoría" },
-  { key: "costToRevenueRatio", label: "Ratio de Costo a Ingreso" },
+  { key: "costToRevenueRatio", label: "Relación de Gasto a Ingreso" },
   {
     key: "utilityCostAnalysis",
     label: "Análisis de Costos de Servicios Públicos",
@@ -38,6 +53,9 @@ const tabComponents = {
   subcategoryAnalysis: SubcategoryAnalysisReport,
   costToRevenueRatio: CostToRevenueRatioReport,
   utilityCostAnalysis: UtilityCostAnalysisReport,
+  revPAROverTime: RevPAROverTimeReport,
+  hotelOccupancyOverTime: HotelOccupancyOverTimeReport,
+  roomOccupancy: RoomOccupancyReport,
 };
 
 function FinanceDashboard() {

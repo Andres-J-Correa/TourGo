@@ -255,5 +255,83 @@ namespace TourGo.Web.Api.Controllers.Finances
             }
             return result;
         }
+
+        [HttpGet("revpar-over-time")]
+        [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<RevPAROverTimeResponse>> GetRevPAROverTime(
+        int id,
+        [FromQuery] DateOnly startDate,
+        [FromQuery] DateOnly endDate)
+        {
+            ObjectResult result;
+            try
+            {
+                var data = _financialReportService.GetRevPAROverTime(id, startDate, endDate);
+                if (data == null)
+                {
+                    result = NotFound404(new ErrorResponse("No data found"));
+                }
+                else
+                {
+                    result = Ok200(new ItemsResponse<RevPAROverTimeResponse> { Items = data });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                result = StatusCode(500, new ErrorResponse());
+            }
+            return result;
+        }
+
+        [HttpGet("occupancy-over-time")]
+        [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<HotelOccupancyOverTimeResponse>> GetHotelOccupancyOverTime(
+            int id,
+            [FromQuery] DateOnly startDate,
+            [FromQuery] DateOnly endDate)
+        {
+            ObjectResult result;
+            try
+            {
+                var data = _financialReportService.GetHotelOccupancyOverTime(id, startDate, endDate);
+                if (data == null)
+                {
+                    result = NotFound404(new ErrorResponse("No data found"));
+                }
+                else
+                {
+                    result = Ok200(new ItemsResponse<HotelOccupancyOverTimeResponse> { Items = data });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                result = StatusCode(500, new ErrorResponse());
+            }
+            return result;
+        }
+
+        [HttpGet("occupancy/room/{roomId:int}")]
+        [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: false)]
+        public ActionResult<ItemResponse<decimal>> GetRoomOccupancyByDateRange(
+            int id,
+            int roomId,
+            [FromQuery] DateOnly startDate,
+            [FromQuery] DateOnly endDate)
+        {
+            ObjectResult result;
+            try
+            {
+                var occupancy = _financialReportService.GetRoomOccupancyByDateRange(startDate, endDate, roomId);
+                result = Ok200(new ItemResponse<decimal> { Item = occupancy });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                result = StatusCode(500, new ErrorResponse());
+            }
+            return result;
+        }
     }
 }

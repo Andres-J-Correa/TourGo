@@ -3,9 +3,9 @@ import {
   faCalendarCheck,
   faClipboardList,
   faBed,
-  faAddressCard,
   faUsers,
-  faMoneyBillTrendUp,
+  faCashRegister,
+  faCogs,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
@@ -83,6 +83,13 @@ export const useNavbarItems = () => {
         capitalize: true,
       },
       {
+        name: "Transacciones",
+        icon: faCashRegister,
+        position: "left",
+        path: `/hotels/${hotel.current.id}/transactions`,
+        capitalize: true,
+      },
+      {
         name: "Gestionar Detalles",
         icon: faBed,
         position: "left",
@@ -132,14 +139,6 @@ export const useNavbarItems = () => {
           },
         ],
       },
-
-      {
-        name: "Clientes",
-        icon: faAddressCard,
-        position: "left",
-        path: `/hotels/${hotel.current.id}/customers`,
-        capitalize: true,
-      },
       ...(hotel.current.roleId === HOTEL_ROLES_IDS.OWNER
         ? [
             {
@@ -151,34 +150,40 @@ export const useNavbarItems = () => {
             },
           ]
         : []),
-      {
-        name: "Finanzas",
-        icon: faMoneyBillTrendUp,
-        position: "left",
-        capitalize: true,
-        collapse: [
-          {
-            name: "Accesos directos",
-            capitalize: true,
-            collapse: [
-              ...(isUserAdmin
-                ? [
+      ...(isUserAdmin
+        ? [
+            {
+              name: "Administración",
+              icon: faCogs,
+              position: "left",
+              capitalize: true,
+              collapse: [
+                {
+                  name: "Accesos directos",
+                  capitalize: true,
+                  collapse: [
+                    {
+                      name: "Editar Alojamiento",
+                      path: `/hotels/${hotel.current.id}/edit`,
+                      capitalize: true,
+                    },
+                  ],
+                },
+                {
+                  name: "Finanzas",
+                  capitalize: true,
+                  collapse: [
                     {
                       name: "Panel de Finanzas",
                       path: `/hotels/${hotel.current.id}/finance-dashboard`,
                       capitalize: true,
                     },
-                  ]
-                : []),
-              {
-                name: "Transacciones",
-                path: `/hotels/${hotel.current.id}/transactions`,
-                capitalize: true,
-              },
-            ],
-          },
-        ],
-      },
+                  ],
+                },
+              ],
+            },
+          ]
+        : []),
     ];
   }
   const items = [...currentHotelItems, ...hotelsItems];
