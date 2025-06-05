@@ -361,7 +361,7 @@ const HotelLandingPage = () => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     title="Ver detalles de la reserva">
-                                    Ver Detales
+                                    Ver Detalles
                                   </Link>
                                 </Col>
                               </Row>
@@ -379,7 +379,7 @@ const HotelLandingPage = () => {
                     ) : (
                       data.departures.map((departure, i) => (
                         <div
-                          key={`arrival-${departure.id}-${i}`}
+                          key={`departure-${departure.id}-${i}`}
                           className={classnames(
                             "w-100 border-dark-subtle py-3",
                             {
@@ -448,7 +448,7 @@ const HotelLandingPage = () => {
                                   rel="noopener noreferrer"
                                   className="btn btn-outline-dark"
                                   title="Ver detalles de la reserva">
-                                  Ver Detales
+                                  Ver Detalles
                                 </Link>
                               </Col>
                             </Row>
@@ -465,7 +465,7 @@ const HotelLandingPage = () => {
                     ) : (
                       data.stays.map((stay, i) => (
                         <div
-                          key={`arrival-${stay.id}-${i}`}
+                          key={`stays-${stay.id}-${i}`}
                           className={classnames(
                             "w-100 border-dark-subtle py-3",
                             {
@@ -532,7 +532,7 @@ const HotelLandingPage = () => {
                                   rel="noopener noreferrer"
                                   className="btn btn-outline-dark"
                                   title="Ver detalles de la reserva">
-                                  Ver Detales
+                                  Ver Detalles
                                 </Link>
                               </Col>
                             </Row>
