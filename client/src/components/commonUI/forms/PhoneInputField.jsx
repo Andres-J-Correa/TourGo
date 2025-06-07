@@ -25,7 +25,7 @@ const CustomInput = forwardRef(
         ref={ref}
         value={value}
         onChange={onChange}
-        className={`${className} my-1 form-control border-0`}
+        className={`${className || ""} my-1 form-control border-0`}
         {...rest}
       />
     </>
