@@ -63,6 +63,7 @@ export const useNavbarItems = () => {
                 name: "Nueva Reserva",
                 path: `/hotels/${hotel.current.id}/bookings/new`,
                 capitalize: true,
+                newTab: true,
               },
               {
                 name: "Lista de Reservas",

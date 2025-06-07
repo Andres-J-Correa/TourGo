@@ -98,6 +98,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
       <NavLink
         end
         to={navItem.path}
+        target={navItem.newTab ? "_blank" : undefined}
         className={classNames("nav-action-item", {
           "text-uppercase": navItem.uppercase,
           "text-capitalize": navItem.capitalize,
