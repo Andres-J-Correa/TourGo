@@ -7,6 +7,7 @@ using System.Security.Principal;
 using TourGo.Models;
 using TourGo.Services;
 using TourGo.Models.Domain.Users;
+using TourGo.Models.Interfaces;
 
 namespace TourGo.Web.Core.Services
 {
@@ -43,20 +44,29 @@ namespace TourGo.Web.Core.Services
                 .SignInAsync(AuthenticationDefaults.AuthenticationScheme, principal, props);
         }
 
-        public static ClaimsIdentity ExtractClaims(IUserAuthData user, Claim[] extraClaims, string originalIssuer = null)
+        public async Task LogInAsyncV2(IUserAuthDataV2 user, params Claim[] extraClaims)
         {
-            ClaimsIdentity identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme
-                                                            , ClaimsIdentity.DefaultNameClaimType
-                                                            , ClaimsIdentity.DefaultRoleClaimType);
+            ClaimsIdentity identity = ExtractClaims(user, extraClaims);
+            AuthenticationProperties props = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                IssuedUtc = DateTime.UtcNow,
+                ExpiresUtc = DateTime.UtcNow.AddDays(60),
+                AllowRefresh = true
+            };
+            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+            await _contextAccessor.HttpContext
+                .SignInAsync(AuthenticationDefaults.AuthenticationScheme, principal, props);
+        }
+        public static ClaimsIdentity ExtractClaims(IUserAuthDataV2 user, Claim[] extraClaims, string originalIssuer = null)
+        {
+            ClaimsIdentity identity = new ClaimsIdentity(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                ClaimsIdentity.DefaultNameClaimType,
+                ClaimsIdentity.DefaultRoleClaimType);
 
+            // Only store non-PII claims
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.String, _title, originalIssuer));
-
-            identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, user.FirstName, ClaimValueTypes.String, _title, originalIssuer));
-
-            identity.AddClaim(new Claim(ClaimTypes.Surname, user.LastName, ClaimValueTypes.String, _title, originalIssuer));
-
-            identity.AddClaim(new Claim(ClaimTypes.Email, user.Email, ClaimValueTypes.String, _title, originalIssuer));
-
             identity.AddClaim(new Claim("https://tourgo.site/claims/isverified", user.IsVerified.ToString(), ClaimValueTypes.Boolean, _title, originalIssuer));
 
             if (user.Roles != null && user.Roles.Any())
@@ -71,21 +81,17 @@ namespace TourGo.Web.Core.Services
             {
                 foreach (var claim in extraClaims)
                 {
-                    // Remove any existing claim with the same type
                     var existingClaims = identity.FindAll(claim.Type).ToList();
                     foreach (var existing in existingClaims)
                     {
                         identity.RemoveClaim(existing);
                     }
-
                     identity.AddClaim(claim);
                 }
             }
 
-
             return identity;
         }
-
 
         public async Task LogOutAsync()
         {
@@ -108,7 +114,7 @@ namespace TourGo.Web.Core.Services
 
         public IUserAuthData GetCurrentUser()
         {
-            UserBase baseUser = null;
+            IUserAuthData baseUser = null;
 
             if (IsLoggedIn())
             {
@@ -172,6 +178,9 @@ namespace TourGo.Web.Core.Services
                         }
                         break;
 
+                    case ClaimTypes.MobilePhone:
+                        baseUser.Phone = claim.Value;
+                        break;
 
                     default:
 

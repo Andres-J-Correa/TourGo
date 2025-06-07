@@ -119,28 +119,31 @@ namespace TourGo.Web.Api.Controllers.Finances
 
                 if (string.IsNullOrEmpty(fileKey))
                 {
-                   ErrorResponse response = new ErrorResponse("No document URL found for the specified transaction.");
+                    ErrorResponse response = new ErrorResponse("No document URL found for the specified transaction.");
                     result = NotFound404(response);
                 }
                 else
                 {
                     string cacheKey = $"presigned-url-{AWSS3BucketEnum.TransactionsFiles}-{fileKey}";
                     string? url = null;
-                    if (!_cache.TryGetValue(cacheKey, out Tuple<string, DateTime> cachedEntry) || cachedEntry.Item2 < DateTime.UtcNow.AddSeconds(300))
+                    CacheEntry<string>? cachedEntry;
+                    if (!_cache.TryGetValue(cacheKey, out cachedEntry) || cachedEntry?.ExpirationTime < DateTime.UtcNow.AddSeconds(300))
                     {
                         Logger.LogInformation("Cache miss for {CacheKey}. Generating new pre-signed URL.", cacheKey);
                         url = await _fileService.GetPresignedUrl(fileKey, AWSS3BucketEnum.TransactionsFiles);
                         var cacheOptions = new MemoryCacheEntryOptions
                         {
-                            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(3500),
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(3600),
                             SlidingExpiration = TimeSpan.FromSeconds(1800)
                         };
-                        _cache.Set(cacheKey, Tuple.Create(url, DateTime.UtcNow.AddSeconds(3600)), cacheOptions);
+                        var expiresAt = DateTime.UtcNow.AddSeconds(3600);
+                        var cacheEntry = new CacheEntry<string>(url, expiresAt);
+                        _cache.Set(cacheKey, cacheEntry, cacheOptions);
                     }
                     else
                     {
                         Logger.LogInformation("Cache hit for {CacheKey}.", cacheKey);
-                        url = cachedEntry.Item1;
+                        url = cachedEntry.Item;
                     }
 
                     ItemResponse<string> response = new ItemResponse<string> { Item = url };
@@ -155,7 +158,6 @@ namespace TourGo.Web.Api.Controllers.Finances
             }
 
             return result;
-
         }
 
         [HttpPut("{id:int}/document-url")]
