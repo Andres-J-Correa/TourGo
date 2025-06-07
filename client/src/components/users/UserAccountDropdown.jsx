@@ -32,6 +32,10 @@ function UserAccountDropdown() {
             name: "Cuenta",
             collapse: [
               {
+                name: "Perfil",
+                path: "/profile",
+              },
+              {
                 name: "Configuración",
                 path: "/profile/settings?tab=email",
               },

@@ -20,6 +20,7 @@ const defaultUser = {
   id: 0,
   firstName: "",
   lastName: "",
+  email: "",
   roles: [],
   isAuthenticated: false,
   isVerified: false,

@@ -144,6 +144,11 @@ const userRoutes = [
     path: "/profile/settings",
     component: lazy(() => import("components/users/UserSettings")),
   },
+  {
+    name: "userProfile",
+    path: "/profile",
+    component: lazy(() => import("components/users/UserProfile")),
+  },
 ];
 
 export const privateRoutes = [
