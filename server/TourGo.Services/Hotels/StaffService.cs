@@ -134,6 +134,17 @@ namespace TourGo.Services.Hotels
             });
         }
 
+        public void LeaveHotel(int userId, int hotelId)
+        {
+            string proc = "hotel_users_roles_user_leave";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_userId", userId);
+                param.AddWithValue("p_hotelId", hotelId);
+            });
+        }
+
         public List<StaffInvite>? GetInvitesByHotelId(int hotelId)
         {
             List<StaffInvite>? invites = null;

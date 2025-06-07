@@ -8,6 +8,7 @@ using TourGo.Data.Extensions;
 using TourGo.Models.Domain.Config;
 using TourGo.Services.Interfaces.Users;
 using TourGo.Models.Interfaces;
+using TourGo.Models.Requests.Users;
 
 namespace TourGo.Services.Users
 {
@@ -87,6 +88,19 @@ namespace TourGo.Services.Users
             if (user != null)
             {
                 RestartFailedAttempts(user.Email);
+            }
+        }
+
+        public void ChangePassword(IUserAuthData user, UserPasswordChangeRequest model)
+        {
+            bool isValidCredentials = IsValidCredentials(user.Email, model.OldPassword);
+
+            if (isValidCredentials)
+            {
+                _userService.ChangePassword(user.Id, model.Password);
+            } else
+            {
+                throw new UnauthorizedAccessException("Invalid credentials provided for password change.");
             }
         }
 

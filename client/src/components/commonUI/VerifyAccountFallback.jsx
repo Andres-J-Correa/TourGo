@@ -11,7 +11,7 @@ function VerifyAccountFallback() {
       <Button
         color="dark"
         onClick={() => navigate("/profile/settings?tab=email")}>
-        Verificar Correo
+        Ir a Verificar Correo
       </Button>
     </div>
   );

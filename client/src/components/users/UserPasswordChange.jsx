@@ -1,132 +1,151 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { Container, Button, Spinner } from "reactstrap";
+import React from "react";
+import { Button, Col, FormGroup, Row } from "reactstrap";
 import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
-import DefaultHeader from "components/commonUI/headers/DefaultHeader";
-import AuthCard from "components/commonUI/forms/AuthCard";
 import { userPasswordChangeSchema } from "components/users/validationSchemas";
-import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
-import { resetPassword, validateToken } from "services/userAuthService";
+import { changePassword } from "services/userAuthService";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
-import backgroundImage from "assets/images/password-reset-bg.jpg";
-import NoRecords404 from "components/commonUI/errors/NoRecords404";
+import Swal from "sweetalert2";
+import { ERROR_CODES } from "constants/errorCodes";
 
 function UserPasswordChange() {
-  const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(null);
-  const [isTokenValid, setIsTokenValid] = useState(null);
-
-  const [searchParams] = useSearchParams();
-  const tokenId = searchParams.get("tokenId");
-
-  const navigate = useNavigate();
-  const { t, getTranslatedErrorMessage } = useLanguage();
+  const { t } = useLanguage();
   const validationSchema = userPasswordChangeSchema;
-  const formRef = useRef(null);
 
-  const handleSubmit = async (values) => {
-    setLoading(true);
+  const handleSubmit = async (
+    values,
+    { setSubmitting, resetForm, setFieldError }
+  ) => {
+    const result = await Swal.fire({
+      title: "¿Cambiar contraseña?",
+      text: "¿Estás seguro de que deseas cambiar tu contraseña?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, cambiar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) {
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      const response = await resetPassword({ ...values, token: tokenId });
-      if (!response?.isSuccessful) {
-        throw new Error("Error changing password");
+      Swal.fire({
+        title: "Cambiando...",
+        text: "Por favor, espera mientras se actualiza tu contraseña.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const response = await changePassword({
+        oldPassword: values.oldPassword,
+        password: values.password,
+        confirmPassword: values.confirmPassword,
+      });
+
+      Swal.close();
+
+      if (response?.isSuccessful) {
+        Swal.fire({
+          title: "Éxito",
+          text: "Tu contraseña ha sido cambiada exitosamente.",
+          icon: "success",
+          timer: 2000,
+        });
+        resetForm();
+      } else {
+        throw new Error("Error al cambiar la contraseña.");
       }
-      toast.success(t("common.success"));
-      setIsTokenValid(false);
-      navigate("/");
     } catch (error) {
-      toast.error(getTranslatedErrorMessage(error));
+      const errorMessage =
+        "La contraseña actual es incorrecta. Por favor, inténtalo de nuevo.";
+
+      if (
+        Number(error?.response?.data?.code) ===
+        ERROR_CODES.INCORRECT_CREDENTIALS
+      ) {
+        setFieldError("oldPassword", errorMessage);
+      }
+
+      Swal.close();
+
+      Swal.fire({
+        title: "Error",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  useEffect(() => {
-    if (token && isTokenValid === null) {
-      validateToken(token)
-        .then((response) => {
-          setIsTokenValid(response?.item ? true : false);
-        })
-        .catch((error) => {
-          toast.error(getTranslatedErrorMessage(error));
-          toast.warning(t("common.redirecting"), {
-            autoClose: 3000,
-          });
-          setTimeout(() => navigate("/"), 3000);
-        });
-    }
-  }, [isTokenValid, token, t, navigate, getTranslatedErrorMessage]);
-
-  useEffect(() => {
-    if (!token && tokenId) {
-      setToken(tokenId);
-    }
-  }, [tokenId, token]);
-
   return (
-    <>
-      {isTokenValid ? (
-        <>
-          <DefaultHeader
-            backgroundImage={backgroundImage}
-            className="m-3 border-radius-xl min-vh-50"
-          />
-          <Container className="mt-n5">
-            <AuthCard
-              title={t("client.passwordChange.title")}
-              subtitle={t("client.passwordChange.subtitle")}
-              xl="4"
-              lg="6"
-              md="8"
-              sm="10"
-              xs="12">
-              <Formik
-                initialValues={{
-                  password: "",
-                  confirmPassword: "",
-                }}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmit}
-                innerRef={formRef}>
-                <Form>
-                  <CustomField
-                    name="password"
-                    type="password"
-                    className="form-control"
-                    placeholder={t("client.passwordChange.newPassword")}
-                    autoComplete="new-password"
-                  />
-                  <CustomField
-                    name="confirmPassword"
-                    type="password"
-                    className="form-control w-100"
-                    placeholder={t("client.passwordChange.confirmPassword")}
-                  />
-                  <ErrorAlert />
-                  <div className="text-center">
-                    <Button
-                      type="submit"
-                      size="lg"
-                      disabled={loading}
-                      className="bg-gradient-success w-100 mt-3 mb-0">
-                      {loading ? (
-                        <Spinner size="sm" />
-                      ) : (
-                        t("client.passwordChange.button")
-                      )}
-                    </Button>
-                  </div>
-                </Form>
-              </Formik>
-            </AuthCard>
-          </Container>
-        </>
-      ) : (
-        <NoRecords404 />
-      )}
-    </>
+    <Row className="justify-content-center">
+      <h4>Cambiar Contraseña</h4>
+      <Col md="6" className="mb-4">
+        <Formik
+          initialValues={{
+            oldPassword: "",
+            password: "",
+            confirmPassword: "",
+          }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}>
+          {({ isSubmitting }) => (
+            <Form>
+              <FormGroup>
+                <CustomField
+                  name="oldPassword"
+                  type="password"
+                  className="form-control"
+                  placeholder={"Contraseña Actual"}
+                  autoComplete="current-password"
+                />
+              </FormGroup>
+              <FormGroup>
+                <CustomField
+                  name="password"
+                  type="password"
+                  className="form-control"
+                  placeholder={
+                    t("client.passwordChange.newPassword") || "Nueva Contraseña"
+                  }
+                  autoComplete="new-password"
+                />
+              </FormGroup>
+              <FormGroup>
+                <CustomField
+                  name="confirmPassword"
+                  type="password"
+                  className="form-control w-100"
+                  placeholder={
+                    t("client.passwordChange.confirmPassword") ||
+                    "Confirmar Nueva Contraseña"
+                  }
+                  autoComplete="new-password"
+                />
+              </FormGroup>
+              <ErrorAlert />
+              <div className="text-center">
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="bg-gradient-success w-100 mt-3 mb-0"
+                  disabled={isSubmitting}>
+                  Cambiar Contraseña
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Col>
+    </Row>
   );
 }
 

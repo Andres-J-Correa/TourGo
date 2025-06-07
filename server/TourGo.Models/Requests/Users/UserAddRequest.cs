@@ -20,8 +20,8 @@ namespace TourGo.Models.Requests.Users
         [Required, EmailAddress, StringLength(100)]
         public string Email { get; set; }
 
-        [Required, Phone, StringLength(20, MinimumLength = 4)]
-        public string Phone { get; set; }
+        [Phone, StringLength(20, MinimumLength = 4)]
+        public string? Phone { get; set; }
 
         [Required, ValidEnum(typeof(AuthProviderEnum))]
         public int AuthProvider { get; set; }

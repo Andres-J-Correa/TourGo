@@ -11,6 +11,7 @@ import {
   TabPane,
   Label,
   CardBody,
+  Button,
 } from "reactstrap";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -24,10 +25,16 @@ import {
   getDepartingRooms,
   getStays,
 } from "services/bookingService";
+import { leaveHotel } from "services/staffService";
 import { formatCurrency } from "utils/currencyHelper";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import classnames from "classnames";
+import { faPersonWalkingLuggage } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Swal from "sweetalert2";
+
+import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 import "./HotelLandingPage.css";
 
@@ -81,6 +88,48 @@ const HotelLandingPage = () => {
           </li>
         ))
       : "Sin habitaciones";
+
+  const handleLeaveHotel = async () => {
+    const result = await Swal.fire({
+      title: "¿Dejar este hotel?",
+      text: "¿Estás seguro de que deseas dejar este hotel? Perderás acceso a su información.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, dejar hotel",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      Swal.fire({
+        title: "Procesando",
+        text: "Por favor espera...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      const res = await leaveHotel(hotelId);
+      if (res.isSuccessful) {
+        Swal.fire({
+          icon: "success",
+          title: "Has dejado el hotel",
+          text: "Ya no tienes acceso a este hotel.",
+          timer: 1500,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+        });
+        navigate("/hotels");
+      }
+    } catch {
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo dejar el hotel, intenta nuevamente.",
+      });
+    }
+  };
 
   useEffect(() => {
     setLoadingArrivalsDepartures(true);
@@ -168,7 +217,20 @@ const HotelLandingPage = () => {
               <h2>{hotel.current.name}</h2>
             </Col>
           </Row>
-
+          {hotel.current.roleId !== HOTEL_ROLES_IDS.OWNER &&
+            hotel.current.roleId !== 0 && (
+              <Button
+                className="float-end"
+                color="dark"
+                size="sm"
+                onClick={handleLeaveHotel}>
+                <FontAwesomeIcon
+                  icon={faPersonWalkingLuggage}
+                  className="me-2"
+                />
+                Dejar Hotel
+              </Button>
+            )}
           <div className="mb-4">
             <Label for="date-select" className="text-dark">
               Fecha

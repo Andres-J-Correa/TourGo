@@ -1,17 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using System.Security.Claims;
 using TourGo.Models;
+using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Config.Emails;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests;
 using TourGo.Models.Requests.Users;
 using TourGo.Services;
+using TourGo.Services.Interfaces;
 using TourGo.Services.Interfaces.Email;
 using TourGo.Services.Interfaces.Users;
+using TourGo.Web.Api.Extensions;
 using TourGo.Web.Controllers;
 using TourGo.Web.Models.Enums;
 using TourGo.Web.Models.Responses;
@@ -27,10 +33,21 @@ namespace TourGo.Web.Api.Controllers.Users
         private readonly IUserAuthService _userAuthService;
         private readonly IUserTokenService _userTokenService;
         private readonly IEmailService _emailService;
-
+        private readonly IErrorLoggingService _errorLoggingService;
+        private readonly IMemoryCache _cache;
+        private readonly EncryptionConfig _encryptionConfig;
         private readonly EmailConfig _emailConfig;
 
-        public UsersAuthController(ILogger<UsersAuthController> logger, IUserService userService, IWebAuthenticationService<int> webAuthService, IEmailService emailService, IUserAuthService userAuthService , IUserTokenService userTokenService, IOptions<EmailConfig> emailConfig) : base(logger)
+        public UsersAuthController(ILogger<UsersAuthController> logger, 
+            IUserService userService, 
+            IWebAuthenticationService<int> webAuthService, 
+            IEmailService emailService, 
+            IUserAuthService userAuthService , 
+            IUserTokenService userTokenService, 
+            IOptions<EmailConfig> emailConfig,
+            IErrorLoggingService errorLoggingService,
+            IMemoryCache memoryCache,
+            IOptions<EncryptionConfig> options) : base(logger)
         {
             _userService = userService;
             _webAuthService = webAuthService;
@@ -38,6 +55,10 @@ namespace TourGo.Web.Api.Controllers.Users
             _userAuthService = userAuthService;
             _userTokenService = userTokenService;
             _emailConfig = emailConfig.Value;
+            _errorLoggingService = errorLoggingService;
+            _encryptionConfig = options.Value;
+            _cache = memoryCache;
+
         }
 
         #region Public Endpoints
@@ -61,7 +82,7 @@ namespace TourGo.Web.Api.Controllers.Users
             {
 
                 int iCode = 500;
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(iCode, response);
             }
@@ -88,7 +109,7 @@ namespace TourGo.Web.Api.Controllers.Users
             {
 
                 int iCode = 500;
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(iCode, response);
             }
@@ -111,12 +132,15 @@ namespace TourGo.Web.Api.Controllers.Users
                     return StatusCode(409, errorResponse);
                 }
 
-                bool phoneExists = _userService.PhoneExists(model.Phone);
-
-                if (phoneExists)
+                if(model.Phone != null)
                 {
-                    ErrorResponse errorResponse = new ErrorResponse("Phone already exists", UserManagementErrorCode.PhoneAlreadyExists);
-                    return StatusCode(409, errorResponse);
+                    bool phoneExists = _userService.PhoneExists(model.Phone);
+
+                    if (phoneExists)
+                    {
+                        ErrorResponse errorResponse = new ErrorResponse("Phone already exists", UserManagementErrorCode.PhoneAlreadyExists);
+                        return StatusCode(409, errorResponse);
+                    }
                 }
 
                 int userId = _userService.Create(model);
@@ -128,7 +152,7 @@ namespace TourGo.Web.Api.Controllers.Users
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse errorResponse = new ErrorResponse();
 
                 return StatusCode(500, errorResponse);
@@ -162,8 +186,8 @@ namespace TourGo.Web.Api.Controllers.Users
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "An error occurred during login");
-                return StatusCode(500, new ErrorResponse("An unexpected error occurred. Please try again later."));
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                return StatusCode(500, new ErrorResponse());
             }
         }
 
@@ -192,7 +216,7 @@ namespace TourGo.Web.Api.Controllers.Users
             catch (Exception ex)
             {
 
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
 
                 result = StatusCode(500, response);
@@ -233,7 +257,7 @@ namespace TourGo.Web.Api.Controllers.Users
             catch (Exception ex)
             {
                 iCode = 500;
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 response = new ErrorResponse();
             }
 
@@ -243,6 +267,67 @@ namespace TourGo.Web.Api.Controllers.Users
         #endregion
 
         #region Private Endpoints
+
+        [HttpPut]
+        public ActionResult<SuccessResponse> Update(UserUpdateRequest model)
+        {
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                _userService.Update(model, userId);
+
+                string cacheKey = $"UserPII_{userId}_v{_encryptionConfig.UserPIICacheVersion ?? "v1"}";
+                _cache.Remove(cacheKey);
+
+                return Ok200(new SuccessResponse());
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+
+                if (Enum.IsDefined(typeof(UserManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((UserManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                return StatusCode(500, error);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse errorResponse = new ErrorResponse();
+                return StatusCode(500, errorResponse);
+            }
+        }
+
+        [HttpPut("password/change")]
+        public ActionResult<SuccessResponse> ChangePassword(UserPasswordChangeRequest model)
+        {
+            int iCode = 200;
+            BaseResponse response;
+            try
+            {
+                IUserAuthData user = _webAuthService.GetCurrentUser();
+                _userAuthService.ChangePassword(user, model);
+                response = new SuccessResponse();
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                response = new ErrorResponse(uaEx.Message, AuthenticationErrorCode.IncorrectCredentials);
+                iCode = 400;
+            }
+            catch (Exception ex)
+            {
+                iCode = 500;
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                response = new ErrorResponse();
+            }
+            return StatusCode(iCode, response);
+        }
 
         [HttpGet("current")]
         public ActionResult<ItemResponse<IUserAuthData>> GetCurrrent()
@@ -258,7 +343,7 @@ namespace TourGo.Web.Api.Controllers.Users
             catch (Exception ex)
             {
                 iCode = 500;
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 response = new ErrorResponse();
             }
 
@@ -280,7 +365,7 @@ namespace TourGo.Web.Api.Controllers.Users
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
 
                 result = StatusCode(500, response);
@@ -317,7 +402,7 @@ namespace TourGo.Web.Api.Controllers.Users
             catch (Exception ex)
             {
 
-                Logger.LogError(ex.ToString());
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 ErrorResponse response = new ErrorResponse();
 
                 result = StatusCode(500, response);
@@ -354,10 +439,14 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 return Ok200(new SuccessResponse());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+
+                return StatusCode(500, response);
+
             }
         }
 

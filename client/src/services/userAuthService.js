@@ -2,6 +2,7 @@ import {
   onGlobalError,
   onGlobalSuccess,
   API_HOST_PREFIX,
+  replaceEmptyStringsWithNull,
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
@@ -24,7 +25,25 @@ export const usersRegister = async (payload) => {
     },
     method: "POST",
     url: `${api}`,
-    data: payload,
+    data: replaceEmptyStringsWithNull(payload),
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const usersUpdate = async (payload) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${api}`,
+    data: replaceEmptyStringsWithNull(payload),
   };
   try {
     const response = await axiosClient(config);
@@ -177,6 +196,21 @@ export const resetPassword = async (payload) => {
   const config = {
     method: "PUT",
     url: `${api}/password/reset`,
+    data: payload,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const changePassword = async (payload) => {
+  const config = {
+    method: "PUT",
+    url: `${api}/password/change`,
     data: payload,
   };
   try {
