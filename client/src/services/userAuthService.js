@@ -207,6 +207,21 @@ export const resetPassword = async (payload) => {
   }
 };
 
+export const changePassword = async (payload) => {
+  const config = {
+    method: "PUT",
+    url: `${api}/password/change`,
+    data: payload,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
 /**
  *
  * @param {string} token

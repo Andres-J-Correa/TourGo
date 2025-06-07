@@ -159,42 +159,6 @@ namespace TourGo.Web.Api.Controllers.Users
             }
         }
 
-        [HttpPut]
-        public ActionResult<SuccessResponse> Update(UserUpdateRequest model)
-        {
-            try
-            {
-                int userId = _webAuthService.GetCurrentUserId();
-                _userService.Update(model, userId);
-
-                string cacheKey = $"UserPII_{userId}_v{_encryptionConfig.UserPIICacheVersion ?? "v1"}";
-                _cache.Remove(cacheKey);
-
-                return Ok200(new SuccessResponse());
-            }
-            catch (MySqlException dbEx)
-            {
-                ErrorResponse error;
-
-                if (Enum.IsDefined(typeof(UserManagementErrorCode), dbEx.Number))
-                {
-                    error = new ErrorResponse((UserManagementErrorCode)dbEx.Number);
-                }
-                else
-                {
-                    error = new ErrorResponse();
-                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
-                }
-                return StatusCode(500, error);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                ErrorResponse errorResponse = new ErrorResponse();
-                return StatusCode(500, errorResponse);
-            }
-        }
-
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<ActionResult<ItemResponse<bool>>> LoginAsync(UserLoginRequest model)
@@ -303,6 +267,67 @@ namespace TourGo.Web.Api.Controllers.Users
         #endregion
 
         #region Private Endpoints
+
+        [HttpPut]
+        public ActionResult<SuccessResponse> Update(UserUpdateRequest model)
+        {
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                _userService.Update(model, userId);
+
+                string cacheKey = $"UserPII_{userId}_v{_encryptionConfig.UserPIICacheVersion ?? "v1"}";
+                _cache.Remove(cacheKey);
+
+                return Ok200(new SuccessResponse());
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+
+                if (Enum.IsDefined(typeof(UserManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((UserManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                return StatusCode(500, error);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse errorResponse = new ErrorResponse();
+                return StatusCode(500, errorResponse);
+            }
+        }
+
+        [HttpPut("password/change")]
+        public ActionResult<SuccessResponse> ChangePassword(UserPasswordChangeRequest model)
+        {
+            int iCode = 200;
+            BaseResponse response;
+            try
+            {
+                IUserAuthData user = _webAuthService.GetCurrentUser();
+                _userAuthService.ChangePassword(user, model);
+                response = new SuccessResponse();
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                response = new ErrorResponse(uaEx.Message, AuthenticationErrorCode.IncorrectCredentials);
+                iCode = 400;
+            }
+            catch (Exception ex)
+            {
+                iCode = 500;
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                response = new ErrorResponse();
+            }
+            return StatusCode(iCode, response);
+        }
 
         [HttpGet("current")]
         public ActionResult<ItemResponse<IUserAuthData>> GetCurrrent()

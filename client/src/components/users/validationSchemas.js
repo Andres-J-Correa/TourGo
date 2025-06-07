@@ -73,6 +73,23 @@ export const userPasswordForgotSchema = Yup.object().shape({
 });
 
 export const userPasswordChangeSchema = Yup.object().shape({
+  oldPassword: Yup.string()
+    .min(8, "La contraseña debe tener mínimo 8 caracteres.")
+    .max(50, "La contraseña debe tener máximo 50 caracteres.")
+    .matches(
+      /[a-z]/,
+      "La contraseña debe contener al menos una letra minúscula."
+    )
+    .matches(
+      /[A-Z]/,
+      "La contraseña debe contener al menos una letra mayúscula."
+    )
+    .matches(/\d/, "La contraseña debe contener al menos un número.")
+    .matches(
+      /[^A-Za-z\d]/,
+      "La contraseña debe contener al menos un carácter especial."
+    )
+    .required("La contraseña actual es obligatoria."),
   password: Yup.string()
     .min(8, "La contraseña debe tener mínimo 8 caracteres.")
     .max(50, "La contraseña debe tener máximo 50 caracteres.")
@@ -89,7 +106,7 @@ export const userPasswordChangeSchema = Yup.object().shape({
       /[^A-Za-z\d]/,
       "La contraseña debe contener al menos un carácter especial."
     )
-    .required("La contraseña es obligatoria."),
+    .required("La nueva contraseña es obligatoria."),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Las contraseñas deben coincidir.")
     .required("La confirmación de la contraseña es obligatoria."),
