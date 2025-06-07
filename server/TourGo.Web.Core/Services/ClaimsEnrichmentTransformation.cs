@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
+using TourGo.Models.Domain;
 using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Users;
 using TourGo.Services.Interfaces.Security;
@@ -39,11 +40,11 @@ public class ClaimsEnrichmentTransformation : IClaimsTransformation
             {
                 UserBase user = null;
                 string cacheKey = GetCacheKey(userId);
-                Tuple<UserBase, DateTime>? cachedEntry;
+                CacheEntry<UserBase>? cachedEntry;
 
-                if (_cache.TryGetValue(cacheKey, out cachedEntry) && cachedEntry != null && cachedEntry.Item2 > DateTime.UtcNow.AddMinutes(5))
+                if (_cache.TryGetValue(cacheKey, out cachedEntry) && cachedEntry != null && cachedEntry.ExpirationTime > DateTime.UtcNow.AddMinutes(5))
                 {
-                    user = DecryptUserPII(cachedEntry.Item1);
+                    user = DecryptUserPII(cachedEntry.Item);
                 }
                 else
                 {
@@ -57,7 +58,8 @@ public class ClaimsEnrichmentTransformation : IClaimsTransformation
                             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60),
                             SlidingExpiration = TimeSpan.FromMinutes(30)
                         };
-                        _cache.Set(cacheKey, Tuple.Create(encryptedToCache, expiresAt), cacheEntryOptions);
+                        var cacheEntry = new CacheEntry<UserBase>(encryptedToCache, expiresAt);
+                        _cache.Set(cacheKey, cacheEntry, cacheEntryOptions);
                     }
                 }
 
