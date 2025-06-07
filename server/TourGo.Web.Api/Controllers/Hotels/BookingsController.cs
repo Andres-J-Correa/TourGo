@@ -30,7 +30,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
         private readonly IBookingService _bookingService;
         private readonly IWebAuthenticationService<int> _webAuthService;
         private readonly IErrorLoggingService _errorLoggingService;
-        private readonly IMemoryCache _cache;
 
         public BookingsController(ILogger<BookingsController> logger,
                                 IBookingService bookingService,
@@ -41,7 +40,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _bookingService = bookingService;
             _webAuthService = webAuthenticationService;
             _errorLoggingService = errorLoggingService;
-            _cache = memoryCache;
         }
 
         [HttpPost("hotel/{id:int}")]
@@ -218,28 +216,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                string cacheKey = $"BookingMinimal_{id}";
+                BookingMinimal? bookingMinimal = _bookingService.GetBookingMinimal(id);
 
-                if (!_cache.TryGetValue(cacheKey, out BookingMinimal? cachedBooking))
-                {
-                    cachedBooking = _bookingService.GetBookingMinimal(id);
-
-                    if (cachedBooking != null)
-                    {
-                        var cacheOptions = new MemoryCacheEntryOptions()
-                            .SetSlidingExpiration(TimeSpan.FromMinutes(5));
-
-                        _cache.Set(cacheKey, cachedBooking, cacheOptions);
-                    }
-                }
-
-                if (cachedBooking == null)
+                if (bookingMinimal == null)
                 {
                     result = NotFound404(new ErrorResponse("Booking not found"));
                 }
                 else
                 {
-                    ItemResponse<BookingMinimal> response = new ItemResponse<BookingMinimal>() { Item = cachedBooking };
+                    ItemResponse<BookingMinimal> response = new ItemResponse<BookingMinimal>() { Item = bookingMinimal };
 
                     result = Ok200(response);
                 }
