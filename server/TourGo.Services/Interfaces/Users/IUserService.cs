@@ -9,6 +9,7 @@ namespace TourGo.Services.Interfaces.Users
     public interface IUserService
     {
         int Create(UserAddRequest request);
+        void Update(UserUpdateRequest request, int userId);
         bool UserExists(string email);
         bool PhoneExists(string phone);
         IUserAuthData Get(string email);

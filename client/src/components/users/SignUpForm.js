@@ -119,7 +119,6 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
               className="form-control d-flex"
               placeholder={t("client.register.phone")}
               autoComplete="tel"
-              isRequired={true}
             />
             <CustomErrorMessage name="phone" />
           </FormGroup>

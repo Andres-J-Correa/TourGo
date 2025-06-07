@@ -46,7 +46,7 @@ namespace TourGo.Services.Users
                 coll.AddWithValue("p_firstName", request.FirstName);
                 coll.AddWithValue("p_lastName", request.LastName);
                 coll.AddWithValue("p_email", request.Email.ToLower());
-                coll.AddWithValue("p_phone", request.Phone);
+                coll.AddWithValue("p_phone", string.IsNullOrEmpty(request.Phone) ? DBNull.Value : request.Phone);
                 coll.AddWithValue("p_providerId", request.AuthProvider);
                 coll.AddWithValue("p_providerUserId", authProviderUserId);
                 coll.AddWithValue("p_passwordHash", hashedPassword);
@@ -60,6 +60,17 @@ namespace TourGo.Services.Users
             return userId;
         }
 
+        public void Update(UserUpdateRequest request, int userId)
+        {
+            string proc = "users_update";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
+            {
+                coll.AddWithValue("p_firstName", request.FirstName);
+                coll.AddWithValue("p_lastName", request.LastName);
+                coll.AddWithValue("p_phone", string.IsNullOrEmpty(request.Phone) ? DBNull.Value : request.Phone);
+                coll.AddWithValue("p_userId", userId);
+            });
+        }
         public bool UserExists(string email)
         {
             string proc = "users_exists";
