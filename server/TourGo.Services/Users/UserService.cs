@@ -7,6 +7,7 @@ using TourGo.Data.Providers;
 using TourGo.Models;
 using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Users;
+using TourGo.Models.Interfaces;
 using TourGo.Models.Requests.Users;
 using TourGo.Services.Interfaces.Users;
 
@@ -93,7 +94,7 @@ namespace TourGo.Services.Users
 
         public IUserAuthData Get(string email)
         {
-            string proc = "users_selectBase_by_email_v2";
+            string proc = "users_select_base_by_email_v3";
             UserBase user = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
@@ -108,9 +109,27 @@ namespace TourGo.Services.Users
             return user;
         }
 
+        public IUserAuthDataV2? GetAuth(string email)
+        {
+            string proc = "users_select_auth_by_email";
+            UserBase? user = null;
+            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
+            {
+                coll.AddWithValue("p_email", email);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                user = new UserBase();
+                user.Id = reader.GetSafeInt32(index++);
+                user.Roles = reader.DeserializeObject<List<string>>(index++);
+                user.IsVerified = reader.GetSafeBool(index++);
+            });
+            return user;
+        }
+
         public IUserAuthData Get(int userId)
         {
-            string proc = "users_selectBase_by_id_v2";
+            string proc = "users_select_base_by_id_v3";
             UserBase user = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
@@ -124,7 +143,24 @@ namespace TourGo.Services.Users
 
             return user;
         }
-
+        public UserBase GetPII(int userId)
+        {
+            string proc = "users_select_pii_by_id";
+            UserBase user = new UserBase();
+            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
+            {
+                coll.AddWithValue("p_userId", userId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                user.Id = userId;
+                user.FirstName = reader.GetSafeString(index++);
+                user.LastName = reader.GetSafeString(index++);
+                user.Email = reader.GetSafeString(index++);
+                user.Phone = reader.GetSafeString(index++);
+            });
+            return user;
+        }
         public void ChangePassword(int userId, string password)
         {
 
@@ -158,6 +194,7 @@ namespace TourGo.Services.Users
             user.Email = reader.GetSafeString(index++);
             user.Roles = reader.DeserializeObject<List<string>>(index++);
             user.IsVerified = reader.GetSafeBool(index++);
+            user.Phone = reader.GetSafeString(index++);
             return user;
         }
 

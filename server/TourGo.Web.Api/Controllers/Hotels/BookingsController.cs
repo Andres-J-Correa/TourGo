@@ -34,8 +34,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         public BookingsController(ILogger<BookingsController> logger,
                                 IBookingService bookingService,
                                 IWebAuthenticationService<int> webAuthenticationService,
-                                IErrorLoggingService errorLoggingService,
-                                IMemoryCache memoryCache) : base(logger)
+                                IErrorLoggingService errorLoggingService) : base(logger)
         {
             _bookingService = bookingService;
             _webAuthService = webAuthenticationService;

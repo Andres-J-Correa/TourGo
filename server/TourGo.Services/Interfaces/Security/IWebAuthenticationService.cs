@@ -1,5 +1,6 @@
-﻿using TourGo.Models;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using TourGo.Models;
+using TourGo.Models.Interfaces;
 
 namespace TourGo.Services
 {
@@ -16,6 +17,8 @@ namespace TourGo.Services
         /// <param name="extraClaims"></param>
         /// <returns></returns>
         Task LogInAsync(IUserAuthData user, params Claim[] extraClaims);
+
+        Task LogInAsyncV2(IUserAuthDataV2 user, params Claim[] extraClaims);
 
         /// <summary>
         /// Logs out the currently signed in user
