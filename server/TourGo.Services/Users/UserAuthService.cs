@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using TourGo.Data.Extensions;
 using TourGo.Models.Domain.Config;
 using TourGo.Services.Interfaces.Users;
+using TourGo.Models.Interfaces;
 
 namespace TourGo.Services.Users
 {
@@ -33,22 +34,18 @@ namespace TourGo.Services.Users
 
             if (isValidCredentials)
             {
-                IUserAuthData response = _userService.Get(email);
+                IUserAuthDataV2? response = _userService.GetAuth(email);
 
                 if (response != null)
                 {
-                    await _webAuthService.LogInAsync(response);
+                    await _webAuthService.LogInAsyncV2(response);
                     RestartFailedAttempts(response.Id);
                     isSuccessful = true;
                 }
             }
             else
             {
-                byte failedAttempts = GetFailedAttempts(email);
-
-                failedAttempts++;
-
-                UpdateFailedAttempts(email, failedAttempts);
+                IncrementFailedAttempts(email);
             }
             return isSuccessful;
         }
@@ -89,7 +86,7 @@ namespace TourGo.Services.Users
 
             if (user != null)
             {
-                UpdateFailedAttempts(user.Email, 0);
+                RestartFailedAttempts(user.Email);
             }
         }
 
@@ -150,14 +147,22 @@ namespace TourGo.Services.Users
             return attempts;
         }
 
-        private void UpdateFailedAttempts(string email, byte newValue)
+        private void IncrementFailedAttempts(string email)
         {
-            string proc = "users_auth_update_failedAttempts";
+            string proc = "users_auth_increment_failed_attempts";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
+            {
+                coll.AddWithValue("p_email", email);
+            });
+        }
+
+        private void RestartFailedAttempts(string email)
+        {
+            string proc = "users_auth_restart_failed_attempts";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
                 coll.AddWithValue("p_email", email);
-                coll.AddWithValue("p_newValue", newValue);
             });
         }
     }

@@ -15,6 +15,7 @@ using MySql.Data.MySqlClient;
 using TourGo.Web.Models.Enums;
 using TourGo.Models.Domain;
 using TourGo.Services.Interfaces.Email;
+using TourGo.Models.Domain.Users;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {

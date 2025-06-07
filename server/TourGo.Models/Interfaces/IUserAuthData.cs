@@ -1,12 +1,12 @@
-﻿namespace TourGo.Models
+﻿using TourGo.Models.Interfaces;
+
+namespace TourGo.Models
 {
-    public interface IUserAuthData
+    public interface IUserAuthData : IUserAuthDataV2
     {
-        int Id { get; }
-        string? FirstName { get; }
-        string? LastName { get; }
+        string FirstName { get; }
+        string LastName { get; }
         string Email { get; }
-        IEnumerable<string> Roles { get; }
-        bool? IsVerified { get; }
+        string Phone { get; }
     }
 }

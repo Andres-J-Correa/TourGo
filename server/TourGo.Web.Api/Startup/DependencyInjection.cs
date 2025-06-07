@@ -1,4 +1,5 @@
-﻿using sib_api_v3_sdk.Api;
+﻿using Microsoft.AspNetCore.Authentication;
+using sib_api_v3_sdk.Api;
 using sib_api_v3_sdk.Client;
 using TourGo.Data;
 using TourGo.Data.Providers;
@@ -85,6 +86,9 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IFinancePartnerService, FinancePartnerService>();
             services.AddSingleton<IStaffService, StaffService>();
             services.AddSingleton<IFinancialReportService, FinancialReportService>();
+            services.AddSingleton<IEncryptionService, EncryptionService>();
+
+            services.AddScoped<IClaimsTransformation, ClaimsEnrichmentTransformation>();
 
             GetAllEntities().ForEach(tt =>
             {
