@@ -18,7 +18,7 @@ export const useNavbarItems = () => {
 
   const hotelsItems = [
     {
-      name: "Alojamientos",
+      name: "Hoteles",
       icon: faHotel,
       capitalize: true,
       collapse: [
@@ -32,12 +32,12 @@ export const useNavbarItems = () => {
               capitalize: true,
             },
             {
-              name: "Lista de alojamientos",
+              name: "Lista de hoteles",
               path: "/hotels",
               capitalize: true,
             },
             {
-              name: "Registra un alojamiento",
+              name: "Registra un hotel",
               path: "/hotels/add",
               capitalize: true,
             },

@@ -278,6 +278,7 @@ function BookingForm({
         extraCharges: currentExtraCharges,
         roomBookings: currentRoomBookings,
         personalizedCharges: currentPersonalizedCharges,
+        hotelId,
       });
     }
   }, [
@@ -287,6 +288,7 @@ function BookingForm({
     initialValues,
     bookingRoomBookings,
     bookingPersonalizedCharges,
+    hotelId,
   ]);
 
   useEffect(() => {
@@ -335,6 +337,7 @@ function BookingForm({
       setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.CURRENT, {
         ...currentForm,
         ...newFormData,
+        hotelId,
       });
     }
 
@@ -351,6 +354,7 @@ function BookingForm({
     totals,
     isLoading,
     setValues,
+    hotelId,
   ]);
 
   useEffect(() => {
@@ -389,6 +393,8 @@ function BookingForm({
       );
 
       if (currentForm && !currentForm.id && isNotEmptyBooking) {
+        if (Number(currentForm?.hotelId) !== Number(hotelId)) return;
+
         Swal.fire({
           title: "¿Recuperar información?",
           text: "Realizaste cambios anteriormente que no se guardaron, ¿deseas recuperarlos?",
@@ -410,7 +416,7 @@ function BookingForm({
         removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
       }
     }
-  }, [bookingId, autoCompleteForm]);
+  }, [bookingId, autoCompleteForm, hotelId]);
 
   useEffect(() => {
     if (rooms.length === 0 && !isHotelDataInitialFetch) {
@@ -590,7 +596,10 @@ export default withFormik({
             : {}),
         });
 
-        setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, { ...values });
+        setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
+          ...values,
+          hotelId,
+        });
         removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
 
         setTimeout(() => {
