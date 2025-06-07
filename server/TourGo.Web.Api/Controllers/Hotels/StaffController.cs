@@ -189,6 +189,23 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
+        [HttpPost("hotel/{hotelId:int}/leave")]
+        public ActionResult<SuccessResponse> LeaveHotel(int hotelId)
+        {
+            try
+            {
+                int userId = _webAuthService.GetCurrentUserId();
+                _staffService.LeaveHotel(userId, hotelId);
+                return Ok200(new SuccessResponse());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new();
+                return StatusCode(500, response);
+            }
+        }
+
         [HttpPost("hotel/{id:int}/invites")]
         [EntityAuth(EntityTypeEnum.HotelInvites, EntityActionTypeEnum.Create)]
         public ActionResult<ItemResponse<int>> AddInvite(int id, StaffInvitationRequest model)

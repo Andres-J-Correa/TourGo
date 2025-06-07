@@ -160,3 +160,20 @@ export const rejectInvite = async (inviteId) => {
     return onGlobalError(error);
   }
 };
+
+export const leaveHotel = async (hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    url: `${api}/hotel/${hotelId}/leave`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

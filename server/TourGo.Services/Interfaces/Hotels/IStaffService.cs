@@ -14,5 +14,6 @@ namespace TourGo.Services.Interfaces.Hotels
         List<Staff>? GetByHotelId(int hotelId);
         void RemoveStaff(int userId, int hotelId, int modifiedBy);
         void UpdateStaffRole(int userId, int hotelId, int role, int modifiedBy);
+        void LeaveHotel(int userId, int hotelId);
     }
 }
