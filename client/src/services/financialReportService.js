@@ -119,19 +119,27 @@ export const getExpenseBreakdown = async (
  * Gets payment methods totals for a hotel.
  * @param {number} hotelId - The hotel ID.
  * @param {string} currencyCode - Currency code.
+ * @param {string} startDate - Start date (YYYY-MM-DD).
+ * @param {string} endDate - End date (YYYY-MM-DD).
  * @returns {Promise<Object>} API response with items array.
  */
 export const getPaymentMethodsTotalsByHotelId = async (
   hotelId,
+  startDate,
+  endDate,
   currencyCode = "COP"
 ) => {
   const queryParams = new URLSearchParams({
     currencyCode,
-  }).toString();
+  });
+
+  if (startDate) queryParams.append("startDate", startDate);
+  if (endDate) queryParams.append("endDate", endDate);
+
   const config = {
     headers: { "Content-Type": "application/json" },
     method: "GET",
-    url: `${api}/${hotelId}/payment-methods-totals?${queryParams}`,
+    url: `${api}/${hotelId}/payment-methods-totals?${queryParams.toString()}`,
   };
   try {
     const response = await axiosClient(config);

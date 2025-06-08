@@ -100,15 +100,17 @@ namespace TourGo.Services.Finances
             return list;
         }
 
-        public List<PaymentMethodTotalsResponse>? GetPaymentMethodsTotalsByHotelId(int hotelId, string currencyCode)
+        public List<PaymentMethodTotalsResponse>? GetPaymentMethodsTotalsByHotelId(int hotelId, string currencyCode, DateOnly? startDate, DateOnly? endDate)
         {
-            string proc = "financial_reports_get_payment_methods_totals_by_hotel_id";
+            string proc = "financial_reports_get_payment_methods_totals_by_hotel_id_v2";
             List<PaymentMethodTotalsResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
                 param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_currencyCode", currencyCode);
+                param.AddWithValue("p_startDate", startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
+                param.AddWithValue("p_endDate", endDate.HasValue ? endDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
             }, (reader, set) =>
             {
                 int index = 0;
