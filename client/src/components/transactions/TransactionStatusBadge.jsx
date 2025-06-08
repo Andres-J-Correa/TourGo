@@ -22,6 +22,7 @@ const statusIcons = {
 function TransactionStatusBadge({ statusId, className, ...props }) {
   return (
     <span
+      aria-label={TRANSACTION_STATUS_BY_ID[statusId] || "Estado desconocido"}
       title={TRANSACTION_STATUS_BY_ID[statusId] || "Estado desconocido"}
       className={classNames("badge rounded-5", className, {
         "bg-warning": statusId === TRANSACTION_STATUS_IDS.PENDING,

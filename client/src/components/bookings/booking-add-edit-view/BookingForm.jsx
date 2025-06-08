@@ -393,6 +393,7 @@ function BookingForm({
       );
 
       if (currentForm && !currentForm.id && isNotEmptyBooking) {
+        // Skip reloading form data if the hotelId does not match to avoid loading irrelevant data.
         if (Number(currentForm?.hotelId) !== Number(hotelId)) return;
 
         Swal.fire({
