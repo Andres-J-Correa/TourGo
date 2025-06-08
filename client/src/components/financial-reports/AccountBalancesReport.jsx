@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import DatePickers from "components/commonUI/forms/DatePickers";
+import Alert from "components/commonUI/Alert";
 
 import { getPaymentMethodsTotalsByHotelId } from "services/financialReportService";
 import { formatCurrency } from "utils/currencyHelper";
@@ -76,6 +77,14 @@ function AccountBalancesReport({ hotelId }) {
             handleClearDates={handleClearDateFilter}
           />
         </Col>
+        {((dates.start && !dates.end) || (!dates.start && dates.end)) && (
+          <Col xs={12} className="mt-2">
+            <Alert
+              type="info"
+              message="Por favor selecciona ambas fechas si deseas filtrar por un rango de fechas."
+            />
+          </Col>
+        )}
       </Row>
       <SimpleLoader isVisible={loading} />
       {!loading && data.length > 1 && (
