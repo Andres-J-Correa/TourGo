@@ -35,6 +35,7 @@ import classnames from "classnames";
 import {
   faPersonWalkingLuggage,
   faPlaneArrival,
+  faPlaneDeparture,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
@@ -210,6 +211,62 @@ const HotelLandingPage = () => {
         icon: "error",
         title: "Error",
         text: "Error al marcar como check-in",
+      });
+    }
+  }, []);
+
+  const handleComplete = useCallback(async (booking) => {
+    const result = await Swal.fire({
+      title: "¿Desea marcar la reserva como completada?",
+      text: "Ya no podrá editar la reserva",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, confirmar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
+      confirmButtonColor: "green",
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const res = await updateStatusToCompleted(booking.id);
+      if (res.isSuccessful) {
+        setData((prevData) => ({
+          ...prevData,
+          departures: prevData.departures.map((departure) =>
+            departure.id === booking.id
+              ? { ...departure, statusId: BOOKING_STATUS_IDS.COMPLETED }
+              : departure
+          ),
+        }));
+
+        Swal.fire({
+          title: "Éxito",
+          text: "Reserva marcada como completada",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+        });
+      } else {
+        throw new Error("Error al marcar como completada");
+      }
+    } catch (error) {
+      Swal.close();
+      await Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error al marcar como completada",
       });
     }
   }, []);
@@ -587,14 +644,38 @@ const HotelLandingPage = () => {
                                 )}
                               </Col>
                               <Col className="text-end align-content-end">
-                                <Link
-                                  to={`/hotels/${hotelId}/bookings/${departure.id}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-outline-dark"
-                                  title="Ver detalles de la reserva">
-                                  Ver Detalles
-                                </Link>
+                                <Row>
+                                  <Col xs={12} className="mb-2">
+                                    {" "}
+                                    <Link
+                                      to={`/hotels/${hotelId}/bookings/${departure.id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-outline-dark"
+                                      title="Ver detalles de la reserva">
+                                      Ver Detalles
+                                    </Link>
+                                  </Col>
+                                  <Col>
+                                    {(departure?.statusId ===
+                                      BOOKING_STATUS_IDS.ACTIVE ||
+                                      departure?.statusId ===
+                                        BOOKING_STATUS_IDS.ARRIVED) && (
+                                      <Button
+                                        color="outline-success"
+                                        className="ms-2"
+                                        onClick={() =>
+                                          handleComplete(departure)
+                                        }>
+                                        Marcar Completada
+                                        <FontAwesomeIcon
+                                          icon={faPlaneDeparture}
+                                          className="ms-2"
+                                        />
+                                      </Button>
+                                    )}
+                                  </Col>
+                                </Row>
                               </Col>
                             </Row>
                           </div>
