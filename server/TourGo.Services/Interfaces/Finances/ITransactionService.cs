@@ -19,5 +19,6 @@ namespace TourGo.Services.Interfaces
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
         int Reverse(int txnId, int userId);
+        void UpdateDescription(TransactionDescriptionUpdateRequest model);
     }
 }

@@ -48,7 +48,7 @@ const LandingPage = () => {
     return (
       <div className="text-center">
         <Link to="/hotels" className="btn btn-dark btn-lg">
-          Ir a hoteles
+          Ir a Hoteles
         </Link>
       </div>
     );

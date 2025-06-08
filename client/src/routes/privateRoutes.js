@@ -49,7 +49,7 @@ const hotelRoutes = [
     name: "financePartners",
     path: "/hotels/:hotelId/finance-partners",
     component: lazy(() =>
-      import("components/transactions/FinancePartnersView")
+      import("components/transactions/finance-partners/FinancePartnersView")
     ),
   },
   {

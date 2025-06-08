@@ -18,7 +18,7 @@ export const useNavbarItems = () => {
 
   const hotelsItems = [
     {
-      name: "Alojamientos",
+      name: "Hoteles",
       icon: faHotel,
       capitalize: true,
       collapse: [
@@ -32,14 +32,12 @@ export const useNavbarItems = () => {
               capitalize: true,
             },
             {
-              name: "Lista de alojamientos",
+              name: "Lista de Hoteles",
               path: "/hotels",
-              capitalize: true,
             },
             {
-              name: "Registra un alojamiento",
+              name: "Registra un Hotel",
               path: "/hotels/add",
-              capitalize: true,
             },
           ],
         },
@@ -65,11 +63,11 @@ export const useNavbarItems = () => {
                 name: "Nueva Reserva",
                 path: `/hotels/${hotel.current.id}/bookings/new`,
                 capitalize: true,
+                newTab: true,
               },
               {
                 name: "Lista de Reservas",
                 path: `/hotels/${hotel.current.id}/bookings`,
-                capitalize: true,
               },
             ],
           },
@@ -123,12 +121,10 @@ export const useNavbarItems = () => {
               {
                 name: "Metodos de Pago",
                 path: `/hotels/${hotel.current.id}/payment-methods`,
-                capitalize: true,
               },
               {
                 name: "Subcategorias de Transacciones",
                 path: `/hotels/${hotel.current.id}/transaction-subcategories`,
-                capitalize: true,
               },
               {
                 name: "Socios financieros",
@@ -176,7 +172,6 @@ export const useNavbarItems = () => {
                     {
                       name: "Panel de Finanzas",
                       path: `/hotels/${hotel.current.id}/finance-dashboard`,
-                      capitalize: true,
                     },
                   ],
                 },

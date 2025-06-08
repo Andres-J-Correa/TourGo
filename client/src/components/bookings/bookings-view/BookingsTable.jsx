@@ -11,7 +11,7 @@ import { flexRender } from "@tanstack/react-table";
 import dayjs from "dayjs";
 
 const BookingsTable = ({ table, columns, loading }) => (
-  <table className="table table-bordered table-hover table-striped mb-1">
+  <table className="table table-sm table-bordered table-hover table-striped mb-1">
     <thead>
       {table.getHeaderGroups().map((headerGroup) => (
         <tr key={headerGroup.id}>

@@ -436,6 +436,18 @@ function TransactionsView() {
     table.setExpanded({});
   }, [table]);
 
+  const onEditDescriptionSuccess = useCallback((txnId, newDescription) => {
+    setData((prev) => {
+      const newItems = prev.items.map((txn) => {
+        if (txn.id === txnId) {
+          return { ...txn, description: newDescription };
+        }
+        return txn;
+      });
+      return { ...prev, items: newItems };
+    });
+  }, []);
+
   useEffect(() => {
     const hasDates =
       Boolean(paginationData.dates.start) || Boolean(paginationData.dates.end);
@@ -572,7 +584,7 @@ function TransactionsView() {
             de {data.totalCount} transacciones
           </span>
 
-          <table className="table table-bordered table-hover table-striped mb-1">
+          <table className="table-sm table table-bordered table-hover table-striped mb-1">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
@@ -681,6 +693,9 @@ function TransactionsView() {
                               txn={row.original}
                               updateHasDocumentUrl={updateHasDocumentUrl}
                               onReverseSuccess={onReverseSuccess}
+                              onEditDescriptionSuccess={
+                                onEditDescriptionSuccess
+                              }
                             />
                           </div>
                         </td>

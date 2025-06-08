@@ -116,12 +116,16 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpGet("payment-methods-totals")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<PaymentMethodTotalsResponse>> GetPaymentMethodsTotalsByHotelId(int id, [FromQuery] string currencyCode)
+        public ActionResult<ItemsResponse<PaymentMethodTotalsResponse>> GetPaymentMethodsTotalsByHotelId(int id, 
+            [FromQuery] string currencyCode,
+            [FromQuery] DateOnly? startDate,
+            [FromQuery] DateOnly? endDate
+            )
         {
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetPaymentMethodsTotalsByHotelId(id, currencyCode);
+                var data = _financialReportService.GetPaymentMethodsTotalsByHotelId(id, currencyCode, startDate, endDate);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));

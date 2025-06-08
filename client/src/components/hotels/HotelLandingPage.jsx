@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Row,
   Col,
@@ -24,17 +24,24 @@ import {
   getArrivingRooms,
   getDepartingRooms,
   getStays,
+  updateStatusToCheckedIn,
+  updateStatusToCompleted,
 } from "services/bookingService";
 import { leaveHotel } from "services/staffService";
 import { formatCurrency } from "utils/currencyHelper";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import classnames from "classnames";
-import { faPersonWalkingLuggage } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPersonWalkingLuggage,
+  faPlaneArrival,
+  faPlaneDeparture,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
 
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
+import { BOOKING_STATUS_IDS } from "components/bookings/constants";
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 import "./HotelLandingPage.css";
 
@@ -130,6 +137,139 @@ const HotelLandingPage = () => {
       });
     }
   };
+
+  const handleCheckIn = useCallback(async (booking) => {
+    let swalText = "Asegúrese de que el cliente ha llegado";
+    let swalTitle = "¿Desea marcar la reserva como arribada?";
+    let hasBalanceDue = booking.balanceDue > 0;
+    if (hasBalanceDue) {
+      swalText =
+        "Esta reserva tiene un saldo pendiente. ¿Desea marcarla como arribada?";
+      swalTitle = "Saldo pendiente!";
+    }
+
+    const result = await Swal.fire({
+      title: swalTitle,
+      text: swalText,
+      icon: hasBalanceDue ? "warning" : "info",
+      showCancelButton: true,
+      confirmButtonText: "Sí, confirmar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: hasBalanceDue,
+      confirmButtonColor: hasBalanceDue ? "red" : "#0d6efd",
+      didOpen: () => {
+        if (hasBalanceDue) {
+          Swal.getConfirmButton().style.display = "none";
+          Swal.showLoading();
+          setTimeout(() => {
+            if (Swal.isVisible()) {
+              Swal.getConfirmButton().style.display = "inline-block";
+              Swal.hideLoading();
+            }
+          }, 2000);
+        }
+      },
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const res = await updateStatusToCheckedIn(booking.id);
+      if (res.isSuccessful) {
+        setData((prevData) => ({
+          ...prevData,
+          arrivals: prevData.arrivals.map((arrival) =>
+            arrival.id === booking.id
+              ? { ...arrival, statusId: BOOKING_STATUS_IDS.ARRIVED }
+              : arrival
+          ),
+        }));
+
+        Swal.fire({
+          title: "Éxito",
+          text: "Reserva marcada como check-in",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+        });
+      } else {
+        throw new Error("Error al marcar como check-in");
+      }
+    } catch (error) {
+      Swal.close();
+      await Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error al marcar como check-in",
+      });
+    }
+  }, []);
+
+  const handleComplete = useCallback(async (booking) => {
+    const result = await Swal.fire({
+      title: "¿Desea marcar la reserva como completada?",
+      text: "Ya no podrá editar la reserva",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, confirmar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
+      confirmButtonColor: "green",
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: "Cargando...",
+        text: "Por favor, espere.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const res = await updateStatusToCompleted(booking.id);
+      if (res.isSuccessful) {
+        setData((prevData) => ({
+          ...prevData,
+          departures: prevData.departures.map((departure) =>
+            departure.id === booking.id
+              ? { ...departure, statusId: BOOKING_STATUS_IDS.COMPLETED }
+              : departure
+          ),
+        }));
+
+        Swal.fire({
+          title: "Éxito",
+          text: "Reserva marcada como completada",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+        });
+      } else {
+        throw new Error("Error al marcar como completada");
+      }
+    } catch (error) {
+      Swal.close();
+      await Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error al marcar como completada",
+      });
+    }
+  }, []);
 
   useEffect(() => {
     setLoadingArrivalsDepartures(true);
@@ -397,14 +537,34 @@ const HotelLandingPage = () => {
                                   </ul>
                                 </Col>
                                 <Col className="text-end align-content-end">
-                                  <Link
-                                    to={`/hotels/${hotelId}/bookings/${arrival.id}`}
-                                    className="btn btn-outline-dark"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    title="Ver detalles de la reserva">
-                                    Ver Detalles
-                                  </Link>
+                                  <Row>
+                                    <Col xs={12} className="mb-2">
+                                      <Link
+                                        to={`/hotels/${hotelId}/bookings/${arrival.id}`}
+                                        className="btn btn-outline-dark"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        title="Ver detalles de la reserva">
+                                        Ver Detalles
+                                      </Link>
+                                    </Col>
+                                    <Col xs={12}>
+                                      {arrival?.statusId ===
+                                        BOOKING_STATUS_IDS.ACTIVE && (
+                                        <Button
+                                          color="outline-success"
+                                          onClick={() =>
+                                            handleCheckIn(arrival)
+                                          }>
+                                          Marcar Check-in
+                                          <FontAwesomeIcon
+                                            icon={faPlaneArrival}
+                                            className="ms-2"
+                                          />
+                                        </Button>
+                                      )}
+                                    </Col>
+                                  </Row>
                                 </Col>
                               </Row>
                             </div>
@@ -484,14 +644,38 @@ const HotelLandingPage = () => {
                                 )}
                               </Col>
                               <Col className="text-end align-content-end">
-                                <Link
-                                  to={`/hotels/${hotelId}/bookings/${departure.id}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-outline-dark"
-                                  title="Ver detalles de la reserva">
-                                  Ver Detalles
-                                </Link>
+                                <Row>
+                                  <Col xs={12} className="mb-2">
+                                    {" "}
+                                    <Link
+                                      to={`/hotels/${hotelId}/bookings/${departure.id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="btn btn-outline-dark"
+                                      title="Ver detalles de la reserva">
+                                      Ver Detalles
+                                    </Link>
+                                  </Col>
+                                  <Col>
+                                    {(departure?.statusId ===
+                                      BOOKING_STATUS_IDS.ACTIVE ||
+                                      departure?.statusId ===
+                                        BOOKING_STATUS_IDS.ARRIVED) && (
+                                      <Button
+                                        color="outline-success"
+                                        className="ms-2"
+                                        onClick={() =>
+                                          handleComplete(departure)
+                                        }>
+                                        Marcar Completada
+                                        <FontAwesomeIcon
+                                          icon={faPlaneDeparture}
+                                          className="ms-2"
+                                        />
+                                      </Button>
+                                    )}
+                                  </Col>
+                                </Row>
                               </Col>
                             </Row>
                           </div>

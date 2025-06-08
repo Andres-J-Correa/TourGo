@@ -110,6 +110,21 @@ const EntityTransactionsView = ({
     [setEntity]
   );
 
+  const onEditDescriptionSuccess = useCallback(
+    (id, newDescription) => {
+      setEntity((prev) => {
+        const newTransactions = prev.transactions.map((txn) => {
+          if (txn.id === id) {
+            return { ...txn, description: newDescription };
+          }
+          return txn;
+        });
+        return { ...prev, transactions: newTransactions };
+      });
+    },
+    [setEntity]
+  );
+
   const mapTransaction = useCallback(
     (txn) => (
       <Transaction
@@ -117,9 +132,10 @@ const EntityTransactionsView = ({
         txn={txn}
         updateHasDocumentUrl={updateHasDocumentUrl}
         onReverseSuccess={onReverseSuccess}
+        onEditDescriptionSuccess={onEditDescriptionSuccess}
       />
     ),
-    [updateHasDocumentUrl, onReverseSuccess]
+    [updateHasDocumentUrl, onReverseSuccess, onEditDescriptionSuccess]
   );
 
   useEffect(() => {

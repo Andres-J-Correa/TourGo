@@ -34,6 +34,7 @@ import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import DataTable from "components/commonUI/tables/DataTable";
+import FinancePartnersExplanationIcon from "components/transactions/finance-partners/FinancePartnersExplanationIcon";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -347,7 +348,9 @@ function FinancePartnersView() {
     <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Socios Financieros" />
       <ErrorBoundary>
-        <h3>Socios Financieros</h3>
+        <h3>
+          Socios Financieros <FinancePartnersExplanationIcon />
+        </h3>
 
         {showForm && (
           <Card className="border-0 shadow-lg mt-3">

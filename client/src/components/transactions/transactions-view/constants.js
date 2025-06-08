@@ -10,7 +10,7 @@ export const transactionsTableColumns = [
     minSize: 50,
   },
   {
-    header: "Fecha de transacción",
+    header: "Fecha",
     accessorKey: "transactionDate",
     cell: ({ getValue }) => {
       const date = getValue();
@@ -47,22 +47,25 @@ export const transactionsTableColumns = [
   {
     header: "Estado",
     accessorKey: "statusId",
+    maxSize: 80,
+    minSize: 80,
     cell: ({ getValue }) => {
       const statusId = getValue();
-      return (
-        <TransactionStatusBadge
-          statusId={statusId}
-          className="text-capitalize"
-        />
-      );
+      return <TransactionStatusBadge statusId={statusId} />;
     },
   },
   {
-    header: "Socio Financiero",
+    header: "Socio financiero",
     accessorKey: "financePartner.name",
   },
   {
-    header: "Entidad Asociada",
+    header: "Entidad",
     accessorKey: "entityId",
+    cell: ({ getValue }) => {
+      const entityId = getValue();
+      return entityId ? entityId : "";
+    },
+    maxSize: 120,
+    minSize: 120,
   },
 ];
