@@ -62,7 +62,9 @@ function TransactionAddForm({
     subcategoryId: "",
     referenceNumber: "",
     statusId: 2,
-    description: "",
+    description: entity?.customer
+      ? `Pago de ${entity.customer.firstName} ${entity.customer.lastName}`
+      : "",
     currencyCode: "COP",
     financePartnerId: "",
     invoiceId: entity?.invoiceId || undefined,
@@ -91,7 +93,6 @@ function TransactionAddForm({
       reverseButtons: true,
       cancelButtonColor: "green",
       didOpen: () => {
-        // Hide buttons initially
         Swal.getConfirmButton().style.display = "none";
         Swal.showLoading();
         setTimeout(() => {
@@ -182,7 +183,6 @@ function TransactionAddForm({
       if (!confirmSave) return;
 
       showLoading("Guardando...");
-
       const response = await add(values, hotelId);
       if (!response.isSuccessful)
         throw new Error("Error al agregar transacción");

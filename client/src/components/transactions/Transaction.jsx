@@ -9,7 +9,12 @@ import { TRANSACTION_STATUS_IDS } from "components/transactions/constants";
 
 import "./Transaction.css";
 
-function Transaction({ txn, updateHasDocumentUrl, onReverseSuccess }) {
+function Transaction({
+  txn,
+  updateHasDocumentUrl,
+  onReverseSuccess,
+  onEditDescriptionSuccess,
+}) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpanded = () => setExpanded((prev) => !prev);
@@ -49,6 +54,7 @@ function Transaction({ txn, updateHasDocumentUrl, onReverseSuccess }) {
               txn={txn}
               updateHasDocumentUrl={updateHasDocumentUrl}
               onReverseSuccess={onReverseSuccess}
+              onEditDescriptionSuccess={onEditDescriptionSuccess}
             />
           </CardBody>
         )}

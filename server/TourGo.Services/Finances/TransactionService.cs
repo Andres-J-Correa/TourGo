@@ -204,6 +204,16 @@ namespace TourGo.Services.Finances
             return fileKey;
         }
 
+        public void UpdateDescription(TransactionDescriptionUpdateRequest model)
+        {
+            string proc = "transactions_update_description";
+
+            _dataProvider.ExecuteNonQuery(proc, (col) =>
+            {
+                col.AddWithValue("p_txnId", model.Id);
+                col.AddWithValue("p_description", model.Description);
+            });
+        }
         public string GetFileKey(TransactionFileAddRequest model, int hotelId)
         {
             string folder = GetFolderName(model.Amount);

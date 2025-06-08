@@ -16,6 +16,7 @@ import {
   getSupportDocumentUrl,
   updateDocumentUrl,
   reverse,
+  updateDescription,
 } from "services/transactionService";
 import { compressImage } from "utils/fileHelper";
 import { useLanguage } from "contexts/LanguageContext";
@@ -24,6 +25,7 @@ const TransactionDetails = ({
   txn,
   updateHasDocumentUrl,
   onReverseSuccess,
+  onEditDescriptionSuccess,
 }) => {
   const [files, setFiles] = useState([]);
   const [showUploader, setShowUploader] = useState(false);
@@ -164,6 +166,47 @@ const TransactionDetails = ({
     }
   };
 
+  const handleEditDescription = async () => {
+    const { value: newDescription } = await Swal.fire({
+      title: "Editar Descripción",
+      input: "textarea",
+      inputLabel: "Nueva descripción",
+      inputValue: txn.description || "",
+      inputPlaceholder: "Escribe la nueva descripción aquí...",
+      showCancelButton: true,
+      confirmButtonText: "Guardar",
+      cancelButtonText: "Cancelar",
+      inputAttributes: {
+        "aria-label": "Nueva descripción",
+      },
+      inputValidator: (value) => {
+        if (value.length > 500) {
+          return "La descripción no puede exceder los 500 caracteres";
+        }
+      },
+    });
+
+    if (newDescription !== undefined && newDescription !== txn.description) {
+      Swal.fire({
+        title: "Guardando...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+      try {
+        const response = await updateDescription(txn.id, newDescription);
+        if (response.isSuccessful) {
+          Swal.fire("Éxito", "Descripción actualizada", "success").then(() => {
+            onEditDescriptionSuccess(txn.id, newDescription);
+          });
+        } else {
+          throw new Error("No se pudo actualizar la descripción");
+        }
+      } catch {
+        Swal.fire("Error", "No se pudo actualizar la descripción", "error");
+      }
+    }
+  };
+
   return (
     <>
       <LoadingOverlay isVisible={isLoading} />
@@ -216,20 +259,24 @@ const TransactionDetails = ({
       {txn?.description && (
         <Row className="mt-2">
           <Col>
-            <strong>Notas:</strong> {txn.description}
+            <strong>Descripción:</strong> {txn.description}
           </Col>
         </Row>
       )}
       <Row className="mt-3">
         <Col className="text-center">
+          <Button color="secondary" onClick={handleEditDescription}>
+            Editar Descripción
+          </Button>
           {txn.hasDocumentUrl ? (
-            <Button color="info" onClick={handleViewDocument}>
+            <Button color="info" onClick={handleViewDocument} className="ms-5">
               Ver comprobante
             </Button>
           ) : (
             txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
               <Button
                 color={showUploader ? "warning" : "primary"}
+                className="ms-5"
                 onClick={() => {
                   setFiles([]);
                   setShowUploader((prev) => !prev);

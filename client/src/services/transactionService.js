@@ -76,6 +76,24 @@ export const getSupportDocumentUrl = async (transactionId) => {
   }
 };
 
+export const updateDescription = async (transactionId, description) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${api}/${transactionId}/description`,
+    data: { description: description.trim() ? description.trim() : null },
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
 export const updateDocumentUrl = async (file, transactionId, amount) => {
   const formData = new FormData();
   formData.append("file", file);

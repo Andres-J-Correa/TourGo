@@ -45,7 +45,7 @@ const DataTable = ({
   });
 
   return (
-    <table className="table table-bordered table-striped table-hover">
+    <table className="table table-sm table-bordered table-striped table-hover">
       <thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>

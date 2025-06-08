@@ -107,6 +107,26 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
+        [HttpPatch("{id:int}/description")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> UpdateDescription(TransactionDescriptionUpdateRequest model)
+        {
+            ObjectResult result = null;
+            try
+            {
+                _transactionService.UpdateDescription(model);
+                SuccessResponse response = new SuccessResponse();
+                result = Ok200(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
+
         [HttpGet("{id:int}/document-url")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read)]
         public async Task<ActionResult<ItemResponse<string>>> GetSupportDocumentUrl(int id)

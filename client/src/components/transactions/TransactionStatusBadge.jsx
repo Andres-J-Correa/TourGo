@@ -8,7 +8,7 @@ import {
   faHourglass,
   faCheckCircle,
   faTimesCircle,
-  faArrowRotateLeft,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -16,14 +16,14 @@ const statusIcons = {
   [TRANSACTION_STATUS_IDS.PENDING]: faHourglass,
   [TRANSACTION_STATUS_IDS.COMPLETED]: faCheckCircle,
   [TRANSACTION_STATUS_IDS.FAILED]: faTimesCircle,
-  [TRANSACTION_STATUS_IDS.REVERSED]: faArrowRotateLeft,
+  [TRANSACTION_STATUS_IDS.REVERSED]: faTriangleExclamation,
 };
 
 function TransactionStatusBadge({ statusId, className, ...props }) {
   return (
     <span
       title={TRANSACTION_STATUS_BY_ID[statusId] || "Estado desconocido"}
-      className={classNames("badge text-capitalize", className, {
+      className={classNames("badge rounded-5", className, {
         "bg-warning": statusId === TRANSACTION_STATUS_IDS.PENDING,
         "bg-success": statusId === TRANSACTION_STATUS_IDS.COMPLETED,
         "bg-danger": statusId === TRANSACTION_STATUS_IDS.FAILED,
