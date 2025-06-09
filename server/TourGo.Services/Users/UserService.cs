@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System.Data;
 using TourGo.Data;
 using TourGo.Data.Extensions;
 using TourGo.Data.Providers;
 using TourGo.Models;
-using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Interfaces;
 using TourGo.Models.Requests.Users;
@@ -15,22 +15,17 @@ namespace TourGo.Services.Users
 {
     public class UserService : IUserService
     {
-        private readonly IWebAuthenticationService<int> _webAuthService;
         private readonly IMySqlDataProvider _mySqlDataProvider;
-        private readonly AuthConfig _authConfig;
 
-
-        public UserService(IWebAuthenticationService<int> authService, IMySqlDataProvider dataProvider, IOptions<AuthConfig> authOptions)
+        public UserService(IMySqlDataProvider dataProvider)
         {
-            _webAuthService = authService;
             _mySqlDataProvider = dataProvider;
-            _authConfig = authOptions.Value;
         }
 
-        public int Create(UserAddRequest request)
+        public int Create(UserAddRequest request, string publicId)
         {
             int userId = 0;
-            string proc = "users_insert";
+            string proc = "users_insert_v2";
             string hashedPassword = GetHashedPassword(request.Password);
             string authProviderUserId;
 
@@ -51,6 +46,7 @@ namespace TourGo.Services.Users
                 coll.AddWithValue("p_providerUserId", authProviderUserId);
                 coll.AddWithValue("p_passwordHash", hashedPassword);
                 coll.AddOutputParameter("p_newId", MySqlDbType.Int32);
+                coll.AddWithValue("p_publicId", publicId);
 
             }, (returnColl) =>
             {
@@ -194,6 +190,25 @@ namespace TourGo.Services.Users
                 coll.AddWithValue("p_userId", userId);
                 coll.AddWithValue("p_isVerified", isVerified);
             });
+        }
+
+        public List<string>? GetAvailablePublicIds(List<string> possibleIds)
+        {
+            string proc = "users_select_available_public_ids";
+            List<string>? availableIds = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
+            {
+                coll.AddWithValue("p_jsonData", JsonConvert.SerializeObject(possibleIds));
+            }, (reader, set) =>
+            {
+                int index = 0;
+                string availableId = reader.GetSafeString(index++);
+                availableIds ??= new List<string>();
+                availableIds.Add(availableId);
+            });
+
+            return availableIds;
         }
 
         private static UserBase MapBaseUser(IDataReader reader, ref int index)

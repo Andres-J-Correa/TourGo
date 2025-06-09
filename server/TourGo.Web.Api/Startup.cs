@@ -39,6 +39,7 @@ namespace TourGo.Web.Api
             services.Configure<AuthConfig>(Configuration.GetSection("AuthConfig"));
             services.Configure<AWSS3Config>(Configuration.GetSection("AWSS3Config"));
             services.Configure<EncryptionConfig>(Configuration.GetSection("EncryptionConfig"));
+            services.Configure<UsersPublicIdConfig>(Configuration.GetSection("UsersPublicIdConfig"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -16,7 +16,9 @@ using TourGo.Models.Requests.Users;
 using TourGo.Services;
 using TourGo.Services.Interfaces;
 using TourGo.Services.Interfaces.Email;
+using TourGo.Services.Interfaces.Security;
 using TourGo.Services.Interfaces.Users;
+using TourGo.Services.Security;
 using TourGo.Web.Api.Extensions;
 using TourGo.Web.Controllers;
 using TourGo.Web.Models.Enums;
@@ -37,6 +39,7 @@ namespace TourGo.Web.Api.Controllers.Users
         private readonly IMemoryCache _cache;
         private readonly EncryptionConfig _encryptionConfig;
         private readonly EmailConfig _emailConfig;
+        private readonly UsersPublicIdConfig _usersPublicIdConfig;
 
         public UsersAuthController(ILogger<UsersAuthController> logger, 
             IUserService userService, 
@@ -47,7 +50,8 @@ namespace TourGo.Web.Api.Controllers.Users
             IOptions<EmailConfig> emailConfig,
             IErrorLoggingService errorLoggingService,
             IMemoryCache memoryCache,
-            IOptions<EncryptionConfig> options) : base(logger)
+            IOptions<EncryptionConfig> encryptionOptions,
+            IOptions<UsersPublicIdConfig> usersPublicIdOptions) : base(logger)
         {
             _userService = userService;
             _webAuthService = webAuthService;
@@ -56,8 +60,9 @@ namespace TourGo.Web.Api.Controllers.Users
             _userTokenService = userTokenService;
             _emailConfig = emailConfig.Value;
             _errorLoggingService = errorLoggingService;
-            _encryptionConfig = options.Value;
+            _encryptionConfig = encryptionOptions.Value;
             _cache = memoryCache;
+            _usersPublicIdConfig = usersPublicIdOptions.Value;
 
         }
 
@@ -123,32 +128,51 @@ namespace TourGo.Web.Api.Controllers.Users
         {
             try
             {
+                string? publicId = null;
+                int attemptsMade = 0;
 
-                bool userExists = _userService.UserExists(model.Email);
-
-                if (userExists)
+                do
                 {
-                    ErrorResponse errorResponse = new ErrorResponse("Email already exists", UserManagementErrorCode.EmailAlreadyExists);
-                    return StatusCode(409, errorResponse);
-                }
+                    List<string> possiblePublicIds = PublicIdGeneratorService.GenerateSecureIds(_usersPublicIdConfig.NumberOfIdsToGenerate,
+                                                                                                _usersPublicIdConfig.Length,
+                                                                                                _usersPublicIdConfig.Characters);
 
-                if(model.Phone != null)
-                {
-                    bool phoneExists = _userService.PhoneExists(model.Phone);
+                    List<string>? availablePublicIds = _userService.GetAvailablePublicIds(possiblePublicIds);
 
-                    if (phoneExists)
+                    if (availablePublicIds != null && availablePublicIds.Count > 0)
                     {
-                        ErrorResponse errorResponse = new ErrorResponse("Phone already exists", UserManagementErrorCode.PhoneAlreadyExists);
-                        return StatusCode(409, errorResponse);
+                        publicId = availablePublicIds[0];
                     }
+
+                    attemptsMade++;
+                } while (publicId == null && attemptsMade < _usersPublicIdConfig.MaxAttempts );
+
+                if(publicId == null)
+                {
+                    throw new Exception("Failed to generate a unique public ID after maximum attempts.");
                 }
 
-                int userId = _userService.Create(model);
+                int userId = _userService.Create(model, publicId);
 
                 ItemResponse<int> response = new ItemResponse<int>() { Item = userId };
 
                 return Created201(response);
 
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+
+                if (Enum.IsDefined(typeof(UserManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((UserManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                return StatusCode(500, error);
             }
             catch (Exception ex)
             {
