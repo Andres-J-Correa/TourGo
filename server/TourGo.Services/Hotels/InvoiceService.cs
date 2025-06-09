@@ -26,9 +26,9 @@ namespace TourGo.Services.Hotels
         }
 
 
-        public int Add(InvoiceAddRequest model, int userId)
+        public int Add(InvoiceAddRequest model, string userId)
         {
-            string proc = "invoices_insert";
+            string proc = "invoices_insert_v2";
             int newId = 0;
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
@@ -58,9 +58,9 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public void Update(InvoiceUpdateRequest model, int userId)
+        public void Update(InvoiceUpdateRequest model, string userId)
         {
-            string proc = "invoices_update";
+            string proc = "invoices_update_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {

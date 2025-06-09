@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace TourGo.Services.Security
 {
-    public class EntityAuthService : ISecureEntities<int, object>
+    public class EntityAuthService : ISecureEntities<string, object>
     {
         private readonly IMySqlDataProvider _dataProvider;
         private readonly ILogger<EntityAuthService> _logger;
@@ -19,11 +19,11 @@ namespace TourGo.Services.Security
             _logger = logger;
         }
 
-        public bool IsAuthorized(int userId, object entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType, bool isBulk)
+        public bool IsAuthorized(string userId, object entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType, bool isBulk)
         {
             bool isAuthorized = false;
 
-            string proc = $"entity_auth_{entityType.ToString().ToLower()}";
+            string proc = $"entity_auth_{entityType.ToString().ToLower()}_v2";
 
             try
             {

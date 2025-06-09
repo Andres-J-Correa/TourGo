@@ -9,15 +9,15 @@ namespace TourGo.Services.Interfaces.Users
     public interface IUserService
     {
         int Create(UserAddRequest request, string publicId);
-        void Update(UserUpdateRequest request, int userId);
+        void Update(UserUpdateRequest request, string userId);
         bool UserExists(string email);
         bool PhoneExists(string phone);
         IUserAuthData Get(string email);
-        IUserAuthData Get(int userId);
-        void ChangePassword(int userId, string password);
-        void UpdateIsVerified(int userId, bool isVerified);
+        IUserAuthData GetByPublicId(string publicId);
+        void ResetPassword(string userId, string password);
+        void UpdateIsVerified(string userId, bool isVerified);
         IUserAuthDataV2? GetAuth(string email);
-        UserBase GetPII(int userId);
+        UserBase GetPII(string userId);
         List<string>? GetAvailablePublicIds(List<string> possibleIds);
     }
 }

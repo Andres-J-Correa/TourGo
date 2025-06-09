@@ -31,7 +31,7 @@ namespace TourGo.Web.Api.Controllers.Users
     public class UsersAuthController : BaseApiController
     {
         private readonly IUserService _userService;
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IUserAuthService _userAuthService;
         private readonly IUserTokenService _userTokenService;
         private readonly IEmailService _emailService;
@@ -43,7 +43,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
         public UsersAuthController(ILogger<UsersAuthController> logger, 
             IUserService userService, 
-            IWebAuthenticationService<int> webAuthService, 
+            IWebAuthenticationService<string> webAuthService, 
             IEmailService emailService, 
             IUserAuthService userAuthService , 
             IUserTokenService userTokenService, 
@@ -228,7 +228,7 @@ namespace TourGo.Web.Api.Controllers.Users
                 if (user != null)
                 {
                     DateTime TokenExpirationDate = DateTime.UtcNow.AddHours(_emailConfig.PasswordResetExpirationHours);
-                    Guid token = _userTokenService.CreateToken(user.Id, UserTokenTypeEnum.PasswordReset, TokenExpirationDate);
+                    Guid token = _userTokenService.CreateToken(user.PublicId, UserTokenTypeEnum.PasswordReset, TokenExpirationDate);
 
                     await _emailService.UserPasswordReset(user, token.ToString());
                 }
@@ -264,11 +264,11 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 if (userToken != null && model.Email == user.Email && userToken.TokenType == UserTokenTypeEnum.PasswordReset)
                 {
-                    _userService.ChangePassword(userToken.UserId, model.Password);
+                    _userService.ResetPassword(user.PublicId, model.Password);
 
                     _userTokenService.DeleteUserToken(userToken);
 
-                    _userAuthService.RestartFailedAttempts(userToken.UserId);
+                    _userAuthService.RestartFailedAttempts(user.PublicId);
 
                     response = new SuccessResponse();
                 }
@@ -297,7 +297,7 @@ namespace TourGo.Web.Api.Controllers.Users
         {
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _userService.Update(model, userId);
 
                 string cacheKey = $"UserPII_{userId}_v{_encryptionConfig.UserPIICacheVersion ?? "v1"}";
@@ -410,7 +410,7 @@ namespace TourGo.Web.Api.Controllers.Users
                 if (user != null)
                 {
                     DateTime TokenExpirationDate = DateTime.UtcNow.AddHours(_emailConfig.EmailVerificationExpirationHours);
-                    Guid token = _userTokenService.CreateToken(user.Id, UserTokenTypeEnum.EmailVerification, TokenExpirationDate);
+                    Guid token = _userTokenService.CreateToken(user.PublicId, UserTokenTypeEnum.EmailVerification, TokenExpirationDate);
 
                     await _emailService.UserEmailVerification(user, token.ToString());
 
@@ -442,7 +442,7 @@ namespace TourGo.Web.Api.Controllers.Users
             {
                 IUserAuthData user = _webAuthService.GetCurrentUser();
 
-                UserToken? userToken = _userTokenService.GetUserToken(user.Id, UserTokenTypeEnum.EmailVerification);
+                UserToken? userToken = _userTokenService.GetUserToken(user.PublicId, UserTokenTypeEnum.EmailVerification);
 
                 if (userToken == null)
                 {
@@ -457,7 +457,7 @@ namespace TourGo.Web.Api.Controllers.Users
                     return StatusCode(400, new ErrorResponse("Invalid token"));
                 }
 
-                _userService.UpdateIsVerified(user.Id, true);
+                _userService.UpdateIsVerified(user.PublicId, true);
                 Claim verified = new Claim("https://tourgo.site/claims/isverified", "True", ClaimValueTypes.Boolean);
                 _webAuthService.LogInAsync(user, [verified]);
 

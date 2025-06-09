@@ -25,12 +25,12 @@ namespace TourGo.Web.Api.Controllers.Hotels
     [ApiController]
     public class HotelsController : BaseApiController
     {
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IHotelService _hotelService;
         private readonly IErrorLoggingService _errorLoggingService;
 
         public HotelsController(ILogger<HotelsController> logger, 
-            IWebAuthenticationService<int> webAuthenticationService, 
+            IWebAuthenticationService<string> webAuthenticationService, 
             IHotelService hotelService,
             IErrorLoggingService errorLoggingService) : base(logger)
         {
@@ -48,7 +48,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 int id = _hotelService.Create(model, userId);
 
@@ -111,7 +111,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 List<Lookup>? hotels = _hotelService.GetUserHotelsMinimal(userId);
 
@@ -175,7 +175,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 HotelMinimalWithUserRole? hotel = _hotelService.GetMinimalWithUserRole(id, userId);
 
                 if (hotel == null)
@@ -207,7 +207,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _hotelService.Update(model, userId);
 
                 response = new SuccessResponse();
@@ -232,7 +232,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _hotelService.Delete(id, userId);
 
                 response = new SuccessResponse();

@@ -42,7 +42,7 @@ namespace TourGo.Services.Finances
 
         public List<FinancePartner>? Get(int hotelId)
         {
-            string proc = "finance_partners_select_all_by_hotel_id";
+            string proc = "finance_partners_select_all_by_hotel_id_v2";
             List<FinancePartner>? financePartners = null;
 
             _dataProvider.ExecuteCmd(proc, (param) =>
@@ -61,9 +61,9 @@ namespace TourGo.Services.Finances
             return financePartners;
         }
 
-        public int Add(FinancePartnerAddUpdateRequest model, int userId)
+        public int Add(FinancePartnerAddUpdateRequest model, string userId)
         {
-            string proc = "finance_partners_insert";
+            string proc = "finance_partners_insert_v2";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
@@ -85,9 +85,9 @@ namespace TourGo.Services.Finances
             return newId;
         }
 
-        public void Update(FinancePartnerAddUpdateRequest model, int userId)
+        public void Update(FinancePartnerAddUpdateRequest model, string userId)
         {
-            string proc = "finance_partners_update";
+            string proc = "finance_partners_update_v2";
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -97,9 +97,9 @@ namespace TourGo.Services.Finances
             });
         }
 
-        public void Delete(int id, int userId)
+        public void Delete(int id, string userId)
         {
-            string proc = "finance_partners_delete";
+            string proc = "finance_partners_delete_v2";
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {

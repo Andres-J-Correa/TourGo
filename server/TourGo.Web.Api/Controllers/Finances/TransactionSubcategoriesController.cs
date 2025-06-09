@@ -19,12 +19,12 @@ namespace TourGo.Web.Api.Controllers.Finances
     {
         private readonly ITransactionSubcategoryService _transactionSubcategoryService;
         private readonly IErrorLoggingService _errorLoggingService;
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
 
         public TransactionSubcategoriesController(ILogger<TransactionSubcategoriesController> logger,
                                                 ITransactionSubcategoryService transactionSubcategoryService,
                                                 IErrorLoggingService errorLoggingService,
-                                                IWebAuthenticationService<int> webAuthService) : base(logger)
+                                                IWebAuthenticationService<string> webAuthService) : base(logger)
         {
             _transactionSubcategoryService = transactionSubcategoryService;
             _errorLoggingService = errorLoggingService;
@@ -40,7 +40,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 int id = _transactionSubcategoryService.Add(model, userId);
 
                 if (id == 0)
@@ -69,7 +69,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _transactionSubcategoryService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();
@@ -93,7 +93,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _transactionSubcategoryService.Delete(id, userId);
 
                 SuccessResponse response = new SuccessResponse();

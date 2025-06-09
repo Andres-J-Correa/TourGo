@@ -25,11 +25,11 @@ namespace TourGo.Services.Hotels
         {
             _mySqlDataProvider = dataProvider;
         }
-        public int Create(HotelAddRequest model, int userId)
+        public int Create(HotelAddRequest model, string userId)
         {
             int newId = 0;
 
-            string proc = "hotels_insert";
+            string proc = "hotels_insert_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -53,10 +53,10 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public void Update(HotelUpdateRequest model, int userId)
+        public void Update(HotelUpdateRequest model, string userId)
         {
 
-            string proc = "hotels_update";
+            string proc = "hotels_update_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -71,9 +71,9 @@ namespace TourGo.Services.Hotels
 
         }
 
-        public void Delete(int id, int userId)
+        public void Delete(int id, string userId)
         {
-            string proc = "hotels_delete";
+            string proc = "hotels_delete_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -84,7 +84,7 @@ namespace TourGo.Services.Hotels
 
         public Hotel? GetDetails(int id)
         {
-            string proc = "hotels_select_details_by_id";
+            string proc = "hotels_select_details_by_id_v2";
             Hotel ? hotel = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -102,7 +102,7 @@ namespace TourGo.Services.Hotels
                 {
                     UserBase user = new();
                     index = 0;
-                    user.Id = reader.GetSafeInt32(index++);
+                    user.PublicId = reader.GetSafeString(index++);
                     user.FirstName = reader.GetSafeString(index++);
                     user.LastName = reader.GetSafeString(index++);
                     hotel.Owner = user;
@@ -153,10 +153,10 @@ namespace TourGo.Services.Hotels
 
             return lookup;
         }
-        public HotelMinimalWithUserRole? GetMinimalWithUserRole(int id, int userId)
+        public HotelMinimalWithUserRole? GetMinimalWithUserRole(int id, string userId)
         {
 
-            string proc = "hotels_select_minimal_by_id_with_user_role";
+            string proc = "hotels_select_minimal_by_id_with_user_role_v2";
 
             HotelMinimalWithUserRole? hotel = null;
 
@@ -177,9 +177,9 @@ namespace TourGo.Services.Hotels
             return hotel;
         }
 
-        public List<Lookup>? GetUserHotelsMinimal(int userId)
+        public List<Lookup>? GetUserHotelsMinimal(string userId)
         {
-            string proc = "hotels_select_minimal_by_user";
+            string proc = "hotels_select_minimal_by_user_v2";
             List<Lookup>? hotels = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

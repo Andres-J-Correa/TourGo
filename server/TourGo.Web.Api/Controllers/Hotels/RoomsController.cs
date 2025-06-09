@@ -18,12 +18,12 @@ namespace TourGo.Web.Api.Controllers.Hotels
     [ApiController]
     public class RoomsController : BaseApiController
     {
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IRoomService _roomService;
         private readonly IErrorLoggingService _errorLoggingService;
 
         public RoomsController(ILogger<RoomsController> logger, 
-                                IWebAuthenticationService<int> webAuthenticationService, 
+                                IWebAuthenticationService<string> webAuthenticationService, 
                                 IRoomService roomService,
                                 IErrorLoggingService errorLoggingService) : base(logger)
         {
@@ -40,7 +40,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 int roomId = _roomService.Create(model, userId);
 
@@ -104,7 +104,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _roomService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();
@@ -130,7 +130,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _roomService.Delete(id, userId);
 
                 SuccessResponse response = new SuccessResponse();

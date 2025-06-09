@@ -8,14 +8,14 @@ namespace TourGo.Services.Interfaces.Hotels
 {
     public interface IHotelService
     {
-        int Create(HotelAddRequest model, int userId);
+        int Create(HotelAddRequest model, string userId);
         Hotel? GetDetails(int id);
-        List<Lookup>? GetUserHotelsMinimal(int userId);
+        List<Lookup>? GetUserHotelsMinimal(string userId);
         Lookup? GetMinimal(int id);
         Lookup? GetMinimalByTransactionId(int txnId);
-        HotelMinimalWithUserRole? GetMinimalWithUserRole(int id, int userId);
-        void Update(HotelUpdateRequest model, int userId);
-        void Delete(int id, int userId);
+        HotelMinimalWithUserRole? GetMinimalWithUserRole(int id, string userId);
+        void Update(HotelUpdateRequest model, string userId);
+        void Delete(int id, string userId);
         List<RolePermission>? GetRolePermissions();
     }
 }

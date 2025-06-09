@@ -36,7 +36,7 @@ namespace TourGo.Services.Hotels
 
         public Booking? GetById(int id)
         {
-            string proc = "bookings_select_details_by_id_v5";
+            string proc = "bookings_select_details_by_id_v6";
             Booking? booking = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -103,7 +103,7 @@ namespace TourGo.Services.Hotels
                                                             string? sortColumn, string? sortDirection, DateOnly? startDate, DateOnly? endDate,
                                                             string? firstName, string? lastName, string? bookingExternalId, int? statusId)
         {
-            string proc = "bookings_select_minimal_by_date_range_paginated_v2";
+            string proc = "bookings_select_minimal_by_date_range_paginated_v3";
             Paged<BookingMinimal>? paged = null;
             List<BookingMinimal>? bookings = null;
             int totalCount = 0;
@@ -170,11 +170,11 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
-        public BookingAddResponse? Add(BookingAddUpdateRequest model, int userId, int hotelId)
+        public BookingAddResponse? Add(BookingAddUpdateRequest model, string userId, int hotelId)
         {
             BookingAddResponse? response = null;
 
-            string proc = "bookings_insert_v2";
+            string proc = "bookings_insert_v3";
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
                 coll.AddWithValue("p_customerId", model.CustomerId);
@@ -206,9 +206,9 @@ namespace TourGo.Services.Hotels
             return response;
         }
 
-        public void Update(BookingAddUpdateRequest model, int userId)
+        public void Update(BookingAddUpdateRequest model, string userId)
         {
-            string proc = "bookings_update_v2";
+            string proc = "bookings_update_v3";
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
                 coll.AddWithValue("p_id", model.Id);
@@ -290,7 +290,7 @@ namespace TourGo.Services.Hotels
             return list;
         }
 
-        public void UpdateStatus(int bookingId, int userId, BookingStatusEnum status)
+        public void UpdateStatus(int bookingId, string userId, BookingStatusEnum status)
         {
             string proc = "bookings_update_status";
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>

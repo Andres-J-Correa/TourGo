@@ -27,9 +27,9 @@ namespace TourGo.Services.Finances
             _dataProvider = provider;
         }
 
-        public int Add(TransactionAddRequest request, int userId)
+        public int Add(TransactionAddRequest request, string userId)
         {
-            string proc = "transactions_insert_v2";
+            string proc = "transactions_insert_v3";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
@@ -66,9 +66,9 @@ namespace TourGo.Services.Finances
             return newId;
         }
 
-        public int Reverse(int txnId, int userId)
+        public int Reverse(int txnId, string userId)
         {
-            string proc = "transactions_reverse";
+            string proc = "transactions_reverse_v2";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
@@ -94,7 +94,7 @@ namespace TourGo.Services.Finances
         public List<Transaction>? GetByEntityId (int entityId)
         {
 
-            string proc = "transactions_select_by_entity_id_v2";
+            string proc = "transactions_select_by_entity_id_v3";
             List<Transaction>? transactions = null;
 
             _dataProvider.ExecuteCmd(proc, (col) =>
@@ -118,7 +118,7 @@ namespace TourGo.Services.Finances
             DateOnly? startDate, DateOnly? endDate, int? txnId, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
             string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
         {
-            string proc = "transactions_select_paginated_v2";
+            string proc = "transactions_select_paginated_v3";
             Paged<Transaction>? paged = null;
             List<Transaction>? transactions = null;
             int totalCount = 0;
@@ -260,7 +260,7 @@ namespace TourGo.Services.Finances
             transaction.HasDocumentUrl = reader.GetSafeBool(index++);
 
 
-            transaction.CreatedBy.Id = reader.GetSafeInt32(index++);
+            transaction.CreatedBy.PublicId = reader.GetSafeString(index++);
             transaction.CreatedBy.FirstName = reader.GetSafeString(index++);
             transaction.CreatedBy.LastName = reader.GetSafeString(index++);
             transaction.PaymentMethod.Id = reader.GetSafeInt32(index++);
@@ -278,7 +278,7 @@ namespace TourGo.Services.Finances
                 transaction.Subcategory = null;
                 index++;
             }
-            transaction.ApprovedBy.Id = reader.GetSafeInt32(index++);
+            transaction.ApprovedBy.PublicId = reader.GetSafeString(index++);
             transaction.ApprovedBy.FirstName = reader.GetSafeString(index++);
             transaction.ApprovedBy.LastName = reader.GetSafeString(index++);
 

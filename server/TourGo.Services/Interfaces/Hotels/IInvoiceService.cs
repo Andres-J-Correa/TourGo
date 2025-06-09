@@ -5,8 +5,8 @@ namespace TourGo.Services.Interfaces.Hotels
 {
     public interface IInvoiceService
     {
-        int Add(InvoiceAddRequest model, int userId);
-        void Update(InvoiceUpdateRequest model, int userId);
+        int Add(InvoiceAddRequest model, string userId);
+        void Update(InvoiceUpdateRequest model, string userId);
         InvoiceWithEntities? GetWithEntitiesById(int invoiceId);
     }
 }

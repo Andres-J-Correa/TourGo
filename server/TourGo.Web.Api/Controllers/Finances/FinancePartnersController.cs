@@ -20,12 +20,12 @@ namespace TourGo.Web.Api.Controllers.Finances
     {
         private readonly IFinancePartnerService _financePartnerService;
         private readonly IErrorLoggingService _errorLoggingService;
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
 
         public FinancePartnersController(ILogger<FinancePartnersController> logger,
                                          IFinancePartnerService financePartnerService,
                                          IErrorLoggingService errorLoggingService,
-                                         IWebAuthenticationService<int> webAuthService) : base(logger)
+                                         IWebAuthenticationService<string> webAuthService) : base(logger)
         {
             _financePartnerService = financePartnerService;
             _errorLoggingService = errorLoggingService;
@@ -102,7 +102,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 int newId = _financePartnerService.Add(model, userId);
 
                 if (newId == 0)
@@ -133,7 +133,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _financePartnerService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();
@@ -157,7 +157,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _financePartnerService.Delete(id, userId);
 
                 SuccessResponse response = new SuccessResponse();

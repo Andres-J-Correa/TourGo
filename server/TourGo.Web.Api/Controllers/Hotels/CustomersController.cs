@@ -17,13 +17,13 @@ namespace TourGo.Web.Api.Controllers.Hotels
     [ApiController]
     public class CustomersController : BaseApiController
     {
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly ICustomerService _customerService;
         private readonly IErrorLoggingService _errorLoggingService;
 
         public CustomersController(
             ILogger<CustomersController> logger,
-            IWebAuthenticationService<int> webAuthenticationService,
+            IWebAuthenticationService<string> webAuthenticationService,
             ICustomerService customerService,
             IErrorLoggingService errorLoggingService) : base(logger)
         {
@@ -41,7 +41,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 Customer? customer = _customerService.GetByDocumentNumber(model.Id, userId, hotelId);
 
                 if (customer == null)
@@ -75,7 +75,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 int id = _customerService.Add(model, userId);
 

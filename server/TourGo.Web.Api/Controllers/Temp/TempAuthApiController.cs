@@ -19,11 +19,11 @@ namespace TourGo.Web.Api.Controllers
     public class TempAuthApiController : BaseApiController
     {
         private IUserAuthService _userAuthService;
-        private IWebAuthenticationService<int> _authService;
+        private IWebAuthenticationService<string> _authService;
         IOptions<SecurityConfig> _options;
 
         public TempAuthApiController(IUserAuthService userAuthService
-            , IWebAuthenticationService<int> authService
+            , IWebAuthenticationService<string> authService
             , ILogger<TempAuthApiController> logger
             , IOptions<SecurityConfig> options) : base(logger)
         {

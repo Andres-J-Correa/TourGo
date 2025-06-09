@@ -6,10 +6,10 @@ namespace TourGo.Services.Interfaces.Hotels
 {
     public interface IBookingProviderService
     {
-        int Add(BookingProviderAddUpdateRequest model, int userId);
-        void Delete(int id, int userId);
+        int Add(BookingProviderAddUpdateRequest model, string userId);
+        void Delete(int id, string userId);
         List<BookingProvider>? Get(int hotelId);
         List<Lookup>? GetMinimal(int hotelId);
-        void Update(BookingProviderAddUpdateRequest model, int userId);
+        void Update(BookingProviderAddUpdateRequest model, string userId);
     }
 }

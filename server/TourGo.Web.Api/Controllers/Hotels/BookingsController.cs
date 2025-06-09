@@ -28,12 +28,12 @@ namespace TourGo.Web.Api.Controllers.Hotels
     public class BookingsController : BaseApiController
     {
         private readonly IBookingService _bookingService;
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IErrorLoggingService _errorLoggingService;
 
         public BookingsController(ILogger<BookingsController> logger,
                                 IBookingService bookingService,
-                                IWebAuthenticationService<int> webAuthenticationService,
+                                IWebAuthenticationService<string> webAuthenticationService,
                                 IErrorLoggingService errorLoggingService) : base(logger)
         {
             _bookingService = bookingService;
@@ -49,7 +49,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 BookingAddResponse? newBooking = _bookingService.Add(model, userId, model.Id);
 
@@ -95,7 +95,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 _bookingService.Update(model, userId);
 
@@ -340,7 +340,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 _bookingService.UpdateStatus(id, userId, BookingStatusEnum.Arrived);
 
@@ -366,7 +366,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 _bookingService.UpdateStatus(id, userId, BookingStatusEnum.Completed);
 
@@ -392,7 +392,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 _bookingService.UpdateStatus(id, userId, BookingStatusEnum.Cancelled);
 
@@ -418,7 +418,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
 
                 _bookingService.UpdateStatus(id, userId, BookingStatusEnum.NoShow);
 

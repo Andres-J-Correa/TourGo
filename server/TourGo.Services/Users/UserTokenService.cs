@@ -34,9 +34,9 @@ namespace TourGo.Services.Users
             return userToken;
         }
 
-        public UserToken? GetUserToken(int userId, UserTokenTypeEnum tokenType)
+        public UserToken? GetUserToken(string userId, UserTokenTypeEnum tokenType)
         {
-            string proc = "users_tokens_select_by_user_id_type_id";
+            string proc = "users_tokens_select_by_user_id_type_id_v2";
             UserToken? userToken = null;
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
@@ -51,10 +51,10 @@ namespace TourGo.Services.Users
             return userToken;
         }
 
-        public Guid CreateToken(int userId, UserTokenTypeEnum tokenType, DateTime expirationDate)
+        public Guid CreateToken(string userId, UserTokenTypeEnum tokenType, DateTime expirationDate)
         {
             Guid guid = Guid.NewGuid();
-            string proc = "users_tokens_insert_v2";
+            string proc = "users_tokens_insert_v3";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {

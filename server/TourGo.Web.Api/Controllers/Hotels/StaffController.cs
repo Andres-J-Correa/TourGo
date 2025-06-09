@@ -25,14 +25,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
     {
         private readonly IStaffService _staffService;
         private readonly IErrorLoggingService _errorLoggingService;
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IHotelService _hotelService;
         private readonly IEmailService _emailService;
 
         public StaffController(ILogger<StaffController> logger, 
                             IStaffService staffService,
                             IErrorLoggingService errorLoggingService,
-                            IWebAuthenticationService<int> webAuthService,
+                            IWebAuthenticationService<string> webAuthService,
                             IHotelService hotelService,
                             IEmailService emailService) : base(logger)
         {
@@ -69,12 +69,12 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
-        [HttpDelete("hotel/{hotelId:int}/user/{userId:int}")]
-        public ActionResult<SuccessResponse> RemoveStaff(int hotelId, int userId)
+        [HttpDelete("hotel/{hotelId:int}/user/{userId}")]
+        public ActionResult<SuccessResponse> RemoveStaff(int hotelId, string userId)
         {
             try
             {
-                int modifiedBy = _webAuthService.GetCurrentUserId();
+                string modifiedBy = _webAuthService.GetCurrentUserId();
                 _staffService.RemoveStaff(userId, hotelId, modifiedBy);
                 return Ok200(new SuccessResponse());
             }
@@ -101,12 +101,12 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
-        [HttpPatch("hotel/{hotelId:int}/user/{userId:int}/role/{role:int}")]
-        public ActionResult<SuccessResponse> UpdateStaffRole(int hotelId, int userId, StaffRoleEnum role)
+        [HttpPatch("hotel/{hotelId:int}/user/{userId}/role/{role:int}")]
+        public ActionResult<SuccessResponse> UpdateStaffRole(int hotelId, string userId, StaffRoleEnum role)
         {
             try
             {
-                int modifiedBy = _webAuthService.GetCurrentUserId();
+                string modifiedBy = _webAuthService.GetCurrentUserId();
                 _staffService.UpdateStaffRole(userId, hotelId, (int)role, modifiedBy);
                 return Ok200(new SuccessResponse());
             }
@@ -194,7 +194,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         {
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _staffService.LeaveHotel(userId, hotelId);
                 return Ok200(new SuccessResponse());
             }
@@ -212,7 +212,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         {
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 int inviteId = _staffService.AddInvite(model, id, userId);
 
                 if (inviteId <= 0)
@@ -291,7 +291,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         {
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _staffService.AcceptInvite(id, userId);
 
                 return Ok200(new SuccessResponse());
@@ -325,7 +325,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         {
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _staffService.RejectInvite(id, userId);
 
                 return Ok200(new SuccessResponse());

@@ -6,10 +6,10 @@ namespace TourGo.Services.Interfaces.Finances
 {
     public interface IFinancePartnerService
     {
-        int Add(FinancePartnerAddUpdateRequest model, int userId);
-        void Delete(int id, int userId);
+        int Add(FinancePartnerAddUpdateRequest model, string userId);
+        void Delete(int id, string userId);
         List<FinancePartner>? Get(int hotelId);
         List<Lookup>? GetMinimal(int hotelId);
-        void Update(FinancePartnerAddUpdateRequest model, int userId);
+        void Update(FinancePartnerAddUpdateRequest model, string userId);
     }
 }

@@ -19,12 +19,12 @@ namespace TourGo.Web.Api.Controllers.Hotels
     {
 
         private readonly IInvoiceService _invoiceService;
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IErrorLoggingService _errorLoggingService;
 
         public InvoicesController(ILogger<InvoicesController> logger, 
             IInvoiceService invoiceService, 
-            IWebAuthenticationService<int> webAuthenticationService,
+            IWebAuthenticationService<string> webAuthenticationService,
             IErrorLoggingService errorLoggingService) : base(logger)
         {
             _invoiceService = invoiceService;
@@ -40,7 +40,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 int id = _invoiceService.Add(model, userId);
 
                 if (id == 0)
@@ -69,7 +69,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _invoiceService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();

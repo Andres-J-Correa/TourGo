@@ -38,7 +38,7 @@ namespace TourGo.Web.StartUp
             string mySqlConnString = configuration.GetConnectionString("MySql");
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.2
 
-            services.AddSingleton<IWebAuthenticationService<int>, WebAuthenticationService>();
+            services.AddSingleton<IWebAuthenticationService<string>, WebAuthenticationService>();
 
             services.AddSingleton<ISqlDataProvider, SqlDataProvider>(delegate (IServiceProvider provider)
             {
@@ -51,7 +51,7 @@ namespace TourGo.Web.StartUp
                 return new MySqlDataProvider(mySqlConnString);
             });
 
-            services.AddSingleton<IIdentityProvider<int>, WebAuthenticationService>();
+            services.AddSingleton<IIdentityProvider<string>, WebAuthenticationService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<IUserService, UserService>();
@@ -71,7 +71,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IUserTokenService, UserTokenService>();
             services.AddSingleton<IUserAuthService, UserAuthService>();
             services.AddSingleton<IBookingService, BookingService>();
-            services.AddSingleton<ISecureEntities<int,object>, EntityAuthService>();
+            services.AddSingleton<ISecureEntities<string,object>, EntityAuthService>();
             services.AddSingleton<IHotelService, HotelService>();
             services.AddSingleton<IRoomService, RoomService>();
             services.AddSingleton<IExtraChargeService, ExtraChargeService>();

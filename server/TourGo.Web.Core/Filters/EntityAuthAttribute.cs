@@ -20,15 +20,15 @@ namespace TourGo.Web.Core.Filters
 
         private class EntityAuthFilterImplementation : IAsyncActionFilter
         {
-            private readonly IIdentityProvider<int> _identityProvider;
-            private readonly ISecureEntities<int, object> _entityAuthService;
+            private readonly IIdentityProvider<string> _identityProvider;
+            private readonly ISecureEntities<string, object> _entityAuthService;
             private readonly EntityTypeEnum _entityTypeId;
             private readonly EntityActionTypeEnum _action;
             private readonly bool _isBulk;
 
             public EntityAuthFilterImplementation(
-                IIdentityProvider<int> identityProvider,
-                ISecureEntities<int, object> entityAuthService,
+                IIdentityProvider<string> identityProvider,
+                ISecureEntities<string, object> entityAuthService,
                 EntityTypeEnum entityTypeId,
                 EntityActionTypeEnum action,
                 bool isBulk)
@@ -90,7 +90,7 @@ namespace TourGo.Web.Core.Filters
 
             private bool ValidateArguments(IDictionary<string, object> actionArguments)
             {
-                int userId = _identityProvider.GetCurrentUserId();
+                string userId = _identityProvider.GetCurrentUserId();
 
                 int id = GetEntityId<int>(actionArguments);
 
