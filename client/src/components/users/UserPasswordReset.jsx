@@ -25,7 +25,7 @@ function UserPasswordReset() {
   const [userEmail, setUserEmail] = useState("");
 
   const { t, getTranslatedErrorMessage } = useLanguage();
-  const { toggleUserSignInModal, user } = useAppContext();
+  const { user } = useAppContext();
   const navigate = useNavigate();
 
   const handleForgotPasswordSubmit = useCallback(
@@ -93,14 +93,11 @@ function UserPasswordReset() {
           text: t("common.success"),
           icon: "success",
           confirmButtonText: "OK",
+          timer: 1000,
+          didClose: () => {
+            navigate("/");
+          },
         });
-
-        navigate("/");
-
-        setTimeout(() => {
-          toggleUserSignInModal();
-          Swal.close();
-        }, 1000);
       } catch (error) {
         const errorMessage = getTranslatedErrorMessage(error);
         if (error?.response?.data?.code === ERROR_CODES.TOKEN_NOT_FOUND) {
@@ -116,7 +113,7 @@ function UserPasswordReset() {
         });
       }
     },
-    [getTranslatedErrorMessage, navigate, t, userEmail, toggleUserSignInModal]
+    [getTranslatedErrorMessage, navigate, t, userEmail]
   );
 
   const forgotPasswordForm = useMemo(
