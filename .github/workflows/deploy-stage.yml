@@ -21,18 +21,18 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             # Change to repo directory
-            cd ~/TourGo
+            cd ~/TourGo-Stage
 
             # Pull latest changes
-            git pull origin main
+            git pull origin stage
 
             # Server Deployment
             dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish
-            sudo rsync -avz ./server/publish/ /var/www/server/
+            sudo rsync -avz ./server/publish/ /var/www/server-stage/
             sudo systemctl restart kestrel-tourgo
 
             # Client Deployment
             cd client
             yarn install
             yarn build
-            sudo rsync -avz ./build/ /var/www/html/
+            sudo rsync -avz ./build/ /var/www/html-stage/
