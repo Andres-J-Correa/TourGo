@@ -36,6 +36,8 @@ import ChargeTypesExplanationIcon from "components/extra-charges/ChargeTypesExpl
 import {
   EXTRA_CHARGE_TYPES,
   formatExtraChargeAmount,
+  EXTRA_CHARGE_TYPES_BY_ID,
+  EXTRA_CHARGE_TYPE_IDS,
 } from "components/extra-charges/constants";
 import { useLanguage } from "contexts/LanguageContext";
 import DataTable from "components/commonUI/tables/DataTable"; // Add this import
@@ -92,15 +94,14 @@ const ExtraChargesView = () => {
   }, [extraCharges, isActiveFilter]);
 
   const toggleForm = useCallback(() => {
-    let isHiding = false;
+    let isHiding = showForm;
     setShowForm((prev) => {
-      isHiding = prev;
       return !prev;
     });
     if (isHiding) {
       setInitialValues({ name: "", typeId: "", amount: "" });
     }
-  }, []);
+  }, [showForm]);
 
   const currentUser = useMemo(() => {
     return {
@@ -312,10 +313,7 @@ const ExtraChargesView = () => {
       {
         accessorKey: "type",
         header: "Tipo",
-        cell: (info) =>
-          EXTRA_CHARGE_TYPES.find(
-            (type) => Number(type.value) === Number(info.getValue().id)
-          )?.label || "N/A",
+        cell: (info) => EXTRA_CHARGE_TYPES_BY_ID[info.getValue().id] || "N/A",
       },
       {
         accessorKey: "isActive",
@@ -444,7 +442,10 @@ const ExtraChargesView = () => {
                             <option value="" disabled>
                               Seleccione el tipo
                             </option>
-                            {EXTRA_CHARGE_TYPES.map((type) => (
+                            {EXTRA_CHARGE_TYPES.filter(
+                              (type) =>
+                                type.value !== EXTRA_CHARGE_TYPE_IDS.CUSTOM
+                            ).map((type) => (
                               <option key={type.value} value={type.value}>
                                 {type.label}
                               </option>

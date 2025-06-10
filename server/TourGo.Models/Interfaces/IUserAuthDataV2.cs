@@ -10,6 +10,6 @@ namespace TourGo.Models.Interfaces
     {
         IEnumerable<string> Roles { get; }
         bool IsVerified { get; }
-        string PublicId { get; }
+        string Id { get; }
     }
 }

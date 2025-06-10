@@ -228,7 +228,7 @@ namespace TourGo.Web.Api.Controllers.Users
                 if (user != null)
                 {
                     DateTime TokenExpirationDate = DateTime.UtcNow.AddHours(_emailConfig.PasswordResetExpirationHours);
-                    Guid token = _userTokenService.CreateToken(user.PublicId, UserTokenTypeEnum.PasswordReset, TokenExpirationDate);
+                    Guid token = _userTokenService.CreateToken(user.Id, UserTokenTypeEnum.PasswordReset, TokenExpirationDate);
 
                     await _emailService.UserPasswordReset(user, token.ToString());
                 }
@@ -264,11 +264,11 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 if (userToken != null && model.Email == user.Email && userToken.TokenType == UserTokenTypeEnum.PasswordReset)
                 {
-                    _userService.ResetPassword(user.PublicId, model.Password);
+                    _userService.ResetPassword(user.Id, model.Password);
 
                     _userTokenService.DeleteUserToken(userToken);
 
-                    _userAuthService.RestartFailedAttempts(user.PublicId);
+                    _userAuthService.RestartFailedAttempts(user.Id);
 
                     response = new SuccessResponse();
                 }
@@ -410,7 +410,7 @@ namespace TourGo.Web.Api.Controllers.Users
                 if (user != null)
                 {
                     DateTime TokenExpirationDate = DateTime.UtcNow.AddHours(_emailConfig.EmailVerificationExpirationHours);
-                    Guid token = _userTokenService.CreateToken(user.PublicId, UserTokenTypeEnum.EmailVerification, TokenExpirationDate);
+                    Guid token = _userTokenService.CreateToken(user.Id, UserTokenTypeEnum.EmailVerification, TokenExpirationDate);
 
                     await _emailService.UserEmailVerification(user, token.ToString());
 
@@ -442,7 +442,7 @@ namespace TourGo.Web.Api.Controllers.Users
             {
                 IUserAuthData user = _webAuthService.GetCurrentUser();
 
-                UserToken? userToken = _userTokenService.GetUserToken(user.PublicId, UserTokenTypeEnum.EmailVerification);
+                UserToken? userToken = _userTokenService.GetUserToken(user.Id, UserTokenTypeEnum.EmailVerification);
 
                 if (userToken == null)
                 {
@@ -457,7 +457,7 @@ namespace TourGo.Web.Api.Controllers.Users
                     return StatusCode(400, new ErrorResponse("Invalid token"));
                 }
 
-                _userService.UpdateIsVerified(user.PublicId, true);
+                _userService.UpdateIsVerified(user.Id, true);
                 Claim verified = new Claim("https://tourgo.site/claims/isverified", "True", ClaimValueTypes.Boolean);
                 _webAuthService.LogInAsync(user, [verified]);
 

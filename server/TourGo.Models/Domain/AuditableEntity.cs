@@ -19,11 +19,11 @@ namespace TourGo.Models.Domain
         public void MapFromReader(IDataReader reader, ref int index)
         {
             CreatedBy = new UserBase();
-            CreatedBy.PublicId = reader.GetSafeString(index++);
+            CreatedBy.Id = reader.GetSafeString(index++);
             CreatedBy.FirstName = reader.GetSafeString(index++);
             CreatedBy.LastName = reader.GetSafeString(index++);
             ModifiedBy = new UserBase();
-            ModifiedBy.PublicId = reader.GetSafeString(index++);
+            ModifiedBy.Id = reader.GetSafeString(index++);
             ModifiedBy.FirstName = reader.GetSafeString(index++);
             ModifiedBy.LastName = reader.GetSafeString(index++);
             DateCreated = reader.GetSafeDateTime(index++);

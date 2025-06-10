@@ -65,7 +65,7 @@ namespace TourGo.Services.Hotels
 
         public void Delete(int id, string userId)
         {
-            string proc = "rooms_delete";
+            string proc = "rooms_delete_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {

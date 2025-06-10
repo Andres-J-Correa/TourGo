@@ -127,7 +127,7 @@ namespace TourGo.Services.Users
             {
                 int index = 0;
                 user = new UserBase();
-                user.PublicId = reader.GetSafeString(index++);
+                user.Id = reader.GetSafeString(index++);
                 user.Roles = reader.DeserializeObject<List<string>>(index++);
                 user.IsVerified = reader.GetSafeBool(index++);
             });
@@ -159,7 +159,7 @@ namespace TourGo.Services.Users
             }, (reader, set) =>
             {
                 int index = 0;
-                user.PublicId = userId;
+                user.Id = userId;
                 user.FirstName = reader.GetSafeString(index++);
                 user.LastName = reader.GetSafeString(index++);
                 user.Email = reader.GetSafeString(index++);
@@ -213,7 +213,7 @@ namespace TourGo.Services.Users
         private static UserBase MapBaseUser(IDataReader reader, ref int index)
         {
             UserBase user = new UserBase();
-            user.PublicId = reader.GetSafeString(index++);
+            user.Id = reader.GetSafeString(index++);
             user.FirstName = reader.GetSafeString(index++);
             user.LastName = reader.GetSafeString(index++);
             user.Email = reader.GetSafeString(index++);

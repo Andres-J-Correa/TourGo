@@ -102,7 +102,7 @@ namespace TourGo.Services.Hotels
                 {
                     UserBase user = new();
                     index = 0;
-                    user.PublicId = reader.GetSafeString(index++);
+                    user.Id = reader.GetSafeString(index++);
                     user.FirstName = reader.GetSafeString(index++);
                     user.LastName = reader.GetSafeString(index++);
                     hotel.Owner = user;

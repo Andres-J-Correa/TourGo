@@ -40,7 +40,7 @@ namespace TourGo.Services.Users
                 if (response != null)
                 {
                     await _webAuthService.LogInAsyncV2(response);
-                    RestartFailedAttempts(response.PublicId);
+                    RestartFailedAttempts(response.Id);
                     isSuccessful = true;
                 }
             }
@@ -60,7 +60,7 @@ namespace TourGo.Services.Users
 
             IUserAuthData response = new UserBase
             {
-                PublicId = id.ToString(),
+                Id = id.ToString(),
                 FirstName = email,
                 LastName = email,
                 Email = email,
@@ -87,7 +87,7 @@ namespace TourGo.Services.Users
 
             if (isValidCredentials)
             {
-                _userService.ResetPassword(user.PublicId, model.Password);
+                _userService.ResetPassword(user.Id, model.Password);
             } else
             {
                 throw new UnauthorizedAccessException("Invalid credentials provided for password change.");

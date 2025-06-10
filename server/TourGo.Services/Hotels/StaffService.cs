@@ -28,7 +28,7 @@ namespace TourGo.Services.Hotels
         public List<Staff>? GetByHotelId(int hotelId)
         {
             List<Staff>? staffList = null;
-            string proc = "hotels_staff_select_by_hotel_id";
+            string proc = "hotels_staff_select_by_hotel_id_v2";
 
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
@@ -38,7 +38,7 @@ namespace TourGo.Services.Hotels
                 int index = 0;
                 Staff staff = new Staff
                 {
-                    Id = reader.GetSafeInt32(index++),
+                    Id = reader.GetSafeString(index++),
                     FirstName = reader.GetSafeString(index++),
                     LastName = reader.GetSafeString(index++),
                     Email = reader.GetSafeString(index++),
@@ -199,7 +199,7 @@ namespace TourGo.Services.Hotels
             invite.Expiration = reader.GetSafeDateTime(index++);
             invite.Email = reader.GetSafeString(index++);
             invite.Flags = reader.GetSafeInt32(index++);
-            invite.IssuedBy.PublicId = reader.GetSafeString(index++);
+            invite.IssuedBy.Id = reader.GetSafeString(index++);
             invite.IssuedBy.FirstName = reader.GetSafeString(index++);
             invite.IssuedBy.LastName = reader.GetSafeString(index++);
             invite.DateCreated = reader.GetSafeDateTime(index++);

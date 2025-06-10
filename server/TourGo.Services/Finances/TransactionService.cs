@@ -260,7 +260,7 @@ namespace TourGo.Services.Finances
             transaction.HasDocumentUrl = reader.GetSafeBool(index++);
 
 
-            transaction.CreatedBy.PublicId = reader.GetSafeString(index++);
+            transaction.CreatedBy.Id = reader.GetSafeString(index++);
             transaction.CreatedBy.FirstName = reader.GetSafeString(index++);
             transaction.CreatedBy.LastName = reader.GetSafeString(index++);
             transaction.PaymentMethod.Id = reader.GetSafeInt32(index++);
@@ -278,7 +278,7 @@ namespace TourGo.Services.Finances
                 transaction.Subcategory = null;
                 index++;
             }
-            transaction.ApprovedBy.PublicId = reader.GetSafeString(index++);
+            transaction.ApprovedBy.Id = reader.GetSafeString(index++);
             transaction.ApprovedBy.FirstName = reader.GetSafeString(index++);
             transaction.ApprovedBy.LastName = reader.GetSafeString(index++);
 

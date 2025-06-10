@@ -292,7 +292,7 @@ namespace TourGo.Services.Hotels
 
         public void UpdateStatus(int bookingId, string userId, BookingStatusEnum status)
         {
-            string proc = "bookings_update_status";
+            string proc = "bookings_update_status_v2";
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_bookingId", bookingId);
