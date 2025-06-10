@@ -13,7 +13,8 @@ namespace TourGo.Web.StartUp
                     builder
                         .WithOrigins(
                             "http://localhost:3000",          // React dev server
-                            "https://tourgo.site"        // Production frontend
+                            "https://tourgo.site",        // Production frontend
+                            "https://tourgo.space"        // Stage frontend
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod()

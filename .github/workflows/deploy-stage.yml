@@ -1,0 +1,38 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - stage
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Change to repo directory
+            cd ~/TourGo
+
+            # Pull latest changes
+            git pull origin main
+
+            # Server Deployment
+            dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish
+            sudo rsync -avz ./server/publish/ /var/www/server/
+            sudo systemctl restart kestrel-tourgo
+
+            # Client Deployment
+            cd client
+            yarn install
+            yarn build
+            sudo rsync -avz ./build/ /var/www/html/
