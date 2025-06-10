@@ -42,7 +42,7 @@ namespace TourGo.Services.Finances
 
         public List<PaymentMethod>? Get(int hotelId)
         {
-            string proc = "payment_methods_select_all_by_hotel_id";
+            string proc = "payment_methods_select_all_by_hotel_id_v2";
             List<PaymentMethod>? paymentMethods = null;
 
             _dataProvider.ExecuteCmd(proc, (param) =>
@@ -61,9 +61,9 @@ namespace TourGo.Services.Finances
             return paymentMethods;
         }
 
-        public int Add(PaymentMethodAddUpdateRequest model, int userId)
+        public int Add(PaymentMethodAddUpdateRequest model, string userId)
         {
-            string proc = "payment_methods_insert";
+            string proc = "payment_methods_insert_v2";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
@@ -85,9 +85,9 @@ namespace TourGo.Services.Finances
             return newId;
         }
 
-        public void Update(PaymentMethodAddUpdateRequest model, int userId)
+        public void Update(PaymentMethodAddUpdateRequest model, string userId)
         {
-            string proc = "payment_methods_update";
+            string proc = "payment_methods_update_v2";
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -97,9 +97,9 @@ namespace TourGo.Services.Finances
             });
         }
 
-        public void Delete(int id, int userId)
+        public void Delete(int id, string userId)
         {
-            string proc = "payment_methods_delete";
+            string proc = "payment_methods_delete_v2";
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {

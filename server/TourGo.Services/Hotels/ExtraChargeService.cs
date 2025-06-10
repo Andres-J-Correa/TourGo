@@ -23,10 +23,10 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Create(ExtraChargeAddUpdateRequest model, int userId)
+        public int Create(ExtraChargeAddUpdateRequest model, string userId)
         {
 
-            string proc = "extra_charges_insert";
+            string proc = "extra_charges_insert_v2";
             int newId = 0;
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
@@ -50,9 +50,9 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public void Update(ExtraChargeAddUpdateRequest model, int userId)
+        public void Update(ExtraChargeAddUpdateRequest model, string userId)
         {
-            string proc = "extra_charges_update";
+            string proc = "extra_charges_update_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -63,9 +63,9 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_modifiedBy", userId);
             });
         }
-        public void Delete(int id, int userId)
+        public void Delete(int id, string userId)
         {
-            string proc = "extra_charges_delete";
+            string proc = "extra_charges_delete_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -77,7 +77,7 @@ namespace TourGo.Services.Hotels
         public List<ExtraCharge>? GetByHotel(int hotelId, bool?isActive)
         {
 
-            string proc = "extra_charges_select_by_hotel";
+            string proc = "extra_charges_select_by_hotel_v2";
             List<ExtraCharge>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

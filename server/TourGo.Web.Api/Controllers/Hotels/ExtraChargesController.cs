@@ -18,12 +18,12 @@ namespace TourGo.Web.Api.Controllers.Hotels
     [ApiController]
     public class ExtraChargesController : BaseApiController
     {
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IExtraChargeService _extraChargeService;
         private readonly IErrorLoggingService _errorLoggingService;
 
         public ExtraChargesController(ILogger<ExtraChargesController> logger,
-            IWebAuthenticationService<int> webAuthenticationService,
+            IWebAuthenticationService<string> webAuthenticationService,
             IExtraChargeService extraChargeService,
             IErrorLoggingService errorLoggingService) : base(logger)
         {
@@ -40,7 +40,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 int id = _extraChargeService.Create(model, userId);
 
                 if (id == 0)
@@ -101,7 +101,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _extraChargeService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();
@@ -126,7 +126,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _extraChargeService.Delete(id, userId);
 
                 SuccessResponse response = new SuccessResponse();

@@ -26,7 +26,7 @@ namespace TourGo.Web.Api.Controllers.Finances
     public class TransactionsController : BaseApiController
     {
         private readonly ITransactionService _transactionService;
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IErrorLoggingService _errorLoggingService;
         private readonly IFileService _fileService;
         private readonly IMemoryCache _cache;
@@ -34,7 +34,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         public TransactionsController(ILogger<TransactionsController> logger, 
             ITransactionService transactionService, 
-            IWebAuthenticationService<int> webAuthenticationService,
+            IWebAuthenticationService<string> webAuthenticationService,
             IErrorLoggingService errorLoggingService,
             IFileService fileService,
             IMemoryCache memoryCache,
@@ -56,7 +56,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 int id = _transactionService.Add(model, userId);
 
                 if(id == 0)
@@ -220,7 +220,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 int txnId = _transactionService.Reverse(id, userId);
 
                 if (txnId == 0)

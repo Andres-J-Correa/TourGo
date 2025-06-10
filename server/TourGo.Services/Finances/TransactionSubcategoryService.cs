@@ -22,9 +22,9 @@ namespace TourGo.Services.Finances
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Add(TransactionSubcategoryAddUpdateRequest model, int userId)
+        public int Add(TransactionSubcategoryAddUpdateRequest model, string userId)
         {
-            string proc = "transaction_subcategories_insert";
+            string proc = "transaction_subcategories_insert_v2";
             int newId = 0;
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
@@ -47,9 +47,9 @@ namespace TourGo.Services.Finances
             return newId;
         }
 
-        public void Update(TransactionSubcategoryAddUpdateRequest model, int userId)
+        public void Update(TransactionSubcategoryAddUpdateRequest model, string userId)
         {
-            string proc = "transaction_subcategories_update";
+            string proc = "transaction_subcategories_update_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -60,9 +60,9 @@ namespace TourGo.Services.Finances
             });
         }
 
-        public void Delete(int id, int userId)
+        public void Delete(int id, string userId)
         {
-            string proc = "transaction_subcategories_delete";
+            string proc = "transaction_subcategories_delete_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -96,7 +96,7 @@ namespace TourGo.Services.Finances
 
         public List<TransactionSubcategory>? GetAll(int hotelId)
         {
-            string proc = "transaction_subcategories_select_all_by_hotel_id";
+            string proc = "transaction_subcategories_select_all_by_hotel_id_v2";
             List<TransactionSubcategory>? transactionSubcategories = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

@@ -20,7 +20,7 @@ namespace TourGo.Services.Hotels
 
         public List<BookingProvider>? Get(int hotelId)
         {
-            string proc = "booking_providers_select_all_by_hotel_id";
+            string proc = "booking_providers_select_all_by_hotel_id_v2";
             List<BookingProvider>? bookingProviders = null;
 
             _dataProvider.ExecuteCmd(proc, (param) =>
@@ -61,9 +61,9 @@ namespace TourGo.Services.Hotels
             return bookingProviders;
         }
 
-        public int Add(BookingProviderAddUpdateRequest model, int userId)
+        public int Add(BookingProviderAddUpdateRequest model, string userId)
         {
-            string proc = "booking_providers_insert";
+            string proc = "booking_providers_insert_v2";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
@@ -85,9 +85,9 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public void Update(BookingProviderAddUpdateRequest model, int userId)
+        public void Update(BookingProviderAddUpdateRequest model, string userId)
         {
-            string proc = "booking_providers_update";
+            string proc = "booking_providers_update_v2";
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -97,9 +97,9 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public void Delete(int id, int userId)
+        public void Delete(int id, string userId)
         {
-            string proc = "booking_providers_delete";
+            string proc = "booking_providers_delete_v2";
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {

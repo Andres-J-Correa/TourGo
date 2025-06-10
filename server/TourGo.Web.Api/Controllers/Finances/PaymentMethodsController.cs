@@ -20,12 +20,12 @@ namespace TourGo.Web.Api.Controllers.Finances
     {
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IErrorLoggingService _errorLoggingService;
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
 
         public PaymentMethodsController(ILogger<PaymentMethodsController> logger,
                                                  IPaymentMethodService paymentMethodService,
                                                  IErrorLoggingService errorLoggingService,
-                                                 IWebAuthenticationService<int> webAuthService) : base(logger)
+                                                 IWebAuthenticationService<string> webAuthService) : base(logger)
         {
             _paymentMethodService = paymentMethodService;
             _errorLoggingService = errorLoggingService;
@@ -102,7 +102,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 int newId = _paymentMethodService.Add(model, userId);
 
                 if (newId == 0)
@@ -133,7 +133,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _paymentMethodService.Update(model, userId);
 
                 SuccessResponse response = new SuccessResponse();
@@ -157,7 +157,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             try
             {
-                int userId = _webAuthService.GetCurrentUserId();
+                string userId = _webAuthService.GetCurrentUserId();
                 _paymentMethodService.Delete(id, userId);
 
                 SuccessResponse response = new SuccessResponse();

@@ -28,7 +28,7 @@ namespace TourGo.Services.Hotels
         public List<Staff>? GetByHotelId(int hotelId)
         {
             List<Staff>? staffList = null;
-            string proc = "hotels_staff_select_by_hotel_id";
+            string proc = "hotels_staff_select_by_hotel_id_v2";
 
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
@@ -38,7 +38,7 @@ namespace TourGo.Services.Hotels
                 int index = 0;
                 Staff staff = new Staff
                 {
-                    Id = reader.GetSafeInt32(index++),
+                    Id = reader.GetSafeString(index++),
                     FirstName = reader.GetSafeString(index++),
                     LastName = reader.GetSafeString(index++),
                     Email = reader.GetSafeString(index++),
@@ -51,9 +51,9 @@ namespace TourGo.Services.Hotels
             return staffList;
         }
 
-        public void RemoveStaff(int userId, int hotelId, int modifiedBy)
+        public void RemoveStaff(string userId, int hotelId, string modifiedBy)
         {
-            string proc = "hotels_staff_remove";
+            string proc = "hotels_staff_remove_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
@@ -63,9 +63,9 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public void UpdateStaffRole(int userId, int hotelId, int role, int modifiedBy)
+        public void UpdateStaffRole(string userId, int hotelId, int role, string modifiedBy)
         {
-            string proc = "hotels_staff_update_role";
+            string proc = "hotels_staff_update_role_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
@@ -76,10 +76,10 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public int AddInvite(StaffInvitationRequest model, int hotelId, int userId)
+        public int AddInvite(StaffInvitationRequest model, int hotelId, string userId)
         {
             int newId = 0;
-            string proc = "hotel_invites_create";
+            string proc = "hotel_invites_create_v2";
 
             DateTime expiration = DateTime.UtcNow.AddDays(_expirationDays);
 
@@ -102,9 +102,9 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public void AcceptInvite(int inviteId, int userId)
+        public void AcceptInvite(int inviteId, string userId)
         {
-            string proc = "hotel_invites_accept";
+            string proc = "hotel_invites_accept_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
@@ -113,9 +113,9 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public void RejectInvite(int inviteId, int userId)
+        public void RejectInvite(int inviteId, string userId)
         {
-            string proc = "hotel_invites_reject";
+            string proc = "hotel_invites_reject_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
@@ -134,9 +134,9 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public void LeaveHotel(int userId, int hotelId)
+        public void LeaveHotel(string userId, int hotelId)
         {
-            string proc = "hotel_users_roles_user_leave";
+            string proc = "hotel_users_roles_user_leave_v2";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -148,7 +148,7 @@ namespace TourGo.Services.Hotels
         public List<StaffInvite>? GetInvitesByHotelId(int hotelId)
         {
             List<StaffInvite>? invites = null;
-            string proc = "hotel_invites_select_by_hotel_id";
+            string proc = "hotel_invites_select_by_hotel_id_v2";
 
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
@@ -169,7 +169,7 @@ namespace TourGo.Services.Hotels
         {
 
             List<StaffInvite>? invites = null;
-            string proc = "hotel_invites_select_by_email";
+            string proc = "hotel_invites_select_by_email_v2";
 
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
@@ -199,7 +199,7 @@ namespace TourGo.Services.Hotels
             invite.Expiration = reader.GetSafeDateTime(index++);
             invite.Email = reader.GetSafeString(index++);
             invite.Flags = reader.GetSafeInt32(index++);
-            invite.IssuedBy.Id = reader.GetSafeInt32(index++);
+            invite.IssuedBy.Id = reader.GetSafeString(index++);
             invite.IssuedBy.FirstName = reader.GetSafeString(index++);
             invite.IssuedBy.LastName = reader.GetSafeString(index++);
             invite.DateCreated = reader.GetSafeDateTime(index++);

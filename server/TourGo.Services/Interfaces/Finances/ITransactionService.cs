@@ -8,7 +8,7 @@ namespace TourGo.Services.Interfaces
 {
     public interface ITransactionService
     {
-        int Add(TransactionAddRequest request, int userId);
+        int Add(TransactionAddRequest request, string userId);
         List<Transaction>? GetByEntityId(int entityId);
         void UpdateDocumentUrl(int transactionId, string fileKey);
         string? GetSupportDocumentUrl(int transactionId);
@@ -18,7 +18,7 @@ namespace TourGo.Services.Interfaces
             string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId);
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
-        int Reverse(int txnId, int userId);
+        int Reverse(int txnId, string userId);
         void UpdateDescription(TransactionDescriptionUpdateRequest model);
     }
 }

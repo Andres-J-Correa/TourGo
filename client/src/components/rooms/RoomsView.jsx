@@ -41,6 +41,7 @@ const validationSchema = Yup.object().shape({
     .required("El nombre es requerido"),
   capacity: Yup.number()
     .min(1, "La capacidad debe ser al menos 1")
+    .max(50, "La capacidad no puede exceder los 50")
     .required("La capacidad es requerida"),
   description: Yup.string()
     .min(2, "La descripción debe tener al menos 2 caracteres")

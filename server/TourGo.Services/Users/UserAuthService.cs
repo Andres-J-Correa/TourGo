@@ -16,10 +16,10 @@ namespace TourGo.Services.Users
     {
         private readonly IUserService _userService;
         private readonly IMySqlDataProvider _mySqlDataProvider;
-        private readonly IWebAuthenticationService<int> _webAuthService;
+        private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly AuthConfig _authConfig;
 
-        public UserAuthService(IMySqlDataProvider dataProvider, IWebAuthenticationService<int> authService, IUserService userService, IOptions<AuthConfig> authOptions)
+        public UserAuthService(IMySqlDataProvider dataProvider, IWebAuthenticationService<string> authService, IUserService userService, IOptions<AuthConfig> authOptions)
         {
             _mySqlDataProvider = dataProvider;
             _webAuthService = authService;
@@ -60,7 +60,7 @@ namespace TourGo.Services.Users
 
             IUserAuthData response = new UserBase
             {
-                Id = id,
+                Id = id.ToString(),
                 FirstName = email,
                 LastName = email,
                 Email = email,
@@ -81,27 +81,27 @@ namespace TourGo.Services.Users
             return isBlocked;
         }
 
-        public void RestartFailedAttempts(int userId)
-        {
-            IUserAuthData user = _userService.Get(userId);
-
-            if (user != null)
-            {
-                RestartFailedAttempts(user.Email);
-            }
-        }
-
         public void ChangePassword(IUserAuthData user, UserPasswordChangeRequest model)
         {
             bool isValidCredentials = IsValidCredentials(user.Email, model.OldPassword);
 
             if (isValidCredentials)
             {
-                _userService.ChangePassword(user.Id, model.Password);
+                _userService.ResetPassword(user.Id, model.Password);
             } else
             {
                 throw new UnauthorizedAccessException("Invalid credentials provided for password change.");
             }
+        }
+
+        public void RestartFailedAttempts(string publicId)
+        {
+            string proc = "users_auth_restart_failed_attempts_by_user_public_id";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
+            {
+                coll.AddWithValue("p_userId", publicId);
+            });
         }
 
         private bool IsValidCredentials(string email, string password)
@@ -164,16 +164,6 @@ namespace TourGo.Services.Users
         private void IncrementFailedAttempts(string email)
         {
             string proc = "users_auth_increment_failed_attempts";
-            _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
-            {
-                coll.AddWithValue("p_email", email);
-            });
-        }
-
-        private void RestartFailedAttempts(string email)
-        {
-            string proc = "users_auth_restart_failed_attempts";
-
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
             {
                 coll.AddWithValue("p_email", email);

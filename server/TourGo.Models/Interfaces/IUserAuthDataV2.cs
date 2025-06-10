@@ -8,8 +8,8 @@ namespace TourGo.Models.Interfaces
 {
     public interface IUserAuthDataV2
     {
-        int Id { get; }
         IEnumerable<string> Roles { get; }
         bool IsVerified { get; }
+        string Id { get; }
     }
 }

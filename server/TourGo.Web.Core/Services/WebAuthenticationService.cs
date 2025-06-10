@@ -11,7 +11,7 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Web.Core.Services
 {
-    public class WebAuthenticationService : IWebAuthenticationService<int>
+    public class WebAuthenticationService : IWebAuthenticationService<string>
     {
         private readonly static string _title = null;
         private IHttpContextAccessor _contextAccessor;
@@ -66,8 +66,8 @@ namespace TourGo.Web.Core.Services
                 ClaimsIdentity.DefaultRoleClaimType);
 
             // Only store non-PII claims
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.String, _title, originalIssuer));
             identity.AddClaim(new Claim("https://tourgo.site/claims/isverified", user.IsVerified.ToString(), ClaimValueTypes.Boolean, _title, originalIssuer));
+            identity.AddClaim(new Claim(ClaimTypes.Sid, user.Id, ClaimValueTypes.String, _title, originalIssuer));
 
             if (user.Roles != null && user.Roles.Any())
             {
@@ -107,9 +107,13 @@ namespace TourGo.Web.Core.Services
         /// Only call this when the user IsLoggedIn
         /// </summary>
         /// <returns></returns>
-        public int GetCurrentUserId()
+        public string GetCurrentUserId()
         {
-            return GetId(_contextAccessor.HttpContext.User.Identity).Value;
+            if(_contextAccessor?.HttpContext?.User.Identity == null || !_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+            {
+                throw new InvalidOperationException("The current IIdentity is not authenticated.");
+            }
+            return GetPublicId(_contextAccessor.HttpContext.User.Identity);
         }
 
         public IUserAuthData GetCurrentUser()
@@ -138,14 +142,8 @@ namespace TourGo.Web.Core.Services
             {
                 switch (claim.Type)
                 {
-                    case ClaimTypes.NameIdentifier:
-                        int id = 0;
-
-                        if (Int32.TryParse(claim.Value, out id))
-                        {
-                            baseUser.Id = id;
-                        }
-
+                    case ClaimTypes.Sid:
+                        baseUser.Id = claim.Value;
                         break;
 
                     case ClaimTypes.Name:
@@ -193,24 +191,24 @@ namespace TourGo.Web.Core.Services
             return baseUser;
         }
 
-        private static int? GetId(IIdentity identity)
+        private static string GetPublicId(IIdentity identity)
         {
-            if (identity == null) { throw new ArgumentNullException("identity"); }
+            if (identity == null) { throw new ArgumentNullException(nameof(identity)); }
             if (!identity.IsAuthenticated) { throw new InvalidOperationException("The current IIdentity is not Authenticated"); }
-            ClaimsIdentity ci = identity as ClaimsIdentity;
 
-            int idParsed = 0;
-
-            if (ci != null)
+            if (identity is ClaimsIdentity ci)
             {
-                Claim claim = ci.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                Claim? claim = ci.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid);
 
-                if (claim != null && Int32.TryParse(claim.Value, out idParsed))
+                if (claim == null || string.IsNullOrEmpty(claim.Value))
                 {
-                    return idParsed;
+                    throw new InvalidOperationException("The current IIdentity does not contain a valid PublicId (ClaimTypes.Sid).");
                 }
+
+                return claim.Value;
             }
-            return null;
+
+            throw new InvalidOperationException("The current IIdentity is not a ClaimsIdentity.");
         }
 
         private static string GetApplicationName()

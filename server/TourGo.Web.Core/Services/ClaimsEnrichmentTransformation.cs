@@ -35,11 +35,11 @@ public class ClaimsEnrichmentTransformation : IClaimsTransformation
 
         if (!identity.HasClaim(c => c.Type == ClaimTypes.Email))
         {
-            var userIdClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            var userIdClaim = identity.FindFirst(ClaimTypes.Sid);
+            if (userIdClaim != null && !string.IsNullOrWhiteSpace(userIdClaim.Value))
             {
                 UserBase user = null;
-                string cacheKey = GetCacheKey(userId);
+                string cacheKey = GetCacheKey(userIdClaim.Value);
                 CacheEntry<UserBase>? cachedEntry;
 
                 if (_cache.TryGetValue(cacheKey, out cachedEntry) && cachedEntry != null && cachedEntry.ExpirationTime > DateTime.UtcNow.AddMinutes(5))
@@ -48,7 +48,7 @@ public class ClaimsEnrichmentTransformation : IClaimsTransformation
                 }
                 else
                 {
-                    user = _userService.GetPII(userId);
+                    user = _userService.GetPII(userIdClaim.Value);
                     if (user != null)
                     {
                         var encryptedToCache = EncryptUserPII(user);
@@ -76,7 +76,7 @@ public class ClaimsEnrichmentTransformation : IClaimsTransformation
         return Task.FromResult(principal);
     }
 
-    private string GetCacheKey(int userId)
+    private string GetCacheKey(string userId)
     {
         // Use a hash or substring of the encryption key for versioning
         var keyVersion = _encryptionConfig.UserPIICacheVersion ?? "v1";
@@ -89,13 +89,10 @@ public class ClaimsEnrichmentTransformation : IClaimsTransformation
 
         return new UserBase
         {
-            Id = user.Id,
             FirstName = string.IsNullOrEmpty(user.FirstName) ? string.Empty : _encryptionService.EncryptString(user.FirstName, _encryptionConfig.UserPIIKey),
             LastName = string.IsNullOrEmpty(user.LastName) ? string.Empty : _encryptionService.EncryptString(user.LastName, _encryptionConfig.UserPIIKey),
             Email = string.IsNullOrEmpty(user.Email) ? string.Empty : _encryptionService.EncryptString(user.Email, _encryptionConfig.UserPIIKey),
             Phone = string.IsNullOrEmpty(user.Phone) ? string.Empty : _encryptionService.EncryptString(user.Phone, _encryptionConfig.UserPIIKey),
-            Roles = user.Roles,
-            IsVerified = user.IsVerified
         };
     }
 
@@ -106,13 +103,10 @@ public class ClaimsEnrichmentTransformation : IClaimsTransformation
 
         return new UserBase
         {
-            Id = encryptedUser.Id,
             FirstName = string.IsNullOrEmpty(encryptedUser.FirstName) ? string.Empty : _encryptionService.DecryptString(encryptedUser.FirstName, _encryptionConfig.UserPIIKey),
             LastName = string.IsNullOrEmpty(encryptedUser.LastName) ? string.Empty : _encryptionService.DecryptString(encryptedUser.LastName, _encryptionConfig.UserPIIKey),
             Email = string.IsNullOrEmpty(encryptedUser.Email) ? string.Empty : _encryptionService.DecryptString(encryptedUser.Email, _encryptionConfig.UserPIIKey),
             Phone = string.IsNullOrEmpty(encryptedUser.Phone) ? string.Empty : _encryptionService.DecryptString(encryptedUser.Phone, _encryptionConfig.UserPIIKey),
-            Roles = encryptedUser.Roles,
-            IsVerified = encryptedUser.IsVerified
         };
     }
 }
