@@ -63,6 +63,8 @@ export const AppContextProvider = ({ children }) => {
   const [isLoadingUser, setIsLoadingUser] = useState(false);
   const [modals, setModals] = useState({ ...defaultModals });
   const [isAuthError, setIsAuthError] = useState(false);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [isResponseIntercepted, setIsResponseIntercepted] = useState(false);
 
   const { t } = useLanguage();
 
@@ -158,12 +160,13 @@ export const AppContextProvider = ({ children }) => {
     },
     toggleUserSignInModal: toggleModal("login"),
     toggleUserSignUpModal: toggleModal("register"),
+    maintenanceMode,
   };
 
   const handleGlobalError = useCallback(
     (error) => {
       if (
-        error.response.status === 401 &&
+        error.response?.status === 401 &&
         currentUser.isAuthenticated &&
         !isAuthError
       ) {
@@ -184,13 +187,21 @@ export const AppContextProvider = ({ children }) => {
         setIsAuthError(true);
         toast.error(t("common.sessionExpired"));
       }
+
+      if (error.code === "ERR_NETWORK" || error.response?.status === 503) {
+        setMaintenanceMode(true);
+      }
       return Promise.reject(error);
     },
     [currentUser, t, isAuthError]
   );
 
   useEffect(() => {
-    if (currentUser.id === 0 && !currentUser.hasFetched) {
+    if (
+      currentUser.id === 0 &&
+      !currentUser.hasFetched &&
+      isResponseIntercepted
+    ) {
       setIsLoadingUser(true);
       getCurrentUser()
         .then((data) => {
@@ -219,6 +230,7 @@ export const AppContextProvider = ({ children }) => {
     currentUser.isAuthenticated,
     navigate,
     currentUser.hasFetched,
+    isResponseIntercepted,
   ]);
 
   useEffect(() => {
@@ -250,14 +262,25 @@ export const AppContextProvider = ({ children }) => {
 
   useEffect(() => {
     const interceptor = axiosClient.interceptors.response.use(
-      (response) => response,
-      (error) => handleGlobalError(error)
+      (response) => {
+        if (maintenanceMode) setMaintenanceMode(false);
+        return response;
+      },
+      (error) => {
+        if (error.response?.status !== 503 || error.code !== "ERR_NETWORK") {
+          setMaintenanceMode(false);
+        }
+        return handleGlobalError(error);
+      }
     );
+
+    setIsResponseIntercepted(true);
 
     return () => {
       axiosClient.interceptors.response.eject(interceptor);
+      setIsResponseIntercepted(false);
     };
-  }, [handleGlobalError]);
+  }, [handleGlobalError, maintenanceMode]);
 
   return (
     <AppContext.Provider value={contextValue}>

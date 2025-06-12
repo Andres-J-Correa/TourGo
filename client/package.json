@@ -47,6 +47,7 @@
   "scripts": {
     "start": "cross-env GENERATE_SOURCEMAP=false react-scripts start",
     "build": "react-scripts build",
+    "build:stage": "env-cmd -f .env.staging react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -70,6 +71,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "env-cmd": "^10.1.0"
   }
 }

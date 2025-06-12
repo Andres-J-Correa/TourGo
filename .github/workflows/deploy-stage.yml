@@ -34,5 +34,5 @@ jobs:
             # Client Deployment
             cd client
             yarn install
-            yarn build
+            yarn build:stage
             sudo rsync -avz ./build/ /var/www/html-stage/

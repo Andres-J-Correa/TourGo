@@ -1,10 +1,11 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, Fragment } from "react";
 
 import { HelmetProvider } from "react-helmet-async";
 import { Container } from "reactstrap";
 
 import NavbarContainer from "components/commonUI/navbars/NavbarContainer";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
+import SiteUnderMaintenance from "components/commonUI/fallback/SiteUnderMaintenance";
 import RouteWrapper from "contexts/RouteWrapper";
 
 import { useAppContext } from "./contexts/GlobalAppContext";
@@ -32,7 +33,7 @@ setDefaultLocale("es");
 const App = () => {
   const [routes, setRoutes] = useState([]);
 
-  const { user } = useAppContext();
+  const { user, maintenanceMode } = useAppContext();
 
   const mapRoute = (route, idx) => (
     <Route
@@ -62,11 +63,17 @@ const App = () => {
       <Suspense
         fallback={<LoadingOverlay isVisible={true} message="cargando" />}>
         <LoadingOverlay isVisible={user.isLoading} message="cargando usuario" />
-        <NavbarContainer />
-        <Container className="my-4 main-container">
-          <Routes>{routes}</Routes>
-        </Container>
-        <Footer />
+        {maintenanceMode ? (
+          <SiteUnderMaintenance />
+        ) : (
+          <Fragment>
+            <NavbarContainer />
+            <Container className="my-4 main-container">
+              <Routes>{routes}</Routes>
+            </Container>
+            <Footer />
+          </Fragment>
+        )}
       </Suspense>
 
       <ToastContainer

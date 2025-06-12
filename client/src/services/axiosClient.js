@@ -11,14 +11,14 @@ axios.interceptors.request.use(function (config) {
 });
 
 axiosRetry(axiosClient, {
-  retries: 5, // Number of retry attempts
+  retries: 3, // Number of retry attempts
   retryDelay: (retryCount) => {
     // Exponential backoff: 1s, 2s, 4s
     return retryCount * 2000;
   },
   retryCondition: (error) => {
-    // Retry on network errors or specific status codes (e.g., 503)
-    return axiosRetry.isNetworkError(error) || error.response?.status === 503;
+    // Retry on network errors or idempotent requests
+    return axiosRetry.isNetworkOrIdempotentRequestError(error);
   },
 });
 
