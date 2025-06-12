@@ -26,13 +26,14 @@ jobs:
             # Pull latest changes
             git pull origin main
 
-            # Server Deployment
-            dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish
-            sudo rsync -avz ./server/publish/ /var/www/server/
-            sudo systemctl restart kestrel-tourgo
-
             # Client Deployment
             cd client
             yarn install
             yarn build
             sudo rsync -avz ./build/ /var/www/html/
+
+            # Server Deployment
+            cd ../server
+            dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish
+            sudo rsync -avz ./server/publish/ /var/www/server/
+            sudo systemctl restart kestrel-tourgo
