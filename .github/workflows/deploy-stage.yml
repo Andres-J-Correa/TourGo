@@ -33,7 +33,7 @@ jobs:
             sudo rsync -avz ./build/ /var/www/html-stage/
 
             # Server Deployment
-            cd ../server
+            cd ..
             dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish
             sudo rsync -avz ./server/publish/ /var/www/server-stage/
             sudo systemctl restart kestrel-tourgo-stage
