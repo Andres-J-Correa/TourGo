@@ -99,11 +99,11 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
-        public Paged<BookingMinimal>? GetPaginatedByDateRange(int hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
+        public Paged<BookingMinimal>? GetPaginatedByDateRange(string hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
                                                             string? sortColumn, string? sortDirection, DateOnly? startDate, DateOnly? endDate,
                                                             string? firstName, string? lastName, string? bookingExternalId, int? statusId)
         {
-            string proc = "bookings_select_minimal_by_date_range_paginated_v3";
+            string proc = "bookings_select_minimal_by_date_range_paginated_v4";
             Paged<BookingMinimal>? paged = null;
             List<BookingMinimal>? bookings = null;
             int totalCount = 0;
@@ -170,11 +170,11 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
-        public BookingAddResponse? Add(BookingAddUpdateRequest model, string userId, int hotelId)
+        public BookingAddResponse? Add(BookingAddRequest model, string userId, string hotelId)
         {
             BookingAddResponse? response = null;
 
-            string proc = "bookings_insert_v3";
+            string proc = "bookings_insert_v4";
             _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
             {
                 coll.AddWithValue("p_customerId", model.CustomerId);
@@ -206,7 +206,7 @@ namespace TourGo.Services.Hotels
             return response;
         }
 
-        public void Update(BookingAddUpdateRequest model, string userId)
+        public void Update(BookingsUpdateRequest model, string userId)
         {
             string proc = "bookings_update_v3";
             _mySqlDataProvider.ExecuteNonQuery(proc, (coll) =>
@@ -269,9 +269,9 @@ namespace TourGo.Services.Hotels
             return list;
         }
 
-        public List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, int hotelId)
+        public List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, string hotelId)
         {
-            string proc = "room_bookings_select_by_date_range";
+            string proc = "room_bookings_select_by_date_range_v2";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -301,9 +301,9 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public List<BookingArrival>? GetArrivalsByDate(DateOnly arrivalDate, int hotelId)
+        public List<BookingArrival>? GetArrivalsByDate(DateOnly arrivalDate, string hotelId)
         {
-            string proc = "bookings_select_by_arrival_date";
+            string proc = "bookings_select_by_arrival_date_v2";
             List<BookingArrival>? bookings = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -322,9 +322,9 @@ namespace TourGo.Services.Hotels
             return bookings;
         }
 
-        public List<BookingDeparture>? GetDeparturesByDate(DateOnly departureDate, int hotelId)
+        public List<BookingDeparture>? GetDeparturesByDate(DateOnly departureDate, string hotelId)
         {
-            string proc = "bookings_select_by_departure_date";
+            string proc = "bookings_select_by_departure_date_v2";
             List<BookingDeparture>? bookings = null;
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
@@ -342,9 +342,9 @@ namespace TourGo.Services.Hotels
             return bookings;
         }
 
-        public List<RoomBooking>? GetDepartingRoomBookings(DateOnly departureDate, int hotelId)
+        public List<RoomBooking>? GetDepartingRoomBookings(DateOnly departureDate, string hotelId)
         {
-            string proc = "room_bookings_select_departing_by_date";
+            string proc = "room_bookings_select_departing_by_date_v2";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -367,9 +367,9 @@ namespace TourGo.Services.Hotels
             return list;
         }
 
-        public List<RoomBooking>? GetArrivingRoomBookings(DateOnly arrivalDate, int hotelId)
+        public List<RoomBooking>? GetArrivingRoomBookings(DateOnly arrivalDate, string hotelId)
         {
-            string proc = "room_bookings_select_arriving_by_date";
+            string proc = "room_bookings_select_arriving_by_date_v2";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -393,9 +393,9 @@ namespace TourGo.Services.Hotels
             return list;
         }
 
-        public List<BookingStay>? GetStaysByDate(DateOnly date, int hotelId)
+        public List<BookingStay>? GetStaysByDate(DateOnly date, string hotelId)
         {
-            string proc = "bookings_select_by_stay_date";
+            string proc = "bookings_select_by_stay_date_v2";
             List<BookingStay>? stays = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

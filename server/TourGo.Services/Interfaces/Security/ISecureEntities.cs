@@ -13,6 +13,7 @@ namespace TourGo.Services.Interfaces.Security
     /// <typeparam name="K">Type used for EntityId</typeparam>
     public interface ISecureEntities<T, K>
     {
-        bool IsAuthorized(T userId, K entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType, bool isBulk);
+        bool IsAuthorized(T userId, K entityId, EntityActionTypeEnum actionType, EntityTypeEnum entityType);
+        bool IsAuthorized(T userId, string hotelId, EntityActionTypeEnum actionType, EntityTypeEnum entityType);
     }
 }

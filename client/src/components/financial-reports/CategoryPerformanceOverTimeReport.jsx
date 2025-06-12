@@ -5,7 +5,10 @@ import DatePickers from "components/commonUI/forms/DatePickers";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getCategoryPerformanceOverTime } from "services/financialReportService";
-import { TRANSACTION_CATEGORIES } from "components/transactions/constants";
+import {
+  TRANSACTION_CATEGORIES,
+  TRANSACTION_CATEGORY_TYPES_IDS,
+} from "components/transactions/constants";
 import { toast } from "react-toastify";
 import { InputGroup, InputGroupText, Input, Row, Col } from "reactstrap";
 import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
@@ -17,14 +20,22 @@ const getMonthRange = () => ({
 
 function CategoryPerformanceOverTimeReport({ hotelId }) {
   const [dates, setDates] = useState(getMonthRange());
-  const [categoryId, setCategoryId] = useState("");
+  const [category, setCategory] = useState({
+    id: 0,
+    typeId: 0,
+  });
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
 
   const chartData = [
     ["Mes", "Total"],
-    ...data.map((item) => [dayjs(item.month).format("MMM YYYY"), item.total]),
+    ...data.map((item) => [
+      dayjs(item.month).format("MMM YYYY"),
+      category.typeId === TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE
+        ? -item.total
+        : item.total,
+    ]),
   ];
 
   const handleDateChange = (type) => (date) => {
@@ -41,18 +52,24 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
   };
 
   const handleCategoryChange = (e) => {
-    setCategoryId(e.target.value);
+    const { value } = e.target;
+    const categoryTypeId =
+      e.target?.options[e.target.selectedIndex]?.dataset?.type;
+    setCategory({
+      id: value,
+      typeId: categoryTypeId ? Number(categoryTypeId) : 0,
+    });
     setShowPrompt(!e.target.value);
     setData([]);
   };
 
   useEffect(() => {
-    if (categoryId && dates.start && dates.end) {
+    if (category.id && dates.start && dates.end) {
       setLoading(true);
       setShowPrompt(false);
       getCategoryPerformanceOverTime(
         hotelId,
-        categoryId,
+        category.id,
         dates.start,
         dates.end
       )
@@ -70,14 +87,14 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
           }
         })
         .finally(() => setLoading(false));
-    } else if (!categoryId) {
+    } else if (!category.id) {
       setShowPrompt(true);
       setData([]);
     } else if (!dates.start || !dates.end) {
       setShowPrompt(true); // Show prompt if dates are cleared
       setData([]);
     }
-  }, [categoryId, dates.start, dates.end, hotelId]);
+  }, [category.id, dates.start, dates.end, hotelId]);
 
   return (
     <div>
@@ -103,12 +120,12 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
           <InputGroup>
             <Input
               type="select"
-              value={categoryId}
+              value={category.id}
               onChange={handleCategoryChange}
               disabled={loading}>
               <option value="">Selecciona una categoría</option>
               {TRANSACTION_CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
+                <option key={cat.id} value={cat.id} data-type={cat.typeId}>
                   {cat.name}
                 </option>
               ))}
@@ -124,7 +141,7 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
         <Alert
           type="info"
           message={
-            !categoryId
+            !category.id
               ? "Por favor selecciona una categoría para ver el desempeño en el tiempo."
               : "Por favor selecciona un rango de fechas para ver el desempeño en el tiempo."
           }

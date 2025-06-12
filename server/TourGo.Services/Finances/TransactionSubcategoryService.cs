@@ -22,16 +22,16 @@ namespace TourGo.Services.Finances
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Add(TransactionSubcategoryAddUpdateRequest model, string userId)
+        public int Add(TransactionSubcategoryAddRequest model, string userId, string hotelId)
         {
-            string proc = "transaction_subcategories_insert_v2";
+            string proc = "transaction_subcategories_insert_v3";
             int newId = 0;
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_name", model.Name);
                 param.AddWithValue("p_categoryId", model.CategoryId);
-                param.AddWithValue("p_hotelId", model.Id);
+                param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_modifiedBy", userId);
 
                 MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
@@ -47,7 +47,7 @@ namespace TourGo.Services.Finances
             return newId;
         }
 
-        public void Update(TransactionSubcategoryAddUpdateRequest model, string userId)
+        public void Update(TransactionSubcategoryUpdateRequest model, string userId)
         {
             string proc = "transaction_subcategories_update_v2";
 
@@ -71,9 +71,9 @@ namespace TourGo.Services.Finances
             });
         }
 
-        public List<TransactionSubcategoryBase>? GetMinimal(int hotelId)
+        public List<TransactionSubcategoryBase>? GetMinimal(string hotelId)
         {
-            string proc = "transaction_subcategories_select_minimal_by_hotel_id";
+            string proc = "transaction_subcategories_select_minimal_by_hotel_id_v2";
             List<TransactionSubcategoryBase>? transactionSubcategories = null;
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
@@ -94,9 +94,9 @@ namespace TourGo.Services.Finances
             return transactionSubcategories;
         }
 
-        public List<TransactionSubcategory>? GetAll(int hotelId)
+        public List<TransactionSubcategory>? GetAll(string hotelId)
         {
-            string proc = "transaction_subcategories_select_all_by_hotel_id_v2";
+            string proc = "transaction_subcategories_select_all_by_hotel_id_v3";
             List<TransactionSubcategory>? transactionSubcategories = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

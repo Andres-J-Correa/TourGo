@@ -49,20 +49,37 @@ function TransactionsTableFilters({
   const selectOptions = useMemo(() => {
     const transactionCategoriesOptions = TRANSACTION_CATEGORIES.map(
       (category) => (
-        <option key={`transaction-category-${category.id}`} value={category.id}>
+        <option
+          key={`transaction-category-${category.id}`}
+          value={category.id}
+          className={classNames({
+            "selected-option":
+              Number(paginationData.categoryId) === category.id,
+          })}>
           {category.name}
         </option>
       )
     );
 
     const transactionStatusesOptions = TRANSACTION_STATUSES.map((status) => (
-      <option key={`transaction status-${status.id}`} value={status.id}>
+      <option
+        key={`transaction status-${status.id}`}
+        value={status.id}
+        className={classNames({
+          "selected-option": Number(paginationData.statusId) === status.id,
+        })}>
         {status.name}
       </option>
     ));
 
     const paymentMethodsOptions = selectData.paymentMethods.map((method) => (
-      <option key={`payment-method-${method.id}`} value={method.id}>
+      <option
+        key={`payment-method-${method.id}`}
+        value={method.id}
+        className={classNames({
+          "selected-option":
+            Number(paginationData.paymentMethodId) === method.id,
+        })}>
         {method.name}
       </option>
     ));
@@ -71,13 +88,23 @@ function TransactionsTableFilters({
       selectData.transactionSubcategories.map((subcategory) => (
         <option
           key={`transaction-subcategory-${subcategory.id}`}
-          value={subcategory.id}>
+          value={subcategory.id}
+          className={classNames({
+            "selected-option":
+              Number(paginationData.subcategoryId) === subcategory.id,
+          })}>
           {subcategory.name}
         </option>
       ));
 
     const financePartnersOptions = selectData.financePartners.map((partner) => (
-      <option key={`finance-partner-${partner.id}`} value={partner.id}>
+      <option
+        key={`finance-partner-${partner.id}`}
+        value={partner.id}
+        className={classNames({
+          "selected-option":
+            Number(paginationData.financePartnerId) === partner.id,
+        })}>
         {partner.name}
       </option>
     ));
@@ -89,7 +116,7 @@ function TransactionsTableFilters({
       transactionSubcategories: transactionSubcategoriesOptions,
       financePartners: financePartnersOptions,
     };
-  }, [selectData]);
+  }, [selectData, paginationData]);
 
   const onTransactionInputChange = (e) => {
     const { value } = e.target;
@@ -254,14 +281,14 @@ function TransactionsTableFilters({
             handleClearDates={handleClearDateFilters}
           />
         </Col>
-        <Col lg="auto" xl="auto">
+        <Col lg="auto" xl="auto" className="mb-3">
           <Label for="transaction-category" className="text-dark">
             Categoría:
           </Label>
           <select
             id="transaction-category"
-            className={classNames("form-select", {
-              "bg-info-subtle": paginationData.categoryId,
+            className={classNames("form-select filter-select", {
+              "bg-success-subtle": paginationData.categoryId,
             })}
             disabled={loading}
             value={paginationData.categoryId}
@@ -271,7 +298,7 @@ function TransactionsTableFilters({
             }}>
             <option
               className={classNames({
-                "bg-warning-subtle": paginationData.categoryId,
+                "bg-dark-subtle": paginationData.categoryId,
               })}
               value="">
               {paginationData.categoryId ? "Quitar Filtro" : "Seleccionar"}
@@ -279,14 +306,14 @@ function TransactionsTableFilters({
             {selectOptions.transactionCategories}
           </select>
         </Col>
-        <Col lg="auto" xl="auto">
+        <Col lg="auto" xl="auto" className="mb-3">
           <Label for="transaction-subcategory" className="text-dark">
             Subcategoría:
           </Label>
           <select
             id="transaction-subcategory"
-            className={classNames("form-select", {
-              "bg-info-subtle": paginationData.subcategoryId,
+            className={classNames("form-select filter-select", {
+              "bg-success-subtle": paginationData.subcategoryId,
             })}
             disabled={loading}
             value={paginationData.subcategoryId}
@@ -296,7 +323,7 @@ function TransactionsTableFilters({
             }}>
             <option
               className={classNames({
-                "bg-warning-subtle": paginationData.subcategoryId,
+                "bg-dark-subtle": paginationData.subcategoryId,
               })}
               value="">
               {isLoadingSelectData
@@ -308,14 +335,14 @@ function TransactionsTableFilters({
             {selectOptions.transactionSubcategories}
           </select>
         </Col>
-        <Col lg="auto" xl="auto">
+        <Col lg="auto" xl="auto" className="mb-3">
           <Label for="payment-method" className="text-dark">
             Método de pago:
           </Label>
           <select
             id="payment-method"
-            className={classNames("form-select", {
-              "bg-info-subtle": paginationData.paymentMethodId,
+            className={classNames("form-select filter-select", {
+              "bg-success-subtle": paginationData.paymentMethodId,
             })}
             disabled={loading}
             value={paginationData.paymentMethodId}
@@ -325,7 +352,7 @@ function TransactionsTableFilters({
             }}>
             <option
               className={classNames({
-                "bg-warning-subtle": paginationData.paymentMethodId,
+                "bg-dark-subtle": paginationData.paymentMethodId,
               })}
               value="">
               {isLoadingSelectData
@@ -337,14 +364,14 @@ function TransactionsTableFilters({
             {selectOptions.paymentMethods}
           </select>
         </Col>
-        <Col lg="auto" xl="auto">
+        <Col lg="auto" xl="auto" className="mb-3">
           <Label for="finance-partner" className="text-dark">
             Socio Financiero:
           </Label>
           <select
             id="finance-partner"
-            className={classNames("form-select", {
-              "bg-info-subtle": paginationData.financePartnerId,
+            className={classNames("form-select filter-select", {
+              "bg-success-subtle": paginationData.financePartnerId,
             })}
             disabled={loading}
             value={paginationData.financePartnerId}
@@ -354,7 +381,7 @@ function TransactionsTableFilters({
             }}>
             <option
               className={classNames({
-                "bg-warning-subtle": paginationData.financePartnerId,
+                "bg-dark-subtle": paginationData.financePartnerId,
               })}
               value="">
               {isLoadingSelectData
@@ -366,9 +393,72 @@ function TransactionsTableFilters({
             {selectOptions.financePartners}
           </select>
         </Col>
+        <Col lg="auto" xl="auto" className="mb-3">
+          <Label for="statusId" className="text-dark">
+            Estado:
+          </Label>
+          <select
+            id="statusId"
+            className={classNames("form-select filter-select", {
+              "bg-success-subtle": paginationData.statusId,
+            })}
+            disabled={loading}
+            value={paginationData.statusId}
+            onChange={(e) => {
+              const { value } = e.target;
+              handleStatusChange(value);
+            }}>
+            <option
+              className={classNames({
+                "bg-dark-subtle": paginationData.statusId,
+              })}
+              value="">
+              {paginationData.statusId ? "Quitar Filtro" : "Seleccionar"}
+            </option>
+            {selectOptions.transactionStatuses}
+          </select>
+        </Col>
+        <Col lg="auto" xl="auto" className="mb-3">
+          <Label for="hasDocumentUrl" className="text-dark">
+            Comprobante
+          </Label>
+          <select
+            id="hasDocumentUrl"
+            className={classNames("form-select filter-select", {
+              "bg-success-subtle": paginationData.hasDocumentUrl,
+            })}
+            disabled={loading}
+            value={paginationData.hasDocumentUrl}
+            onChange={(e) => {
+              const { value } = e.target;
+              handleHasDocumentUrlChange(value);
+            }}>
+            <option
+              value=""
+              className={classNames({
+                "bg-dark-subtle": paginationData.hasDocumentUrl,
+              })}>
+              Todos
+            </option>
+            <option
+              value="true"
+              className={classNames({
+                "selected-option": paginationData.hasDocumentUrl === "true",
+              })}>
+              Con Comprobante
+            </option>
+            <option
+              value="false"
+              className={classNames({
+                "selected-option": paginationData.hasDocumentUrl === "false",
+              })}>
+              Sin Comprobante
+            </option>
+          </select>
+        </Col>
       </Row>
-      <Row className="mb-3">
-        <Col lg={6} xl={3}>
+      <Row>
+        <Col lg={6} xl={3} className="mb-3">
           <Form onSubmit={handleTransactionIdFilterSubmit}>
             <Label for="transactionId" className="text-dark">
               Id de transacción:
@@ -400,7 +490,7 @@ function TransactionsTableFilters({
             </InputGroup>
           </Form>
         </Col>
-        <Col lg={6} xl={3}>
+        <Col lg={6} xl={3} className="mb-3">
           <Form onSubmit={handleReferenceNumberFilterSubmit}>
             <Label for="referenceNumber" className="text-dark">
               Número de referencia:
@@ -432,7 +522,7 @@ function TransactionsTableFilters({
             </InputGroup>
           </Form>
         </Col>
-        <Col lg={6} xl={3}>
+        <Col lg={6} xl={3} className="mb-3">
           <Form onSubmit={handleEntityIdFilterSubmit}>
             <Label for="entityId" className="text-dark">
               Id de Entidad Asociada:
@@ -464,7 +554,7 @@ function TransactionsTableFilters({
             </InputGroup>
           </Form>
         </Col>
-        <Col lg={6} xl={3}>
+        <Col lg={6} xl={3} className="mb-3">
           <Form onSubmit={handleDescriptionFilterSubmit}>
             <Label for="description" className="text-dark">
               Descripción:
@@ -498,51 +588,6 @@ function TransactionsTableFilters({
         </Col>
       </Row>
       <Row>
-        <Col lg="auto" xl="auto">
-          <Label for="statusId" className="text-dark">
-            Estado:
-          </Label>
-          <select
-            id="statusId"
-            className={classNames("form-select", {
-              "bg-info-subtle": paginationData.statusId,
-            })}
-            disabled={loading}
-            value={paginationData.statusId}
-            onChange={(e) => {
-              const { value } = e.target;
-              handleStatusChange(value);
-            }}>
-            <option
-              className={classNames({
-                "bg-warning-subtle": paginationData.statusId,
-              })}
-              value="">
-              {paginationData.statusId ? "Quitar Filtro" : "Seleccionar"}
-            </option>
-            {selectOptions.transactionStatuses}
-          </select>
-        </Col>
-        <Col lg="auto" xl="auto">
-          <Label for="hasDocumentUrl" className="text-dark">
-            Comprobante
-          </Label>
-          <select
-            id="hasDocumentUrl"
-            className={classNames("form-select", {
-              "bg-info-subtle": paginationData.hasDocumentUrl,
-            })}
-            disabled={loading}
-            value={paginationData.hasDocumentUrl}
-            onChange={(e) => {
-              const { value } = e.target;
-              handleHasDocumentUrlChange(value);
-            }}>
-            <option value="">Todos</option>
-            <option value="true">Con Comprobante</option>
-            <option value="false">Sin Comprobante</option>
-          </select>
-        </Col>
         <Col className="align-content-end">
           <Button
             color="dark"

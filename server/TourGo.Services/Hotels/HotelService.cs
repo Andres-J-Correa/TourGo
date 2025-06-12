@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -25,11 +26,11 @@ namespace TourGo.Services.Hotels
         {
             _mySqlDataProvider = dataProvider;
         }
-        public int Create(HotelAddRequest model, string userId)
+        public int Create(HotelAddRequest model, string userId, string publicId)
         {
             int newId = 0;
 
-            string proc = "hotels_insert_v2";
+            string proc = "hotels_insert_v3";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -39,6 +40,7 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_email", model.Email);
                 param.AddWithValue("p_taxId", model.TaxId);
                 param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_publicId", publicId);
 
                 MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
                 newIdOut.Direction = ParameterDirection.Output;
@@ -56,7 +58,7 @@ namespace TourGo.Services.Hotels
         public void Update(HotelUpdateRequest model, string userId)
         {
 
-            string proc = "hotels_update_v2";
+            string proc = "hotels_update_v3";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -71,9 +73,9 @@ namespace TourGo.Services.Hotels
 
         }
 
-        public void Delete(int id, string userId)
+        public void Delete(string id, string userId)
         {
-            string proc = "hotels_delete_v2";
+            string proc = "hotels_delete_v3";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -82,9 +84,9 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public Hotel? GetDetails(int id)
+        public Hotel? GetDetails(string id)
         {
-            string proc = "hotels_select_details_by_id_v2";
+            string proc = "hotels_select_details_by_id_v3";
             Hotel ? hotel = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -112,11 +114,11 @@ namespace TourGo.Services.Hotels
             return hotel;
         }
 
-        public Lookup? GetMinimal(int id)
+        public HotelMinimal? GetMinimal(string id)
         {
-            string proc = "hotels_select_minimal_by_id";
+            string proc = "hotels_select_minimal_by_id_v2";
 
-            Lookup? lookup = null;
+            HotelMinimal? lookup = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
@@ -125,19 +127,19 @@ namespace TourGo.Services.Hotels
             {
                 int index = 0;
 
-                lookup = new Lookup();
-                lookup.Id = reader.GetSafeInt32(index++);
+                lookup = new HotelMinimal();
+                lookup.Id = reader.GetSafeString(index++);
                 lookup.Name = reader.GetSafeString(index++);
             });
 
             return lookup;
         }
 
-        public Lookup? GetMinimalByTransactionId(int txnId)
+        public HotelMinimal? GetMinimalByTransactionId(int txnId)
         {
-            string proc = "hotels_select_minimal_by_transaction_id";
+            string proc = "hotels_select_minimal_by_transaction_id_v2";
 
-            Lookup? lookup = null;
+            HotelMinimal? lookup = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
@@ -146,17 +148,17 @@ namespace TourGo.Services.Hotels
             {
                 int index = 0;
 
-                lookup = new Lookup();
-                lookup.Id = reader.GetSafeInt32(index++);
+                lookup = new HotelMinimal();
+                lookup.Id = reader.GetSafeString(index++);
                 lookup.Name = reader.GetSafeString(index++);
             });
 
             return lookup;
         }
-        public HotelMinimalWithUserRole? GetMinimalWithUserRole(int id, string userId)
+        public HotelMinimalWithUserRole? GetMinimalWithUserRole(string id, string userId)
         {
 
-            string proc = "hotels_select_minimal_by_id_with_user_role_v2";
+            string proc = "hotels_select_minimal_by_id_with_user_role_v3";
 
             HotelMinimalWithUserRole? hotel = null;
 
@@ -169,7 +171,7 @@ namespace TourGo.Services.Hotels
                 int index = 0;
 
                 hotel = new HotelMinimalWithUserRole();
-                hotel.Id = reader.GetSafeInt32(index++);
+                hotel.Id = reader.GetSafeString(index++);
                 hotel.Name = reader.GetSafeString(index++);
                 hotel.RoleId = reader.GetSafeInt32(index++);
             });
@@ -177,10 +179,10 @@ namespace TourGo.Services.Hotels
             return hotel;
         }
 
-        public List<Lookup>? GetUserHotelsMinimal(string userId)
+        public List<HotelMinimal>? GetUserHotelsMinimal(string userId)
         {
-            string proc = "hotels_select_minimal_by_user_v2";
-            List<Lookup>? hotels = null;
+            string proc = "hotels_select_minimal_by_user_v3";
+            List<HotelMinimal>? hotels = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
@@ -188,11 +190,11 @@ namespace TourGo.Services.Hotels
             }, (reader, set) =>
             {
                 int index = 0;
-                Lookup hotel = new();
-                hotel.Id = reader.GetSafeInt32(index++);
+                HotelMinimal hotel = new();
+                hotel.Id = reader.GetSafeString(index++);
                 hotel.Name = reader.GetSafeString(index++);
 
-                hotels ??= new List<Lookup>();
+                hotels ??= new List<HotelMinimal>();
 
                 hotels.Add(hotel);
             });
@@ -222,10 +224,29 @@ namespace TourGo.Services.Hotels
             return permissions;
         }
 
+        public List<string>? GetAvailablePublicIds(List<string> possibleIds)
+        {
+            string proc = "hotels_select_available_public_ids";
+            List<string>? availableIds = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
+            {
+                coll.AddWithValue("p_jsonData", JsonConvert.SerializeObject(possibleIds));
+            }, (reader, set) =>
+            {
+                int index = 0;
+                string availableId = reader.GetSafeString(index++);
+                availableIds ??= new List<string>();
+                availableIds.Add(availableId);
+            });
+
+            return availableIds;
+        }
+
         private static Hotel MapHotel(IDataReader reader, ref int index)
         {
             Hotel hotel = new();
-            hotel.Id = reader.GetSafeInt32(index++);
+            hotel.Id = reader.GetSafeString(index++);
             hotel.Name = reader.GetSafeString(index++);
             hotel.Phone = reader.GetSafeString(index++);
             hotel.Address = reader.GetSafeString(index++);

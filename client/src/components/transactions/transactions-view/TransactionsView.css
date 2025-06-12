@@ -1,3 +1,11 @@
 .filter-container {
   overflow: hidden; /* Prevents content from spilling during height transition */
 }
+
+.filter-select option.selected-option {
+  background-color: var(--bs-success-bg-subtle) !important;
+}
+
+.filter-select option {
+  background-color: white;
+}

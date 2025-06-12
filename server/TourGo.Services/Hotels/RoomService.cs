@@ -23,9 +23,9 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Create(RoomAddUpdateRequest model, string userId)
+        public int Create(RoomAddRequest model, string userId, string hotelId)
         {
-            string proc = "rooms_insert_v2";
+            string proc = "rooms_insert_v3";
             int newId = 0;
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
@@ -33,7 +33,7 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_name", model.Name);
                 param.AddWithValue("p_capacity", model.Capacity);
                 param.AddWithValue("p_description", string.IsNullOrEmpty(model.Description) ? DBNull.Value : model.Description);
-                param.AddWithValue("p_hotelId", model.Id);
+                param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_modifiedBy", userId);
 
                 MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
@@ -49,7 +49,7 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public void Update(RoomAddUpdateRequest model, string userId)
+        public void Update(RoomUpdateRequest model, string userId)
         {
             string proc = "rooms_update_v2";
 
@@ -74,9 +74,9 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public List<Room>? GetByHotel(int hotelId, bool? isActive)
+        public List<Room>? GetByHotel(string hotelId, bool? isActive)
         {
-            string proc = "rooms_select_by_hotel_v2";
+            string proc = "rooms_select_by_hotel_v3";
             List<Room>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

@@ -18,9 +18,9 @@ namespace TourGo.Services.Finances
             _dataProvider = dataProvider;
         }
 
-        public List<Lookup>? GetMinimal(int hotelId)
+        public List<Lookup>? GetMinimal(string hotelId)
         {
-            string proc = "payment_methods_select_minimal_by_hotel_id";
+            string proc = "payment_methods_select_minimal_by_hotel_id_v2";
             List<Lookup>? paymentMethods = null;
             _dataProvider.ExecuteCmd(proc, (param) =>
             {
@@ -40,9 +40,9 @@ namespace TourGo.Services.Finances
             return paymentMethods;
         }
 
-        public List<PaymentMethod>? Get(int hotelId)
+        public List<PaymentMethod>? Get(string hotelId)
         {
-            string proc = "payment_methods_select_all_by_hotel_id_v2";
+            string proc = "payment_methods_select_all_by_hotel_id_v3";
             List<PaymentMethod>? paymentMethods = null;
 
             _dataProvider.ExecuteCmd(proc, (param) =>
@@ -61,15 +61,15 @@ namespace TourGo.Services.Finances
             return paymentMethods;
         }
 
-        public int Add(PaymentMethodAddUpdateRequest model, string userId)
+        public int Add(PaymentMethodAddRequest model, string userId, string hotelId)
         {
-            string proc = "payment_methods_insert_v2";
+            string proc = "payment_methods_insert_v3";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_name", model.Name);
-                param.AddWithValue("p_hotelId", model.Id);
+                param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_modifiedBy", userId);
 
                 MySqlParameter idOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
@@ -85,7 +85,7 @@ namespace TourGo.Services.Finances
             return newId;
         }
 
-        public void Update(PaymentMethodAddUpdateRequest model, string userId)
+        public void Update(PaymentMethodUpdateRequest model, string userId)
         {
             string proc = "payment_methods_update_v2";
 

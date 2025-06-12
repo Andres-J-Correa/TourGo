@@ -5,6 +5,7 @@ import CustomErrorMessage from "./CustomErrorMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAsterisk } from "@fortawesome/free-solid-svg-icons";
 import "react-datepicker/dist/react-datepicker.css";
+import dayjs from "dayjs";
 import "./DatePickers.css"; // Custom styles for the date picker
 import "./forms.css"; // Custom styles for the form elements
 
@@ -22,7 +23,9 @@ const CustomDateTimePicker = ({ isRequired, ...props }) => {
       <DatePicker
         {...props}
         id={props.name}
-        selected={field.value ? new Date(field.value) : null}
+        selected={
+          dayjs(field.value).isValid() ? dayjs(field.value).toDate() : null
+        }
         onChange={props.onChange || handleChange}
         showTimeSelect
         timeFormat="h:mm aa"

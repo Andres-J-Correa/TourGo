@@ -74,7 +74,7 @@ function PaymentMethodsView() {
   }, [paymentMethods, isActiveFilter]);
 
   const toggleForm = useCallback(() => {
-    let isHiding = false;
+    let isHiding = showForm;
     setShowForm((prev) => {
       isHiding = prev;
       return !prev;
@@ -82,7 +82,7 @@ function PaymentMethodsView() {
     if (isHiding) {
       setInitialValues({ name: "", categoryId: "" });
     }
-  }, []);
+  }, [showForm]);
 
   const currentUser = useMemo(() => {
     return {

@@ -26,9 +26,9 @@ namespace TourGo.Services.Hotels
         }
 
 
-        public int Add(InvoiceAddRequest model, string userId)
+        public int Add(InvoiceAddRequest model, string userId, string hotelId)
         {
-            string proc = "invoices_insert_v2";
+            string proc = "invoices_insert_v3";
             int newId = 0;
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
@@ -36,7 +36,7 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_parentId", model.ParentId.HasValue ? model.ParentId : DBNull.Value);
                 param.AddWithValue("p_externalId", model.ExternalId ?? (object)DBNull.Value);
                 param.AddWithValue("p_customerId", model.CustomerId);
-                param.AddWithValue("p_hotelId", model.Id);
+                param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_typeId", model.TypeId);
                 param.AddWithValue("p_statusId", model.StatusId);
                 param.AddWithValue("p_modifiedBy", userId);

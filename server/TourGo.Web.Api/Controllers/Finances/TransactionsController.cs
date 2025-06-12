@@ -48,16 +48,16 @@ namespace TourGo.Web.Api.Controllers.Finances
             _hotelService = hotelService;
         }
 
-        [HttpPost("hotel/{id:int}")]
+        [HttpPost("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Add(TransactionAddRequest model)
+        public ActionResult<ItemResponse<int>> Add(TransactionAddRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                int id = _transactionService.Add(model, userId);
+                int id = _transactionService.Add(model, userId, hotelId);
 
                 if(id == 0)
                 {
@@ -77,9 +77,9 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result ;
         }
 
-        [HttpGet("hotel/{id:int}/entity/{entityId:int}")]
+        [HttpGet("hotel/{hotelId}/entity/{entityId:int}")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk:true)]
-        public ActionResult<ItemsResponse<Transaction>> GetByEntityId(int entityId, int id)
+        public ActionResult<ItemsResponse<Transaction>> GetByEntityId(int entityId, string hotelId)
         {
             ObjectResult result = null;
 
@@ -193,7 +193,14 @@ namespace TourGo.Web.Api.Controllers.Finances
                     return BadRequest("File is empty");
                 }
 
-                int hotelId = _hotelService.GetMinimalByTransactionId(model.Id)?.Id ?? 0;
+                string? hotelId = _hotelService.GetMinimalByTransactionId(model.Id)?.Id;
+
+                if (string.IsNullOrEmpty(hotelId))
+                {
+                    ErrorResponse error = new ErrorResponse("Hotel not found for the specified transaction.");
+                    return NotFound404(error);
+                }
+
                 string fileKey = _transactionService.GetFileKey(model, hotelId);
 
                 _fileService.Upload(model.File, AWSS3BucketEnum.TransactionsFiles, fileKey);
@@ -259,10 +266,10 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/paginated")]
+        [HttpGet("hotel/{hotelId}/paginated")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemResponse<Paged<Transaction>>> GetPaginated(
-            int id,
+            string hotelId,
             [FromQuery] int pageIndex, 
             [FromQuery] int pageSize,
             [FromQuery] string? sortColumn, 
@@ -296,7 +303,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                 }
 
                 Paged<Transaction>? transactions = _transactionService.GetPaginated(
-                    id,
+                    hotelId,
                     pageIndex,
                     pageSize,
                     sortColumn,
@@ -336,10 +343,10 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/pagination")]
+        [HttpGet("hotel/{hotelId}/pagination")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemResponse<Paged<Transaction>>> GetPaginated(
-            int id,
+            string hotelId,
             [FromQuery] int pageIndex, 
             [FromQuery] int pageSize,
             [FromQuery] string? sortColumn, 
@@ -363,7 +370,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                 DateOnly endDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
                 Paged<Transaction>? transactions = _transactionService.GetPaginated(
-                    id,
+                    hotelId,
                     pageIndex,
                     pageSize,
                     sortColumn,

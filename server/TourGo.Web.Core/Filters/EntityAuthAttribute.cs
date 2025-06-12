@@ -92,23 +92,20 @@ namespace TourGo.Web.Core.Filters
             {
                 string userId = _identityProvider.GetCurrentUserId();
 
-                int id = GetEntityId<int>(actionArguments);
+                if (_isBulk || _action == EntityActionTypeEnum.Create)
+                {
+                    string hotelId = GetEntityId<string>(actionArguments, "hotelId");
+                    return _entityAuthService.IsAuthorized(userId, hotelId, _action, _entityTypeId);
+                } else
+                {
+                    int id = GetEntityId<int>(actionArguments);
+                    if (id > 0)
+                        return _entityAuthService.IsAuthorized(userId, id, _action, _entityTypeId);
 
-                if (id > 0)
-                {
-                    return _entityAuthService.IsAuthorized(userId, id, _action, _entityTypeId, _isBulk);
-                }
-                else
-                {
                     string idString = GetEntityId<string>(actionArguments);
-
-                    if (!string.IsNullOrEmpty(idString))
-                    {
-                        return _entityAuthService.IsAuthorized(userId, idString, _action, _entityTypeId, _isBulk);
-                    }
-
+                    return !string.IsNullOrEmpty(idString) &&
+                           _entityAuthService.IsAuthorized(userId, idString, _action, _entityTypeId);
                 }
-                return false;
             }
 
             private void HandleUnauthorizedRequest(ActionExecutingContext context)

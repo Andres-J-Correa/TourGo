@@ -23,9 +23,9 @@ namespace TourGo.Services.Customers
             _mySqlDataProvider = dataProvider;
         }
 
-        public int Add(CustomerAddUpdateRequest model, string userId)
+        public int Add(CustomerAddRequest model, string userId, string hotelId)
         {
-            string proc = "customers_insert_v2";
+            string proc = "customers_insert_v3";
             int newId = 0;
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
@@ -35,7 +35,7 @@ namespace TourGo.Services.Customers
                 param.AddWithValue("p_phone", model.Phone);
                 param.AddWithValue("p_email", model.Email);
                 param.AddWithValue("p_documentNumber", model.DocumentNumber);
-                param.AddWithValue("p_hotelId", model.Id);
+                param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_modifiedBy", userId);
 
                 MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
@@ -51,9 +51,9 @@ namespace TourGo.Services.Customers
             return newId;
         }
 
-        public Customer? GetByDocumentNumber(string documentNumber, string userId, int hotelId)
+        public Customer? GetByDocumentNumber(string documentNumber, string userId, string hotelId)
         {
-            string proc = "customers_select_by_document_number_v3";
+            string proc = "customers_select_by_document_number_v4";
             Customer customer = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

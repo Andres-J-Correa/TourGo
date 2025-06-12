@@ -11,9 +11,8 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Finances
 {
-    public class TransactionAddRequest : IModelIdentifier
+    public class TransactionAddRequest
     {
-        public int Id { get; set; }
 
         [Range(1, Int32.MaxValue)]
         public int? EntityId { get; set; }

@@ -16,6 +16,7 @@ using TourGo.Web.Models.Enums;
 using TourGo.Models.Domain;
 using TourGo.Services.Interfaces.Email;
 using TourGo.Models.Domain.Users;
+using TourGo.Models.Domain.Hotels;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -43,13 +44,13 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _emailService = emailService;
         }
 
-        [HttpGet("hotel/{id:int}")]
+        [HttpGet("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<Staff>> GetByHotelId (int id)
+        public ActionResult<ItemsResponse<Staff>> GetByHotelId (string hotelId)
         {
             try
             {
-                List<Staff>? staffList = _staffService.GetByHotelId(id);
+                List<Staff>? staffList = _staffService.GetByHotelId(hotelId);
 
                 if (staffList == null)
                 {
@@ -69,8 +70,8 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
-        [HttpDelete("hotel/{hotelId:int}/user/{userId}")]
-        public ActionResult<SuccessResponse> RemoveStaff(int hotelId, string userId)
+        [HttpDelete("hotel/{hotelId}/user/{userId}")]
+        public ActionResult<SuccessResponse> RemoveStaff(string hotelId, string userId)
         {
             try
             {
@@ -101,8 +102,8 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
-        [HttpPatch("hotel/{hotelId:int}/user/{userId}/role/{role:int}")]
-        public ActionResult<SuccessResponse> UpdateStaffRole(int hotelId, string userId, StaffRoleEnum role)
+        [HttpPatch("hotel/{hotelId}/user/{userId}/role/{role:int}")]
+        public ActionResult<SuccessResponse> UpdateStaffRole(string hotelId, string userId, StaffRoleEnum role)
         {
             try
             {
@@ -133,13 +134,13 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
-        [HttpGet("hotel/{id:int}/invites")]
+        [HttpGet("hotel/{hotelId}/invites")]
         [EntityAuth(EntityTypeEnum.HotelInvites, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<StaffInvite>> GetInvitesByHotelId(int id)
+        public ActionResult<ItemsResponse<StaffInvite>> GetInvitesByHotelId(string hotelId)
         {
             try
             {
-                List<StaffInvite>? invites = _staffService.GetInvitesByHotelId(id);
+                List<StaffInvite>? invites = _staffService.GetInvitesByHotelId(hotelId);
 
                 if (invites == null)
                 {
@@ -189,8 +190,8 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
-        [HttpPost("hotel/{hotelId:int}/leave")]
-        public ActionResult<SuccessResponse> LeaveHotel(int hotelId)
+        [HttpPost("hotel/{hotelId}/leave")]
+        public ActionResult<SuccessResponse> LeaveHotel(string hotelId)
         {
             try
             {
@@ -206,21 +207,21 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
-        [HttpPost("hotel/{id:int}/invites")]
+        [HttpPost("hotel/{hotelId}/invites")]
         [EntityAuth(EntityTypeEnum.HotelInvites, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> AddInvite(int id, StaffInvitationRequest model)
+        public ActionResult<ItemResponse<int>> AddInvite(string hotelId, StaffInvitationRequest model)
         {
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                int inviteId = _staffService.AddInvite(model, id, userId);
+                int inviteId = _staffService.AddInvite(model, hotelId, userId);
 
                 if (inviteId <= 0)
                 {
                     throw new Exception("Failed to create staff invite.");
                 }
 
-                Lookup? hotel = _hotelService.GetMinimal(id);
+                HotelMinimal? hotel = _hotelService.GetMinimal(hotelId);
 
                 if( hotel != null)
                 {

@@ -5,10 +5,10 @@ namespace TourGo.Services.Interfaces.Finances
 {
     public interface ITransactionSubcategoryService
     {
-        int Add(TransactionSubcategoryAddUpdateRequest model, string userId);
+        int Add(TransactionSubcategoryAddRequest model, string userId, string hotelId);
         void Delete(int id, string userId);
-        List<TransactionSubcategoryBase>? GetMinimal(int hotelId);
-        List<TransactionSubcategory>? GetAll(int hotelId);
-        void Update(TransactionSubcategoryAddUpdateRequest model, string userId);
+        List<TransactionSubcategoryBase>? GetMinimal(string hotelId);
+        List<TransactionSubcategory>? GetAll(string hotelId);
+        void Update(TransactionSubcategoryUpdateRequest model, string userId);
     }
 }

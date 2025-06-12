@@ -32,16 +32,16 @@ namespace TourGo.Web.Api.Controllers.Finances
         }
 
 
-        [HttpPost("hotel/{id:int}")]
+        [HttpPost("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Add(TransactionSubcategoryAddUpdateRequest model)
+        public ActionResult<ItemResponse<int>> Add(TransactionSubcategoryAddRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                int id = _transactionSubcategoryService.Add(model, userId);
+                int id = _transactionSubcategoryService.Add(model, userId, hotelId);
 
                 if (id == 0)
                 {
@@ -63,7 +63,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(TransactionSubcategoryAddUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(TransactionSubcategoryUpdateRequest model)
         {
             ObjectResult result = null;
 
@@ -109,15 +109,15 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/minimal")]
+        [HttpGet("hotel/{hotelId}/minimal")]
         [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<TransactionSubcategoryBase>> GetMinimal(int id)
+        public ActionResult<ItemsResponse<TransactionSubcategoryBase>> GetMinimal(string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
-                List<TransactionSubcategoryBase>? transactionSubcategories = _transactionSubcategoryService.GetMinimal(id);
+                List<TransactionSubcategoryBase>? transactionSubcategories = _transactionSubcategoryService.GetMinimal(hotelId);
 
                 if (transactionSubcategories == null)
                 {
@@ -140,15 +140,15 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{id:int}")]
+        [HttpGet("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<TransactionSubcategory>> Get(int id)
+        public ActionResult<ItemsResponse<TransactionSubcategory>> Get(string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
-                List<TransactionSubcategory>? transactionSubcategories = _transactionSubcategoryService.GetAll(id);
+                List<TransactionSubcategory>? transactionSubcategories = _transactionSubcategoryService.GetAll(hotelId);
 
                 if (transactionSubcategories == null)
                 {

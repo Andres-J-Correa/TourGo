@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using TourGo.Models.Interfaces;
 
-namespace TourGo.Models.Requests.Hotels
+namespace TourGo.Models.Requests.Bookings
 {
-    public class HotelUpdateRequest : HotelAddRequest
+    public class BookingsUpdateRequest : BookingAddRequest, IModelIdentifier
     {
-        public string? Id { get; set; }
+        public int Id { get; set; }
     }
 }

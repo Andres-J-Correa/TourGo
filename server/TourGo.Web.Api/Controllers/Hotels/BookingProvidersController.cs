@@ -36,16 +36,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _webAuthService = webAuthService;
         }
 
-        [HttpPost("hotel/{id:int}")]
+        [HttpPost("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.BookingProviders, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Add(BookingProviderAddUpdateRequest model)
+        public ActionResult<ItemResponse<int>> Add(BookingProviderAddRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                int id = _bookingProviderService.Add(model, userId);
+                int id = _bookingProviderService.Add(model, userId, hotelId);
 
                 if (id == 0)
                 {
@@ -67,7 +67,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.BookingProviders, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(BookingProviderAddUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(BookingProviderUpdateRequest model)
         {
             ObjectResult result = null;
 
@@ -128,15 +128,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/minimal")]
+        [HttpGet("hotel/{hotelId}/minimal")]
         [EntityAuth(EntityTypeEnum.BookingProviders, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<Lookup>> GetMinimal(int id)
+        public ActionResult<ItemsResponse<Lookup>> GetMinimal(string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
-                List<Lookup>? bookingProviders = _bookingProviderService.GetMinimal(id);
+                List<Lookup>? bookingProviders = _bookingProviderService.GetMinimal(hotelId);
 
                 if (bookingProviders == null)
                 {
@@ -159,15 +159,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}")]
+        [HttpGet("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.BookingProviders, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<BookingProvider>> Get(int id)
+        public ActionResult<ItemsResponse<BookingProvider>> Get(string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
-                List<BookingProvider>? bookingProviders = _bookingProviderService.Get(id);
+                List<BookingProvider>? bookingProviders = _bookingProviderService.Get(hotelId);
 
                 if (bookingProviders == null)
                 {

@@ -35,11 +35,15 @@ function PersonalizedCharges({ personalizedCharges, setPersonalizedCharges }) {
       <h5 className="mb-3">Cargos Personalizados</h5>
       <Row className="justify-content-center">
         {personalizedCharges.length > 0 &&
-          personalizedCharges.map((charge) => {
+          personalizedCharges.map((charge, i) => {
             return (
-              <Col sm="6" md="4" lg="2" key={charge.id} className="mb-3">
+              <Col
+                key={`personalized-charge-${i}`}
+                sm="6"
+                md="4"
+                lg="2"
+                className="mb-3">
                 <ExtraChargeCard
-                  key={charge.id}
                   charge={charge}
                   onClick={() => removeCharge(charge)}
                   isSelected={true}

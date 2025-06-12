@@ -7,8 +7,8 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Hotels
 {
-    public class HotelUpdateRequest : HotelAddRequest
+    public class ExtraChargeUpdateRequest: ExtraChargeAddRequest, IModelIdentifier
     {
-        public string? Id { get; set; }
+        public int Id { get; set; } 
     }
 }

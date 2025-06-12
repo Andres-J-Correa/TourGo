@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourGo.Models.Attributes;
 using TourGo.Models.Enums;
-using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Hotels
 {
-    public class ExtraChargeAddUpdateRequest : IModelIdentifier
+    public class ExtraChargeAddRequest
     {
-        public int Id { get; set; } // this is the hotel id when adding and the charge id when updating
-
         [Required, StringLength(100)]
         public string Name { get; set; }
 
