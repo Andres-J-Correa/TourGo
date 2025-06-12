@@ -176,7 +176,7 @@ export const AppContextProvider = ({ children }) => {
         toast.error(t("common.sessionExpired"));
       }
 
-      if (error.code === "ERR_NETWORK" || error.response?.status !== 503) {
+      if (error.code === "ERR_NETWORK" || error.response?.status === 503) {
         setMaintenanceMode(true);
       }
       return Promise.reject(error);
