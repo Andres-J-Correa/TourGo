@@ -1,23 +1,26 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using TourGo.Models.Domain;
-using TourGo.Models.Domain.Hotels;
-using TourGo.Models.Enums;
-using TourGo.Models.Requests.Hotels;
-using TourGo.Services;
-using TourGo.Services.Interfaces.Hotels;
-using TourGo.Web.Controllers;
-using TourGo.Web.Core.Filters;
-using TourGo.Web.Models.Responses;
-using TourGo.Web.Api.Extensions;
-using TourGo.Services.Interfaces;
-using TourGo.Models.Domain.Finances;
-using TourGo.Services.Finances;
-using TourGo.Models.Requests.Finances;
+using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
+using TourGo.Models.Domain;
+using TourGo.Models.Domain.Config;
+using TourGo.Models.Domain.Finances;
+using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Enums;
+using TourGo.Models.Requests.Finances;
+using TourGo.Models.Requests.Hotels;
+using TourGo.Services;
+using TourGo.Services.Finances;
+using TourGo.Services.Interfaces;
+using TourGo.Services.Interfaces.Hotels;
+using TourGo.Services.Security;
+using TourGo.Web.Api.Extensions;
+using TourGo.Web.Controllers;
+using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Enums;
+using TourGo.Web.Models.Responses;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -28,36 +31,63 @@ namespace TourGo.Web.Api.Controllers.Hotels
         private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IHotelService _hotelService;
         private readonly IErrorLoggingService _errorLoggingService;
+        private readonly HotelsPublicIdConfig _hotelsPublicIdConfig;
 
         public HotelsController(ILogger<HotelsController> logger, 
             IWebAuthenticationService<string> webAuthenticationService, 
             IHotelService hotelService,
-            IErrorLoggingService errorLoggingService) : base(logger)
+            IErrorLoggingService errorLoggingService,
+            IOptions<HotelsPublicIdConfig> publicIdOptions) : base(logger)
         {
             _webAuthService = webAuthenticationService;
             _hotelService = hotelService;
             _errorLoggingService = errorLoggingService;
+            _hotelsPublicIdConfig = publicIdOptions.Value;
         }
 
         #region hotel
         [HttpPost]
         [VerifiedUser]
-        public ActionResult<ItemResponse<int>> Create(HotelAddRequest model)
+        public ActionResult<ItemResponse<string>> Create(HotelAddRequest model)
         {
             ObjectResult result = null;
 
             try
             {
+                string? publicId = null;
+                int attemptsMade = 0;
+
+                do
+                {
+                    List<string> possiblePublicIds = PublicIdGeneratorService.GenerateSecureIds(_hotelsPublicIdConfig.NumberOfIdsToGenerate,
+                                                                                                _hotelsPublicIdConfig.Length,
+                                                                                                _hotelsPublicIdConfig.Characters);
+
+                    List<string>? availablePublicIds = _hotelService.GetAvailablePublicIds(possiblePublicIds);
+
+                    if (availablePublicIds != null && availablePublicIds.Count > 0)
+                    {
+                        publicId = availablePublicIds[0];
+                    }
+
+                    attemptsMade++;
+                } while (publicId == null && attemptsMade < _hotelsPublicIdConfig.MaxAttempts);
+
+                if (publicId == null)
+                {
+                    throw new Exception("Failed to generate a unique public ID after maximum attempts.");
+                }
+
                 string userId = _webAuthService.GetCurrentUserId();
 
-                int id = _hotelService.Create(model, userId);
+                int id = _hotelService.Create(model, userId, publicId);
 
                 if (id == 0)
                 {
                     throw new Exception("Failed to create hotel");
                 }
 
-                ItemResponse<int> response = new ItemResponse<int>() { Item = id };
+                ItemResponse<string> response = new ItemResponse<string>() { Item = publicId };
                 result = Created201(response);
             }
             catch (Exception ex)
@@ -71,9 +101,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("details/{id:int}")]
+        [HttpGet("details/{id}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<Hotel>> GetDetails(int id)
+        public ActionResult<ItemResponse<Hotel>> GetDetails(string id)
         {
             int code = 200;
             BaseResponse response;
@@ -105,7 +135,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
 
         [HttpGet]
-        public ActionResult<ItemsResponse<Lookup>> GetUserHotels()
+        public ActionResult<ItemsResponse<HotelMinimal>> GetUserHotels()
         {
             BaseResponse response;
 
@@ -113,7 +143,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
                 string userId = _webAuthService.GetCurrentUserId();
 
-                List<Lookup>? hotels = _hotelService.GetUserHotelsMinimal(userId);
+                List<HotelMinimal>? hotels = _hotelService.GetUserHotelsMinimal(userId);
 
                 if (hotels == null)
                 {
@@ -123,7 +153,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 }
                 else
                 {
-                    response = new ItemsResponse<Lookup> { Items = hotels };
+                    response = new ItemsResponse<HotelMinimal> { Items = hotels };
                     return Ok200(response);
                 }
             }
@@ -135,16 +165,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{hotelId}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<Lookup>> GetMinimal(int id)
+        public ActionResult<ItemResponse<HotelMinimal>> GetMinimal(string hotelId)
         {
             int code = 200;
             BaseResponse response;
 
             try
             {
-                Lookup? lookup = _hotelService.GetMinimal(id);
+                HotelMinimal? lookup = _hotelService.GetMinimal(hotelId);
 
                 if (lookup == null)
                 {
@@ -153,7 +183,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 }
                 else
                 {
-                    response = new ItemResponse<Lookup> { Item = lookup };
+                    response = new ItemResponse<HotelMinimal> { Item = lookup };
                 }
             }
             catch (Exception ex)
@@ -166,9 +196,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return StatusCode(code, response);
         }
 
-        [HttpGet("minimal/{id:int}")]
+        [HttpGet("minimal/{id}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<HotelMinimalWithUserRole>> GetMinimalWithUserRole(int id)
+        public ActionResult<ItemResponse<HotelMinimalWithUserRole>> GetMinimalWithUserRole(string id)
         {
             int code = 200;
             BaseResponse response;
@@ -198,15 +228,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return StatusCode(code, response);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(HotelUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(HotelUpdateRequest model, string id)
  {
             int code = 200;
             BaseResponse response = null;
 
             try
             {
+                model.Id = id;
                 string userId = _webAuthService.GetCurrentUserId();
                 _hotelService.Update(model, userId);
 
@@ -223,9 +254,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Delete)]
-        public ActionResult<SuccessResponse> Delete(int id)
+        public ActionResult<SuccessResponse> Delete(string id)
         {
             int code = 200;
             BaseResponse response = null;

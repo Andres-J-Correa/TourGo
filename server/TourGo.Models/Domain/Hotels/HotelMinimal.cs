@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace TourGo.Models.Domain.Hotels
 {
-    public class HotelMinimalWithUserRole: HotelMinimal
+    public class HotelMinimal
     {
-        public int RoleId { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
     }
 }

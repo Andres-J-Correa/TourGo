@@ -74,7 +74,7 @@ function FinancePartnersView() {
   }, [financePartners, isActiveFilter]);
 
   const toggleForm = useCallback(() => {
-    let isHiding = false;
+    let isHiding = showForm;
     setShowForm((prev) => {
       isHiding = prev;
       return !prev;
@@ -82,7 +82,7 @@ function FinancePartnersView() {
     if (isHiding) {
       setInitialValues({ name: "" });
     }
-  }, []);
+  }, [showForm]);
 
   const currentUser = useMemo(() => {
     return {

@@ -11,9 +11,8 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Invoices
 {
-    public class InvoiceAddRequest : IModelIdentifier
+    public class InvoiceAddRequest
     {
-        public int Id { get; set; }
 
         [Range(1, Int32.MaxValue)]
         public int ? ParentId { get; set; }

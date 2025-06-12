@@ -18,9 +18,9 @@ namespace TourGo.Services.Hotels
             _dataProvider = dataProvider;
         }
 
-        public List<BookingProvider>? Get(int hotelId)
+        public List<BookingProvider>? Get(string hotelId)
         {
-            string proc = "booking_providers_select_all_by_hotel_id_v2";
+            string proc = "booking_providers_select_all_by_hotel_id_v3";
             List<BookingProvider>? bookingProviders = null;
 
             _dataProvider.ExecuteCmd(proc, (param) =>
@@ -39,9 +39,9 @@ namespace TourGo.Services.Hotels
             return bookingProviders;
         }
 
-        public List<Lookup>? GetMinimal(int hotelId)
+        public List<Lookup>? GetMinimal(string hotelId)
         {
-            string proc = "booking_providers_select_minimal_by_hotel_id";
+            string proc = "booking_providers_select_minimal_by_hotel_id_v2";
             List<Lookup>? bookingProviders = null;
             _dataProvider.ExecuteCmd(proc, (param) =>
             {
@@ -61,15 +61,15 @@ namespace TourGo.Services.Hotels
             return bookingProviders;
         }
 
-        public int Add(BookingProviderAddUpdateRequest model, string userId)
+        public int Add(BookingProviderAddRequest model, string userId, string hotelId)
         {
-            string proc = "booking_providers_insert_v2";
+            string proc = "booking_providers_insert_v3";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_name", model.Name);
-                param.AddWithValue("p_hotelId", model.Id);
+                param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_modifiedBy", userId);
 
                 MySqlParameter idOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
@@ -85,7 +85,7 @@ namespace TourGo.Services.Hotels
             return newId;
         }
 
-        public void Update(BookingProviderAddUpdateRequest model, string userId)
+        public void Update(BookingProviderUpdateRequest model, string userId)
         {
             string proc = "booking_providers_update_v2";
 

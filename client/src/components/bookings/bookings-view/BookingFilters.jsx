@@ -197,7 +197,7 @@ function BookingFilters({
           <select
             id="statusId"
             className={classNames("form-select", {
-              "bg-info-subtle": paginationData.statusId,
+              "bg-success-subtle": paginationData.statusId,
             })}
             disabled={loading}
             value={paginationData.statusId}
@@ -207,7 +207,7 @@ function BookingFilters({
             }}>
             <option
               className={classNames("form-select", {
-                "bg-warning-subtle": paginationData.statusId,
+                "bg-dark-subtle": paginationData.statusId,
               })}
               value="">
               {paginationData.statusId ? "Quitar Filtro" : "Seleccionar"}
@@ -216,8 +216,9 @@ function BookingFilters({
               <option
                 key={`${status.id}`}
                 className={classNames({
-                  "bg-info-subtle": paginationData.statusId === status.id,
-                  "bg-white": paginationData.statusId !== status.id,
+                  "bg-success-subtle":
+                    Number(paginationData.statusId) === status.id,
+                  "bg-white": Number(paginationData.statusId) !== status.id,
                 })}
                 value={status.id}>
                 {status.name}

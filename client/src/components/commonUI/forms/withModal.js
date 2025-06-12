@@ -12,8 +12,8 @@ const withModal = (WrappedComponent) => {
         toggle={toggle}
         centered={true}
         className="px-sm-5 mt-5"
-        backdrop={backdrop || loading ? "static" : true}
-        keyboard={keyboard || !loading}
+        backdrop={!loading && backdrop ? backdrop : "static"}
+        keyboard={!loading && keyboard}
         zIndex={2000}>
         <ModalBody className="p-0">
           <WrappedComponent

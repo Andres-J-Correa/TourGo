@@ -535,7 +535,11 @@ function TransactionsView() {
               <select
                 id="pageSize"
                 className="form-select"
-                value={paginationData.pageSize}
+                value={
+                  paginationData.pageSize > data.totalCount
+                    ? data.totalCount
+                    : paginationData.pageSize
+                }
                 disabled={loading}
                 onChange={onPageSizeChange}>
                 {[5, 10, 20, 50]

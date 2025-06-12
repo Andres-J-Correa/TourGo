@@ -124,7 +124,7 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<int>> Create(UserAddRequest model)
+        public ActionResult<ItemResponse<string>> Create(UserAddRequest model)
         {
             try
             {
@@ -154,7 +154,12 @@ namespace TourGo.Web.Api.Controllers.Users
 
                 int userId = _userService.Create(model, publicId);
 
-                ItemResponse<int> response = new ItemResponse<int>() { Item = userId };
+                if(userId <= 0)
+                {
+                    return StatusCode(500, new ErrorResponse("Failed to create user."));
+                }
+
+                ItemResponse<string> response = new ItemResponse<string>() { Item = publicId };
 
                 return Created201(response);
 

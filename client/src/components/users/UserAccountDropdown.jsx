@@ -46,7 +46,7 @@ function UserAccountDropdown() {
             collapse: [
               {
                 name: t("client.navbar.logout"),
-                action: user.logout,
+                action: () => user.logout(),
               },
             ],
           },
@@ -54,7 +54,7 @@ function UserAccountDropdown() {
       : [
           {
             name: t("client.navbar.loginRegister"),
-            action: toggleUserSignInModal,
+            action: () => toggleUserSignInModal(),
           },
         ],
   };

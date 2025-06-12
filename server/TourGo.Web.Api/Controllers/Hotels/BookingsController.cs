@@ -41,9 +41,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _errorLoggingService = errorLoggingService;
         }
 
-        [HttpPost("hotel/{id:int}")]
+        [HttpPost("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<BookingAddResponse>> Add(BookingAddUpdateRequest model)
+        public ActionResult<ItemResponse<BookingAddResponse>> Add(BookingAddRequest model, string hotelId)
         {
             ObjectResult result = null;
 
@@ -51,7 +51,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
                 string userId = _webAuthService.GetCurrentUserId();
 
-                BookingAddResponse? newBooking = _bookingService.Add(model, userId, model.Id);
+                BookingAddResponse? newBooking = _bookingService.Add(model, userId, hotelId);
 
                 if (newBooking == null)
                 {
@@ -89,7 +89,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(BookingAddUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(BookingsUpdateRequest model)
         {
             ObjectResult result = null;
 
@@ -159,9 +159,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/date-range")]
+        [HttpGet("hotel/{hotelId}/date-range")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemResponse<Paged<BookingMinimal>>> GetPaginatedByDateRange(int id, [FromQuery] int pageIndex, [FromQuery] int pageSize, [FromQuery] bool isArrivalDate,
+        public ActionResult<ItemResponse<Paged<BookingMinimal>>> GetPaginatedByDateRange(string hotelId, [FromQuery] int pageIndex, [FromQuery] int pageSize, [FromQuery] bool isArrivalDate,
                                                                                         [FromQuery] string? sortColumn, [FromQuery] string? sortDirection,
                                                                                         [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate,
                                                                                         [FromQuery]string? firstName, [FromQuery] string? lastName,
@@ -182,7 +182,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 }
 
                 Paged<BookingMinimal>? bookings = _bookingService.GetPaginatedByDateRange(
-                    id, pageIndex, pageSize, isArrivalDate, sortColumn, sortDirection, startDate, endDate,
+                    hotelId, pageIndex, pageSize, isArrivalDate, sortColumn, sortDirection, startDate, endDate,
                     firstName, lastName, externalBookingId, statusId);
                     
 
@@ -301,15 +301,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/room-bookings")]
+        [HttpGet("hotel/{hotelId}/room-bookings")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<RoomBooking>> GetRoomBookingsByDateRange(int id, [FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
+        public ActionResult<ItemsResponse<RoomBooking>> GetRoomBookingsByDateRange(string hotelId, [FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
         {
             ObjectResult result = null;
 
             try
             {
-                List<RoomBooking>? roomBookings = _bookingService.GetRoomBookingsByDateRange(startDate, endDate, id);
+                List<RoomBooking>? roomBookings = _bookingService.GetRoomBookingsByDateRange(startDate, endDate, hotelId);
 
                 if (roomBookings == null)
                 {
@@ -436,15 +436,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/arrivals")]
+        [HttpGet("hotel/{hotelId}/arrivals")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<BookingArrival>> GetArrivingToday(int id, [FromQuery] DateOnly date)
+        public ActionResult<ItemsResponse<BookingArrival>> GetArrivingToday(string hotelId, [FromQuery] DateOnly date)
         {
             ObjectResult result = null;
 
             try
             {
-                List<BookingArrival>? arrivals = _bookingService.GetArrivalsByDate(date, id);
+                List<BookingArrival>? arrivals = _bookingService.GetArrivalsByDate(date, hotelId);
 
                 if (arrivals == null)
                 {
@@ -467,15 +467,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/departures")]
+        [HttpGet("hotel/{hotelId}/departures")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<BookingDeparture>> GetLeavingToday(int id, [FromQuery] DateOnly date)
+        public ActionResult<ItemsResponse<BookingDeparture>> GetLeavingToday(string hotelId, [FromQuery] DateOnly date)
         {
             ObjectResult result = null;
 
             try
             {
-                List<BookingDeparture>? departures = _bookingService.GetDeparturesByDate(date, id);
+                List<BookingDeparture>? departures = _bookingService.GetDeparturesByDate(date, hotelId);
 
                 if (departures == null || departures.Count == 0)
                 {
@@ -498,14 +498,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/stays")]
+        [HttpGet("hotel/{hotelId}/stays")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<BookingStay>> GetStaysToday(int id, [FromQuery] DateOnly date)
+        public ActionResult<ItemsResponse<BookingStay>> GetStaysToday(string hotelId, [FromQuery] DateOnly date)
         {
             ObjectResult result = null;
             try
             {
-                List<BookingStay>? stays = _bookingService.GetStaysByDate(date, id);
+                List<BookingStay>? stays = _bookingService.GetStaysByDate(date, hotelId);
                 if (stays == null)
                 {
                     result = NotFound404(new ErrorResponse("No stays found for today"));
@@ -525,15 +525,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/departures/rooms")]
+        [HttpGet("hotel/{hotelId}/departures/rooms")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<RoomBooking>> GetDepartingRoomBookings(int id, [FromQuery] DateOnly date)
+        public ActionResult<ItemsResponse<RoomBooking>> GetDepartingRoomBookings(string hotelId, [FromQuery] DateOnly date)
         {
             ObjectResult result = null;
 
             try
             {
-                List<RoomBooking>? departingRooms = _bookingService.GetDepartingRoomBookings(date, id);
+                List<RoomBooking>? departingRooms = _bookingService.GetDepartingRoomBookings(date, hotelId);
 
                 if (departingRooms == null)
                 {
@@ -556,15 +556,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/arrivals/rooms")]
+        [HttpGet("hotel/{hotelId}/arrivals/rooms")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<RoomBooking>> GetArrivingRoomBookings(int id, [FromQuery] DateOnly date)
+        public ActionResult<ItemsResponse<RoomBooking>> GetArrivingRoomBookings(string hotelId, [FromQuery] DateOnly date)
         {
             ObjectResult result = null;
 
             try
             {
-                List<RoomBooking>? arrivingRooms = _bookingService.GetArrivingRoomBookings(date, id);
+                List<RoomBooking>? arrivingRooms = _bookingService.GetArrivingRoomBookings(date, hotelId);
 
                 if (arrivingRooms == null)
                 {

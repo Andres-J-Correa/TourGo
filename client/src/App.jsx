@@ -6,6 +6,7 @@ import { Container } from "reactstrap";
 import NavbarContainer from "components/commonUI/navbars/NavbarContainer";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import SiteUnderMaintenance from "components/commonUI/fallback/SiteUnderMaintenance";
+import RouteWrapper from "contexts/RouteWrapper";
 
 import { useAppContext } from "./contexts/GlobalAppContext";
 
@@ -38,7 +39,11 @@ const App = () => {
     <Route
       key={`route-${idx}`}
       path={route.path}
-      element={<route.component />}
+      element={
+        <RouteWrapper>
+          <route.component />
+        </RouteWrapper>
+      }
     />
   );
 

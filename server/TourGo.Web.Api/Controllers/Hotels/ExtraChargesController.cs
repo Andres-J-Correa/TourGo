@@ -32,16 +32,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _errorLoggingService = errorLoggingService;
         }
 
-        [HttpPost("hotel/{id:int}")]
+        [HttpPost("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Create(ExtraChargeAddUpdateRequest model)
+        public ActionResult<ItemResponse<int>> Create(ExtraChargeAddRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                int id = _extraChargeService.Create(model, userId);
+                int id = _extraChargeService.Create(model, userId, hotelId);
 
                 if (id == 0)
                 {
@@ -62,15 +62,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{id:int}")]
+        [HttpGet("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<ExtraCharge>> GetByHotel(int id, [FromQuery] bool? isActive)
+        public ActionResult<ItemsResponse<ExtraCharge>> GetByHotel(string hotelId, [FromQuery] bool? isActive)
         {
             ObjectResult result = null;
 
             try
             {
-                List<ExtraCharge>? list = _extraChargeService.GetByHotel(id, isActive);
+                List<ExtraCharge>? list = _extraChargeService.GetByHotel(hotelId, isActive);
 
                 if (list == null)
                 {
@@ -95,7 +95,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(ExtraChargeAddUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(ExtraChargeUpdateRequest model)
         {
             ObjectResult result = null;
 

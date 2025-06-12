@@ -63,7 +63,7 @@ function TransactionAddForm({
     referenceNumber: "",
     statusId: 2,
     description: entity?.customer
-      ? `Pago de ${entity.customer.firstName} ${entity.customer.lastName}`
+      ? `Cliente asociado: ${entity.customer.firstName} ${entity.customer.lastName}`
       : "",
     currencyCode: "COP",
     financePartnerId: "",

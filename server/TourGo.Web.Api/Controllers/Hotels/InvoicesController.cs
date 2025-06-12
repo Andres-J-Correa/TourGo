@@ -32,16 +32,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _errorLoggingService = errorLoggingService;
         }
 
-        [HttpPost("hotel/{id:int}")]
+        [HttpPost("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Add(InvoiceAddRequest model)
+        public ActionResult<ItemResponse<int>> Add(InvoiceAddRequest model, string hotelId)
         {
             ObjectResult? result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                int id = _invoiceService.Add(model, userId);
+                int id = _invoiceService.Add(model, userId, hotelId);
 
                 if (id == 0)
                 {

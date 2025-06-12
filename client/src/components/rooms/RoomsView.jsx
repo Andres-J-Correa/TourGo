@@ -83,7 +83,7 @@ const RoomsView = () => {
   }, [rooms, isActiveFilter]);
 
   const toggleForm = useCallback(() => {
-    let isHiding = false;
+    let isHiding = showForm;
     setShowForm((prev) => {
       isHiding = prev;
       return !prev;
@@ -91,7 +91,7 @@ const RoomsView = () => {
     if (isHiding) {
       setInitialValues({ name: "", capacity: "", description: "" });
     }
-  }, []);
+  }, [showForm]);
 
   const currentUser = useMemo(() => {
     return {

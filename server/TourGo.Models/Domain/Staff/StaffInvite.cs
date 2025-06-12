@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourGo.Models.Domain;
+using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Users;
 
 namespace TourGo.Models.Domain.Staff
@@ -18,6 +19,6 @@ namespace TourGo.Models.Domain.Staff
         public UserBase IssuedBy { get; set; } = new UserBase();
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
-        public Lookup? Hotel { get; set; }
+        public HotelMinimal? Hotel { get; set; }
     }
 }

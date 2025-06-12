@@ -4,17 +4,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Customers
 {
-    public class CustomerAddUpdateRequest: IModelIdentifier
+    public class CustomerAddRequest
     {
-        public int Id { get; set; }
 
         [Required]
         [StringLength(100, MinimumLength = 2)]
-		public string FirstName { get; set; }
+        public string FirstName { get; set; }
 
         [Required]
         [StringLength(100, MinimumLength = 2)]

@@ -39,6 +39,11 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
 
     setFieldValue("bookingProviderId", selectedValue); // Update Formik state
     setFieldValue("bookingProviderName", selectedName); // Update Formik state
+
+    if (!selectedValue) {
+      setFieldValue("externalId", "", false); // Clear externalId if no provider is selected
+      setFieldValue("externalCommission", "", false); // Clear externalCommission if no provider is selected
+    }
   };
 
   useEffect(() => {

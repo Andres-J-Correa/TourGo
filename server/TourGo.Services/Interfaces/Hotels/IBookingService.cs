@@ -10,23 +10,23 @@ namespace TourGo.Services.Interfaces
 {
     public interface IBookingService
     {
-        BookingAddResponse? Add(BookingAddUpdateRequest model, string userId, int hotelId);
-        void Update(BookingAddUpdateRequest model, string userId);
+        BookingAddResponse? Add(BookingAddRequest model, string userId, string hotelId);
+        void Update(BookingsUpdateRequest model, string userId);
         Booking? GetById(int id);
-        Paged<BookingMinimal>? GetPaginatedByDateRange(int hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
+        Paged<BookingMinimal>? GetPaginatedByDateRange(string hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
                                                         string? sortColumn, string? sortDirection, DateOnly? startDate, DateOnly? endDate,
                                                         string? firstName, string? lastName, string? bookingExternalId, int? statusId);
         BookingMinimal? GetBookingMinimal(int bookingId);
         List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByBookingId(int bookingId);
-        List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, int hotelId);
+        List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, string hotelId);
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
         void UpdateStatus(int bookingId, string userId, BookingStatusEnum status);
-        List<BookingArrival>? GetArrivalsByDate(DateOnly arrivalDate, int hotelId);
-        List<BookingDeparture>? GetDeparturesByDate(DateOnly departureDate, int hotelId);
-        List<BookingStay>? GetStaysByDate(DateOnly date, int hotelId);
-        List<RoomBooking>? GetDepartingRoomBookings(DateOnly departureDate, int hotelId);
-        List<RoomBooking>? GetArrivingRoomBookings(DateOnly arrivalDate, int hotelId);
+        List<BookingArrival>? GetArrivalsByDate(DateOnly arrivalDate, string hotelId);
+        List<BookingDeparture>? GetDeparturesByDate(DateOnly departureDate, string hotelId);
+        List<BookingStay>? GetStaysByDate(DateOnly date, string hotelId);
+        List<RoomBooking>? GetDepartingRoomBookings(DateOnly departureDate, string hotelId);
+        List<RoomBooking>? GetArrivingRoomBookings(DateOnly arrivalDate, string hotelId);
     }
 }

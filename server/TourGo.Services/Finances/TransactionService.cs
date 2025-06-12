@@ -27,9 +27,9 @@ namespace TourGo.Services.Finances
             _dataProvider = provider;
         }
 
-        public int Add(TransactionAddRequest request, string userId)
+        public int Add(TransactionAddRequest request, string userId, string hotelId)
         {
-            string proc = "transactions_insert_v3";
+            string proc = "transactions_insert_v4";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
@@ -49,7 +49,7 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_financePartnerId", request.FinancePartnerId > 0 ? request.FinancePartnerId : DBNull.Value);
                 col.AddWithValue("p_createdBy", userId);
                 col.AddWithValue("p_approvedBy", userId);
-                col.AddWithValue("p_hotelId", request.Id);
+                col.AddWithValue("p_hotelId", hotelId);
 
                 MySqlParameter resultOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
                 resultOut.Direction = ParameterDirection.Output;
@@ -114,11 +114,11 @@ namespace TourGo.Services.Finances
             return transactions;
         }
 
-        public Paged<Transaction>? GetPaginated(int id, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
+        public Paged<Transaction>? GetPaginated(string hotelId, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
             DateOnly? startDate, DateOnly? endDate, int? txnId, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
             string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
         {
-            string proc = "transactions_select_paginated_v3";
+            string proc = "transactions_select_paginated_v4";
             Paged<Transaction>? paged = null;
             List<Transaction>? transactions = null;
             int totalCount = 0;
@@ -129,7 +129,7 @@ namespace TourGo.Services.Finances
             {
                 col.AddWithValue("p_pageIndex", pageIndex);
                 col.AddWithValue("p_pageSize", pageSize);
-                col.AddWithValue("p_hotelId", id);
+                col.AddWithValue("p_hotelId", hotelId);
 
                 col.AddWithValue("p_sortColumn", string.IsNullOrEmpty(mappedColumn) ? DBNull.Value: mappedColumn);
                 col.AddWithValue("p_sortDirection", string.IsNullOrEmpty(sortDirection) ? DBNull.Value : sortDirection);
@@ -214,7 +214,7 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_description", model.Description);
             });
         }
-        public string GetFileKey(TransactionFileAddRequest model, int hotelId)
+        public string GetFileKey(TransactionFileAddRequest model, string hotelId)
         {
             string folder = GetFolderName(model.Amount);
             string fileExtension = Path.GetExtension(model.File.FileName).ToLower();

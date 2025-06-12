@@ -32,15 +32,15 @@ namespace TourGo.Web.Api.Controllers.Finances
             _webAuthService = webAuthService;
         }
 
-        [HttpGet("hotel/{id:int}")]
+        [HttpGet("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<PaymentMethod>> Get(int id)
+        public ActionResult<ItemsResponse<PaymentMethod>> Get(string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
-                List<PaymentMethod>? paymentMethods = _paymentMethodService.Get(id);
+                List<PaymentMethod>? paymentMethods = _paymentMethodService.Get(hotelId);
 
                 if (paymentMethods == null || paymentMethods.Count == 0)
                 {
@@ -63,15 +63,15 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{id:int}/minimal")]
+        [HttpGet("hotel/{hotelId}/minimal")]
         [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<Lookup>> GetMinimal(int id)
+        public ActionResult<ItemsResponse<Lookup>> GetMinimal(string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
-                List<Lookup>? paymentMethods = _paymentMethodService.GetMinimal(id);
+                List<Lookup>? paymentMethods = _paymentMethodService.GetMinimal(hotelId);
 
                 if (paymentMethods == null || paymentMethods.Count == 0)
                 {
@@ -94,16 +94,16 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpPost("hotel/{id:int}")]
+        [HttpPost("hotel/{hotelId}")]
         [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Add(PaymentMethodAddUpdateRequest model)
+        public ActionResult<ItemResponse<int>> Add(PaymentMethodAddRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                int newId = _paymentMethodService.Add(model, userId);
+                int newId = _paymentMethodService.Add(model, userId, hotelId);
 
                 if (newId == 0)
                 {
@@ -127,7 +127,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(PaymentMethodAddUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(PaymentMethodUpdateRequest model)
         {
             ObjectResult result = null;
 

@@ -4,7 +4,10 @@ import DatePickers from "components/commonUI/forms/DatePickers";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getSubcategoryAnalysis } from "services/financialReportService";
-import { TRANSACTION_CATEGORIES } from "components/transactions/constants";
+import {
+  TRANSACTION_CATEGORIES,
+  TRANSACTION_CATEGORY_TYPES_IDS,
+} from "components/transactions/constants";
 import { toast } from "react-toastify";
 import { Input, Row, Col, InputGroup, InputGroupText } from "reactstrap";
 import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
@@ -18,19 +21,25 @@ const getMonthRange = () => ({
 
 function SubcategoryAnalysisReport({ hotelId }) {
   const [dates, setDates] = useState(getMonthRange());
-  const [categoryId, setCategoryId] = useState("");
+  const [category, setCategory] = useState({ id: "", typeId: 0 });
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
   const [data, setData] = useState([]);
 
   const chartData = [
     ["Subcategoría", "Total", { role: "annotation" }, { role: "style" }],
-    ...data.map((item) => [
-      item.subcategory,
-      item.total,
-      formatCurrency(item.total, "COP"),
-      item.total < 0 ? "color: #f44335; opacity:0.5;" : "opacity:0.5;",
-    ]),
+    ...data.map((item) => {
+      const value =
+        category.typeId === TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE
+          ? -item.total
+          : item.total;
+      return [
+        item.subcategory,
+        value,
+        formatCurrency(value, "COP"),
+        value < 0 ? "color: #f44335; opacity:0.5;" : "opacity:0.5;",
+      ];
+    }),
   ];
 
   const handleDateChange = (type) => (date) => {
@@ -47,16 +56,22 @@ function SubcategoryAnalysisReport({ hotelId }) {
   };
 
   const handleCategoryChange = (e) => {
-    setCategoryId(e.target.value);
-    setShowPrompt(!e.target.value);
+    const { value } = e.target;
+    const categoryTypeId =
+      e.target?.options[e.target.selectedIndex]?.dataset?.type;
+    setCategory({
+      id: value,
+      typeId: categoryTypeId ? Number(categoryTypeId) : 0,
+    });
+    setShowPrompt(!value);
     setData([]);
   };
 
   useEffect(() => {
-    if (categoryId && dates.start && dates.end) {
+    if (category.id && dates.start && dates.end) {
       setLoading(true);
       setShowPrompt(false);
-      getSubcategoryAnalysis(hotelId, categoryId, dates.start, dates.end)
+      getSubcategoryAnalysis(hotelId, category.id, dates.start, dates.end)
         .then((res) => {
           if (res?.isSuccessful && Array.isArray(res.items)) {
             setData(res.items);
@@ -71,14 +86,14 @@ function SubcategoryAnalysisReport({ hotelId }) {
           }
         })
         .finally(() => setLoading(false));
-    } else if (!categoryId) {
+    } else if (!category.id) {
       setShowPrompt(true);
       setData([]);
     } else if (!dates.start || !dates.end) {
       setShowPrompt(true); // Show prompt if dates are cleared
       setData([]);
     }
-  }, [categoryId, dates.start, dates.end, hotelId]);
+  }, [category.id, dates.start, dates.end, hotelId]);
 
   return (
     <div>
@@ -104,12 +119,12 @@ function SubcategoryAnalysisReport({ hotelId }) {
           <InputGroup>
             <Input
               type="select"
-              value={categoryId}
+              value={category.id}
               onChange={handleCategoryChange}
               disabled={loading}>
               <option value="">Selecciona una categoría</option>
               {TRANSACTION_CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
+                <option key={cat.id} value={cat.id} data-type={cat.typeId}>
                   {cat.name}
                 </option>
               ))}
@@ -125,7 +140,7 @@ function SubcategoryAnalysisReport({ hotelId }) {
         <Alert
           type="info"
           message={
-            !categoryId
+            !category.id
               ? "Por favor selecciona una categoría para ver el análisis de subcategorías."
               : "Por favor selecciona un rango de fechas para ver el análisis de subcategorías."
           }

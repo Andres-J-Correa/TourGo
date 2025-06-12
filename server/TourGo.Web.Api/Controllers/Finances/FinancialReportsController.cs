@@ -10,7 +10,7 @@ using TourGo.Web.Models.Responses;
 
 namespace TourGo.Web.Api.Controllers.Finances
 {
-    [Route("api/financial-reports/hotel/{id:int}")]
+    [Route("api/financial-reports/hotel/{hotelId}")]
     [ApiController]
     public class FinancialReportsController : BaseApiController
     {
@@ -27,7 +27,7 @@ namespace TourGo.Web.Api.Controllers.Finances
         [HttpGet("category-performance")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<CategoryPerformanceOverTimeResponse>> GetCategoryPerformanceOverTime(
-            int id,
+            string hotelId,
             [FromQuery] TransactionCategoryEnum categoryId,
             [FromQuery] DateOnly startDate,
             [FromQuery] DateOnly endDate,
@@ -36,7 +36,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetCategoryPerformanceOverTime(id, (int)categoryId, startDate, endDate, currencyCode);
+                var data = _financialReportService.GetCategoryPerformanceOverTime(hotelId, (int)categoryId, startDate, endDate, currencyCode);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -57,7 +57,7 @@ namespace TourGo.Web.Api.Controllers.Finances
         [HttpGet("cost-to-revenue-ratio")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<CostToRevenueRatioResponse>> GetCostToRevenueRatio(
-            int id,
+            string hotelId,
             [FromQuery] TransactionCategoryEnum revenueCategoryId,
             [FromQuery] TransactionCategoryEnum expenseCategoryId,
             [FromQuery] DateOnly startDate,
@@ -67,7 +67,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetCostToRevenueRatio(id, (int)revenueCategoryId, (int)expenseCategoryId, startDate, endDate, currencyCode);
+                var data = _financialReportService.GetCostToRevenueRatio(hotelId, (int)revenueCategoryId, (int)expenseCategoryId, startDate, endDate, currencyCode);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -88,7 +88,7 @@ namespace TourGo.Web.Api.Controllers.Finances
         [HttpGet("expense-breakdown")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<ExpenseBreakdownResponse>> GetExpenseBreakdown(
-            int id,
+            string hotelId,
             [FromQuery] DateOnly startDate,
             [FromQuery] DateOnly endDate,
             [FromQuery] string currencyCode)
@@ -96,7 +96,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetExpenseBreakdown(id, startDate, endDate, currencyCode);
+                var data = _financialReportService.GetExpenseBreakdown(hotelId, startDate, endDate, currencyCode);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -116,7 +116,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpGet("payment-methods-totals")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<PaymentMethodTotalsResponse>> GetPaymentMethodsTotalsByHotelId(int id, 
+        public ActionResult<ItemsResponse<PaymentMethodTotalsResponse>> GetPaymentMethodsTotalsByHotelId(string hotelId, 
             [FromQuery] string currencyCode,
             [FromQuery] DateOnly? startDate,
             [FromQuery] DateOnly? endDate
@@ -125,7 +125,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetPaymentMethodsTotalsByHotelId(id, currencyCode, startDate, endDate);
+                var data = _financialReportService.GetPaymentMethodsTotalsByHotelId(hotelId, currencyCode, startDate, endDate);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -146,7 +146,7 @@ namespace TourGo.Web.Api.Controllers.Finances
         [HttpGet("profit-and-loss-summary")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemResponse<ProfitAndLossSummaryResponse>> GetProfitAndLossSummary(
-            int id,
+            string hotelId,
             [FromQuery] DateOnly startDate,
             [FromQuery] DateOnly endDate,
             [FromQuery] string currencyCode)
@@ -154,7 +154,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetProfitAndLossSummary(id, startDate, endDate, currencyCode);
+                var data = _financialReportService.GetProfitAndLossSummary(hotelId, startDate, endDate, currencyCode);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -175,7 +175,7 @@ namespace TourGo.Web.Api.Controllers.Finances
         [HttpGet("revenue-breakdown")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<RevenueBreakdownResponse>> GetRevenueBreakdown(
-            int id,
+            string hotelId,
             [FromQuery] DateOnly startDate,
             [FromQuery] DateOnly endDate,
             [FromQuery] string currencyCode)
@@ -183,7 +183,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetRevenueBreakdown(id, startDate, endDate, currencyCode);
+                var data = _financialReportService.GetRevenueBreakdown(hotelId, startDate, endDate, currencyCode);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -204,7 +204,7 @@ namespace TourGo.Web.Api.Controllers.Finances
         [HttpGet("subcategory-analysis")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<SubcategoryAnalysisResponse>> GetSubcategoryAnalysis(
-            int id,
+            string hotelId,
             [FromQuery] TransactionCategoryEnum categoryId,
             [FromQuery] DateOnly startDate,
             [FromQuery] DateOnly endDate,
@@ -213,7 +213,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetSubcategoryAnalysis(id, (int)categoryId, startDate, endDate, currencyCode);
+                var data = _financialReportService.GetSubcategoryAnalysis(hotelId, (int)categoryId, startDate, endDate, currencyCode);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -234,7 +234,7 @@ namespace TourGo.Web.Api.Controllers.Finances
         [HttpGet("utility-cost-analysis")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<UtilityCostAnalysisResponse>> GetUtilityCostAnalysis(
-            int id,
+            string hotelId,
             [FromQuery] DateOnly startDate,
             [FromQuery] DateOnly endDate,
             [FromQuery] string currencyCode)
@@ -242,7 +242,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetUtilityCostAnalysis(id, startDate, endDate, currencyCode);
+                var data = _financialReportService.GetUtilityCostAnalysis(hotelId, startDate, endDate, currencyCode);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -263,14 +263,14 @@ namespace TourGo.Web.Api.Controllers.Finances
         [HttpGet("revpar-over-time")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<RevPAROverTimeResponse>> GetRevPAROverTime(
-        int id,
+        string hotelId,
         [FromQuery] DateOnly startDate,
         [FromQuery] DateOnly endDate)
         {
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetRevPAROverTime(id, startDate, endDate);
+                var data = _financialReportService.GetRevPAROverTime(hotelId, startDate, endDate);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -291,14 +291,14 @@ namespace TourGo.Web.Api.Controllers.Finances
         [HttpGet("occupancy-over-time")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<HotelOccupancyOverTimeResponse>> GetHotelOccupancyOverTime(
-            int id,
+            string hotelId,
             [FromQuery] DateOnly startDate,
             [FromQuery] DateOnly endDate)
         {
             ObjectResult result;
             try
             {
-                var data = _financialReportService.GetHotelOccupancyOverTime(id, startDate, endDate);
+                var data = _financialReportService.GetHotelOccupancyOverTime(hotelId, startDate, endDate);
                 if (data == null)
                 {
                     result = NotFound404(new ErrorResponse("No data found"));
@@ -317,9 +317,9 @@ namespace TourGo.Web.Api.Controllers.Finances
         }
 
         [HttpGet("occupancy/room/{roomId:int}")]
-        [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: false)]
+        [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemResponse<decimal>> GetRoomOccupancyByDateRange(
-            int id,
+            string hotelId,
             int roomId,
             [FromQuery] DateOnly startDate,
             [FromQuery] DateOnly endDate)

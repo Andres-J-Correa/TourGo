@@ -36,7 +36,7 @@ const HotelAdd = () => {
       const response = await add(values);
       Swal.close();
 
-      if (response.isSuccessful && response.item > 0) {
+      if (response.isSuccessful) {
         await Swal.fire({
           icon: "success",
           title: "Hotel agregado exitosamente",

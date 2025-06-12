@@ -16,9 +16,9 @@ namespace TourGo.Services.Finances
             _mySqlDataProvider = dataProvider;
         }
 
-        public List<CategoryPerformanceOverTimeResponse>? GetCategoryPerformanceOverTime(int hotelId, int categoryId, DateOnly startDate, DateOnly endDate, string currencyCode)
+        public List<CategoryPerformanceOverTimeResponse>? GetCategoryPerformanceOverTime(string hotelId, int categoryId, DateOnly startDate, DateOnly endDate, string currencyCode)
         {
-            string proc = "financial_reports_get_category_performance_over_time";
+            string proc = "financial_reports_get_category_performance_over_time_v2";
             List<CategoryPerformanceOverTimeResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -44,9 +44,9 @@ namespace TourGo.Services.Finances
             return list;
         }
 
-        public List<CostToRevenueRatioResponse>? GetCostToRevenueRatio(int hotelId, int revenueCategoryId, int expenseCategoryId, DateOnly startDate, DateOnly endDate, string currencyCode)
+        public List<CostToRevenueRatioResponse>? GetCostToRevenueRatio(string hotelId, int revenueCategoryId, int expenseCategoryId, DateOnly startDate, DateOnly endDate, string currencyCode)
         {
-            string proc = "financial_reports_get_cost_to_revenue_ratio";
+            string proc = "financial_reports_get_cost_to_revenue_ratio_v2";
             List<CostToRevenueRatioResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -73,9 +73,9 @@ namespace TourGo.Services.Finances
             return list;
         }
 
-        public List<ExpenseBreakdownResponse>? GetExpenseBreakdown(int hotelId, DateOnly startDate, DateOnly endDate, string currencyCode)
+        public List<ExpenseBreakdownResponse>? GetExpenseBreakdown(string hotelId, DateOnly startDate, DateOnly endDate, string currencyCode)
         {
-            string proc = "financial_reports_get_expense_breakdown";
+            string proc = "financial_reports_get_expense_breakdown_v2";
             List<ExpenseBreakdownResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -100,9 +100,9 @@ namespace TourGo.Services.Finances
             return list;
         }
 
-        public List<PaymentMethodTotalsResponse>? GetPaymentMethodsTotalsByHotelId(int hotelId, string currencyCode, DateOnly? startDate, DateOnly? endDate)
+        public List<PaymentMethodTotalsResponse>? GetPaymentMethodsTotalsByHotelId(string hotelId, string currencyCode, DateOnly? startDate, DateOnly? endDate)
         {
-            string proc = "financial_reports_get_payment_methods_totals_by_hotel_id_v2";
+            string proc = "financial_reports_get_payment_methods_totals_by_hotel_id_v3";
             List<PaymentMethodTotalsResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -127,9 +127,9 @@ namespace TourGo.Services.Finances
             return list;
         }
 
-        public ProfitAndLossSummaryResponse? GetProfitAndLossSummary(int hotelId, DateOnly startDate, DateOnly endDate, string currencyCode)
+        public ProfitAndLossSummaryResponse? GetProfitAndLossSummary(string hotelId, DateOnly startDate, DateOnly endDate, string currencyCode)
         {
-            string proc = "financial_reports_get_profit_and_loss_summary";
+            string proc = "financial_reports_get_profit_and_loss_summary_v2";
             ProfitAndLossSummaryResponse? response = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -152,9 +152,9 @@ namespace TourGo.Services.Finances
             return response;
         }
 
-        public List<RevenueBreakdownResponse>? GetRevenueBreakdown(int hotelId, DateOnly startDate, DateOnly endDate, string currencyCode)
+        public List<RevenueBreakdownResponse>? GetRevenueBreakdown(string hotelId, DateOnly startDate, DateOnly endDate, string currencyCode)
         {
-            string proc = "financial_reports_get_revenue_breakdown";
+            string proc = "financial_reports_get_revenue_breakdown_v2";
             List<RevenueBreakdownResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -179,9 +179,9 @@ namespace TourGo.Services.Finances
             return list;
         }
 
-        public List<SubcategoryAnalysisResponse>? GetSubcategoryAnalysis(int hotelId, int categoryId, DateOnly startDate, DateOnly endDate, string currencyCode)
+        public List<SubcategoryAnalysisResponse>? GetSubcategoryAnalysis(string hotelId, int categoryId, DateOnly startDate, DateOnly endDate, string currencyCode)
         {
-            string proc = "financial_reports_get_subcategory_analysis";
+            string proc = "financial_reports_get_subcategory_analysis_v2";
             List<SubcategoryAnalysisResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -207,9 +207,9 @@ namespace TourGo.Services.Finances
             return list;
         }
 
-        public List<UtilityCostAnalysisResponse>? GetUtilityCostAnalysis(int hotelId, DateOnly startDate, DateOnly endDate, string currencyCode)
+        public List<UtilityCostAnalysisResponse>? GetUtilityCostAnalysis(string hotelId, DateOnly startDate, DateOnly endDate, string currencyCode)
         {
-            string proc = "financial_reports_get_utility_cost_analysis";
+            string proc = "financial_reports_get_utility_cost_analysis_v2";
             List<UtilityCostAnalysisResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -235,9 +235,9 @@ namespace TourGo.Services.Finances
             return list;
         }
 
-        public List<RevPAROverTimeResponse>? GetRevPAROverTime(int hotelId, DateOnly startDate, DateOnly endDate)
+        public List<RevPAROverTimeResponse>? GetRevPAROverTime(string hotelId, DateOnly startDate, DateOnly endDate)
         {
-            string proc = "financial_reports_get_revpar_over_time";
+            string proc = "financial_reports_get_revpar_over_time_v2";
             List<RevPAROverTimeResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -261,9 +261,9 @@ namespace TourGo.Services.Finances
             return list;
         }
 
-        public List<HotelOccupancyOverTimeResponse>? GetHotelOccupancyOverTime(int hotelId, DateOnly startDate, DateOnly endDate)
+        public List<HotelOccupancyOverTimeResponse>? GetHotelOccupancyOverTime(string hotelId, DateOnly startDate, DateOnly endDate)
         {
-            string proc = "financial_reports_get_hotel_occupancy_over_time";
+            string proc = "financial_reports_get_hotel_occupancy_over_time_v2";
             List<HotelOccupancyOverTimeResponse>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

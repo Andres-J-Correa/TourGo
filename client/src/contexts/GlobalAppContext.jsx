@@ -5,7 +5,7 @@ import React, {
   useContext,
   useCallback,
 } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getCurrentUser, usersLogout } from "services/userAuthService";
 import { getMinimalWithUserRoleById } from "services/hotelService";
 import { UserSignInFormModal } from "components/users/UserSignInForm";
@@ -29,7 +29,7 @@ const defaultUser = {
 };
 
 const defaultHotel = {
-  id: 0,
+  id: "",
   name: "",
   roleId: 0,
 };
@@ -56,9 +56,9 @@ const defaultModals = {
 const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
-  const location = useLocation();
   const [currentUser, setCurrentUser] = useState({ ...defaultUser });
   const [hotel, setHotel] = useState({ ...defaultHotel });
+  const [hotelIdParam, setHotelIdParam] = useState(null);
   const [isLoadingHotel, setIsLoadingHotel] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(false);
   const [modals, setModals] = useState({ ...defaultModals });
@@ -70,25 +70,27 @@ export const AppContextProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
-  const toggleModal =
+  const toggleModal = useCallback(
     (key) =>
-    (options = {}) => {
-      setModals((prev) => {
-        const isOptionsEmpty = Object.keys(options).length === 0;
-        return {
-          ...defaultModals,
-          [key]: {
-            ...prev[key],
-            isOpen: !prev[key].isOpen,
-            options: isOptionsEmpty
-              ? { ...defaultModals[key].options, ...prev[key].options }
-              : { ...prev[key].options, ...options },
-          },
-        };
-      });
-    };
+      (options = {}) => {
+        setModals((prev) => {
+          const isOptionsEmpty = Object.keys(options).length === 0;
+          return {
+            ...defaultModals,
+            [key]: {
+              ...prev[key],
+              isOpen: !prev[key].isOpen,
+              options: isOptionsEmpty
+                ? { ...prev[key].options }
+                : { ...prev[key].options, ...options },
+            },
+          };
+        });
+      },
+    [setModals]
+  );
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     const result = await Swal.fire({
       title: "Cerrar sesión",
       text: "¿Seguro que quieres cerrar la sesión?",
@@ -133,7 +135,16 @@ export const AppContextProvider = ({ children }) => {
         icon: "error",
       });
     }
-  };
+  }, [navigate]);
+
+  const setHotelId = useCallback(
+    (hotelId) => {
+      if (hotelId && hotelId !== hotelIdParam) {
+        setHotelIdParam(hotelId);
+      }
+    },
+    [hotelIdParam]
+  );
 
   const contextValue = {
     user: {
@@ -145,6 +156,7 @@ export const AppContextProvider = ({ children }) => {
     hotel: {
       current: hotel,
       isLoading: isLoadingHotel,
+      setHotelId,
     },
     toggleUserSignInModal: toggleModal("login"),
     toggleUserSignUpModal: toggleModal("register"),
@@ -222,17 +234,13 @@ export const AppContextProvider = ({ children }) => {
   ]);
 
   useEffect(() => {
-    const pathRegex = /\/hotels\/([^/]+)/; // Matches /hotel/{hotelId}
-    const pathMatch = location.pathname.match(pathRegex);
-    const hotelId = pathMatch ? Number(pathMatch[1]) : null;
-
     if (
-      !isNaN(hotelId) &&
-      Number(hotelId) !== Number(hotel.id) &&
+      hotelIdParam &&
+      hotel.id !== hotelIdParam &&
       currentUser.isAuthenticated
     ) {
       setIsLoadingHotel(true);
-      getMinimalWithUserRoleById(hotelId)
+      getMinimalWithUserRoleById(hotelIdParam)
         .then((res) => {
           if (res.isSuccessful) {
             setHotel(res.item);
@@ -250,7 +258,7 @@ export const AppContextProvider = ({ children }) => {
     } else if (hotel.id !== 0 && !currentUser.isAuthenticated) {
       setHotel({ ...defaultHotel });
     }
-  }, [location.pathname, hotel.id, currentUser]);
+  }, [hotelIdParam, hotel.id, currentUser]);
 
   useEffect(() => {
     const interceptor = axiosClient.interceptors.response.use(
