@@ -52,6 +52,8 @@ namespace TourGo.Web.Api
             });
 
             app.UseMiddleware<ErrorLoggingMiddleware>();
+            app.UseMiddleware<MaintenanceMiddleware>();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
