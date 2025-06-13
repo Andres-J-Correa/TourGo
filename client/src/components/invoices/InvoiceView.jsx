@@ -19,7 +19,7 @@ import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import BookingGeneralCharges from "components/bookings/booking-summary/BookingGeneralCharges";
 import BookingFinancials from "components/bookings/booking-summary/BookingFinancials";
 import { toast } from "react-toastify";
-import { INVOICE_TYPES_BY_ID } from "components/invoices/constants";
+// import { INVOICE_TYPES_BY_ID } from "components/invoices/constants";
 import { Margin, usePDF } from "react-to-pdf";
 import classNames from "classnames";
 import "./InvoiceView.css";
@@ -122,7 +122,7 @@ const InvoiceView = () => {
 
           <Row className="mb-4">
             <h4 className="text-end mb-3">
-              Factura # {invoiceData?.details?.invoiceNumber}
+              Cuenta de Cobro # {invoiceData?.details?.invoiceNumber}
             </h4>
             <Col className="border-end">
               <h5 className="text-start">Cliente</h5>
@@ -181,7 +181,7 @@ const InvoiceView = () => {
                     </Col>
                   </Row>
                   <Row>
-                    <Col>
+                    {/* <Col>
                       <span>
                         <strong>Factura Matriz: </strong>
                         <p>{invoiceData?.details?.parentId || "N/A"}</p>
@@ -194,7 +194,7 @@ const InvoiceView = () => {
                           {INVOICE_TYPES_BY_ID[invoiceData?.details?.typeId]}
                         </p>
                       </span>
-                    </Col>
+                    </Col> */}
                   </Row>
                 </Col>
               </Row>
