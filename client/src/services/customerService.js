@@ -44,3 +44,21 @@ export const add = async (payload, hotelId) => {
     return onGlobalError(error);
   }
 };
+
+export const update = async (payload, hotelId, customerId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${api}/${customerId}/hotel/${hotelId}`,
+    data: payload,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form } from "formik";
 import { Row, Col, Button, FormGroup, Spinner } from "reactstrap";
 
 import PropTypes from "prop-types";
 
 import Swal from "sweetalert2";
-import { getByDocumentNumber, add } from "services/customerService";
+import { getByDocumentNumber, add, update } from "services/customerService";
 
 import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomField from "components/commonUI/forms/CustomField";
@@ -29,7 +29,8 @@ function CustomerForm({
   creating = false,
   booking,
 }) {
-  const isUpdate = booking?.id > 0;
+  const isUpdate = booking?.id;
+  const [editing, setEditing] = useState(false);
 
   const handleDocumentSubmit = async (values) => {
     try {
@@ -128,6 +129,58 @@ function CustomerForm({
     }
   };
 
+  const handleCustomerUpdate = async (values) => {
+    const result = await Swal.fire({
+      title: "Confirmar actualización",
+      text: "¿Está seguro de que desea actualizar los datos del cliente?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, actualizar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      setSubmitting(true);
+      Swal.fire({
+        title: "Actualizando cliente...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+      const res = await update(values, hotelId, customer.id);
+      Swal.close();
+      if (res.isSuccessful) {
+        setCustomer((prev) => ({
+          ...prev,
+          ...values,
+        }));
+        setEditing(false);
+        await Swal.fire({
+          icon: "success",
+          title: "Cliente actualizado correctamente",
+          timer: 1500,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+        });
+      }
+    } catch (err) {
+      Swal.close();
+      await Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo actualizar el cliente, intente nuevamente",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCancelEdit = (resetForm) => {
+    setEditing(false);
+    resetForm();
+  };
+
   return (
     <>
       <div className="text-end mb-4">
@@ -135,7 +188,7 @@ function CustomerForm({
           <Button
             onClick={() => setCurrentStep(1)}
             color="dark"
-            disabled={submitting}>
+            disabled={submitting || editing}>
             Siguiente
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </Button>
@@ -149,15 +202,23 @@ function CustomerForm({
           phone: customer?.phone || "",
           email: customer?.email || "",
         }}
-        validationSchema={creating ? customerSchema : searchCustomerSchema}
-        onSubmit={creating ? handleCustomerCreate : handleDocumentSubmit}
+        validationSchema={
+          creating || editing ? customerSchema : searchCustomerSchema
+        }
+        onSubmit={
+          creating
+            ? handleCustomerCreate
+            : editing
+            ? handleCustomerUpdate
+            : handleDocumentSubmit
+        }
         enableReinitialize>
-        {({ values, setFieldValue }) => {
+        {({ values, setFieldValue, resetForm }) => {
           const handleDocChange = (e) => {
             const docValue = e.target.value;
             setFieldValue("documentNumber", docValue);
             // If there was a customer loaded, and docNumber is changing, reset rest
-            if (customer?.id || creating) {
+            if ((customer?.id || creating) && !editing) {
               setCustomer({
                 documentNumber: docValue,
                 firstName: "",
@@ -166,6 +227,7 @@ function CustomerForm({
                 email: "",
               });
               setCreating(false);
+              setEditing(false);
             }
           };
 
@@ -178,19 +240,40 @@ function CustomerForm({
                     placeholder="Documento de Identidad"
                     onChange={handleDocChange}
                     value={values.documentNumber}
-                    disabled={submitting || isUpdate}
+                    disabled={submitting || (isUpdate && !editing)}
                     isRequired={true}
                   />
                 </Col>
                 <Col md="6" className="text-end">
+                  {customer?.id && !editing && (
+                    <Button
+                      onClick={() => setEditing(true)}
+                      color="warning"
+                      disabled={submitting}
+                      className="me-2">
+                      Editar
+                    </Button>
+                  )}
+                  {editing && (
+                    <Button
+                      type="button"
+                      color="secondary"
+                      className="me-2"
+                      disabled={submitting}
+                      onClick={() => handleCancelEdit(resetForm)}>
+                      Cancelar
+                    </Button>
+                  )}
                   <Button
                     type="submit"
-                    disabled={submitting || isUpdate}
+                    disabled={submitting || (isUpdate && !editing)}
                     className="bg-gradient-success">
                     {submitting ? (
                       <Spinner size="sm" />
                     ) : creating ? (
                       "Guardar Cliente"
+                    ) : editing ? (
+                      "Actualizar Cliente"
                     ) : (
                       "Buscar Cliente"
                     )}
@@ -205,16 +288,16 @@ function CustomerForm({
                       <CustomField
                         name="firstName"
                         placeholder="Nombre"
-                        disabled={!!customer?.id || submitting}
-                        isRequired={creating}
+                        disabled={(!!customer?.id && !editing) || submitting}
+                        isRequired={creating || editing}
                       />
                     </Col>
                     <Col md="6">
                       <CustomField
                         name="lastName"
                         placeholder="Apellido"
-                        disabled={!!customer?.id || submitting}
-                        isRequired={creating}
+                        disabled={(!!customer?.id && !editing) || submitting}
+                        isRequired={creating || editing}
                       />
                     </Col>
                   </Row>
@@ -223,8 +306,8 @@ function CustomerForm({
                       <CustomField
                         name="email"
                         placeholder="Correo Electrónico"
-                        disabled={!!customer?.id || submitting}
-                        isRequired={creating}
+                        disabled={(!!customer?.id && !editing) || submitting}
+                        isRequired={creating || editing}
                         autoComplete="email"
                       />
                     </Col>
@@ -236,8 +319,8 @@ function CustomerForm({
                           className="form-control d-flex"
                           placeholder="Teléfono"
                           autoComplete="tel"
-                          disabled={!!customer?.id || submitting}
-                          isRequired={creating}
+                          disabled={(!!customer?.id && !editing) || submitting}
+                          isRequired={creating || editing}
                         />
                         <CustomErrorMessage name="phone" />
                       </FormGroup>

@@ -72,6 +72,21 @@ namespace TourGo.Services.Customers
             return customer;
         }
 
+        public void Update(CustomerUpdateRequest model, string userId, string hotelId)
+        {
+            string proc = "customers_update";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_id", model.Id);
+                param.AddWithValue("p_firstName", model.FirstName);
+                param.AddWithValue("p_lastName", model.LastName);
+                param.AddWithValue("p_phone", model.Phone);
+                param.AddWithValue("p_email", model.Email);
+                param.AddWithValue("p_documentNumber", model.DocumentNumber);
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_modifiedBy", userId);
+            });
+        }
         public static Customer MapCustomer(IDataReader reader, ref int index)
         {
             return new Customer

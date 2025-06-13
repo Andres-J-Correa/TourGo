@@ -1,15 +1,17 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
 using TourGo.Models.Domain.Customers;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Customers;
 using TourGo.Services;
+using TourGo.Services.Interfaces;
 using TourGo.Services.Interfaces.Hotels;
+using TourGo.Web.Api.Extensions;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
+using TourGo.Web.Models.Enums;
 using TourGo.Web.Models.Responses;
-using TourGo.Web.Api.Extensions;
-using TourGo.Services.Interfaces;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -98,6 +100,39 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
+        [HttpPut("{id:int}/hotel/{hotelId}")]
+        [EntityAuth(EntityTypeEnum.Customers, EntityActionTypeEnum.Update)]
+        public ActionResult<BaseResponse> Update(CustomerUpdateRequest model, string hotelId)
+        {
+            ObjectResult result = null;
+            try
+            {
+                string userId = _webAuthService.GetCurrentUserId();
+                _customerService.Update(model, userId, hotelId);
+                result = Ok200(new SuccessResponse());
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
 
+                if (Enum.IsDefined(typeof(HotelManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((HotelManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                result = StatusCode(500, error);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
     }
 }
