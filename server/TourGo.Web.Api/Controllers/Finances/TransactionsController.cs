@@ -401,5 +401,33 @@ namespace TourGo.Web.Api.Controllers.Finances
 
             return result;
         }
+
+        [HttpGet("{id:int}/versions")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemsResponse<Transaction>> GetVersionsByTransactionId(int id)
+        {
+            ObjectResult result = null;
+            try
+            {
+                List<Transaction>? versions = _transactionService.GetVersionsByTransactionId(id);
+                if (versions == null)
+                {
+                    ErrorResponse response = new ErrorResponse("No versions found for the specified transaction.");
+                    result = NotFound404(response);
+                }
+                else
+                {
+                    ItemsResponse<Transaction> response = new ItemsResponse<Transaction> { Items = versions };
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
     }
 }

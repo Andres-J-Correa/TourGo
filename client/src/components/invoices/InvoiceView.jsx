@@ -32,7 +32,7 @@ const InvoiceView = () => {
   const [loading, setLoading] = useState(true);
   const { hotelId, invoiceId } = useParams();
   const { toPDF, targetRef } = usePDF({
-    filename: `Factura-${invoiceData?.details?.invoiceNumber}-${invoiceData?.details?.customer?.firstName}-${invoiceData?.details?.customer?.lastName}.pdf`,
+    filename: `CxC-${invoiceData?.details?.invoiceNumber}-${invoiceData?.details?.customer?.firstName}-${invoiceData?.details?.customer?.lastName}.pdf`,
     page: {
       margin: Margin.MEDIUM,
       page: "letter",
