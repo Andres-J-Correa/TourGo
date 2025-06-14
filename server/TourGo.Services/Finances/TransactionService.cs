@@ -68,7 +68,7 @@ namespace TourGo.Services.Finances
 
         public int Reverse(int txnId, string userId)
         {
-            string proc = "transactions_reverse_v2";
+            string proc = "transactions_reverse_v3";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
@@ -174,15 +174,16 @@ namespace TourGo.Services.Finances
             return paged;
         }
 
-        public void UpdateDocumentUrl (int transactionId, string fileKey)
+        public void UpdateDocumentUrl (int transactionId, string fileKey, string userId)
         {
 
-           string proc = "transactions_update_by_id_document_url";
+           string proc = "transactions_update_document_url_by_id";
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
                 col.AddWithValue("p_id", transactionId);
                 col.AddWithValue("p_documentUrl", fileKey);
+                col.AddWithValue("p_modifiedBy", userId);
             });
         }
 
@@ -194,6 +195,25 @@ namespace TourGo.Services.Finances
             _dataProvider.ExecuteCmd(proc, (col) =>
             {
                 col.AddWithValue("p_id", transactionId);
+            }, (reader, returnCol) =>
+            {
+                int index = 0;
+
+                fileKey = reader.GetSafeString(index++);
+            });
+
+            return fileKey;
+        }
+
+        public string? GetVersionSupportDocumentUrl(int transactionId, int versionId)
+        {
+            string proc = "transactions_versions_select_document_url_by_id";
+            string? fileKey = null;
+
+            _dataProvider.ExecuteCmd(proc, (col) =>
+            {
+                col.AddWithValue("p_txnId", transactionId);
+                col.AddWithValue("p_versionId", versionId);
             }, (reader, returnCol) =>
             {
                 int index = 0;
@@ -226,6 +246,7 @@ namespace TourGo.Services.Finances
             {
                 int index = 0;
                 Transaction transaction = MapTransactionVersion(reader, ref index);
+                transaction.ParentId = transactionId;
 
                 transactions ??= new List<Transaction>();
                 transactions.Add(transaction);
@@ -237,8 +258,8 @@ namespace TourGo.Services.Finances
         {
             string folder = GetFolderName(model.Amount);
             string fileExtension = Path.GetExtension(model.File.FileName).ToLower();
-            string date = DateTime.UtcNow.ToString("yyyy-MM-dd");
-            string fileKey = $"hotels/{hotelId}/{folder}/transaction-{model.Id}-date-{date}{fileExtension}";
+            string date = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss-fff");
+            string fileKey = $"hotels/{hotelId}/{folder}/transaction-{model.Id}-{date}{fileExtension}";
             return fileKey;
         }
 
@@ -325,6 +346,7 @@ namespace TourGo.Services.Finances
         private static Transaction MapTransactionVersion(IDataReader reader, ref int index)
         {
             Transaction transaction = new Transaction();
+            transaction.Id = reader.GetSafeInt32(index++);
             transaction.Amount = reader.GetSafeDecimal(index++);
             transaction.TransactionDate = reader.GetSafeDateTime(index++);
             transaction.PaymentMethod.Name = reader.GetSafeString(index++);

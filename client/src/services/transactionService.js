@@ -212,3 +212,40 @@ export const getFixedPagination = async (
     return onGlobalError(error);
   }
 };
+
+export const getTransactionVersions = async (transactionId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/${transactionId}/versions`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getVersionSupportDocumentUrl = async (
+  transactionId,
+  versionId
+) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/${transactionId}/versions/${versionId}/document-url`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

@@ -194,9 +194,10 @@ namespace TourGo.Web.Api.Controllers.Finances
                 }
 
                 string fileKey = _transactionService.GetFileKey(model, hotelId);
+                string userId = _webAuthService.GetCurrentUserId();
 
                 _fileService.Upload(model.File, AWSS3BucketEnum.TransactionsFiles, fileKey);
-                _transactionService.UpdateDocumentUrl(model.Id, fileKey);
+                _transactionService.UpdateDocumentUrl(model.Id, fileKey, userId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
@@ -418,6 +419,55 @@ namespace TourGo.Web.Api.Controllers.Finances
                 else
                 {
                     ItemsResponse<Transaction> response = new ItemsResponse<Transaction> { Items = versions };
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
+
+        [HttpGet("{id:int}/versions/{versionId:int}/document-url")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read)]
+        public async Task<ActionResult<ItemResponse<string>>> GetVersionSupportDocumentUrl(int id, int versionId)
+        {
+            ObjectResult result = null;
+            try
+            {
+                string? fileKey = _transactionService.GetVersionSupportDocumentUrl(id, versionId);
+                if (string.IsNullOrEmpty(fileKey))
+                {
+                    ErrorResponse response = new ErrorResponse("No document URL found for the specified transaction version.");
+                    result = NotFound404(response);
+                }
+                else
+                {
+                    string cacheKey = $"presigned-url-{AWSS3BucketEnum.TransactionsFiles}-{fileKey}";
+                    string? url = null;
+                    CacheEntry<string>? cachedEntry;
+                    if (!_cache.TryGetValue(cacheKey, out cachedEntry) || cachedEntry?.ExpirationTime < DateTime.UtcNow.AddSeconds(300))
+                    {
+                        Logger.LogInformation("Cache miss for {CacheKey}. Generating new pre-signed URL.", cacheKey);
+                        url = await _fileService.GetPresignedUrl(fileKey, AWSS3BucketEnum.TransactionsFiles);
+                        var cacheOptions = new MemoryCacheEntryOptions
+                        {
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(3600),
+                            SlidingExpiration = TimeSpan.FromSeconds(1800)
+                        };
+                        var expiresAt = DateTime.UtcNow.AddSeconds(3600);
+                        var cacheEntry = new CacheEntry<string>(url, expiresAt);
+                        _cache.Set(cacheKey, cacheEntry, cacheOptions);
+                    }
+                    else
+                    {
+                        Logger.LogInformation("Cache hit for {CacheKey}.", cacheKey);
+                        url = cachedEntry.Item;
+                    }
+                    ItemResponse<string> response = new ItemResponse<string> { Item = url };
                     result = Ok200(response);
                 }
             }
