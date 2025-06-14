@@ -94,7 +94,12 @@ export const updateDescription = async (transactionId, description) => {
   }
 };
 
-export const updateDocumentUrl = async (file, transactionId, amount) => {
+export const updateDocumentUrl = async (
+  file,
+  transactionId,
+  amount,
+  hotelId
+) => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("amount", amount);
@@ -102,8 +107,8 @@ export const updateDocumentUrl = async (file, transactionId, amount) => {
     headers: {
       "Content-Type": "multipart/form-data",
     },
-    method: "PUT",
-    url: `${api}/${transactionId}/document-url`,
+    method: "POST",
+    url: `${api}/hotel/${hotelId}/transaction/${transactionId}/document-url`,
     data: formData,
   };
   try {

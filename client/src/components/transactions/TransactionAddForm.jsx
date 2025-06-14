@@ -146,7 +146,8 @@ function TransactionAddForm({
       const response = await updateDocumentUrl(
         compressedFile,
         transaction.id,
-        transaction.amount
+        transaction.amount,
+        hotelId
       );
       return Promise.resolve(response);
     } catch (error) {

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import { Row, Col, Button } from "reactstrap";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
@@ -35,6 +36,8 @@ const TransactionDetails = ({
   const [documentUrl, setDocumentUrl] = useState(null);
 
   const { getTranslatedErrorMessage } = useLanguage();
+
+  const { hotelId } = useParams();
 
   const category = TRANSACTION_CATEGORIES.find(
     (cat) => cat.id === txn.categoryId
@@ -88,7 +91,8 @@ const TransactionDetails = ({
       const uploadResponse = await updateDocumentUrl(
         compressedFile,
         txn.id,
-        txn.amount
+        txn.amount,
+        hotelId
       );
 
       if (uploadResponse.isSuccessful) {

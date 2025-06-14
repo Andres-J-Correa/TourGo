@@ -180,9 +180,9 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpPut("{id:int}/document-url")]
-        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> UpdateDocumentUrl([FromForm] TransactionFileAddRequest model)
+        [HttpPost("hotel/{hotelId}/transaction/{id:int}/document-url")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Create)]
+        public ActionResult<SuccessResponse> UpdateDocumentUrl([FromForm] TransactionFileAddRequest model, string hotelId)
         {
             ObjectResult result = null;
 
@@ -191,14 +191,6 @@ namespace TourGo.Web.Api.Controllers.Finances
                 if (model.File.Length == 0)
                 {
                     return BadRequest("File is empty");
-                }
-
-                string? hotelId = _hotelService.GetMinimalByTransactionId(model.Id)?.Id;
-
-                if (string.IsNullOrEmpty(hotelId))
-                {
-                    ErrorResponse error = new ErrorResponse("Hotel not found for the specified transaction.");
-                    return NotFound404(error);
                 }
 
                 string fileKey = _transactionService.GetFileKey(model, hotelId);
