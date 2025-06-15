@@ -13,7 +13,7 @@ import {
 import { getVersionSupportDocumentUrl } from "services/transactionService";
 import classNames from "classnames";
 
-const VersionDetails = ({ txn, parentSize = "lg" }) => {
+const VersionDetails = ({ txn }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [documentUrl, setDocumentUrl] = useState(null);
@@ -45,26 +45,26 @@ const VersionDetails = ({ txn, parentSize = "lg" }) => {
     <>
       <LoadingOverlay isVisible={isLoading} />
       <Row>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Modificada por:</strong> <br />
           {txn.modifiedBy?.firstName} {txn.modifiedBy?.lastName}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Modificada el:</strong> <br />
           {dayjs(txn.dateModified).format("DD/MMM/YYYY - h:mm A")}
         </Col>
       </Row>
       <Row>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Versión #</strong>
           <br />
           {txn.id}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Id Precursor:</strong> <br />
           {txn.parentId || " - "}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 12} md={12} className="mb-2">
+        <Col xl={12} md={12} className="mb-2">
           <strong>Referencia:</strong> <br />{" "}
           <span
             className={classNames({
@@ -76,11 +76,11 @@ const VersionDetails = ({ txn, parentSize = "lg" }) => {
       </Row>
 
       <Row>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Estado:</strong> <br />
           {status}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Subcategoría:</strong> <br />
           <span
             className={classNames({
@@ -89,7 +89,7 @@ const VersionDetails = ({ txn, parentSize = "lg" }) => {
             {txn.subcategory?.name || "Sin subcategoría"}
           </span>
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Categoría:</strong> <br />
           <span
             className={classNames({
@@ -98,7 +98,7 @@ const VersionDetails = ({ txn, parentSize = "lg" }) => {
             {category}
           </span>
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Método de Pago:</strong> <br />
           <span
             className={classNames({
@@ -110,11 +110,11 @@ const VersionDetails = ({ txn, parentSize = "lg" }) => {
       </Row>
 
       <Row>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Aprobada por:</strong> <br />
           {txn.approvedBy?.firstName} {txn.approvedBy?.lastName || " - "}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Socio Financiero:</strong> <br />
           <span
             className={classNames({
@@ -123,11 +123,11 @@ const VersionDetails = ({ txn, parentSize = "lg" }) => {
             {txn.financePartner?.name || " - "}
           </span>
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Creada por:</strong> <br />
           {txn.createdBy?.firstName} {txn.createdBy?.lastName}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={6} md={12} className="mb-2">
           <strong>Creada el:</strong> <br />
           {dayjs(txn.dateCreated).format("DD/MMM/YYYY - h:mm A")}
         </Col>

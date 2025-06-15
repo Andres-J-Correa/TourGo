@@ -9,7 +9,7 @@ import { TRANSACTION_STATUS_IDS } from "components/transactions/constants";
 
 import "./Transaction.css";
 
-function TransactionVersion({ txn, parentSize }) {
+function TransactionVersion({ txn }) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpanded = () => setExpanded((prev) => !prev);
@@ -55,7 +55,7 @@ function TransactionVersion({ txn, parentSize }) {
 
         {expanded && (
           <CardBody>
-            <VersionDetails txn={txn} parentSize={parentSize} />
+            <VersionDetails txn={txn} />
           </CardBody>
         )}
       </Card>

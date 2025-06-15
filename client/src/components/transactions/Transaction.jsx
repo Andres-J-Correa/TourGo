@@ -14,7 +14,6 @@ function Transaction({
   updateHasDocumentUrl,
   onReverseSuccess,
   onEditDescriptionSuccess,
-  parentSize,
   onEditTransaction,
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -57,7 +56,6 @@ function Transaction({
               updateHasDocumentUrl={updateHasDocumentUrl}
               onReverseSuccess={onReverseSuccess}
               onEditDescriptionSuccess={onEditDescriptionSuccess}
-              parentSize={parentSize}
               onEditTransaction={onEditTransaction}
             />
           </CardBody>

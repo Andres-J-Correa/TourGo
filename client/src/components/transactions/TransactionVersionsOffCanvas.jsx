@@ -45,7 +45,6 @@ function TransactionVersionsOffCanvas({
       <TransactionVersion
         key={`version-${i}-${version.id}`}
         txn={mappedVersion}
-        parentSize="sm"
       />
     );
   }, []);

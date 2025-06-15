@@ -29,7 +29,6 @@ const TransactionDetails = ({
   onReverseSuccess,
   onEditDescriptionSuccess,
   onEditTransaction,
-  parentSize = "lg",
 }) => {
   const [files, setFiles] = useState([]);
   const [showUploader, setShowUploader] = useState(false);
@@ -223,64 +222,64 @@ const TransactionDetails = ({
     <>
       <LoadingOverlay isVisible={isLoading} />
       <Row>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Transacción #</strong>
           <br />
           {txn.id}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Id Precursor:</strong> <br />
           {txn.parentId || " - "}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 12} md={12} className="mb-2">
+        <Col xl={3} md={12} className="mb-2">
           <strong>Referencia:</strong> <br />{" "}
           {txn.referenceNumber || "Sin referencia"}
         </Col>
       </Row>
 
       <Row>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Estado:</strong> <br />
           {status}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Subcategoría:</strong> <br />
           {txn.subcategory?.name || "Sin subcategoría"}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Categoría:</strong> <br />
           {category}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Método de Pago:</strong> <br />
           {txn.paymentMethod?.name}
         </Col>
       </Row>
 
       <Row>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Aprobada por:</strong> <br />
           {txn.approvedBy?.firstName} {txn.approvedBy?.lastName || " - "}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Socio Financiero:</strong> <br />
           {txn.financePartner?.name || " - "}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Creada por:</strong> <br />
           {txn.createdBy?.firstName} {txn.createdBy?.lastName}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Creada el:</strong> <br />
           {dayjs(txn.dateCreated).format("DD/MMM/YYYY - h:mm A")}
         </Col>
       </Row>
       <Row>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Modificada por:</strong> <br />
           {txn.modifiedBy?.firstName} {txn.modifiedBy?.lastName}
         </Col>
-        <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>Modificada el:</strong> <br />
           {dayjs(txn.dateModified).format("DD/MMM/YYYY - h:mm A")}
         </Col>
