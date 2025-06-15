@@ -80,7 +80,7 @@ const BookingArrival = ({
         <Row>
           <Col>
             <strong>Fecha y hora de llegada:</strong>{" "}
-            {dayjs().format("DD/MM/YYYY h:mm")}
+            {dayjs(arrival.eta).format("DD/MM/YYYY h:mm")}
           </Col>
         </Row>
       )}
