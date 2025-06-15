@@ -1,38 +1,40 @@
 import React, { useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Row, Col, Nav, NavItem, NavLink } from "reactstrap";
 import { useAppContext } from "contexts/GlobalAppContext";
-import EmailVerification from "components/users/EmailVerification";
+import HotelEdit from "components/hotels/HotelEdit";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
-import UserPasswordChange from "components/users/UserPasswordChange";
+import InvoicesTC from "components/hotels/InvoicesTC";
 
 const tabComponents = {
-  email: EmailVerification,
-  password: UserPasswordChange,
+  edit: HotelEdit,
+  invoices: InvoicesTC,
   // Add more tabs here as needed
 };
 
-const validTabs = ["email", "password"];
+const validTabs = ["edit", "invoices"];
 
-const breadcrumbs = [
-  { label: "Inicio", path: "/" },
-  { label: "Perfil", path: "/profile" },
-];
-
-const UserSettingsView = () => {
+const HotelSettings = () => {
   const { user } = useAppContext();
   const location = useLocation();
+  const { hotelId } = useParams();
   const navigate = useNavigate();
 
   const activeTab = useMemo(
-    () => new URLSearchParams(location.search).get("tab") || "email",
+    () => new URLSearchParams(location.search).get("tab") || "edit",
     [location.search]
   );
 
+  const breadcrumbs = [
+    { label: "Inicio", path: "/" },
+    { label: "Hoteles", path: "/hotels" },
+    { label: "Hotel", path: `/hotels/${hotelId}` },
+  ];
+
   const handleTabChange = (tab) => {
-    const newTab = validTabs.includes(tab) ? tab : "email";
+    const newTab = validTabs.includes(tab) ? tab : "edit";
     const newParams = new URLSearchParams(location.search);
     newParams.set("tab", newTab);
     navigate({
@@ -44,7 +46,7 @@ const UserSettingsView = () => {
   const renderTabContent = () => {
     const Component = tabComponents[activeTab];
     if (Component) {
-      return <Component user={user} />;
+      return <Component hotelId={hotelId} />;
     }
     return <div>Seleccione una opción 👈</div>;
   };
@@ -63,22 +65,19 @@ const UserSettingsView = () => {
               style={{ top: "40px", zIndex: 1020 }}>
               <NavItem>
                 <NavLink
-                  active={activeTab === "email"}
-                  onClick={() => handleTabChange("email")}
+                  active={activeTab === "edit"}
+                  onClick={() => handleTabChange("edit")}
                   className="cursor-pointer">
-                  Verificación de Email
+                  Editar Hotel
                 </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink
-                  active={activeTab === "password"}
-                  onClick={() => handleTabChange("password")}
+                  active={activeTab === "invoices"}
+                  onClick={() => handleTabChange("invoices")}
                   className="cursor-pointer">
-                  Cambiar Contraseña
+                  T&C Facturas
                 </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink disabled>Preferencias de Notificaciones</NavLink>
               </NavItem>
             </Nav>
           </Col>
@@ -93,4 +92,4 @@ const UserSettingsView = () => {
   );
 };
 
-export default UserSettingsView;
+export default HotelSettings;

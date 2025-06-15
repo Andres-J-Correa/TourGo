@@ -159,9 +159,8 @@ export const useNavbarItems = () => {
                   capitalize: true,
                   collapse: [
                     {
-                      name: "Editar Alojamiento",
-                      path: `/hotels/${hotel.current.id}/edit`,
-                      capitalize: true,
+                      name: "Configuración del Hotel",
+                      path: `/hotels/${hotel.current.id}/settings?tab=edit`,
                     },
                   ],
                 },

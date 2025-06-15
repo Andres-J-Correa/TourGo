@@ -127,13 +127,17 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
           />
         </Col>
       </Row>
-      <CustomField
-        as="textarea"
-        name="notes"
-        placeholder="Notas"
-        disabled={submitting}
-        onChange={(e) => handleInputChange(e, "notes")}
-      />
+      <Row>
+        <Col md="12">
+          <CustomField
+            as="textarea"
+            name="notes"
+            placeholder="Notas"
+            disabled={submitting}
+            onChange={(e) => handleInputChange(e, "notes")}
+          />
+        </Col>
+      </Row>
     </>
   );
 }

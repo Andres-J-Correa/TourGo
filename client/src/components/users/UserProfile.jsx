@@ -110,7 +110,7 @@ function UserProfile() {
   return (
     <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Perfil" />
-      <h1 className="display-6 mb-4">Perfil de Usuario</h1>
+      <h2 className="display-6 mb-4">Perfil de Usuario</h2>
       <ErrorBoundary>
         <Formik
           initialValues={initialValues}

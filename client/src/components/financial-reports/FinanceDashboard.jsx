@@ -104,8 +104,7 @@ function FinanceDashboard() {
                   <NavLink
                     active={activeTab === tab.key}
                     onClick={() => handleTabChange(tab.key)}
-                    className="cursor-pointer"
-                    href="#">
+                    className="cursor-pointer">
                     {tab.label}
                   </NavLink>
                 </NavItem>

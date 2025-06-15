@@ -2,6 +2,7 @@ import {
   onGlobalError,
   onGlobalSuccess,
   API_HOST_PREFIX,
+  replaceEmptyStringsWithNull,
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
@@ -121,7 +122,7 @@ export const getDetailsById = async (id) => {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url: `${api}/details/${id}`,
+    url: `${api}/${id}/details`,
   };
   try {
     const response = await axiosClient(config);
@@ -181,6 +182,68 @@ export const getAllRolePermissions = async () => {
     },
     method: "GET",
     url: `${api}/roles/permissions`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+/**
+ * @param {string} hotelId
+ * @param {{terms:string}} payload
+ * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
+ */
+export const upsertInvoicesTC = async (hotelId, payload) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    url: `${api}/${hotelId}/invoices-tc`,
+    data: replaceEmptyStringsWithNull(payload),
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+/**
+ * @param {string} hotelId
+ * @returns {Promise<{
+ *  isSuccessful: boolean,
+ *  transactionId: string,
+ *  item: {
+ *    terms: string,
+ *    dateCreated: string,
+ *    dateModified: string,
+ *    modifiedBy:{
+ *      id: string,
+ *      firstName: string,
+ *      lastName: string
+ *    },
+ *    createdBy:{
+ *      id: string,
+ *      firstName: string,
+ *      lastName: string
+ *    }
+ *  }
+ *}}
+ */
+export const getInvoicesTC = async (hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/${hotelId}/invoices-tc`,
   };
   try {
     const response = await axiosClient(config);

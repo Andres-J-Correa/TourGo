@@ -1,6 +1,7 @@
 ﻿using TourGo.Models.Domain;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Requests.Finances;
 using TourGo.Models.Requests.Hotels;
 
@@ -18,5 +19,7 @@ namespace TourGo.Services.Interfaces.Hotels
         void Delete(string id, string userId);
         List<RolePermission>? GetRolePermissions();
         List<string>? GetAvailablePublicIds(List<string> possibleIds);
+        void InvoicesUpsertDefaultTC(string hotelId, InvoiceDefaultTCAddUpdateRequest model, string userId);
+        InvoicesDefaultTC? GetInvoicesDefaultTC(string hotelId);
     }
 }

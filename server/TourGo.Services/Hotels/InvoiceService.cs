@@ -25,7 +25,6 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider = mySqlDataProvider;
         }
 
-
         public int Add(InvoiceAddRequest model, string userId, string hotelId)
         {
             string proc = "invoices_insert_v3";
@@ -78,12 +77,11 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_balanceDue", model.BalanceDue);
                 param.AddWithValue("p_locked", model.Locked ? 1 : 0);
             });
-
         }
 
         public InvoiceWithEntities? GetWithEntitiesById(int invoiceId)
         {
-            string proc = "invoices_select_with_entities_by_id_v3";
+            string proc = "invoices_select_with_entities_by_id_v4";
             InvoiceWithEntities? invoiceWithEntities = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -91,9 +89,7 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_invoiceId", invoiceId);
             }, (IDataReader reader, short set) =>
             {
-
                 int index = 0;
-
 
                 if (set == 0)
                 {
@@ -108,14 +104,19 @@ namespace TourGo.Services.Hotels
                     invoiceWithEntities.Customer = CustomerService.MapCustomer(reader, ref index);
                 }
 
-                if( set == 2 && invoiceWithEntities != null)
+                if (set == 2 && invoiceWithEntities != null)
                 {
                     Booking booking = BookingService.MapBooking(reader, ref index);
-                    booking.RoomBookings = reader.DeserializeObjectSafely<List<RoomBooking>>(index++, ()=> null);
+                    booking.RoomBookings = reader.DeserializeObjectSafely<List<RoomBooking>>(index++, () => null);
                     booking.ExtraCharges = reader.DeserializeObjectSafely<List<ExtraCharge>>(index++, () => null);
                     booking.PersonalizedCharges = reader.DeserializeObjectSafely<List<ExtraCharge>>(index++, () => null);
                     invoiceWithEntities.Bookings ??= new List<Booking>();
                     invoiceWithEntities.Bookings.Add(booking);
+                }
+
+                if (set == 3 && invoiceWithEntities != null)
+                {
+                    invoiceWithEntities.Terms = reader.GetSafeString(0);
                 }
             });
 

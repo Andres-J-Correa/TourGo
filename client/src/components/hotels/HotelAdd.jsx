@@ -61,7 +61,7 @@ const HotelAdd = () => {
     return (
       <>
         <Breadcrumb breadcrumbs={breadcrumbs} active="Agregar Hotel" />
-        <h1 className="display-6 mb-4">Agregar Nuevo Hotel</h1>
+        <h2 className="display-6 mb-4">Agregar Nuevo Hotel</h2>
         <VerifyAccountFallback />
       </>
     );
@@ -70,7 +70,7 @@ const HotelAdd = () => {
   return (
     <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Agregar Hotel" />
-      <h1 className="display-6 mb-4">Agregar Nuevo Hotel</h1>
+      <h2 className="display-6 mb-4">Agregar Nuevo Hotel</h2>
       <ErrorBoundary>
         <Formik
           initialValues={{
