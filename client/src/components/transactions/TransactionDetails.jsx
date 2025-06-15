@@ -309,7 +309,7 @@ const TransactionDetails = ({
             !Boolean(txn.parentId) && (
               <Button
                 size="sm"
-                color="secondary"
+                color="outline-danger"
                 onClick={() => onEditTransaction(txn)}
                 className="float-start">
                 Editar Transacción
