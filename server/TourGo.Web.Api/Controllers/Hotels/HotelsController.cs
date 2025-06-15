@@ -8,11 +8,13 @@ using TourGo.Models.Domain;
 using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Finances;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services;
 using TourGo.Services.Finances;
+using TourGo.Services.Hotels;
 using TourGo.Services.Interfaces;
 using TourGo.Services.Interfaces.Hotels;
 using TourGo.Services.Security;
@@ -45,7 +47,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _hotelsPublicIdConfig = publicIdOptions.Value;
         }
 
-        #region hotel
+        
         [HttpPost]
         [VerifiedUser]
         public ActionResult<ItemResponse<string>> Create(HotelAddRequest model)
@@ -101,7 +103,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("details/{id}")]
+        [HttpGet("{id}/details")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
         public ActionResult<ItemResponse<Hotel>> GetDetails(string id)
         {
@@ -307,6 +309,54 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return StatusCode(code, response);
         }
-        #endregion
+
+        [HttpPost("{id}/invoices-tc")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> InvoicesUpsertDefaultTC(InvoiceDefaultTCAddUpdateRequest model, string id)
+        {
+            ObjectResult? result = null;
+            try
+            {
+                string userId = _webAuthService.GetCurrentUserId();
+                _hotelService.InvoicesUpsertDefaultTC(id, model, userId);
+                SuccessResponse response = new SuccessResponse();
+                result = Ok200(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
+
+        [HttpGet("{id}/invoices-tc")]
+        [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemResponse<InvoicesDefaultTC>> GetInvoicesDefaultTC(string id)
+        {
+            ObjectResult? result = null;
+            try
+            {
+                InvoicesDefaultTC? defaultTC = _hotelService.GetInvoicesDefaultTC(id);
+                if (defaultTC == null)
+                {
+                    ErrorResponse response = new ErrorResponse("Default terms and conditions not found.");
+                    result = NotFound404(response);
+                }
+                else
+                {
+                    ItemResponse<InvoicesDefaultTC> response = new ItemResponse<InvoicesDefaultTC> { Item = defaultTC };
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
     }
 }

@@ -11,6 +11,7 @@ using TourGo.Data.Providers;
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Domain.Users;
 using TourGo.Models.Requests.Finances;
 using TourGo.Models.Requests.Hotels;
@@ -30,7 +31,7 @@ namespace TourGo.Services.Hotels
         {
             int newId = 0;
 
-            string proc = "hotels_insert_v3";
+            string proc = "hotels_insert_v4";
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
@@ -86,7 +87,7 @@ namespace TourGo.Services.Hotels
 
         public Hotel? GetDetails(string id)
         {
-            string proc = "hotels_select_details_by_id_v3";
+            string proc = "hotels_select_details_by_id_v4";
             Hotel ? hotel = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -99,6 +100,7 @@ namespace TourGo.Services.Hotels
                 if (set == 0)
                 {
                     hotel = MapHotel(reader, ref index);
+                    hotel.MapFromReader(reader, ref index);
                 }
                 else if(set == 1 && hotel != null)
                 {
@@ -241,6 +243,34 @@ namespace TourGo.Services.Hotels
             });
 
             return availableIds;
+        }
+
+        public void InvoicesUpsertDefaultTC(string hotelId, InvoiceDefaultTCAddUpdateRequest model, string userId)
+        {
+            string proc = "invoices_default_terms_and_conditions_upsert";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_terms", string.IsNullOrEmpty(model.Terms) ? DBNull.Value : model.Terms);
+                param.AddWithValue("p_modifiedBy", userId);
+            });
+        }
+
+        public InvoicesDefaultTC? GetInvoicesDefaultTC(string hotelId)
+        {
+            string proc = "invoices_default_terms_and_conditions_select";
+            InvoicesDefaultTC? defaultTC = null;
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (IDataReader reader, short set) =>
+            {
+                int index = 0;
+                defaultTC = new InvoicesDefaultTC();
+                defaultTC.Terms = reader.GetSafeString(index++);
+                defaultTC.MapFromReader(reader, ref index);
+            });
+            return defaultTC;
         }
 
         private static Hotel MapHotel(IDataReader reader, ref int index)

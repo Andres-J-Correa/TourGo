@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Row, Col, Card, CardBody, CardHeader, Button } from "reactstrap";
 import dayjs from "dayjs";
@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 // import { INVOICE_TYPES_BY_ID } from "components/invoices/constants";
 import { Margin, usePDF } from "react-to-pdf";
 import classNames from "classnames";
+import DOMPurify from "dompurify";
 import "./InvoiceView.css";
 
 const InvoiceView = () => {
@@ -44,6 +45,13 @@ const InvoiceView = () => {
     { label: "Hoteles", path: "/hotels" },
     { label: "Hotel", path: `/hotels/${hotelId}` },
   ];
+
+  const sanitizedTerms = useMemo(() => {
+    return (
+      DOMPurify.sanitize(invoiceData?.details?.terms) ||
+      "<p>No hay términos y condiciones disponibles.</p>"
+    );
+  }, [invoiceData?.details?.terms]);
 
   useEffect(() => {
     if (!hotelId || !invoiceId) return;
@@ -96,7 +104,7 @@ const InvoiceView = () => {
         <div ref={targetRef} className="w-75 mx-auto my-5">
           <Row>
             <Col className="text-center">
-              <h1>{invoiceData?.hotel?.name}</h1>
+              <h2>{invoiceData?.hotel?.name}</h2>
               <span className="me-4">NIT: {invoiceData?.hotel?.taxId}</span>
               <span className="text-capitalize">
                 {invoiceData?.hotel?.type}
@@ -326,23 +334,31 @@ const InvoiceView = () => {
                     <hr />
                   </Row>
 
-                  <>
-                    <h5>Habitaciones</h5>
-                    <Row>
-                      {groupedRooms.map((room, idx) => (
-                        <Col
-                          key={`${room.roomName}-${idx}`}
-                          lg={6}
-                          className="d-flex justify-content-center">
-                          <RoomCard
-                            room={room}
-                            bookingNights={room.segments?.length || 0}
-                            extraCharges={booking?.extraCharges}
-                          />
-                        </Col>
-                      ))}
-                    </Row>
-                  </>
+                  <h5>Habitaciones</h5>
+                  <Row>
+                    {groupedRooms.map((room, idx) => (
+                      <Col
+                        key={`${room.roomName}-${idx}`}
+                        lg={6}
+                        className="d-flex justify-content-center">
+                        <RoomCard
+                          room={room}
+                          bookingNights={room.segments?.length || 0}
+                          extraCharges={booking?.extraCharges}
+                        />
+                      </Col>
+                    ))}
+                  </Row>
+
+                  <hr />
+                  <Row className="mb-3 booking-card-content">
+                    <Col>
+                      <h5>Términos y Condiciones</h5>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: sanitizedTerms }}
+                      />
+                    </Col>
+                  </Row>
                 </CardBody>
               </Card>
             );

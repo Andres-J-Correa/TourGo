@@ -1,30 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button, Row, Col, Spinner } from "reactstrap";
 import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
 import { getDetailsById, updateById, deleteById } from "services/hotelService";
-import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
-import Breadcrumb from "components/commonUI/Breadcrumb";
-import ErrorBoundary from "components/commonUI/ErrorBoundary";
-import { addValidationSchema } from "./constants";
+import { addValidationSchema, HOTEL_ROLES } from "components/hotels/constants";
+import { useAppContext } from "contexts/GlobalAppContext";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import dayjs from "dayjs";
+import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 
-const HotelEdit = () => {
-  const { hotelId } = useParams();
+const HotelEdit = ({ hotelId }) => {
   const [hotel, setHotel] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
 
-  const navigate = useNavigate();
+  const { hotel: currentHotel } = useAppContext();
 
-  const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
-  ];
+  const navigate = useNavigate();
 
   // Handles form cancel action
   const handleCancel = (resetForm) => {
@@ -117,13 +112,10 @@ const HotelEdit = () => {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Editar" />
-      <h1 className="display-6 mb-4">Detalles del Hotel</h1>
-
-      <LoadingOverlay isVisible={isLoading} message="Cargando..." />
-      <ErrorBoundary>
+      <h4 className="display-6 mb-4">Editar Hotel</h4>
+      <SimpleLoader isVisible={isLoading} />
+      {!isLoading && (
         <div>
-          {" "}
           {/* Form for Editable Fields */}
           <Formik
             initialValues={{
@@ -222,30 +214,52 @@ const HotelEdit = () => {
                 onClick={() => setIsEditing(true)}>
                 Editar
               </Button>
-              <Button
-                className="ms-2 bg-danger text-white"
-                type="button"
-                onClick={handleDelete}
-                disabled={isUploading}>
-                {isUploading ? <Spinner size="sm" /> : "Eliminar Hotel"}
-              </Button>
+              {currentHotel.current.roleId === HOTEL_ROLES.OWNER && (
+                <Button
+                  className="ms-2 bg-danger text-white"
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={isUploading}>
+                  {isUploading ? <Spinner size="sm" /> : "Eliminar Hotel"}
+                </Button>
+              )}
             </>
           )}
-          {/* Hotel Info (Read-only Fields) */}
-          <Row className="mb-3">
-            <Col md="6">
-              <strong>Fecha de creación:</strong>{" "}
-              {new Date(hotel?.dateCreated).toLocaleDateString()}
-            </Col>
-            <Col md="6">
+          <Row className="mt-4">
+            <Col>
               <strong>Propietario:</strong>{" "}
-              {hotel?.owner
-                ? `${hotel.owner.firstName} ${hotel.owner.lastName}`
-                : "N/A"}
+              <p>
+                {" "}
+                {hotel?.owner
+                  ? `${hotel.owner.firstName} ${hotel.owner.lastName}`
+                  : "N/A"}
+              </p>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col>
+              <strong>Creado por:</strong>
+              <p>
+                {hotel?.createdBy?.firstName} {hotel?.createdBy?.lastName}
+              </p>
+            </Col>
+            <Col>
+              <strong>Fecha de creación:</strong>
+              <p>{dayjs(hotel?.dateCreated).format("DD/MM/YYYY h:mm a")}</p>
+            </Col>
+            <Col>
+              <strong>Modificado por:</strong>
+              <p>
+                {hotel?.modifiedBy?.firstName} {hotel?.modifiedBy?.lastName}
+              </p>
+            </Col>
+            <Col>
+              <strong>Fecha de modificación</strong>
+              <p>{dayjs(hotel?.dateModified).format("DD/MM/YYYY h:mm a")}</p>
             </Col>
           </Row>
         </div>
-      </ErrorBoundary>
+      )}
     </>
   );
 };

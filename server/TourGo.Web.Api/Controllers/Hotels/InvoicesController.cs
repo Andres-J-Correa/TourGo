@@ -22,8 +22,8 @@ namespace TourGo.Web.Api.Controllers.Hotels
         private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IErrorLoggingService _errorLoggingService;
 
-        public InvoicesController(ILogger<InvoicesController> logger, 
-            IInvoiceService invoiceService, 
+        public InvoicesController(ILogger<InvoicesController> logger,
+            IInvoiceService invoiceService,
             IWebAuthenticationService<string> webAuthenticationService,
             IErrorLoggingService errorLoggingService) : base(logger)
         {
@@ -47,7 +47,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 {
                     throw new Exception("Unable to add invoice. Please try again later.");
                 }
-     
+
                 ItemResponse<int> response = new ItemResponse<int> { Item = id };
                 result = Created201(response);
             }

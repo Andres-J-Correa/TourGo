@@ -24,5 +24,6 @@ namespace TourGo.Models.Domain.Invoices
         public decimal Total { get; set; }
         public decimal BalanceDue { get; set; }
         public bool Locked { get; set; }
+        public string? Terms { get; set; }
     }
 }
