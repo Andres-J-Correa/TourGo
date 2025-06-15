@@ -161,6 +161,22 @@ export const transactionAddValidationSchema = Yup.object({
     .max(100, "El número de referencia no puede exceder los 100 caracteres")
     .nullable(),
   description: Yup.string().min(2).max(500),
+  financePartnerId: Yup.number().nullable(),
+});
+
+export const transactionUpdateValidationSchema = Yup.object({
+  transactionDate: Yup.date().required(
+    "La fecha de la transacción es requerida"
+  ),
+  paymentMethodId: Yup.number().required("El método de pago es requerido"),
+  categoryId: Yup.number().required("La categoría es requerida"),
+  subcategoryId: Yup.number().nullable(),
+  referenceNumber: Yup.string()
+    .min(2, "El número de referencia debe tener al menos 2 caracteres")
+    .max(100, "El número de referencia no puede exceder los 100 caracteres")
+    .nullable(),
+  description: Yup.string().min(2).max(500),
+  financePartnerId: Yup.number().nullable(),
 });
 
 export const sanitizeNewTransaction = (
@@ -201,4 +217,11 @@ export const sanitizeNewTransaction = (
     firstName: user.firstName,
     lastName: user.lastName,
   },
+  modifiedBy: {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  },
+  dateCreated: new Date().toISOString(),
+  dateModified: new Date().toISOString(),
 });

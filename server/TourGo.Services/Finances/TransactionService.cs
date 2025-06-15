@@ -235,23 +235,43 @@ namespace TourGo.Services.Finances
             });
         }
 
-        public List<Transaction>? GetVersionsByTransactionId(int transactionId)
+        public List<TransactionVersion>? GetVersionsByTransactionId(int transactionId)
         {
             string proc = "transactions_versions_select_by_transaction_id";
-            List<Transaction>? transactions = null;
+            List<TransactionVersion>? transactions = null;
             _dataProvider.ExecuteCmd(proc, (col) =>
             {
                 col.AddWithValue("p_id", transactionId);
             }, (reader, returnCol) =>
             {
                 int index = 0;
-                Transaction transaction = MapTransactionVersion(reader, ref index);
+                TransactionVersion transaction = MapTransactionVersion(reader, ref index);
                 transaction.ParentId = transactionId;
 
-                transactions ??= new List<Transaction>();
+                transactions ??= new List<TransactionVersion>();
                 transactions.Add(transaction);
             });
             return transactions;
+        }
+   
+        public void Update(TransactionUpdateRequest model, string userId, string hotelId)
+        {
+            string proc = "transactions_update";
+
+            _dataProvider.ExecuteNonQuery(proc, (col) =>
+            {
+                col.AddWithValue("p_transactionDate", model.TransactionDate.ToString("yyyy-MM-dd"));
+                col.AddWithValue("p_paymentMethodId", model.PaymentMethodId);
+                col.AddWithValue("p_categoryId", model.CategoryId);
+                col.AddWithValue("p_subcategoryId", model.SubcategoryId);
+                col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(model.ReferenceNumber) ? DBNull.Value : model.ReferenceNumber);
+                col.AddWithValue("p_description", string.IsNullOrEmpty(model.Description) ? DBNull.Value : model.Description);
+                col.AddWithValue("p_currencyCode", model.CurrencyCode);
+                col.AddWithValue("p_financePartnerId", model.FinancePartnerId > 0 ? model.FinancePartnerId : DBNull.Value);
+                col.AddWithValue("p_hotelId", hotelId);
+                col.AddWithValue("p_modifiedBy", userId);
+                col.AddWithValue("p_txnId", model.Id);
+            });
         }
 
         public string GetFileKey(TransactionFileAddRequest model, string hotelId)
@@ -343,9 +363,9 @@ namespace TourGo.Services.Finances
             return transaction;
         }
 
-        private static Transaction MapTransactionVersion(IDataReader reader, ref int index)
+        private static TransactionVersion MapTransactionVersion(IDataReader reader, ref int index)
         {
-            Transaction transaction = new Transaction();
+            TransactionVersion transaction = new TransactionVersion();
             transaction.Id = reader.GetSafeInt32(index++);
             transaction.Amount = reader.GetSafeDecimal(index++);
             transaction.TransactionDate = reader.GetSafeDateTime(index++);
@@ -383,6 +403,7 @@ namespace TourGo.Services.Finances
             transaction.ModifiedBy.LastName = reader.GetSafeString(index++);
             transaction.DateModified = reader.GetSafeDateTime(index++);
             transaction.DateCreated = reader.GetSafeDateTime(index++);
+            transaction.DocumentUrlChanged = reader.GetSafeBool(index++);
             return transaction;
         }
 

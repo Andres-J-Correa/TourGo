@@ -8,6 +8,7 @@ import TransactionDetails from "components/transactions/TransactionDetails";
 import TransactionsTableFilters from "components/transactions/transactions-view/TransactionsTableFilters";
 import TransactionAddForm from "components/transactions/TransactionAddForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
+import TransactionUpdateForm from "components/transactions/TransactionUpdateForm";
 
 import {
   getPagedTransactions,
@@ -21,6 +22,7 @@ import {
   TRANSACTION_CATEGORIES_BY_ID,
   TRANSACTION_STATUS_BY_ID,
 } from "components/transactions/constants";
+import useHotelFormData from "components/transactions/hooks/useHotelFormData";
 
 import { Button, Col, Label, Row, Spinner } from "reactstrap";
 import classNames from "classnames";
@@ -85,6 +87,14 @@ function TransactionsView() {
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [transactionToUpdate, setTransactionToUpdate] = useState(null);
+
+  const {
+    paymentMethods,
+    transactionSubcategories,
+    financePartners,
+    isLoadingHotelData,
+  } = useHotelFormData(hotelId);
 
   const { hotel } = useAppContext();
 
@@ -359,6 +369,40 @@ function TransactionsView() {
     }));
     table.setExpanded({});
   };
+
+  const onEditTransaction = useCallback(
+    (transaction) => {
+      setTransactionToUpdate(transaction);
+      setShowForm(false);
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    },
+    [setTransactionToUpdate]
+  );
+
+  const handleCancelUpdate = useCallback(() => {
+    setTransactionToUpdate(null);
+  }, [setTransactionToUpdate]);
+
+  const onTransactionUpdated = useCallback(
+    (updatedTransaction) => {
+      setData((prev) => {
+        const newItems = prev.items.map((txn) => {
+          if (txn.id === updatedTransaction.id) {
+            return { ...txn, ...updatedTransaction };
+          }
+          return txn;
+        });
+        return { ...prev, items: newItems };
+      });
+      setTransactionToUpdate(null);
+    },
+    [setData]
+  );
 
   const fetchData = useCallback(
     async (hotelId, values) => {
@@ -700,6 +744,7 @@ function TransactionsView() {
                               onEditDescriptionSuccess={
                                 onEditDescriptionSuccess
                               }
+                              onEditTransaction={onEditTransaction}
                             />
                           </div>
                         </td>
@@ -734,6 +779,21 @@ function TransactionsView() {
             showForm={showForm}
             setShowForm={setShowForm}
             onTransactionAdded={onTransactionAdded}
+            paymentMethods={paymentMethods}
+            transactionSubcategories={transactionSubcategories}
+            financePartners={financePartners}
+            isLoadingHotelData={isLoadingHotelData}
+          />
+          <TransactionUpdateForm
+            transaction={transactionToUpdate}
+            hotelId={hotelId}
+            showForm={!!transactionToUpdate}
+            handleCancelClick={handleCancelUpdate}
+            paymentMethods={paymentMethods}
+            transactionSubcategories={transactionSubcategories}
+            financePartners={financePartners}
+            isLoadingHotelData={isLoadingHotelData}
+            onTransactionUpdated={onTransactionUpdated}
           />
         </div>
       </ErrorBoundary>

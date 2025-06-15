@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Offcanvas, OffcanvasHeader, OffcanvasBody } from "reactstrap";
 import { toast } from "react-toastify";
 
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
-import Transaction from "components/transactions/Transaction";
+import TransactionVersion from "components/transactions/TransactionVersion";
 import Alert from "components/commonUI/Alert";
 
 import { getTransactionVersions } from "services/transactionService";
@@ -19,14 +19,36 @@ function TransactionVersionsOffCanvas({
     mapped: [],
   });
 
-  const mapVersion = (version, i) => (
-    <Transaction
-      key={`version-${i}-${version.id}`}
-      txn={version}
-      isVersion={true}
-      parentSize="sm"
-    />
-  );
+  const mapVersion = useCallback((version, i, array) => {
+    const mappedVersion = {
+      ...version,
+    };
+    if (i < array.length - 1) {
+      const changes = {
+        transactionDate:
+          version.transactionDate !== array[i + 1].transactionDate,
+        paymentMethod:
+          version.paymentMethod?.name !== array[i + 1].paymentMethod?.name,
+        categoryId: version.categoryId !== array[i + 1].categoryId,
+        subcategory:
+          version.subcategory?.name !== array[i + 1].subcategory?.name,
+        referenceNumber:
+          version.referenceNumber !== array[i + 1].referenceNumber,
+        description: version.description !== array[i + 1].description,
+        financePartner:
+          version.financePartner?.name !== array[i + 1].financePartner?.name,
+      };
+      mappedVersion.changes = changes;
+    }
+
+    return (
+      <TransactionVersion
+        key={`version-${i}-${version.id}`}
+        txn={mappedVersion}
+        parentSize="sm"
+      />
+    );
+  }, []);
 
   useEffect(() => {
     if (offCanvasOpen) {
@@ -53,26 +75,29 @@ function TransactionVersionsOffCanvas({
           setLoading(false);
         });
     }
-  }, [offCanvasOpen, transaction.id, versions.hasFetched]);
+  }, [offCanvasOpen, transaction.id, versions.hasFetched, mapVersion]);
 
   return (
     <Offcanvas
       isOpen={offCanvasOpen}
       toggle={handleToggleOffcanvas}
       direction="end"
-      style={{ width: "50%" }}
+      style={{ width: "50%", padding: "0.5rem" }}
       zIndex={5001}>
       <OffcanvasHeader toggle={handleToggleOffcanvas}>
         Historial de Cambios para Transacción # {transaction.id}
       </OffcanvasHeader>
       <OffcanvasBody>
+        <Alert
+          type="info"
+          message="Los datos resaltados en color rojo indican modificaciones."
+        />
         <SimpleLoader isVisible={loading} />
         {!loading && versions.items.length === 0 && (
           <div className="text-center py-5">
             <Alert
-              type="info"
+              type="warning"
               message="No se encontraron versiones para esta transacción."
-              className="mb-0"
             />
           </div>
         )}

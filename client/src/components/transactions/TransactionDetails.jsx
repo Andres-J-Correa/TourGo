@@ -10,13 +10,12 @@ import SupportDocumentModal from "components/transactions/SupportDocumentModal";
 import TransactionVersionsOffCanvas from "components/transactions/TransactionVersionsOffCanvas";
 
 import {
-  TRANSACTION_CATEGORIES,
-  TRANSACTION_STATUSES,
+  TRANSACTION_CATEGORIES_BY_ID,
+  TRANSACTION_STATUS_BY_ID,
   TRANSACTION_STATUS_IDS,
 } from "components/transactions/constants";
 import {
   getSupportDocumentUrl,
-  getVersionSupportDocumentUrl,
   updateDocumentUrl,
   reverse,
   updateDescription,
@@ -29,7 +28,7 @@ const TransactionDetails = ({
   updateHasDocumentUrl,
   onReverseSuccess,
   onEditDescriptionSuccess,
-  isVersion = false,
+  onEditTransaction,
   parentSize = "lg",
 }) => {
   const [files, setFiles] = useState([]);
@@ -44,11 +43,10 @@ const TransactionDetails = ({
 
   const { hotelId } = useParams();
 
-  const category = TRANSACTION_CATEGORIES.find(
-    (cat) => cat.id === txn.categoryId
-  )?.name;
+  const category =
+    TRANSACTION_CATEGORIES_BY_ID[txn.categoryId] || "Desconocido";
 
-  const status = TRANSACTION_STATUSES.find((s) => s.id === txn.statusId)?.name;
+  const status = TRANSACTION_STATUS_BY_ID[txn.statusId] || "Desconocido";
 
   const handleToggleOffcanvas = () => {
     setOffcanvasOpen((prev) => !prev);
@@ -57,12 +55,8 @@ const TransactionDetails = ({
   const handleViewDocument = async () => {
     setIsLoading(true);
     try {
-      let response;
-      if (isVersion) {
-        response = await getVersionSupportDocumentUrl(txn.parentId, txn.id);
-      } else {
-        response = await getSupportDocumentUrl(txn.id);
-      }
+      const response = await getSupportDocumentUrl(txn.id);
+
       if (response.isSuccessful) {
         setDocumentUrl(response.item);
         setModalOpen(true);
@@ -230,7 +224,7 @@ const TransactionDetails = ({
       <LoadingOverlay isVisible={isLoading} />
       <Row>
         <Col xl={parentSize === "lg" ? 3 : 6} md={6} className="mb-2">
-          <strong>{isVersion ? "Versión" : "Transacción"} #</strong>
+          <strong>Transacción #</strong>
           <br />
           {txn.id}
         </Col>
@@ -301,21 +295,32 @@ const TransactionDetails = ({
       )}
       <Row className="mt-3">
         <Col className="text-center">
-          {onEditDescriptionSuccess && (
-            <Button color="secondary" onClick={handleEditDescription}>
+          {Boolean(txn.parentId) && Boolean(onEditDescriptionSuccess) && (
+            <Button
+              size="sm"
+              color="secondary"
+              onClick={handleEditDescription}
+              className="float-start">
               Editar Descripción
             </Button>
           )}
-          {txn.hasDocumentUrl && (
-            <Button color="info" onClick={handleViewDocument} className="ms-5">
-              Ver comprobante
-            </Button>
-          )}
+          {Boolean(onEditTransaction) &&
+            txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED &&
+            !Boolean(txn.parentId) && (
+              <Button
+                size="sm"
+                color="secondary"
+                onClick={() => onEditTransaction(txn)}
+                className="float-start">
+                Editar Transacción
+              </Button>
+            )}
           {updateHasDocumentUrl &&
             txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
               <Button
-                color={showUploader ? "warning" : "primary"}
-                className="ms-5"
+                size="sm"
+                color={showUploader ? "warning" : "outline-dark"}
+                className="me-2"
                 onClick={() => {
                   setFiles([]);
                   setShowUploader((prev) => !prev);
@@ -327,10 +332,19 @@ const TransactionDetails = ({
                   : "Adjuntar Comprobante"}
               </Button>
             )}
+          {txn.hasDocumentUrl && (
+            <Button
+              size="sm"
+              color="outline-success"
+              onClick={handleViewDocument}
+              className="me-2">
+              Ver comprobante
+            </Button>
+          )}
           {!txn.parentId && (
             <Button
-              color="secondary"
-              className="ms-5"
+              size="sm"
+              color="outline-secondary"
               onClick={handleToggleOffcanvas}>
               Ver Historial
             </Button>
@@ -338,8 +352,9 @@ const TransactionDetails = ({
           {onReverseSuccess &&
             txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
               <Button
+                size="sm"
                 color="outline-danger"
-                className="ms-5"
+                className="float-end"
                 onClick={handleReverseTransaction}>
                 Revertir
               </Button>
@@ -370,6 +385,7 @@ const TransactionDetails = ({
             {
               <div className="text-center mt-2">
                 <Button
+                  size="sm"
                   color="success"
                   onClick={handleFileSubmit}
                   disabled={submitting || files.length === 0}>

@@ -249,3 +249,21 @@ export const getVersionSupportDocumentUrl = async (
     return onGlobalError(error);
   }
 };
+
+export const update = async (payload, transactionId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${api}/hotel/${hotelId}/transaction/${transactionId}`,
+    data: replaceEmptyStringsWithNull(payload),
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

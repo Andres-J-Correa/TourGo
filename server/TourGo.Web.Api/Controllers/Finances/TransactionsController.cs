@@ -67,6 +67,21 @@ namespace TourGo.Web.Api.Controllers.Finances
                 ItemResponse<int> response = new ItemResponse<int> { Item = id };
                 result = Created201(response);
             }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+
+                if (Enum.IsDefined(typeof(TransactionManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((TransactionManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                result = StatusCode(500, error);
+            }
             catch (Exception ex)
             {
                 Logger.LogError(ex.ToString());
@@ -405,12 +420,12 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpGet("{id:int}/versions")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemsResponse<Transaction>> GetVersionsByTransactionId(int id)
+        public ActionResult<ItemsResponse<TransactionVersion>> GetVersionsByTransactionId(int id)
         {
             ObjectResult result = null;
             try
             {
-                List<Transaction>? versions = _transactionService.GetVersionsByTransactionId(id);
+                List<TransactionVersion>? versions = _transactionService.GetVersionsByTransactionId(id);
                 if (versions == null)
                 {
                     ErrorResponse response = new ErrorResponse("No versions found for the specified transaction.");
@@ -418,7 +433,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                 }
                 else
                 {
-                    ItemsResponse<Transaction> response = new ItemsResponse<Transaction> { Items = versions };
+                    ItemsResponse<TransactionVersion> response = new ItemsResponse<TransactionVersion> { Items = versions };
                     result = Ok200(response);
                 }
             }
@@ -470,6 +485,41 @@ namespace TourGo.Web.Api.Controllers.Finances
                     ItemResponse<string> response = new ItemResponse<string> { Item = url };
                     result = Ok200(response);
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
+
+        [HttpPut("hotel/{hotelId}/transaction/{id:int}")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> Update(TransactionUpdateRequest model, string hotelId)
+        {
+            ObjectResult result = null;
+            try
+            {
+                string userId = _webAuthService.GetCurrentUserId();
+                _transactionService.Update(model, userId, hotelId);
+                SuccessResponse response = new SuccessResponse();
+                result = Ok200(response);
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+                if (Enum.IsDefined(typeof(TransactionManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((TransactionManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                result = StatusCode(500, error);
             }
             catch (Exception ex)
             {

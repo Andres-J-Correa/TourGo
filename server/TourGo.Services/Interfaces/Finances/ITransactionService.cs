@@ -20,7 +20,8 @@ namespace TourGo.Services.Interfaces
         bool IsValidSortColumn(string? column);
         int Reverse(int txnId, string userId);
         void UpdateDescription(TransactionDescriptionUpdateRequest model);
-        List<Transaction>? GetVersionsByTransactionId(int transactionId);
+        List<TransactionVersion>? GetVersionsByTransactionId(int transactionId);
         string? GetVersionSupportDocumentUrl(int transactionId, int versionId);
+        void Update(TransactionUpdateRequest model, string userId, string hotelId);
     }
 }
