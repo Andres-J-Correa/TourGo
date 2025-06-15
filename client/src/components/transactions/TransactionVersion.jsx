@@ -3,19 +3,13 @@ import { Card, CardBody, CardHeader, Row } from "reactstrap";
 import { formatCurrency } from "utils/currencyHelper";
 import classNames from "classnames";
 import dayjs from "dayjs";
-import TransactionDetails from "components/transactions/TransactionDetails";
+import VersionDetails from "components/transactions/VersionDetails";
 import TransactionStatusBadge from "components/transactions/TransactionStatusBadge";
 import { TRANSACTION_STATUS_IDS } from "components/transactions/constants";
 
 import "./Transaction.css";
 
-function Transaction({
-  txn,
-  updateHasDocumentUrl,
-  onReverseSuccess,
-  onEditDescriptionSuccess,
-  onEditTransaction,
-}) {
+function TransactionVersion({ txn }) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpanded = () => setExpanded((prev) => !prev);
@@ -40,9 +34,19 @@ function Transaction({
         <CardHeader onClick={toggleExpanded} className={cardHeaderClass}>
           <strong>{formatCurrency(txn.amount, txn.currencyCode)}</strong>
           {" - "}
-          {dayjs(txn.transactionDate).format("DD/MMM/YYYY")}
+          <span
+            className={classNames({
+              "text-danger": txn.changes?.transactionDate,
+            })}>
+            {dayjs(txn.transactionDate).format("DD/MMM/YYYY")}
+          </span>
           {" - "}
-          {txn.paymentMethod?.name}
+          <span
+            className={classNames({
+              "text-danger": txn.changes?.paymentMethod,
+            })}>
+            {txn.paymentMethod?.name}
+          </span>
           <TransactionStatusBadge
             statusId={txn?.statusId}
             className="float-end"
@@ -51,13 +55,7 @@ function Transaction({
 
         {expanded && (
           <CardBody>
-            <TransactionDetails
-              txn={txn}
-              updateHasDocumentUrl={updateHasDocumentUrl}
-              onReverseSuccess={onReverseSuccess}
-              onEditDescriptionSuccess={onEditDescriptionSuccess}
-              onEditTransaction={onEditTransaction}
-            />
+            <VersionDetails txn={txn} />
           </CardBody>
         )}
       </Card>
@@ -65,4 +63,4 @@ function Transaction({
   );
 }
 
-export default Transaction;
+export default TransactionVersion;

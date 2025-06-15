@@ -124,7 +124,8 @@
       "4004": "No se encontraron registros",
       "4005": "No tiene permisos suficientes para realizar esta acción",
       "5000": "Error de gestión de transacciones",
-      "5001": "La solicitud no es válida"
+      "5001": "La solicitud no es válida",
+      "5002": "Ya existe una transacción con este número de referencia"
     }
   }
 }

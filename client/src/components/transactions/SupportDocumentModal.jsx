@@ -4,7 +4,11 @@ import defaultImage from "assets/images/default-image.svg";
 
 function SupportDocumentModal({ modalOpen, setModalOpen, documentUrl }) {
   return (
-    <Modal isOpen={modalOpen} toggle={() => setModalOpen(false)} size="lg">
+    <Modal
+      isOpen={modalOpen}
+      toggle={() => setModalOpen(false)}
+      size="lg"
+      zIndex={5002}>
       <ModalHeader
         toggle={() => setModalOpen(false)}
         className="bg-primary-subtle">

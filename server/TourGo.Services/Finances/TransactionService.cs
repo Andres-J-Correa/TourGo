@@ -29,7 +29,7 @@ namespace TourGo.Services.Finances
 
         public int Add(TransactionAddRequest request, string userId, string hotelId)
         {
-            string proc = "transactions_insert_v4";
+            string proc = "transactions_insert_v5";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
@@ -68,7 +68,7 @@ namespace TourGo.Services.Finances
 
         public int Reverse(int txnId, string userId)
         {
-            string proc = "transactions_reverse_v2";
+            string proc = "transactions_reverse_v3";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
@@ -94,7 +94,7 @@ namespace TourGo.Services.Finances
         public List<Transaction>? GetByEntityId (int entityId)
         {
 
-            string proc = "transactions_select_by_entity_id_v3";
+            string proc = "transactions_select_by_entity_id_v4";
             List<Transaction>? transactions = null;
 
             _dataProvider.ExecuteCmd(proc, (col) =>
@@ -118,7 +118,7 @@ namespace TourGo.Services.Finances
             DateOnly? startDate, DateOnly? endDate, int? txnId, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
             string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
         {
-            string proc = "transactions_select_paginated_v4";
+            string proc = "transactions_select_paginated_v5";
             Paged<Transaction>? paged = null;
             List<Transaction>? transactions = null;
             int totalCount = 0;
@@ -174,15 +174,16 @@ namespace TourGo.Services.Finances
             return paged;
         }
 
-        public void UpdateDocumentUrl (int transactionId, string fileKey)
+        public void UpdateDocumentUrl (int transactionId, string fileKey, string userId)
         {
 
-           string proc = "transactions_update_by_id_document_url";
+           string proc = "transactions_update_document_url_by_id";
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
                 col.AddWithValue("p_id", transactionId);
                 col.AddWithValue("p_documentUrl", fileKey);
+                col.AddWithValue("p_modifiedBy", userId);
             });
         }
 
@@ -204,6 +205,25 @@ namespace TourGo.Services.Finances
             return fileKey;
         }
 
+        public string? GetVersionSupportDocumentUrl(int transactionId, int versionId)
+        {
+            string proc = "transactions_versions_select_document_url_by_id";
+            string? fileKey = null;
+
+            _dataProvider.ExecuteCmd(proc, (col) =>
+            {
+                col.AddWithValue("p_txnId", transactionId);
+                col.AddWithValue("p_versionId", versionId);
+            }, (reader, returnCol) =>
+            {
+                int index = 0;
+
+                fileKey = reader.GetSafeString(index++);
+            });
+
+            return fileKey;
+        }
+
         public void UpdateDescription(TransactionDescriptionUpdateRequest model)
         {
             string proc = "transactions_update_description";
@@ -214,12 +234,52 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_description", model.Description);
             });
         }
+
+        public List<TransactionVersion>? GetVersionsByTransactionId(int transactionId)
+        {
+            string proc = "transactions_versions_select_by_transaction_id";
+            List<TransactionVersion>? transactions = null;
+            _dataProvider.ExecuteCmd(proc, (col) =>
+            {
+                col.AddWithValue("p_id", transactionId);
+            }, (reader, returnCol) =>
+            {
+                int index = 0;
+                TransactionVersion transaction = MapTransactionVersion(reader, ref index);
+                transaction.ParentId = transactionId;
+
+                transactions ??= new List<TransactionVersion>();
+                transactions.Add(transaction);
+            });
+            return transactions;
+        }
+   
+        public void Update(TransactionUpdateRequest model, string userId, string hotelId)
+        {
+            string proc = "transactions_update";
+
+            _dataProvider.ExecuteNonQuery(proc, (col) =>
+            {
+                col.AddWithValue("p_transactionDate", model.TransactionDate.ToString("yyyy-MM-dd"));
+                col.AddWithValue("p_paymentMethodId", model.PaymentMethodId);
+                col.AddWithValue("p_categoryId", model.CategoryId);
+                col.AddWithValue("p_subcategoryId", model.SubcategoryId);
+                col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(model.ReferenceNumber) ? DBNull.Value : model.ReferenceNumber);
+                col.AddWithValue("p_description", string.IsNullOrEmpty(model.Description) ? DBNull.Value : model.Description);
+                col.AddWithValue("p_currencyCode", model.CurrencyCode);
+                col.AddWithValue("p_financePartnerId", model.FinancePartnerId > 0 ? model.FinancePartnerId : DBNull.Value);
+                col.AddWithValue("p_hotelId", hotelId);
+                col.AddWithValue("p_modifiedBy", userId);
+                col.AddWithValue("p_txnId", model.Id);
+            });
+        }
+
         public string GetFileKey(TransactionFileAddRequest model, string hotelId)
         {
             string folder = GetFolderName(model.Amount);
             string fileExtension = Path.GetExtension(model.File.FileName).ToLower();
-            string date = DateTime.UtcNow.ToString("yyyy-MM-dd");
-            string fileKey = $"hotels/{hotelId}/{folder}/transaction-{model.Id}-date-{date}{fileExtension}";
+            string date = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss-fff");
+            string fileKey = $"hotels/{hotelId}/{folder}/transaction-{model.Id}-{date}{fileExtension}";
             return fileKey;
         }
 
@@ -295,7 +355,55 @@ namespace TourGo.Services.Finances
                 transaction.FinancePartner = null;
                 index++;
             }
+            transaction.ModifiedBy.Id = reader.GetSafeString(index++);
+            transaction.ModifiedBy.FirstName = reader.GetSafeString(index++);
+            transaction.ModifiedBy.LastName = reader.GetSafeString(index++);
+            transaction.DateModified = reader.GetSafeDateTime(index++);
 
+            return transaction;
+        }
+
+        private static TransactionVersion MapTransactionVersion(IDataReader reader, ref int index)
+        {
+            TransactionVersion transaction = new TransactionVersion();
+            transaction.Id = reader.GetSafeInt32(index++);
+            transaction.Amount = reader.GetSafeDecimal(index++);
+            transaction.TransactionDate = reader.GetSafeDateTime(index++);
+            transaction.PaymentMethod.Name = reader.GetSafeString(index++);
+            transaction.CategoryId = reader.GetSafeInt32(index++);
+            string subcategoryName = reader.GetSafeString(index++);
+            if (!string.IsNullOrEmpty(subcategoryName))
+            {
+                transaction.Subcategory = new Lookup
+                {
+                    Name = subcategoryName
+                };
+            }
+            transaction.ReferenceNumber = reader.GetSafeString(index++);
+            transaction.StatusId = reader.GetSafeInt32(index++);
+            transaction.HasDocumentUrl = reader.GetSafeBool(index++);
+            transaction.Description = reader.GetSafeString(index++);
+            transaction.CurrencyCode = reader.GetSafeString(index++);
+            string financePartnerName = reader.GetSafeString(index++);
+            if (!string.IsNullOrEmpty(financePartnerName))
+            {
+                transaction.FinancePartner = new Lookup
+                {
+                    Name = financePartnerName
+                };
+            }
+            transaction.CreatedBy.Id = reader.GetSafeString(index++);
+            transaction.CreatedBy.FirstName = reader.GetSafeString(index++);
+            transaction.CreatedBy.LastName = reader.GetSafeString(index++);
+            transaction.ApprovedBy.Id = reader.GetSafeString(index++);
+            transaction.ApprovedBy.FirstName = reader.GetSafeString(index++);
+            transaction.ApprovedBy.LastName = reader.GetSafeString(index++);
+            transaction.ModifiedBy.Id = reader.GetSafeString(index++);
+            transaction.ModifiedBy.FirstName = reader.GetSafeString(index++);
+            transaction.ModifiedBy.LastName = reader.GetSafeString(index++);
+            transaction.DateModified = reader.GetSafeDateTime(index++);
+            transaction.DateCreated = reader.GetSafeDateTime(index++);
+            transaction.DocumentUrlChanged = reader.GetSafeBool(index++);
             return transaction;
         }
 

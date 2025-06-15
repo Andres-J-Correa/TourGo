@@ -3,6 +3,7 @@ export const ERROR_CODES = {
   AUTHENTICATION_ERROR: 2000,
   USER_MANAGEMENT_ERROR: 3000,
   HOTEL_MANAGEMENT_ERROR: 4000,
+  TRANSACTION_MANAGEMENT_ERROR: 5000,
 
   // Authentication-specific error codes
   USER_NOT_FOUND: 2001,
@@ -22,6 +23,10 @@ export const ERROR_CODES = {
   CONFLICTS: 4003,
   NO_RECORDS_FOUND: 4004,
   INSUFICIENT_PERMISSIONS: 4005,
+
+  // Transaction Management-specific error codes
+  TRANSACTION_BAD_REQUEST: 5001,
+  TRANSACTION_REFERENCE_NUMBER_CONFLICT: 5002,
 
   // Add other specific error codes here
 };

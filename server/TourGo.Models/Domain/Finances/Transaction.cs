@@ -27,6 +27,8 @@ namespace TourGo.Models.Domain.Finances
         public int EntityId { get; set; } 
         public bool HasDocumentUrl { get; set; }
         public decimal Total { get; set; }
+        public UserBase ModifiedBy { get; set; } = new UserBase();
+        public DateTime DateModified { get; set; }
 
     }
 }

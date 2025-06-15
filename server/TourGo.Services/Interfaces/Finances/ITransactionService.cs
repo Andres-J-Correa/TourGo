@@ -10,7 +10,7 @@ namespace TourGo.Services.Interfaces
     {
         int Add(TransactionAddRequest request, string userId, string hotelId);
         List<Transaction>? GetByEntityId(int entityId);
-        void UpdateDocumentUrl(int transactionId, string fileKey);
+        void UpdateDocumentUrl(int transactionId, string fileKey, string userId);
         string? GetSupportDocumentUrl(int transactionId);
         string GetFileKey(TransactionFileAddRequest model, string hotelId);
         Paged<Transaction>? GetPaginated(string hotelId, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
@@ -20,5 +20,8 @@ namespace TourGo.Services.Interfaces
         bool IsValidSortColumn(string? column);
         int Reverse(int txnId, string userId);
         void UpdateDescription(TransactionDescriptionUpdateRequest model);
+        List<TransactionVersion>? GetVersionsByTransactionId(int transactionId);
+        string? GetVersionSupportDocumentUrl(int transactionId, int versionId);
+        void Update(TransactionUpdateRequest model, string userId, string hotelId);
     }
 }

@@ -14,11 +14,9 @@ import { getRoomBookingsByDateRange } from "services/bookingService";
 
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
-import Popover from "components/commonUI/popover/Popover";
-import MinimalBookingCard from "components/bookings/BookingMinimalCard";
+import CalendarCell from "components/bookings/calendar/CalendarCell";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 
-import { formatCurrency } from "utils/currencyHelper";
 import { getColorForId } from "utils/colorHelper";
 import { cellColors } from "./constants";
 
@@ -98,25 +96,12 @@ function CalendarView() {
 
           if (!price) return "-";
           return (
-            <Popover
-              content={
-                <MinimalBookingCard
-                  bookingId={booking.bookingId}
-                  hotelId={hotelId}
-                />
-              }>
-              <div className="text-center cursor-pointer">
-                <p
-                  title={name}
-                  className="text-truncate m-0"
-                  style={{ maxWidth: 110 }}>
-                  {name}
-                </p>
-                <span className={`text-center cursor-pointer`}>
-                  {formatCurrency(price, "COP")}
-                </span>
-              </div>
-            </Popover>
+            <CalendarCell
+              name={name}
+              price={price}
+              bookingId={booking?.bookingId}
+              hotelId={hotelId}
+            />
           );
         },
         size: 120,

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import { Row, Col, Button } from "reactstrap";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
@@ -6,10 +7,11 @@ import Swal from "sweetalert2";
 import Dropzone from "components/commonUI/forms/Dropzone";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import SupportDocumentModal from "components/transactions/SupportDocumentModal";
+import TransactionVersionsOffCanvas from "components/transactions/TransactionVersionsOffCanvas";
 
 import {
-  TRANSACTION_CATEGORIES,
-  TRANSACTION_STATUSES,
+  TRANSACTION_CATEGORIES_BY_ID,
+  TRANSACTION_STATUS_BY_ID,
   TRANSACTION_STATUS_IDS,
 } from "components/transactions/constants";
 import {
@@ -26,6 +28,7 @@ const TransactionDetails = ({
   updateHasDocumentUrl,
   onReverseSuccess,
   onEditDescriptionSuccess,
+  onEditTransaction,
 }) => {
   const [files, setFiles] = useState([]);
   const [showUploader, setShowUploader] = useState(false);
@@ -33,19 +36,26 @@ const TransactionDetails = ({
   const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [documentUrl, setDocumentUrl] = useState(null);
+  const [offCanvasOpen, setOffcanvasOpen] = useState(false);
 
   const { getTranslatedErrorMessage } = useLanguage();
 
-  const category = TRANSACTION_CATEGORIES.find(
-    (cat) => cat.id === txn.categoryId
-  )?.name;
+  const { hotelId } = useParams();
 
-  const status = TRANSACTION_STATUSES.find((s) => s.id === txn.statusId)?.name;
+  const category =
+    TRANSACTION_CATEGORIES_BY_ID[txn.categoryId] || "Desconocido";
+
+  const status = TRANSACTION_STATUS_BY_ID[txn.statusId] || "Desconocido";
+
+  const handleToggleOffcanvas = () => {
+    setOffcanvasOpen((prev) => !prev);
+  };
 
   const handleViewDocument = async () => {
     setIsLoading(true);
     try {
       const response = await getSupportDocumentUrl(txn.id);
+
       if (response.isSuccessful) {
         setDocumentUrl(response.item);
         setModalOpen(true);
@@ -88,7 +98,8 @@ const TransactionDetails = ({
       const uploadResponse = await updateDocumentUrl(
         compressedFile,
         txn.id,
-        txn.amount
+        txn.amount,
+        hotelId
       );
 
       if (uploadResponse.isSuccessful) {
@@ -211,88 +222,142 @@ const TransactionDetails = ({
     <>
       <LoadingOverlay isVisible={isLoading} />
       <Row>
-        <Col md={3}>
-          <strong>Transacción #:</strong> {txn.id}
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Transacción #</strong>
+          <br />
+          {txn.id}
         </Col>
-        <Col md={6}>
-          <strong>Referencia:</strong> {txn.referenceNumber || "Sin referencia"}
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Id Precursor:</strong> <br />
+          {txn.parentId || " - "}
         </Col>
-        <Col md={3}>
-          <strong>Método de Pago:</strong> {txn.paymentMethod?.name}
+        <Col xl={3} md={12} className="mb-2">
+          <strong>Referencia:</strong> <br />{" "}
+          {txn.referenceNumber || "Sin referencia"}
         </Col>
       </Row>
 
-      <Row className="mt-2">
-        <Col md={3}>
-          <strong>Estado:</strong> {status}
+      <Row>
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Estado:</strong> <br />
+          {status}
         </Col>
-        <Col md={3}>
-          <strong>Subcategoría:</strong>{" "}
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Subcategoría:</strong> <br />
           {txn.subcategory?.name || "Sin subcategoría"}
         </Col>
-        <Col md={3}>
-          <strong>Categoría:</strong> {category}
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Categoría:</strong> <br />
+          {category}
         </Col>
-        <Col md={3}>
-          <strong>Socio Financiero:</strong> {txn.financePartner?.name || " - "}
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Método de Pago:</strong> <br />
+          {txn.paymentMethod?.name}
         </Col>
       </Row>
 
-      <Row className="mt-2">
-        <Col md={3}>
-          <strong>Creada por:</strong> {txn.createdBy?.firstName}{" "}
-          {txn.createdBy?.lastName}
+      <Row>
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Aprobada por:</strong> <br />
+          {txn.approvedBy?.firstName} {txn.approvedBy?.lastName || " - "}
         </Col>
-        <Col md={3}>
-          <strong>Aprobada por:</strong> {txn.approvedBy?.firstName}{" "}
-          {txn.approvedBy?.lastName || " - "}
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Socio Financiero:</strong> <br />
+          {txn.financePartner?.name || " - "}
         </Col>
-        <Col md={3}>
-          <strong>Creada el:</strong>{" "}
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Creada por:</strong> <br />
+          {txn.createdBy?.firstName} {txn.createdBy?.lastName}
+        </Col>
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Creada el:</strong> <br />
           {dayjs(txn.dateCreated).format("DD/MMM/YYYY - h:mm A")}
         </Col>
-        <Col md={3}>
-          <strong>Id Precursor:</strong> {txn.parentId || " - "}
+      </Row>
+      <Row>
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Modificada por:</strong> <br />
+          {txn.modifiedBy?.firstName} {txn.modifiedBy?.lastName}
+        </Col>
+        <Col xl={3} md={6} className="mb-2">
+          <strong>Modificada el:</strong> <br />
+          {dayjs(txn.dateModified).format("DD/MMM/YYYY - h:mm A")}
         </Col>
       </Row>
 
       {txn?.description && (
-        <Row className="mt-2">
+        <Row>
           <Col>
-            <strong>Descripción:</strong> {txn.description}
+            <strong>Descripción:</strong> <br /> {txn.description}
           </Col>
         </Row>
       )}
       <Row className="mt-3">
         <Col className="text-center">
-          <Button color="secondary" onClick={handleEditDescription}>
-            Editar Descripción
-          </Button>
-          {txn.hasDocumentUrl ? (
-            <Button color="info" onClick={handleViewDocument} className="ms-5">
-              Ver comprobante
+          {Boolean(txn.parentId) && Boolean(onEditDescriptionSuccess) && (
+            <Button
+              size="sm"
+              color="secondary"
+              onClick={handleEditDescription}
+              className="float-start">
+              Editar Descripción
             </Button>
-          ) : (
+          )}
+          {Boolean(onEditTransaction) &&
+            txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED &&
+            !Boolean(txn.parentId) && (
+              <Button
+                size="sm"
+                color="outline-danger"
+                onClick={() => onEditTransaction(txn)}
+                className="float-start">
+                Editar Transacción
+              </Button>
+            )}
+          {updateHasDocumentUrl &&
             txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
               <Button
-                color={showUploader ? "warning" : "primary"}
-                className="ms-5"
+                size="sm"
+                color={showUploader ? "warning" : "outline-dark"}
+                className="me-2"
                 onClick={() => {
                   setFiles([]);
                   setShowUploader((prev) => !prev);
                 }}>
-                {showUploader ? "Cancelar" : "Agregar comprobante"}
+                {showUploader
+                  ? "Cancelar"
+                  : txn.hasDocumentUrl
+                  ? "Cambiar Comprobante"
+                  : "Adjuntar Comprobante"}
               </Button>
-            )
-          )}
-          {txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
+            )}
+          {txn.hasDocumentUrl && (
             <Button
-              color="outline-danger"
-              className="ms-5"
-              onClick={handleReverseTransaction}>
-              Revertir
+              size="sm"
+              color="outline-success"
+              onClick={handleViewDocument}
+              className="me-2">
+              Ver comprobante
             </Button>
           )}
+          {!txn.parentId && (
+            <Button
+              size="sm"
+              color="outline-secondary"
+              onClick={handleToggleOffcanvas}>
+              Ver Historial
+            </Button>
+          )}
+          {onReverseSuccess &&
+            txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
+              <Button
+                size="sm"
+                color="outline-danger"
+                className="float-end"
+                onClick={handleReverseTransaction}>
+                Revertir
+              </Button>
+            )}
         </Col>
       </Row>
 
@@ -316,14 +381,17 @@ const TransactionDetails = ({
               files={files}
               maxSize={1000 * 1024} // 1 MB
             />
-            <div className="text-center mt-2">
-              <Button
-                color="success"
-                onClick={handleFileSubmit}
-                disabled={submitting || files.length === 0}>
-                Subir comprobante
-              </Button>
-            </div>
+            {
+              <div className="text-center mt-2">
+                <Button
+                  size="sm"
+                  color="success"
+                  onClick={handleFileSubmit}
+                  disabled={submitting || files.length === 0}>
+                  Subir comprobante
+                </Button>
+              </div>
+            }
           </Col>
         </Row>
       )}
@@ -331,6 +399,11 @@ const TransactionDetails = ({
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
         documentUrl={documentUrl}
+      />
+      <TransactionVersionsOffCanvas
+        offCanvasOpen={offCanvasOpen}
+        handleToggleOffcanvas={handleToggleOffcanvas}
+        transaction={txn}
       />
     </>
   );

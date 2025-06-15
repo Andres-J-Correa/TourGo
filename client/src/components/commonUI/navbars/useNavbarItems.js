@@ -47,7 +47,7 @@ export const useNavbarItems = () => {
 
   let currentHotelItems = [];
 
-  if (hotel.current?.id) {
+  if (hotel.current?.id && !hotel.isLoading) {
     currentHotelItems = [
       {
         name: "Reservas",

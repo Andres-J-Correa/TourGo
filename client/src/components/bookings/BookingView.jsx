@@ -13,13 +13,15 @@ import {
   LOCKED_BOOKING_STATUSES,
 } from "components/bookings/constants";
 import BookingSummary from "components/bookings/booking-summary/BookingSummary";
+import BookingStatusBadge from "components/bookings/BookingStatusBadge";
+import BookingTransactions from "components/bookings/booking-summary/BookingTransactions";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import { Button, Col, Row } from "reactstrap";
+import { Button, Col, Row, Card, CardBody, CardHeader } from "reactstrap";
 import {
   faPlaneArrival,
   faRectangleXmark,
@@ -316,70 +318,86 @@ function BookingView() {
   return (
     <>
       <Breadcrumb breadcrumbs={breadcrumbs} active="Reserva" />
-      <h3 className="mb-4">Reserva</h3>
-      <Row className="mb-3">
-        <Col className="px-3">
-          {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE && (
-            <Button color="outline-dark" onClick={handleCheckIn}>
-              Marcar Check-in
-              <FontAwesomeIcon icon={faPlaneArrival} className="ms-2" />
-            </Button>
-          )}
-          {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) &&
-            dayjs(dayjs()).isAfter(booking?.arrivalDate) && (
-              <Button
-                color="outline-dark"
-                className="ms-2"
-                onClick={handleComplete}>
-                Marcar Completada
-                <FontAwesomeIcon icon={faPlaneDeparture} className="ms-2" />
-              </Button>
-            )}
-          {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE &&
-            dayjs(dayjs()).isSameOrAfter(booking?.arrivalDate) && (
-              <Button
-                color="outline-dark"
-                className="ms-2"
-                onClick={handleNoShow}>
-                Marcar No Show
-                <FontAwesomeIcon icon={faCalendarXmark} className="ms-2" />
-              </Button>
-            )}
-          {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
-            <Button
-              color="outline-danger"
-              className="ms-2 float-end"
-              onClick={handleCancel}>
-              Cancelar Reserva
-              <FontAwesomeIcon icon={faRectangleXmark} className="ms-2" />
-            </Button>
-          )}
-          {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
-            <Link to="edit" className=" ms-2 float-end btn btn-outline-dark">
-              Editar
-              <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
-            </Link>
-          )}
-          <Link
-            to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-outline-dark float-end">
-            Ir a Factura
-            <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />
-          </Link>
-        </Col>
-      </Row>
-      <LoadingOverlay isVisible={isLoading} />
+      <h3 className="mb-4">Detalles de Reserva</h3>
       <ErrorBoundary>
+        <Row className="mb-3">
+          <Col className="px-3">
+            {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE && (
+              <Button color="outline-dark" onClick={handleCheckIn}>
+                Marcar Check-in
+                <FontAwesomeIcon icon={faPlaneArrival} className="ms-2" />
+              </Button>
+            )}
+            {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) &&
+              dayjs(dayjs()).isAfter(booking?.arrivalDate) && (
+                <Button
+                  color="outline-dark"
+                  className="ms-2"
+                  onClick={handleComplete}>
+                  Marcar Completada
+                  <FontAwesomeIcon icon={faPlaneDeparture} className="ms-2" />
+                </Button>
+              )}
+            {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE &&
+              dayjs(dayjs()).isSameOrAfter(booking?.arrivalDate) && (
+                <Button
+                  color="outline-dark"
+                  className="ms-2"
+                  onClick={handleNoShow}>
+                  Marcar No Show
+                  <FontAwesomeIcon icon={faCalendarXmark} className="ms-2" />
+                </Button>
+              )}
+            {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
+              <Button
+                color="outline-danger"
+                className="ms-2 float-end"
+                onClick={handleCancel}>
+                Cancelar Reserva
+                <FontAwesomeIcon icon={faRectangleXmark} className="ms-2" />
+              </Button>
+            )}
+            {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
+              <Link to="edit" className=" ms-2 float-end btn btn-outline-dark">
+                Editar
+                <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
+              </Link>
+            )}
+            <Link
+              to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline-dark float-end">
+              Ir a Factura
+              <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />
+            </Link>
+          </Col>
+        </Row>
+        <LoadingOverlay isVisible={isLoading} />
         {booking !== null && (
-          <BookingSummary
-            bookingData={booking}
-            roomBookings={booking?.roomBookings}
-            extraCharges={booking?.extraCharges}
-            setBooking={setBooking}
-            hotelId={hotelId}
-          />
+          <Card className="mb-4 bg-body-tertiary shadow">
+            <CardHeader tag="h4" className="text-bg-dark text-center">
+              Reserva # {booking?.id}
+              <BookingStatusBadge
+                className="float-end"
+                statusId={booking?.status?.id}
+              />
+            </CardHeader>
+            <CardBody className="text-dark">
+              <BookingSummary
+                bookingData={booking}
+                roomBookings={booking?.roomBookings}
+                extraCharges={booking?.extraCharges}
+                setBooking={setBooking}
+                hotelId={hotelId}
+              />
+              <BookingTransactions
+                hotelId={hotelId}
+                booking={booking}
+                setBooking={setBooking}
+              />
+            </CardBody>
+          </Card>
         )}
       </ErrorBoundary>
     </>

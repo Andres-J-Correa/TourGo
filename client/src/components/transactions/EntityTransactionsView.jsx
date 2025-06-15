@@ -5,7 +5,9 @@ import Transaction from "components/transactions/Transaction";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import { formatCurrency } from "utils/currencyHelper";
 import TransactionAddForm from "components/transactions/TransactionAddForm";
+import TransactionUpdateForm from "components/transactions/TransactionUpdateForm";
 import { TRANSACTION_STATUS_IDS } from "components/transactions/constants";
+import useHotelFormData from "components/transactions/hooks/useHotelFormData";
 import dayjs from "dayjs";
 import { useAppContext } from "contexts/GlobalAppContext";
 
@@ -19,6 +21,14 @@ const EntityTransactionsView = ({
 }) => {
   const [mappedTransactions, setMappedTransactions] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [transactionToUpdate, setTransactionToUpdate] = useState(null);
+
+  const {
+    paymentMethods,
+    transactionSubcategories,
+    financePartners,
+    isLoadingHotelData,
+  } = useHotelFormData(hotelId);
 
   const { user } = useAppContext();
 
@@ -125,6 +135,40 @@ const EntityTransactionsView = ({
     [setEntity]
   );
 
+  const onEditTransaction = useCallback(
+    (transaction) => {
+      setTransactionToUpdate(transaction);
+      setShowForm(false);
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    },
+    [setTransactionToUpdate]
+  );
+
+  const handleCancelUpdate = useCallback(() => {
+    setTransactionToUpdate(null);
+  }, [setTransactionToUpdate]);
+
+  const onTransactionUpdated = useCallback(
+    (updatedTransaction) => {
+      setEntity((prev) => {
+        const newTransactions = prev.transactions.map((txn) => {
+          if (txn.id === updatedTransaction.id) {
+            return { ...txn, ...updatedTransaction };
+          }
+          return txn;
+        });
+        return { ...prev, transactions: newTransactions };
+      });
+      setTransactionToUpdate(null);
+    },
+    [setEntity]
+  );
+
   const mapTransaction = useCallback(
     (txn) => (
       <Transaction
@@ -133,9 +177,15 @@ const EntityTransactionsView = ({
         updateHasDocumentUrl={updateHasDocumentUrl}
         onReverseSuccess={onReverseSuccess}
         onEditDescriptionSuccess={onEditDescriptionSuccess}
+        onEditTransaction={onEditTransaction}
       />
     ),
-    [updateHasDocumentUrl, onReverseSuccess, onEditDescriptionSuccess]
+    [
+      updateHasDocumentUrl,
+      onReverseSuccess,
+      onEditDescriptionSuccess,
+      onEditTransaction,
+    ]
   );
 
   useEffect(() => {
@@ -195,6 +245,21 @@ const EntityTransactionsView = ({
           showForm={showForm}
           setShowForm={setShowForm}
           onTransactionAdded={onTransactionAdded}
+          paymentMethods={paymentMethods}
+          transactionSubcategories={transactionSubcategories}
+          financePartners={financePartners}
+          isLoadingHotelData={isLoadingHotelData}
+        />
+        <TransactionUpdateForm
+          transaction={transactionToUpdate}
+          hotelId={hotelId}
+          showForm={!!transactionToUpdate}
+          handleCancelClick={handleCancelUpdate}
+          paymentMethods={paymentMethods}
+          transactionSubcategories={transactionSubcategories}
+          financePartners={financePartners}
+          isLoadingHotelData={isLoadingHotelData}
+          onTransactionUpdated={onTransactionUpdated}
         />
       </div>
     </>

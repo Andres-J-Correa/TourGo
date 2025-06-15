@@ -9,5 +9,6 @@ namespace TourGo.Web.Models.Enums
     public enum TransactionManagementErrorCode
     {
         BadRequest = BaseErrorCode.TransactionManagementError + 1,
+        ReferenceNumberConflict = BaseErrorCode.TransactionManagementError + 2,
     }
 }

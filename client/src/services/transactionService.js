@@ -94,7 +94,12 @@ export const updateDescription = async (transactionId, description) => {
   }
 };
 
-export const updateDocumentUrl = async (file, transactionId, amount) => {
+export const updateDocumentUrl = async (
+  file,
+  transactionId,
+  amount,
+  hotelId
+) => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("amount", amount);
@@ -102,8 +107,8 @@ export const updateDocumentUrl = async (file, transactionId, amount) => {
     headers: {
       "Content-Type": "multipart/form-data",
     },
-    method: "PUT",
-    url: `${api}/${transactionId}/document-url`,
+    method: "POST",
+    url: `${api}/hotel/${hotelId}/transaction/${transactionId}/document-url`,
     data: formData,
   };
   try {
@@ -198,6 +203,61 @@ export const getFixedPagination = async (
     },
     method: "GET",
     url: url,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getTransactionVersions = async (transactionId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/${transactionId}/versions`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getVersionSupportDocumentUrl = async (
+  transactionId,
+  versionId
+) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api}/${transactionId}/versions/${versionId}/document-url`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const update = async (payload, transactionId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${api}/hotel/${hotelId}/transaction/${transactionId}`,
+    data: replaceEmptyStringsWithNull(payload),
   };
   try {
     const response = await axiosClient(config);

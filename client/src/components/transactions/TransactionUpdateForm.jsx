@@ -1,20 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 
 import CustomField from "components/commonUI/forms/CustomField";
-import Dropzone from "components/commonUI/forms/Dropzone";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
 
 import { useAppContext } from "contexts/GlobalAppContext";
 import { getDate } from "utils/dateHelper";
-import { compressImage } from "utils/fileHelper";
 import {
   TRANSACTION_CATEGORIES,
   TRANSACTION_CATEGORY_TYPES_IDS,
-  transactionAddValidationSchema,
-  sanitizeNewTransaction,
+  transactionUpdateValidationSchema,
 } from "components/transactions/constants";
-import { add, updateDocumentUrl } from "services/transactionService";
+import { update } from "services/transactionService";
 import { useLanguage } from "contexts/LanguageContext";
 import { ERROR_CODES } from "constants/errorCodes";
 
@@ -25,49 +22,36 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 
-function TransactionAddForm({
+function TransactionUpdateForm({
+  transaction,
   hotelId,
-  entity,
-  submitting,
   showForm,
-  setShowForm,
+  handleCancelClick,
+  onTransactionUpdated = () => {},
   paymentMethods,
   transactionSubcategories,
   financePartners,
   isLoadingHotelData,
-  onTransactionAdded = () => {},
 }) {
   const { user } = useAppContext();
   const { t, getTranslatedErrorMessage } = useLanguage();
 
-  const [files, setFiles] = useState([]);
-
-  const handleCancelClick = () => {
-    setShowForm(false);
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }, 100);
-  };
-
   const initialValues = {
-    amount: "",
-    transactionDate: dayjs().format("YYYY-MM-DD"),
-    paymentMethodId: "",
-    categoryId: "",
-    categoryTypeId: "",
-    subcategoryId: "",
-    referenceNumber: "",
-    statusId: 2,
-    description: entity?.customer
-      ? `Cliente asociado: ${entity.customer.firstName} ${entity.customer.lastName}`
-      : "",
-    currencyCode: "COP",
-    financePartnerId: "",
-    invoiceId: entity?.invoiceId || undefined,
-    entityId: entity?.id || undefined,
+    amount: transaction?.amount || 0,
+    transactionDate: transaction?.transactionDate
+      ? dayjs(transaction.transactionDate).format("YYYY-MM-DD")
+      : dayjs().format("YYYY-MM-DD"),
+    paymentMethodId: transaction?.paymentMethod?.id || "",
+    categoryId: transaction?.categoryId || "",
+    categoryTypeId:
+      TRANSACTION_CATEGORIES.find(
+        (cat) => cat.id === Number(transaction?.categoryId)
+      )?.typeId || "",
+    subcategoryId: transaction?.subcategory?.id || "",
+    referenceNumber: transaction?.referenceNumber || "",
+    description: transaction?.description || "",
+    currencyCode: transaction?.currencyCode || "COP",
+    financePartnerId: transaction?.financePartner?.id || "",
   };
 
   const confirmProceedWithMismatchedCategoryAmount = (
@@ -104,23 +88,9 @@ function TransactionAddForm({
     });
   };
 
-  const confirmProceedWithoutFile = () => {
-    return Swal.fire({
-      icon: "warning",
-      title: "No se ha adjuntado un comprobante",
-      text: "¿Deseas continuar sin adjuntar un comprobante?",
-      showCancelButton: true,
-      confirmButtonText: "Sí, continuar",
-      confirmButtonColor: "red",
-      cancelButtonText: "No, adjuntar comprobante",
-      reverseButtons: true,
-      cancelButtonColor: "green",
-    });
-  };
-
   const confirmTransactionSave = () => {
     return Swal.fire({
-      title: "¿Guardar Transacción?",
+      title: "¿Actualizar Transacción?",
       html: "<strong>Revisa los datos antes de continuar.</strong>",
       icon: "question",
       showCancelButton: true,
@@ -138,25 +108,8 @@ function TransactionAddForm({
     });
   };
 
-  const handleFileUpload = async (transaction, file) => {
-    try {
-      const compressedFile = await compressImage(file, 35 * 1024); // 35 KB
-
-      const response = await updateDocumentUrl(
-        compressedFile,
-        transaction.id,
-        transaction.amount,
-        hotelId
-      );
-      return Promise.resolve(response);
-    } catch (error) {
-      return Promise.resolve(error);
-    }
-  };
-
   const handleSubmit = async (values, { resetForm, setFieldError }) => {
-    let newTransaction = null;
-
+    let updatedTransaction = null;
     try {
       if (
         (values.amount >= 0 &&
@@ -174,69 +127,35 @@ function TransactionAddForm({
         if (!isConfirmed) return;
       }
 
-      if (files.length === 0) {
-        const { isConfirmed } = await confirmProceedWithoutFile();
-        if (!isConfirmed) return;
-      }
-
       const { isConfirmed: confirmSave } = await confirmTransactionSave();
       if (!confirmSave) return;
 
       showLoading("Guardando...");
-      const response = await add(values, hotelId);
+      const response = await update(values, transaction.id, hotelId);
       if (!response.isSuccessful)
-        throw new Error("Error al agregar transacción");
+        throw new Error("Error al actualizar transacción");
 
-      newTransaction = {
-        ...sanitizeNewTransaction(
-          values,
-          user.current,
-          paymentMethods,
-          transactionSubcategories,
-          financePartners
-        ),
-        id: response.item,
-        hotelId,
-        entityId: entity?.id,
-        invoiceId: entity?.invoiceId,
+      updatedTransaction = {
+        ...transaction,
+        ...values,
+        modifiedBy: {
+          id: user.current.id,
+          firstName: user.current.firstName,
+          lastName: user.current.lastName,
+        },
+        dateModified: dayjs().toDate(),
       };
 
       await Swal.fire({
         icon: "success",
-        title: "Transacción agregada",
+        title: "Transacción actualizada",
         timer: 1500,
         showConfirmButton: false,
         allowOutsideClick: false,
       });
 
-      if (files.length > 0) {
-        showLoading("Subiendo comprobante...");
-
-        const uploadResponse = await handleFileUpload(newTransaction, files[0]);
-
-        if (uploadResponse?.isSuccessful) {
-          newTransaction.hasDocumentUrl = true;
-          Swal.fire({
-            icon: "success",
-            title: "Comprobante subido",
-            timer: 1500,
-            showConfirmButton: false,
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "No se pudo subir el comprobante, ve a la transacción para subirlo manualmente",
-            timer: 3000,
-            showConfirmButton: false,
-          });
-        }
-      }
-
-      onTransactionAdded(newTransaction);
+      onTransactionUpdated(updatedTransaction);
       resetForm();
-      setShowForm(false);
-      setFiles([]);
     } catch (error) {
       if (
         Number(error?.response?.data?.code) ===
@@ -250,9 +169,7 @@ function TransactionAddForm({
         );
       }
       const errorMessage = getTranslatedErrorMessage(error);
-
       Swal.close();
-
       Swal.fire({
         title: "Error",
         text: errorMessage,
@@ -265,7 +182,7 @@ function TransactionAddForm({
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={transactionAddValidationSchema}
+      validationSchema={transactionUpdateValidationSchema}
       onSubmit={handleSubmit}
       enableReinitialize>
       {({ values, setFieldValue }) => {
@@ -302,7 +219,7 @@ function TransactionAddForm({
             className={classNames("mt-4 p-3 border rounded shadow-lg", {
               "d-none": !showForm,
             })}>
-            <h5 className="mb-3 text-center">Agregar Transacción</h5>
+            <h5 className="mb-3 text-center">Actualizar Transacción</h5>
             <div className="d-flex justify-content-end mb-3">
               <Button type="submit" color="success" className="me-2">
                 Guardar
@@ -321,6 +238,7 @@ function TransactionAddForm({
                   placeholder="Monto"
                   step="0.01"
                   isRequired={true}
+                  disabled={true}
                 />
               </Col>
               <Col md={4}>
@@ -430,26 +348,6 @@ function TransactionAddForm({
               className="form-control"
               placeholder="Descripción"
             />
-
-            <h6 className="text-center mt-3 mb-1">
-              Adjuntar Comprobante
-              <span className="text-muted"> (.png, .jpg, .jpeg, .webp)</span>
-              <br />
-              <span className="text-muted">(Máx. 1 MB)</span>
-            </h6>
-            <Dropzone
-              onDropAccepted={(files) => {
-                setFiles(files);
-              }}
-              multiple={false}
-              accept={{
-                "image/*": [".png", ".jpeg", ".jpg", "webp"],
-              }}
-              disabled={submitting}
-              setFiles={setFiles}
-              files={files}
-              maxSize={1000 * 1024} // 1 MB
-            />
           </Form>
         );
       }}
@@ -457,4 +355,4 @@ function TransactionAddForm({
   );
 }
 
-export default TransactionAddForm;
+export default TransactionUpdateForm;
