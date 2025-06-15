@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Row, Col, Card, CardBody, CardHeader, Button } from "reactstrap";
 import dayjs from "dayjs";
@@ -46,7 +46,12 @@ const InvoiceView = () => {
     { label: "Hotel", path: `/hotels/${hotelId}` },
   ];
 
-  const sanitizedTerms = DOMPurify.sanitize(invoiceData?.details?.terms);
+  const sanitizedTerms = useMemo(() => {
+    return (
+      DOMPurify.sanitize(invoiceData?.details?.terms) ||
+      "<p>No hay términos y condiciones disponibles.</p>"
+    );
+  }, [invoiceData?.details?.terms]);
 
   useEffect(() => {
     if (!hotelId || !invoiceId) return;

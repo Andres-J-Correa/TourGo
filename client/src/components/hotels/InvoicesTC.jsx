@@ -62,7 +62,7 @@ function InvoicesTC({ hotelId }) {
 
   return (
     <div>
-      <h4>Terminos y Condiciones de las Facturas</h4>
+      <h4>Términos y Condiciones de las Facturas</h4>
       <SimpleLoader isVisible={loading} />
       {!loading && (
         <>
