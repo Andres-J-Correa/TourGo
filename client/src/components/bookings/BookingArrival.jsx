@@ -68,10 +68,11 @@ const BookingArrival = ({
           <strong>Saldo:</strong> {formatCurrency(arrival.balanceDue, "COP")}
         </Col>
         <Col md="auto">
-          <strong>Fecha de llegada:</strong> {dayjs().format("DD/MM/YYYY")}
+          <strong>Fecha de llegada:</strong>{" "}
+          {dayjs(arrival.arrivalDate).format("DD/MM/YYYY")}
           <br />
           <strong>Fecha de salida:</strong>{" "}
-          {dayjs().add(arrival.nights, "days").format("DD/MM/YYYY")}
+          {dayjs(arrival.departureDate).format("DD/MM/YYYY")}
           <br />
           <strong>Noches:</strong> {arrival.nights}
         </Col>

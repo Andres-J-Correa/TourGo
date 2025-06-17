@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import classnames from "classnames";
 import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
+import dayjs from "dayjs";
 
 const BookingDeparture = ({
   departure,
@@ -52,9 +53,11 @@ const BookingDeparture = ({
           <strong>Proveedor:</strong> {departure.bookingProviderName || "N/A"}
         </Col>
         <Col md="auto">
-          <strong>Fecha de llegada:</strong> {departure.arrivalDate}
+          <strong>Fecha de llegada:</strong>{" "}
+          {dayjs(departure.arrivalDate).format("DD/MM/YYYY")}
           <br />
-          <strong>Fecha de salida:</strong> {departure.departureDate}
+          <strong>Fecha de salida:</strong>{" "}
+          {dayjs(departure.departureDate).format("DD/MM/YYYY")}
           <br />
           <strong>Noches:</strong> {departure.nights}
           <br />

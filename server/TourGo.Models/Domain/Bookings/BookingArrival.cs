@@ -21,5 +21,7 @@ namespace TourGo.Models.Domain.Bookings
         public List<Lookup>? ArrivingRooms { get; set; }
         public List<Lookup>? OtherRooms { get; set;}
         public Customer Customer { get; set; } = new Customer();
+        public DateOnly ArrivalDate { get; set; }
+        public DateOnly DepartureDate { get; set; }
     }
 }

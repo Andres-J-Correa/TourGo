@@ -510,6 +510,8 @@ namespace TourGo.Services.Hotels
             booking.StatusId = reader.GetSafeInt32(index++);
             booking.Notes = reader.GetSafeString(index++);
             booking.Nights = reader.GetSafeInt32(index++);
+            booking.ArrivalDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
+            booking.DepartureDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
             booking.DepartingRooms = reader.DeserializeObjectSafely<List<Lookup>>(index++, () => null);
             booking.Customer.Id = reader.GetSafeInt32(index++);
             booking.Customer.FirstName = reader.GetSafeString(index++);
@@ -529,6 +531,8 @@ namespace TourGo.Services.Hotels
             booking.StatusId = reader.GetSafeInt32(index++);
             booking.Notes = reader.GetSafeString(index++);
             booking.Nights = reader.GetSafeInt32(index++);
+            booking.ArrivalDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
+            booking.DepartureDate = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
             booking.Total = reader.GetSafeDecimal(index++);
             booking.BalanceDue = reader.GetSafeDecimal(index++);
             booking.ArrivingRooms = reader.DeserializeObjectSafely<List<Lookup>>(index++, () => null);

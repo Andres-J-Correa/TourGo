@@ -42,7 +42,10 @@ function CustomerForm({
         didOpen: () => Swal.showLoading(),
       });
 
-      const res = await getByDocumentNumber(hotelId, values.documentNumber);
+      const res = await getByDocumentNumber(
+        hotelId,
+        values.documentNumber.trim()
+      );
 
       Swal.close(); // Close loading
 
@@ -96,12 +99,21 @@ function CustomerForm({
         didOpen: () => Swal.showLoading(),
       });
 
-      const res = await add({ ...values }, hotelId);
+      const trimmedData = {
+        ...values,
+        documentNumber: values.documentNumber.trim(),
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        phone: values.phone.trim(),
+        email: values.email.trim(),
+      };
+
+      const res = await add(trimmedData, hotelId);
 
       Swal.close();
 
       if (res.item > 0) {
-        setCustomer({ ...values, id: res.item });
+        setCustomer({ ...trimmedData, id: res.item });
         setCreating(false);
 
         setTimeout(() => {
