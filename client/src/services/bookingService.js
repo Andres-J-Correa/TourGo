@@ -6,6 +6,7 @@ import {
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
+// #region V1
 const api = `${API_HOST_PREFIX}/bookings`;
 
 export const getRoomBookingsByDateRange = async (
@@ -54,71 +55,6 @@ export const getById = async (bookingId) => {
     },
     method: "GET",
     url: `${api}/${bookingId}`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getPagedMinimalBookingsByDateRange = async (
-  hotelId,
-  startDate,
-  endDate,
-  pageIndex,
-  pageSize,
-  isArrivalDate,
-  sortColumn,
-  sortDirection,
-  firstName,
-  lastName,
-  externalBookingId,
-  statusId
-) => {
-  const queryParams = new URLSearchParams({
-    pageIndex,
-    pageSize,
-  });
-  if (sortColumn) queryParams.append("sortColumn", sortColumn);
-  if (sortDirection) queryParams.append("sortDirection", sortDirection);
-  if (startDate) queryParams.append("startDate", startDate);
-  if (endDate) queryParams.append("endDate", endDate);
-  if (isArrivalDate && startDate && endDate)
-    queryParams.append("isArrivalDate", isArrivalDate);
-  if (firstName) queryParams.append("firstName", firstName);
-  if (lastName) queryParams.append("lastName", lastName);
-  if (externalBookingId)
-    queryParams.append("externalBookingId", externalBookingId);
-  if (statusId) queryParams.append("statusId", statusId);
-
-  const url = `${api}/hotel/${hotelId}/date-range?${queryParams.toString()}`;
-
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: url,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getMinimalById = async (bookingId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/${bookingId}/minimal`,
   };
   try {
     const response = await axiosClient(config);
@@ -333,3 +269,94 @@ export const getDepartingRooms = async (hotelId, date) => {
     return onGlobalError(error);
   }
 };
+
+// #endregion
+
+// #region V2
+const apiV2 = `${API_HOST_PREFIX}/hotel/{hotelId}/bookings`;
+
+export const getBookingById = async (bookingId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getPagedMinimalBookingsByDateRange = async (
+  hotelId,
+  startDate,
+  endDate,
+  pageIndex,
+  pageSize,
+  isArrivalDate,
+  sortColumn,
+  sortDirection,
+  firstName,
+  lastName,
+  externalBookingId,
+  statusId
+) => {
+  const queryParams = new URLSearchParams({
+    pageIndex,
+    pageSize,
+  });
+  if (sortColumn) queryParams.append("sortColumn", sortColumn);
+  if (sortDirection) queryParams.append("sortDirection", sortDirection);
+  if (startDate) queryParams.append("startDate", startDate);
+  if (endDate) queryParams.append("endDate", endDate);
+  if (isArrivalDate && startDate && endDate)
+    queryParams.append("isArrivalDate", isArrivalDate);
+  if (firstName) queryParams.append("firstName", firstName);
+  if (lastName) queryParams.append("lastName", lastName);
+  if (externalBookingId)
+    queryParams.append("externalBookingId", externalBookingId);
+  if (statusId) queryParams.append("statusId", statusId);
+
+  const url = `${apiV2.replace(
+    /{hotelId}/,
+    hotelId
+  )}/date-range?${queryParams.toString()}`;
+
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: url,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getMinimalById = async (bookingId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/minimal`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+// #endregion

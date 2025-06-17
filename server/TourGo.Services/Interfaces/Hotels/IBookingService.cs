@@ -11,18 +11,18 @@ namespace TourGo.Services.Interfaces
     public interface IBookingService
     {
         BookingAddResponse? Add(BookingAddRequest model, string userId, string hotelId);
-        void Update(BookingsUpdateRequest model, string userId);
-        Booking? GetById(int id);
+        void Update(BookingsUpdateRequest model, string userId, string hotelId);
+        Booking? GetById(string id, string hotelId);
         Paged<BookingMinimal>? GetPaginatedByDateRange(string hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
                                                         string? sortColumn, string? sortDirection, DateOnly? startDate, DateOnly? endDate,
                                                         string? firstName, string? lastName, string? bookingExternalId, int? statusId);
-        BookingMinimal? GetBookingMinimal(int bookingId);
+        BookingMinimal? GetBookingMinimal(string bookingId, string hotelId);
         List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByBookingId(int bookingId);
         List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, string hotelId);
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
-        void UpdateStatus(int bookingId, string userId, BookingStatusEnum status);
+        void UpdateStatus(string bookingId, string userId, BookingStatusEnum status, string hotelId);
         List<BookingArrival>? GetArrivalsByDate(DateOnly arrivalDate, string hotelId);
         List<BookingDeparture>? GetDeparturesByDate(DateOnly departureDate, string hotelId);
         List<BookingStay>? GetStaysByDate(DateOnly date, string hotelId);

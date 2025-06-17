@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
-  getById as getBookingById,
+  getBookingById,
   updateStatusToCheckedIn,
   updateStatusToNoShow,
   updateStatusToCompleted,
@@ -308,12 +308,12 @@ function BookingView() {
   useEffect(() => {
     if (bookingId) {
       setIsLoading(true);
-      getBookingById(bookingId)
+      getBookingById(bookingId, hotelId)
         .then(onGetBookingSuccess)
         .catch(onGetBookingError)
         .finally(() => setIsLoading(false));
     }
-  }, [bookingId]);
+  }, [bookingId, hotelId]);
 
   return (
     <>

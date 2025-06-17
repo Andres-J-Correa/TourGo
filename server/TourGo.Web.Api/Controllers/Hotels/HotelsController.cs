@@ -232,14 +232,13 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(HotelUpdateRequest model, string id)
+        public ActionResult<SuccessResponse> Update(HotelUpdateRequest model)
  {
             int code = 200;
             BaseResponse response = null;
 
             try
             {
-                model.Id = id;
                 string userId = _webAuthService.GetCurrentUserId();
                 _hotelService.Update(model, userId);
 

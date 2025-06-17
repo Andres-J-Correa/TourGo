@@ -23,7 +23,7 @@ namespace TourGo.Services.Security
         {
             bool isAuthorized = false;
 
-            string proc = $"entity_auth_create_and_bulk";
+            string proc = $"entity_auth";
 
             try
             {

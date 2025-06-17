@@ -8,7 +8,7 @@ import Breadcrumb from "components/commonUI/Breadcrumb";
 import TabNavigation from "components/bookings/booking-add-edit-view/TabNavigation";
 
 import { toast } from "react-toastify";
-import { getById as getBookingById } from "services/bookingService";
+import { getBookingById } from "services/bookingService";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 
@@ -104,7 +104,7 @@ const BookingAddUpdateView = () => {
   useEffect(() => {
     if (bookingId) {
       setIsLoading(true);
-      getBookingById(bookingId)
+      getBookingById(bookingId, hotelId)
         .then(onGetBookingSuccess)
         .catch(onGetBookingError)
         .finally(() => setIsLoading(false));
@@ -113,7 +113,7 @@ const BookingAddUpdateView = () => {
       setCustomer(null);
       setCurrentStep(0);
     }
-  }, [bookingId, onGetBookingSuccess, mapBookingData]);
+  }, [bookingId, onGetBookingSuccess, mapBookingData, hotelId]);
 
   return (
     <>

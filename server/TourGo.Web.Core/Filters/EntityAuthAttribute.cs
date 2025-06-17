@@ -51,7 +51,7 @@ namespace TourGo.Web.Core.Filters
                 await next();
             }
 
-            private T GetEntityId<T>(IDictionary<string, object> actionArguments, string idField = "id")
+            private T? GetEntityId<T>(IDictionary<string, object> actionArguments, string idField = "id")
             {
                 // Check for a model implementing IModelIdentifier
                 if (typeof(T) == typeof(int) &&
@@ -59,6 +59,13 @@ namespace TourGo.Web.Core.Filters
                     model is IModelIdentifier requestModel)
                 {
                     return (T)(object)requestModel.Id;
+                }
+
+                if (typeof(T) == typeof(string) &&
+                    actionArguments.TryGetValue("model", out var stringModel) &&
+                    stringModel is IModelIdentifierString stringModelIdentifier)
+                {
+                    return (T)(object)stringModelIdentifier.Id;
                 }
 
                 // Try to extract the ID value directly
@@ -91,21 +98,23 @@ namespace TourGo.Web.Core.Filters
             private bool ValidateArguments(IDictionary<string, object> actionArguments)
             {
                 string userId = _identityProvider.GetCurrentUserId();
+                int entityId = GetEntityId<int>(actionArguments);
 
-                if (_isBulk || _action == EntityActionTypeEnum.Create)
+                if (entityId > 0)
                 {
-                    string hotelId = GetEntityId<string>(actionArguments, "hotelId");
-                    return _entityAuthService.IsAuthorized(userId, hotelId, _action, _entityTypeId);
+                    return _entityAuthService.IsAuthorized(userId, entityId, _action, _entityTypeId);
                 } else
                 {
-                    int id = GetEntityId<int>(actionArguments);
-                    if (id > 0)
-                        return _entityAuthService.IsAuthorized(userId, id, _action, _entityTypeId);
+                    string? hotelId = GetEntityId<string>(actionArguments, "hotelId") ?? GetEntityId<string>(actionArguments);
 
-                    string idString = GetEntityId<string>(actionArguments);
-                    return !string.IsNullOrEmpty(idString) &&
-                           _entityAuthService.IsAuthorized(userId, idString, _action, _entityTypeId);
-                }
+                    if (!string.IsNullOrEmpty(hotelId))
+                    {
+                        return _entityAuthService.IsAuthorized(userId, hotelId, _action, _entityTypeId);
+                    } else
+                    {
+                        return false;
+                    }
+                }               
             }
 
             private void HandleUnauthorizedRequest(ActionExecutingContext context)

@@ -9,7 +9,7 @@ namespace TourGo.Models.Domain.Bookings
 {
     public class BookingDeparture
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string? ExternalBookingId { get; set; }
         public string? BookingProviderName { get; set; }
         public int StatusId { get; set; }

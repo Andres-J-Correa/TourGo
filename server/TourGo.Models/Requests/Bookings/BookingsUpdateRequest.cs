@@ -7,8 +7,8 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Bookings
 {
-    public class BookingsUpdateRequest : BookingAddRequest, IModelIdentifier
+    public class BookingsUpdateRequest : BookingAddRequest, IModelIdentifierString
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = string.Empty;
     }
 }
