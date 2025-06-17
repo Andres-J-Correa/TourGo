@@ -58,7 +58,7 @@ const BookingAddUpdateView = () => {
 
   const isStepComplete = {
     0: customer?.id > 0,
-    1: Number(booking.id) > 0,
+    1: !!booking?.id,
     2: booking?.transactions?.length > 0,
     3: false,
   };

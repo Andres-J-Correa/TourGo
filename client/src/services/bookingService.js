@@ -6,273 +6,6 @@ import {
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-// #region V1
-const api = `${API_HOST_PREFIX}/bookings`;
-
-export const getRoomBookingsByDateRange = async (
-  hotelId,
-  startDate,
-  endDate
-) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/hotel/${hotelId}/room-bookings?startDate=${startDate}&endDate=${endDate}`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const add = async (payload, hotelId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-    url: `${api}/hotel/${hotelId}`,
-    data: replaceEmptyStringsWithNull(payload),
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getById = async (bookingId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/${bookingId}`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getChargesByBookingId = async (bookingId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/${bookingId}/extra-charges`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const update = async (payload) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "PUT",
-    url: `${api}/${payload.id}`,
-    data: replaceEmptyStringsWithNull(payload),
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getRoomBookingsByBookingId = async (bookingId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/${bookingId}/room-bookings`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const updateStatusToCheckedIn = async (bookingId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "PATCH",
-    url: `${api}/${bookingId}/check-in`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const updateStatusToNoShow = async (bookingId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "PATCH",
-    url: `${api}/${bookingId}/no-show`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const updateStatusToCompleted = async (bookingId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "PATCH",
-    url: `${api}/${bookingId}/complete`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const updateStatusToCancelled = async (bookingId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "PATCH",
-    url: `${api}/${bookingId}/cancel`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getArrivals = async (hotelId, date) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/hotel/${hotelId}/arrivals?date=${date}`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getDepartures = async (hotelId, date) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/hotel/${hotelId}/departures?date=${date}`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getStays = async (hotelId, date) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/hotel/${hotelId}/stays?date=${date}`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getArrivingRooms = async (hotelId, date) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/hotel/${hotelId}/arrivals/rooms?date=${date}`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getDepartingRooms = async (hotelId, date) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/hotel/${hotelId}/departures/rooms?date=${date}`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-// #endregion
-
-// #region V2
 const apiV2 = `${API_HOST_PREFIX}/hotel/{hotelId}/bookings`;
 
 export const getBookingById = async (bookingId, hotelId) => {
@@ -359,4 +92,233 @@ export const getMinimalById = async (bookingId, hotelId) => {
     return onGlobalError(error);
   }
 };
-// #endregion
+
+export const updateStatusToCheckedIn = async (bookingId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/check-in`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const updateStatusToNoShow = async (bookingId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/no-show`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const updateStatusToCompleted = async (bookingId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/complete`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const updateStatusToCancelled = async (bookingId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/cancel`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getChargesByBookingId = async (bookingId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/extra-charges`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getRoomBookingsByDateRange = async (
+  hotelId,
+  startDate,
+  endDate
+) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(
+      /{hotelId}/,
+      hotelId
+    )}/room-bookings?startDate=${startDate}&endDate=${endDate}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getArrivals = async (hotelId, date) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/arrivals?date=${date}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getDepartures = async (hotelId, date) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/departures?date=${date}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getStays = async (hotelId, date) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/stays?date=${date}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getArrivingRooms = async (hotelId, date) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/arrivals/rooms?date=${date}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getDepartingRooms = async (hotelId, date) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/departures/rooms?date=${date}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const update = async (payload, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${payload.id}`,
+    data: replaceEmptyStringsWithNull(payload),
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const add = async (payload, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}`,
+    data: replaceEmptyStringsWithNull(payload),
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

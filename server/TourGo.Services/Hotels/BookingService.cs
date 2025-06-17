@@ -172,37 +172,49 @@ namespace TourGo.Services.Hotels
             return booking;
         }
 
-        public BookingAddResponse? Add(BookingAddRequest model, string userId, string hotelId)
+        public BookingAddResponse? Add(BookingAddRequest model, string userId, string hotelId, string publicId)
         {
             BookingAddResponse? response = null;
 
-            string proc = "bookings_insert_v4";
-            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
+            string proc = "bookings_insert_v5";
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
-                coll.AddWithValue("p_customerId", model.CustomerId);
-                coll.AddWithValue("p_externalBookingId", string.IsNullOrEmpty(model.ExternalId) ? (object)DBNull.Value : model.ExternalId);
-                coll.AddWithValue("p_bookingProviderId", model.BookingProviderId > 0 ? model.BookingProviderId: DBNull.Value);
-                coll.AddWithValue("p_arrivalDate", model.ArrivalDate.ToString("yyyy-MM-dd"));
-                coll.AddWithValue("p_departureDate", model.DepartureDate.ToString("yyyy-MM-dd"));
-                coll.AddWithValue("p_eta", model.ETA?.ToString("yyyy-MM-ddTHH:mm:ss") ?? (object)DBNull.Value);
-                coll.AddWithValue("p_adultGuests", model.AdultGuests);
-                coll.AddWithValue("p_childGuests", model.ChildGuests > 0 ? model.ChildGuests : DBNull.Value);
-                coll.AddWithValue("p_notes", model.Notes ?? (object)DBNull.Value);
-                coll.AddWithValue("p_modifiedBy", userId);
-                coll.AddWithValue("p_hotelId", hotelId);
-                coll.AddWithValue("p_externalComission", model.ExternalCommission > 0 ? model.ExternalCommission : 0);
-                coll.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
-                coll.AddWithValue("p_extraChargesJson", model.ExtraCharges?.Count > 0 ? JsonConvert.SerializeObject(model.ExtraCharges) : DBNull.Value);
-                coll.AddWithValue("p_personalizedChargesJson", model.PersonalizedCharges?.Count > 0 ? JsonConvert.SerializeObject(model.PersonalizedCharges) : DBNull.Value);
-                coll.AddWithValue("p_subtotal", model.Subtotal);
-                coll.AddWithValue("p_charges", model.Charges);
-                coll.AddWithValue("p_total", model.Total);
+                param.AddWithValue("p_customerId", model.CustomerId);
+                param.AddWithValue("p_externalBookingId", string.IsNullOrEmpty(model.ExternalId) ? (object)DBNull.Value : model.ExternalId);
+                param.AddWithValue("p_bookingProviderId", model.BookingProviderId > 0 ? model.BookingProviderId: DBNull.Value);
+                param.AddWithValue("p_arrivalDate", model.ArrivalDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_departureDate", model.DepartureDate.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_eta", model.ETA?.ToString("yyyy-MM-ddTHH:mm:ss") ?? (object)DBNull.Value);
+                param.AddWithValue("p_adultGuests", model.AdultGuests);
+                param.AddWithValue("p_childGuests", model.ChildGuests > 0 ? model.ChildGuests : DBNull.Value);
+                param.AddWithValue("p_notes", model.Notes ?? (object)DBNull.Value);
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_externalComission", model.ExternalCommission > 0 ? model.ExternalCommission : 0);
+                param.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
+                param.AddWithValue("p_extraChargesJson", model.ExtraCharges?.Count > 0 ? JsonConvert.SerializeObject(model.ExtraCharges) : DBNull.Value);
+                param.AddWithValue("p_personalizedChargesJson", model.PersonalizedCharges?.Count > 0 ? JsonConvert.SerializeObject(model.PersonalizedCharges) : DBNull.Value);
+                param.AddWithValue("p_subtotal", model.Subtotal);
+                param.AddWithValue("p_charges", model.Charges);
+                param.AddWithValue("p_total", model.Total);
+                param.AddWithValue("p_publicId", publicId);
+
             }, (reader, set) =>
-            {
-                response = new BookingAddResponse();
+            {             
                 int index = 0;
-                response.BookingId = reader.GetSafeInt32(index++);
-                response.InvoiceId = reader.GetSafeInt32(index++);
+                int newBookingId = reader.GetSafeInt32(index++);
+                int newInvoiceId = reader.GetSafeInt32(index++);
+
+                if (newBookingId <= 0 || newInvoiceId <= 0)
+                {
+                    return;
+                }
+
+                response = new BookingAddResponse
+                {
+                    BookingId = publicId,
+                    InvoiceId = newInvoiceId,
+                };
             });
 
             return response;
@@ -234,47 +246,9 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public List<ExtraCharge>? GetExtraChargesByBookingId(int bookingId)
-        {
-            string proc = "booking_extra_charges_select_by_booking_id";
-            List<ExtraCharge>? list = null;
-
-            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
-            {
-                param.AddWithValue("p_bookingId", bookingId);
-            }, (reader, set) =>
-            {
-                int index = 0;
-                list ??= new List<ExtraCharge>();
-                ExtraCharge extraCharge = ExtraChargeService.MapExtraCharge(reader, ref index);
-                list.Add(extraCharge);
-            });
-
-            return list;
-        }
-
-        public List<RoomBooking>? GetRoomBookingsByBookingId(int bookingId)
-        {
-            string proc = "room_bookings_select_by_booking_id";
-            List<RoomBooking>? list = null;
-
-            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
-            {
-                param.AddWithValue("p_bookingId", bookingId);
-            }, (reader, set) =>
-            {
-                int index = 0;
-                list ??= new List<RoomBooking>();
-                RoomBooking roomBooking = MapRoomBooking(reader, ref index);
-                list.Add(roomBooking);
-            });
-
-            return list;
-        }
-
         public List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, string hotelId)
         {
-            string proc = "room_bookings_select_by_date_range_v2";
+            string proc = "room_bookings_select_by_date_range_v3";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -348,7 +322,7 @@ namespace TourGo.Services.Hotels
 
         public List<RoomBooking>? GetDepartingRoomBookings(DateOnly departureDate, string hotelId)
         {
-            string proc = "room_bookings_select_departing_by_date_v2";
+            string proc = "room_bookings_select_departing_by_date_v3";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -363,7 +337,7 @@ namespace TourGo.Services.Hotels
                 roomBooking.Room.Name = reader.GetSafeString(index++);
                 roomBooking.FirstName = reader.GetSafeString(index++);
                 roomBooking.LastName = reader.GetSafeString(index++);
-                roomBooking.BookingId = reader.GetSafeInt32(index++);
+                roomBooking.BookingId = reader.GetSafeString(index++);
 
                 list ??= new List<RoomBooking>();
                 list.Add(roomBooking);
@@ -373,7 +347,7 @@ namespace TourGo.Services.Hotels
 
         public List<RoomBooking>? GetArrivingRoomBookings(DateOnly arrivalDate, string hotelId)
         {
-            string proc = "room_bookings_select_arriving_by_date_v2";
+            string proc = "room_bookings_select_arriving_by_date_v3";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -388,7 +362,7 @@ namespace TourGo.Services.Hotels
                 roomBooking.Room.Name = reader.GetSafeString(index++);
                 roomBooking.FirstName = reader.GetSafeString(index++);
                 roomBooking.LastName = reader.GetSafeString(index++);
-                roomBooking.BookingId = reader.GetSafeInt32(index++);
+                roomBooking.BookingId = reader.GetSafeString(index++);
 
                 list ??= new List<RoomBooking>();
                 list.Add(roomBooking);
@@ -415,6 +389,25 @@ namespace TourGo.Services.Hotels
             });
 
             return stays;
+        }
+
+        public List<string>? GetAvailablePublicIds(List<string> possibleIds)
+        {
+            string proc = "bookings_select_available_public_ids";
+            List<string>? availableIds = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (coll) =>
+            {
+                coll.AddWithValue("p_jsonData", JsonConvert.SerializeObject(possibleIds));
+            }, (reader, set) =>
+            {
+                int index = 0;
+                string availableId = reader.GetSafeString(index++);
+                availableIds ??= new List<string>();
+                availableIds.Add(availableId);
+            });
+
+            return availableIds;
         }
 
         public bool IsValidSortDirection(string? direction)
@@ -447,7 +440,7 @@ namespace TourGo.Services.Hotels
             roomBooking.Date = DateOnly.FromDateTime(reader.GetSafeDateTime(index++));
             roomBooking.Room.Id = reader.GetSafeInt32(index++);
             roomBooking.Room.Name = reader.GetSafeString(index++);
-            roomBooking.BookingId = reader.GetSafeInt32(index++);
+            roomBooking.BookingId = reader.GetSafeString(index++);
             roomBooking.Price = reader.GetSafeDecimal(index++);
             roomBooking.FirstName = reader.GetSafeString(index++);
             roomBooking.LastName = reader.GetSafeString(index++);

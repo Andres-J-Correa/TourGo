@@ -225,3 +225,39 @@ export const sanitizeNewTransaction = (
   dateCreated: new Date().toISOString(),
   dateModified: new Date().toISOString(),
 });
+
+export const sanitizeUpdatedTransaction = (
+  transaction,
+  user,
+  paymentMethods,
+  transactionSubcategories,
+  financePartners
+) => ({
+  ...transaction,
+  statusId: Number(transaction.statusId),
+  categoryId: Number(transaction.categoryId),
+  paymentMethod: {
+    id: Number(transaction.paymentMethodId),
+    name: paymentMethods.find(
+      (pm) => Number(pm.id) === Number(transaction.paymentMethodId)
+    )?.name,
+  },
+  subcategory: {
+    id: Number(transaction.subcategoryId),
+    name: transactionSubcategories.find(
+      (s) => Number(s.id) === Number(transaction.subcategoryId)
+    )?.name,
+  },
+  financePartner: {
+    id: Number(transaction.financePartnerId),
+    name: financePartners.find(
+      (fp) => Number(fp.id) === Number(transaction.financePartnerId)
+    )?.name,
+  },
+  modifiedBy: {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  },
+  dateModified: new Date().toISOString(),
+});

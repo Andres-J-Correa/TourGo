@@ -53,21 +53,6 @@ namespace TourGo.Web.Core.Filters
 
             private T? GetEntityId<T>(IDictionary<string, object> actionArguments, string idField = "id")
             {
-                // Check for a model implementing IModelIdentifier
-                if (typeof(T) == typeof(int) &&
-                    actionArguments.TryGetValue("model", out var model) &&
-                    model is IModelIdentifier requestModel)
-                {
-                    return (T)(object)requestModel.Id;
-                }
-
-                if (typeof(T) == typeof(string) &&
-                    actionArguments.TryGetValue("model", out var stringModel) &&
-                    stringModel is IModelIdentifierString stringModelIdentifier)
-                {
-                    return (T)(object)stringModelIdentifier.Id;
-                }
-
                 // Try to extract the ID value directly
                 if (actionArguments.TryGetValue(idField, out var idValue))
                 {
@@ -89,6 +74,21 @@ namespace TourGo.Web.Core.Filters
                     {
                         // Ignore and fall through to default
                     }
+                }
+
+                // Check for a model implementing IModelIdentifier
+                if (typeof(T) == typeof(int) &&
+                    actionArguments.TryGetValue("model", out var model) &&
+                    model is IModelIdentifier requestModel)
+                {
+                    return (T)(object)requestModel.Id;
+                }
+
+                if (typeof(T) == typeof(string) &&
+                    actionArguments.TryGetValue("model", out var stringModel) &&
+                    stringModel is IModelIdentifierString stringModelIdentifier)
+                {
+                    return (T)(object)stringModelIdentifier.Id;
                 }
 
                 return default;
