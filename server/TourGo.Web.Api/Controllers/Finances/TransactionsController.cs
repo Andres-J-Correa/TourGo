@@ -1,27 +1,31 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
+using TourGo.Models;
+using TourGo.Models.Domain;
+using TourGo.Models.Domain.Config;
+using TourGo.Models.Domain.Config.Emails;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Enums;
+using TourGo.Models.Enums.Transactions;
+using TourGo.Models.Requests;
 using TourGo.Models.Requests.Finances;
 using TourGo.Services;
+using TourGo.Services.Hotels;
 using TourGo.Services.Interfaces;
+using TourGo.Services.Interfaces.Hotels;
+using TourGo.Services.Security;
+using TourGo.Web.Api.Extensions;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
-using TourGo.Web.Models.Responses;
-using TourGo.Web.Api.Extensions;
-using TourGo.Models.Requests;
-using TourGo.Models.Enums.Transactions;
-using Microsoft.Extensions.Caching.Memory;
-using TourGo.Models.Domain;
-using TourGo.Models;
-using TourGo.Services.Hotels;
-using MySql.Data.MySqlClient;
 using TourGo.Web.Models.Enums;
-using TourGo.Services.Interfaces.Hotels;
+using TourGo.Web.Models.Responses;
 
 namespace TourGo.Web.Api.Controllers.Finances
 {
-    [Route("api/transactions")]
+    [Route("api/hotel/{hotelId}/transactions")]
     [ApiController]
     public class TransactionsController : BaseApiController
     {
@@ -30,7 +34,7 @@ namespace TourGo.Web.Api.Controllers.Finances
         private readonly IErrorLoggingService _errorLoggingService;
         private readonly IFileService _fileService;
         private readonly IMemoryCache _cache;
-        private readonly IHotelService _hotelService;
+        private readonly TransactionsPublicIdConfig _publicIdConfig;
 
         public TransactionsController(ILogger<TransactionsController> logger, 
             ITransactionService transactionService, 
@@ -38,33 +42,57 @@ namespace TourGo.Web.Api.Controllers.Finances
             IErrorLoggingService errorLoggingService,
             IFileService fileService,
             IMemoryCache memoryCache,
-            IHotelService hotelService) : base(logger)
+            IOptions<TransactionsPublicIdConfig> publicIdOptions) : base(logger)
         {
             _transactionService = transactionService;
             _webAuthService = webAuthenticationService;
             _errorLoggingService = errorLoggingService;
             _fileService = fileService;
             _cache = memoryCache;
-            _hotelService = hotelService;
+            _publicIdConfig = publicIdOptions.Value;
         }
 
-        [HttpPost("hotel/{hotelId}")]
+        [HttpPost]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Add(TransactionAddRequest model, string hotelId)
+        public ActionResult<ItemResponse<string>> Add(TransactionAddRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
+                string? publicId = null;
+                int attemptsMade = 0;
+
+                do
+                {
+                    List<string> possiblePublicIds = PublicIdGeneratorService.GenerateSecureIds(_publicIdConfig.NumberOfIdsToGenerate,
+                                                                                                _publicIdConfig.Length,
+                                                                                                _publicIdConfig.Characters);
+
+                    List<string>? availablePublicIds = _transactionService.GetAvailablePublicIds(possiblePublicIds);
+
+                    if (availablePublicIds != null && availablePublicIds.Count > 0)
+                    {
+                        publicId = availablePublicIds[0];
+                    }
+
+                    attemptsMade++;
+                } while (publicId == null && attemptsMade < _publicIdConfig.MaxAttempts);
+
+                if (publicId == null)
+                {
+                    throw new Exception("Failed to generate a unique public ID after maximum attempts.");
+                }
+
                 string userId = _webAuthService.GetCurrentUserId();
-                int id = _transactionService.Add(model, userId, hotelId);
+                int id = _transactionService.Add(model, userId, hotelId, publicId);
 
                 if(id == 0)
                 {
                     throw new Exception("Transaction not created");
                 }
 
-                ItemResponse<int> response = new ItemResponse<int> { Item = id };
+                ItemResponse<string> response = new ItemResponse<string> { Item = publicId };
                 result = Created201(response);
             }
             catch (MySqlException dbEx)
@@ -92,25 +120,31 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result ;
         }
 
-        [HttpGet("hotel/{hotelId}/entity/{entityId:int}")]
-        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk:true)]
-        public ActionResult<ItemsResponse<Transaction>> GetByEntityId(int entityId, string hotelId)
+        [HttpPut("{id}")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> Update(TransactionUpdateRequest model, string hotelId)
         {
             ObjectResult result = null;
-
             try
             {
-                List<Transaction>? transactions = _transactionService.GetByEntityId(entityId);
-
-                if (transactions == null)
+                string userId = _webAuthService.GetCurrentUserId();
+                _transactionService.Update(model, userId, hotelId);
+                SuccessResponse response = new SuccessResponse();
+                result = Ok200(response);
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+                if (Enum.IsDefined(typeof(TransactionManagementErrorCode), dbEx.Number))
                 {
-                    ErrorResponse response = new ErrorResponse("No transactions found for the specified entity.");
-                    result = NotFound404(response);
-                } else
-                {
-                    ItemsResponse<Transaction> response = new ItemsResponse<Transaction> { Items = transactions };
-                    result = Ok200(response);
+                    error = new ErrorResponse((TransactionManagementErrorCode)dbEx.Number);
                 }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                result = StatusCode(500, error);
             }
             catch (Exception ex)
             {
@@ -118,11 +152,10 @@ namespace TourGo.Web.Api.Controllers.Finances
                 ErrorResponse response = new ErrorResponse();
                 result = StatusCode(500, response);
             }
-
             return result;
         }
 
-        [HttpPatch("{id:int}/description")]
+        [HttpPatch("{id}/description")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
         public ActionResult<SuccessResponse> UpdateDescription(TransactionDescriptionUpdateRequest model)
         {
@@ -142,60 +175,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("{id:int}/document-url")]
-        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read)]
-        public async Task<ActionResult<ItemResponse<string>>> GetSupportDocumentUrl(int id)
-        {
-            ObjectResult result = null;
-
-            try
-            {
-                string? fileKey = _transactionService.GetSupportDocumentUrl(id);
-
-                if (string.IsNullOrEmpty(fileKey))
-                {
-                    ErrorResponse response = new ErrorResponse("No document URL found for the specified transaction.");
-                    result = NotFound404(response);
-                }
-                else
-                {
-                    string cacheKey = $"presigned-url-{AWSS3BucketEnum.TransactionsFiles}-{fileKey}";
-                    string? url = null;
-                    CacheEntry<string>? cachedEntry;
-                    if (!_cache.TryGetValue(cacheKey, out cachedEntry) || cachedEntry?.ExpirationTime < DateTime.UtcNow.AddSeconds(300))
-                    {
-                        Logger.LogInformation("Cache miss for {CacheKey}. Generating new pre-signed URL.", cacheKey);
-                        url = await _fileService.GetPresignedUrl(fileKey, AWSS3BucketEnum.TransactionsFiles);
-                        var cacheOptions = new MemoryCacheEntryOptions
-                        {
-                            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(3600),
-                            SlidingExpiration = TimeSpan.FromSeconds(1800)
-                        };
-                        var expiresAt = DateTime.UtcNow.AddSeconds(3600);
-                        var cacheEntry = new CacheEntry<string>(url, expiresAt);
-                        _cache.Set(cacheKey, cacheEntry, cacheOptions);
-                    }
-                    else
-                    {
-                        Logger.LogInformation("Cache hit for {CacheKey}.", cacheKey);
-                        url = cachedEntry.Item;
-                    }
-
-                    ItemResponse<string> response = new ItemResponse<string> { Item = url };
-                    result = Ok200(response);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                ErrorResponse response = new ErrorResponse();
-                result = StatusCode(500, response);
-            }
-
-            return result;
-        }
-
-        [HttpPost("hotel/{hotelId}/transaction/{id:int}/document-url")]
+        [HttpPost("{id}/document-url")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Create)]
         public ActionResult<SuccessResponse> UpdateDocumentUrl([FromForm] TransactionFileAddRequest model, string hotelId)
         {
@@ -227,16 +207,40 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpPut("{id:int}/reverse")]
+        [HttpPut("{id}/reverse")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
-        public ActionResult<ItemResponse<int>> Reverse(int id)
+        public ActionResult<ItemResponse<string>> Reverse(string id)
         {
             ObjectResult result = null;
 
             try
             {
+                string? publicId = null;
+                int attemptsMade = 0;
+
+                do
+                {
+                    List<string> possiblePublicIds = PublicIdGeneratorService.GenerateSecureIds(_publicIdConfig.NumberOfIdsToGenerate,
+                                                                                                _publicIdConfig.Length,
+                                                                                                _publicIdConfig.Characters);
+
+                    List<string>? availablePublicIds = _transactionService.GetAvailablePublicIds(possiblePublicIds);
+
+                    if (availablePublicIds != null && availablePublicIds.Count > 0)
+                    {
+                        publicId = availablePublicIds[0];
+                    }
+
+                    attemptsMade++;
+                } while (publicId == null && attemptsMade < _publicIdConfig.MaxAttempts);
+
+                if (publicId == null)
+                {
+                    throw new Exception("Failed to generate a unique public ID after maximum attempts.");
+                }
+
                 string userId = _webAuthService.GetCurrentUserId();
-                int txnId = _transactionService.Reverse(id, userId);
+                int txnId = _transactionService.Reverse(id, userId, publicId);
 
                 if (txnId == 0)
                 {
@@ -245,7 +249,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                 }
                 else
                 {
-                    ItemResponse<int> response = new ItemResponse<int> { Item = txnId };
+                    ItemResponse<string> response = new ItemResponse<string> { Item = publicId };
                     result = Ok200(response);
                 }
             }
@@ -274,19 +278,19 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{hotelId}/paginated")]
+        [HttpGet("paginated")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemResponse<Paged<Transaction>>> GetPaginated(
             string hotelId,
-            [FromQuery] int pageIndex, 
+            [FromQuery] int pageIndex,
             [FromQuery] int pageSize,
-            [FromQuery] string? sortColumn, 
+            [FromQuery] string? sortColumn,
             [FromQuery] string? sortDirection,
             [FromQuery] DateOnly? startDate,
             [FromQuery] DateOnly? endDate,
-            [FromQuery] int? txnId,
-            [FromQuery] int? parentId,
-            [FromQuery] int? entityId,
+            [FromQuery] string? txnId,
+            [FromQuery] string? parentId,
+            [FromQuery] string? entityId,
             [FromQuery] int? categoryId,
             [FromQuery] int? statusId,
             [FromQuery] string? referenceNumber,
@@ -316,18 +320,18 @@ namespace TourGo.Web.Api.Controllers.Finances
                     pageSize,
                     sortColumn,
                     sortDirection,
-                    startDate, 
+                    startDate,
                     endDate,
-                    txnId, 
-                    parentId, 
-                    entityId, 
-                    categoryId, 
-                    statusId, 
-                    referenceNumber, 
-                    description, 
-                    hasDocumentUrl, 
-                    paymentMethodId, 
-                    subcategoryId, 
+                    txnId,
+                    parentId,
+                    entityId,
+                    categoryId,
+                    statusId,
+                    referenceNumber,
+                    description,
+                    hasDocumentUrl,
+                    paymentMethodId,
+                    subcategoryId,
                     financePartnerId);
 
                 if (transactions == null)
@@ -351,13 +355,13 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{hotelId}/pagination")]
+        [HttpGet("pagination")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemResponse<Paged<Transaction>>> GetPaginated(
             string hotelId,
-            [FromQuery] int pageIndex, 
+            [FromQuery] int pageIndex,
             [FromQuery] int pageSize,
-            [FromQuery] string? sortColumn, 
+            [FromQuery] string? sortColumn,
             [FromQuery] string? sortDirection)
         {
             ObjectResult result = null;
@@ -418,9 +422,62 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("{id:int}/versions")]
+        [HttpGet("{id}/document-url")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemsResponse<TransactionVersion>> GetVersionsByTransactionId(int id)
+        public async Task<ActionResult<ItemResponse<string>>> GetSupportDocumentUrl(string id)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                string? fileKey = _transactionService.GetSupportDocumentUrl(id);
+
+                if (string.IsNullOrEmpty(fileKey))
+                {
+                    ErrorResponse response = new ErrorResponse("No document URL found for the specified transaction.");
+                    result = NotFound404(response);
+                }
+                else
+                {
+                    string cacheKey = $"presigned-url-{AWSS3BucketEnum.TransactionsFiles}-{fileKey}";
+                    string? url = null;
+                    CacheEntry<string>? cachedEntry;
+                    if (!_cache.TryGetValue(cacheKey, out cachedEntry) || cachedEntry?.ExpirationTime < DateTime.UtcNow.AddSeconds(300))
+                    {
+                        Logger.LogInformation("Cache miss for {CacheKey}. Generating new pre-signed URL.", cacheKey);
+                        url = await _fileService.GetPresignedUrl(fileKey, AWSS3BucketEnum.TransactionsFiles);
+                        var cacheOptions = new MemoryCacheEntryOptions
+                        {
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(3600),
+                            SlidingExpiration = TimeSpan.FromSeconds(1800)
+                        };
+                        var expiresAt = DateTime.UtcNow.AddSeconds(3600);
+                        var cacheEntry = new CacheEntry<string>(url, expiresAt);
+                        _cache.Set(cacheKey, cacheEntry, cacheOptions);
+                    }
+                    else
+                    {
+                        Logger.LogInformation("Cache hit for {CacheKey}.", cacheKey);
+                        url = cachedEntry.Item;
+                    }
+
+                    ItemResponse<string> response = new ItemResponse<string> { Item = url };
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpGet("{id}/versions")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemsResponse<TransactionVersion>> GetVersionsByTransactionId(string id)
         {
             ObjectResult result = null;
             try
@@ -446,9 +503,10 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("{id:int}/versions/{versionId:int}/document-url")]
+
+        [HttpGet("{id}/versions/{versionId:int}/document-url")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read)]
-        public async Task<ActionResult<ItemResponse<string>>> GetVersionSupportDocumentUrl(int id, int versionId)
+        public async Task<ActionResult<ItemResponse<string>>> GetVersionSupportDocumentUrl(string id, int versionId)
         {
             ObjectResult result = null;
             try
@@ -485,41 +543,6 @@ namespace TourGo.Web.Api.Controllers.Finances
                     ItemResponse<string> response = new ItemResponse<string> { Item = url };
                     result = Ok200(response);
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                ErrorResponse response = new ErrorResponse();
-                result = StatusCode(500, response);
-            }
-            return result;
-        }
-
-        [HttpPut("hotel/{hotelId}/transaction/{id:int}")]
-        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(TransactionUpdateRequest model, string hotelId)
-        {
-            ObjectResult result = null;
-            try
-            {
-                string userId = _webAuthService.GetCurrentUserId();
-                _transactionService.Update(model, userId, hotelId);
-                SuccessResponse response = new SuccessResponse();
-                result = Ok200(response);
-            }
-            catch (MySqlException dbEx)
-            {
-                ErrorResponse error;
-                if (Enum.IsDefined(typeof(TransactionManagementErrorCode), dbEx.Number))
-                {
-                    error = new ErrorResponse((TransactionManagementErrorCode)dbEx.Number);
-                }
-                else
-                {
-                    error = new ErrorResponse();
-                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
-                }
-                result = StatusCode(500, error);
             }
             catch (Exception ex)
             {

@@ -13,7 +13,6 @@ namespace TourGo.Services.Interfaces.Hotels
         Hotel? GetDetails(string id);
         List<HotelMinimal>? GetUserHotelsMinimal(string userId);
         HotelMinimal? GetMinimal(string id);
-        HotelMinimal? GetMinimalByTransactionId(int txnId);
         HotelMinimalWithUserRole? GetMinimalWithUserRole(string id, string userId);
         void Update(HotelUpdateRequest model, string userId);
         void Delete(string id, string userId);

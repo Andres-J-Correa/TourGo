@@ -54,7 +54,7 @@ const TransactionDetails = ({
   const handleViewDocument = async () => {
     setIsLoading(true);
     try {
-      const response = await getSupportDocumentUrl(txn.id);
+      const response = await getSupportDocumentUrl(txn.id, hotelId);
 
       if (response.isSuccessful) {
         setDocumentUrl(response.item);
@@ -151,7 +151,7 @@ const TransactionDetails = ({
     });
 
     try {
-      const response = await reverse(txn.id);
+      const response = await reverse(txn.id, hotelId);
       if (response.isSuccessful) {
         onReverseSuccess(txn.id, response.item);
         Swal.fire({
@@ -204,7 +204,11 @@ const TransactionDetails = ({
         didOpen: () => Swal.showLoading(),
       });
       try {
-        const response = await updateDescription(txn.id, newDescription);
+        const response = await updateDescription(
+          txn.id,
+          newDescription,
+          hotelId
+        );
         if (response.isSuccessful) {
           Swal.fire("Éxito", "Descripción actualizada", "success").then(() => {
             onEditDescriptionSuccess(txn.id, newDescription);
@@ -404,6 +408,7 @@ const TransactionDetails = ({
         offCanvasOpen={offCanvasOpen}
         handleToggleOffcanvas={handleToggleOffcanvas}
         transaction={txn}
+        hotelId={hotelId}
       />
     </>
   );

@@ -51,7 +51,7 @@ const RoomBookingTable = ({
       (b) =>
         b.date === date &&
         Number(b.room.id) === Number(roomId) &&
-        Number(b.bookingId) !== Number(bookingId)
+        b.bookingId !== bookingId
     );
 
   // 🎯 Cell click handler

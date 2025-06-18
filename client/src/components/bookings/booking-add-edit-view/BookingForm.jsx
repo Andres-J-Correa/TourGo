@@ -235,7 +235,7 @@ function BookingForm({
   };
 
   useEffect(() => {
-    if (booking.id > 0) {
+    if (!!booking.id) {
       if (!dates.start && !dates.end) {
         setDates({
           start: booking.arrivalDate,
@@ -572,7 +572,7 @@ export default withFormik({
 
       let res = null;
       if (values.id) {
-        res = await updateBooking(values);
+        res = await updateBooking(values, hotelId);
       } else {
         res = await addBooking(values, hotelId);
       }

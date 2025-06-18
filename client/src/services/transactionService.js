@@ -6,7 +6,7 @@ import {
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-const api = `${API_HOST_PREFIX}/transactions`;
+const apiV2 = `${API_HOST_PREFIX}/hotel/{hotelId}/transactions`;
 
 export const add = async (payload, hotelId) => {
   const config = {
@@ -14,7 +14,7 @@ export const add = async (payload, hotelId) => {
       "Content-Type": "application/json",
     },
     method: "POST",
-    url: `${api}/hotel/${hotelId}`,
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}`,
     data: replaceEmptyStringsWithNull(payload),
   };
   try {
@@ -26,64 +26,14 @@ export const add = async (payload, hotelId) => {
   }
 };
 
-export const reverse = (txnId) => {
+export const update = async (payload, transactionId, hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "PUT",
-    url: `${api}/${txnId}/reverse`,
-  };
-  return axiosClient(config)
-    .then((response) => {
-      onGlobalSuccess(response);
-      return response.data;
-    })
-    .catch((error) => onGlobalError(error));
-};
-
-export const getByEntityId = async (entityId, hotelId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/hotel/${hotelId}/entity/${entityId}`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const getSupportDocumentUrl = async (transactionId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "GET",
-    url: `${api}/${transactionId}/document-url`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const updateDescription = async (transactionId, description) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "PATCH",
-    url: `${api}/${transactionId}/description`,
-    data: { description: description.trim() ? description.trim() : null },
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${transactionId}`,
+    data: replaceEmptyStringsWithNull(payload),
   };
   try {
     const response = await axiosClient(config);
@@ -108,8 +58,63 @@ export const updateDocumentUrl = async (
       "Content-Type": "multipart/form-data",
     },
     method: "POST",
-    url: `${api}/hotel/${hotelId}/transaction/${transactionId}/document-url`,
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${transactionId}/document-url`,
     data: formData,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const reverse = (txnId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${txnId}/reverse`,
+  };
+  return axiosClient(config)
+    .then((response) => {
+      onGlobalSuccess(response);
+      return response.data;
+    })
+    .catch((error) => onGlobalError(error));
+};
+
+export const updateDescription = async (
+  transactionId,
+  description,
+  hotelId
+) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${transactionId}/description`,
+    data: { description: description.trim() ? description.trim() : null },
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const getSupportDocumentUrl = async (transactionId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${transactionId}/document-url`,
   };
   try {
     const response = await axiosClient(config);
@@ -162,7 +167,10 @@ export const getPagedTransactions = async (
   if (financePartnerId)
     queryParams.append("financePartnerId", financePartnerId);
 
-  const url = `${api}/hotel/${hotelId}/paginated?${queryParams.toString()}`;
+  const url = `${apiV2.replace(
+    /{hotelId}/,
+    hotelId
+  )}/paginated?${queryParams.toString()}`;
 
   const config = {
     headers: {
@@ -195,7 +203,10 @@ export const getFixedPagination = async (
   if (sortColumn) queryParams.append("sortColumn", sortColumn);
   if (sortDirection) queryParams.append("sortDirection", sortDirection);
 
-  const url = `${api}/hotel/${hotelId}/pagination?${queryParams.toString()}`;
+  const url = `${apiV2.replace(
+    /{hotelId}/,
+    hotelId
+  )}/pagination?${queryParams.toString()}`;
 
   const config = {
     headers: {
@@ -213,13 +224,13 @@ export const getFixedPagination = async (
   }
 };
 
-export const getTransactionVersions = async (transactionId) => {
+export const getTransactionVersions = async (transactionId, hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url: `${api}/${transactionId}/versions`,
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${transactionId}/versions`,
   };
   try {
     const response = await axiosClient(config);
@@ -232,32 +243,18 @@ export const getTransactionVersions = async (transactionId) => {
 
 export const getVersionSupportDocumentUrl = async (
   transactionId,
-  versionId
+  versionId,
+  hotelId
 ) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url: `${api}/${transactionId}/versions/${versionId}/document-url`,
-  };
-  try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data;
-  } catch (error) {
-    return onGlobalError(error);
-  }
-};
-
-export const update = async (payload, transactionId, hotelId) => {
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "PUT",
-    url: `${api}/hotel/${hotelId}/transaction/${transactionId}`,
-    data: replaceEmptyStringsWithNull(payload),
+    url: `${apiV2.replace(
+      /{hotelId}/,
+      hotelId
+    )}/${transactionId}/versions/${versionId}/document-url`,
   };
   try {
     const response = await axiosClient(config);

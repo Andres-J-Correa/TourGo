@@ -103,16 +103,16 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("{id}/details")]
+        [HttpGet("{hotelId}/details")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<Hotel>> GetDetails(string id)
+        public ActionResult<ItemResponse<Hotel>> GetDetails(string hotelId)
         {
             int code = 200;
             BaseResponse response;
 
             try
             {
-                Hotel ? hotel = _hotelService.GetDetails(id);
+                Hotel ? hotel = _hotelService.GetDetails(hotelId);
 
                 if (hotel == null)
                 {
@@ -198,9 +198,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return StatusCode(code, response);
         }
 
-        [HttpGet("minimal/{id}")]
+        [HttpGet("minimal/{hotelId}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<HotelMinimalWithUserRole>> GetMinimalWithUserRole(string id)
+        public ActionResult<ItemResponse<HotelMinimalWithUserRole>> GetMinimalWithUserRole(string hotelId)
         {
             int code = 200;
             BaseResponse response;
@@ -208,7 +208,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                HotelMinimalWithUserRole? hotel = _hotelService.GetMinimalWithUserRole(id, userId);
+                HotelMinimalWithUserRole? hotel = _hotelService.GetMinimalWithUserRole(hotelId, userId);
 
                 if (hotel == null)
                 {
@@ -232,14 +232,13 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(HotelUpdateRequest model, string id)
+        public ActionResult<SuccessResponse> Update(HotelUpdateRequest model)
  {
             int code = 200;
             BaseResponse response = null;
 
             try
             {
-                model.Id = id;
                 string userId = _webAuthService.GetCurrentUserId();
                 _hotelService.Update(model, userId);
 
@@ -256,9 +255,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{hotelId}")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Delete)]
-        public ActionResult<SuccessResponse> Delete(string id)
+        public ActionResult<SuccessResponse> Delete(string hotelId)
         {
             int code = 200;
             BaseResponse response = null;
@@ -266,7 +265,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _hotelService.Delete(id, userId);
+                _hotelService.Delete(hotelId, userId);
 
                 response = new SuccessResponse();
             }
@@ -310,15 +309,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return StatusCode(code, response);
         }
 
-        [HttpPost("{id}/invoices-tc")]
+        [HttpPost("{hotelId}/invoices-tc")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> InvoicesUpsertDefaultTC(InvoiceDefaultTCAddUpdateRequest model, string id)
+        public ActionResult<SuccessResponse> InvoicesUpsertDefaultTC(InvoiceDefaultTCAddUpdateRequest model, string hotelId)
         {
             ObjectResult? result = null;
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _hotelService.InvoicesUpsertDefaultTC(id, model, userId);
+                _hotelService.InvoicesUpsertDefaultTC(hotelId, model, userId);
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
             }
@@ -331,14 +330,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("{id}/invoices-tc")]
+        [HttpGet("{hotelId}/invoices-tc")]
         [EntityAuth(EntityTypeEnum.Hotels, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<InvoicesDefaultTC>> GetInvoicesDefaultTC(string id)
+        public ActionResult<ItemResponse<InvoicesDefaultTC>> GetInvoicesDefaultTC(string hotelId)
         {
             ObjectResult? result = null;
             try
             {
-                InvoicesDefaultTC? defaultTC = _hotelService.GetInvoicesDefaultTC(id);
+                InvoicesDefaultTC? defaultTC = _hotelService.GetInvoicesDefaultTC(hotelId);
                 if (defaultTC == null)
                 {
                     ErrorResponse response = new ErrorResponse("Default terms and conditions not found.");

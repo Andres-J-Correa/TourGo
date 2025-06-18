@@ -81,7 +81,7 @@ namespace TourGo.Services.Hotels
 
         public InvoiceWithEntities? GetWithEntitiesById(int invoiceId)
         {
-            string proc = "invoices_select_with_entities_by_id_v4";
+            string proc = "invoices_select_with_entities_by_id_v5";
             InvoiceWithEntities? invoiceWithEntities = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

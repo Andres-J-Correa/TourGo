@@ -21,7 +21,7 @@ import {
   faClipboardList,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getById as getBookingById } from "services/bookingService";
+import { getBookingById } from "services/bookingService";
 import { LOCKED_BOOKING_STATUSES } from "components/bookings/constants";
 
 dayjs.extend(isSameOrAfter);
@@ -47,12 +47,12 @@ function BookingViewOffCanvas({
   useEffect(() => {
     if (bookingId && offCanvasOpen) {
       setLoading(true);
-      getBookingById(bookingId)
+      getBookingById(bookingId, hotelId)
         .then(onGetBookingSuccess)
         .catch(onGetBookingError)
         .finally(() => setLoading(false));
     }
-  }, [bookingId, offCanvasOpen]);
+  }, [bookingId, offCanvasOpen, hotelId]);
 
   return (
     <Offcanvas

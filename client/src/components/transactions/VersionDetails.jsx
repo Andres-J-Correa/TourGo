@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import { Row, Col, Button } from "reactstrap";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
@@ -18,6 +19,8 @@ const VersionDetails = ({ txn }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [documentUrl, setDocumentUrl] = useState(null);
 
+  const { hotelId } = useParams();
+
   const category =
     TRANSACTION_CATEGORIES_BY_ID[txn.categoryId] || "Desconocido";
 
@@ -26,7 +29,11 @@ const VersionDetails = ({ txn }) => {
   const handleViewDocument = async () => {
     setIsLoading(true);
     try {
-      const response = await getVersionSupportDocumentUrl(txn.parentId, txn.id);
+      const response = await getVersionSupportDocumentUrl(
+        txn.parentId,
+        txn.id,
+        hotelId
+      );
 
       if (response.isSuccessful) {
         setDocumentUrl(response.item);

@@ -195,18 +195,26 @@ export const sanitizeNewTransaction = (
       (pm) => Number(pm.id) === Number(transaction.paymentMethodId)
     )?.name,
   },
-  subcategory: {
-    id: Number(transaction.subcategoryId),
-    name: transactionSubcategories.find(
-      (s) => Number(s.id) === Number(transaction.subcategoryId)
-    )?.name,
-  },
-  financePartner: {
-    id: Number(transaction.financePartnerId),
-    name: financePartners.find(
-      (fp) => Number(fp.id) === Number(transaction.financePartnerId)
-    )?.name,
-  },
+  ...(transaction.subcategoryId
+    ? {
+        subcategory: {
+          id: Number(transaction.subcategoryId),
+          name: transactionSubcategories.find(
+            (s) => Number(s.id) === Number(transaction.subcategoryId)
+          )?.name,
+        },
+      }
+    : {}),
+  ...(transaction.financePartnerId
+    ? {
+        financePartner: {
+          id: Number(transaction.financePartnerId),
+          name: financePartners.find(
+            (fp) => Number(fp.id) === Number(transaction.financePartnerId)
+          )?.name,
+        },
+      }
+    : {}),
   createdBy: {
     id: user.id,
     firstName: user.firstName,
@@ -222,6 +230,45 @@ export const sanitizeNewTransaction = (
     firstName: user.firstName,
     lastName: user.lastName,
   },
-  dateCreated: new Date().toISOString(),
-  dateModified: new Date().toISOString(),
+  dateCreated: new Date(),
+  dateModified: new Date(),
+});
+
+export const sanitizeUpdatedTransaction = (
+  transaction,
+  user,
+  paymentMethods,
+  transactionSubcategories,
+  financePartners
+) => ({
+  ...transaction,
+  categoryId: Number(transaction.categoryId),
+  paymentMethod: {
+    id: Number(transaction.paymentMethodId),
+    name: paymentMethods.find(
+      (pm) => Number(pm.id) === Number(transaction.paymentMethodId)
+    )?.name,
+  },
+  subcategory: transaction.subcategoryId
+    ? {
+        id: Number(transaction.subcategoryId),
+        name: transactionSubcategories.find(
+          (s) => Number(s.id) === Number(transaction.subcategoryId)
+        )?.name,
+      }
+    : null,
+  financePartner: transaction.financePartnerId
+    ? {
+        id: Number(transaction.financePartnerId),
+        name: financePartners.find(
+          (fp) => Number(fp.id) === Number(transaction.financePartnerId)
+        )?.name,
+      }
+    : null,
+  modifiedBy: {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  },
+  dateModified: new Date(),
 });

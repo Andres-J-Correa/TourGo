@@ -136,138 +136,144 @@ const HotelLandingPage = () => {
     }
   };
 
-  const handleCheckIn = useCallback(async (booking) => {
-    let swalText = "Asegúrese de que el cliente ha llegado";
-    let swalTitle = "¿Desea marcar la reserva como arribada?";
-    let hasBalanceDue = booking.balanceDue > 0;
-    if (hasBalanceDue) {
-      swalText =
-        "Esta reserva tiene un saldo pendiente. ¿Desea marcarla como arribada?";
-      swalTitle = "Saldo pendiente!";
-    }
+  const handleCheckIn = useCallback(
+    async (booking) => {
+      let swalText = "Asegúrese de que el cliente ha llegado";
+      let swalTitle = "¿Desea marcar la reserva como arribada?";
+      let hasBalanceDue = booking.balanceDue > 0;
+      if (hasBalanceDue) {
+        swalText =
+          "Esta reserva tiene un saldo pendiente. ¿Desea marcarla como arribada?";
+        swalTitle = "Saldo pendiente!";
+      }
 
-    const result = await Swal.fire({
-      title: swalTitle,
-      text: swalText,
-      icon: hasBalanceDue ? "warning" : "info",
-      showCancelButton: true,
-      confirmButtonText: "Sí, confirmar",
-      cancelButtonText: "Cancelar",
-      reverseButtons: hasBalanceDue,
-      confirmButtonColor: hasBalanceDue ? "red" : "#0d6efd",
-      didOpen: () => {
-        if (hasBalanceDue) {
-          Swal.getConfirmButton().style.display = "none";
-          Swal.showLoading();
-          setTimeout(() => {
-            if (Swal.isVisible()) {
-              Swal.getConfirmButton().style.display = "inline-block";
-              Swal.hideLoading();
-            }
-          }, 2000);
+      const result = await Swal.fire({
+        title: swalTitle,
+        text: swalText,
+        icon: hasBalanceDue ? "warning" : "info",
+        showCancelButton: true,
+        confirmButtonText: "Sí, confirmar",
+        cancelButtonText: "Cancelar",
+        reverseButtons: hasBalanceDue,
+        confirmButtonColor: hasBalanceDue ? "red" : "#0d6efd",
+        didOpen: () => {
+          if (hasBalanceDue) {
+            Swal.getConfirmButton().style.display = "none";
+            Swal.showLoading();
+            setTimeout(() => {
+              if (Swal.isVisible()) {
+                Swal.getConfirmButton().style.display = "inline-block";
+                Swal.hideLoading();
+              }
+            }, 2000);
+          }
+        },
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      try {
+        Swal.fire({
+          title: "Cargando...",
+          text: "Por favor, espere.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        const res = await updateStatusToCheckedIn(booking.id, hotelId);
+        if (res.isSuccessful) {
+          setData((prevData) => ({
+            ...prevData,
+            arrivals: prevData.arrivals.map((arrival) =>
+              arrival.id === booking.id
+                ? { ...arrival, statusId: BOOKING_STATUS_IDS.ARRIVED }
+                : arrival
+            ),
+          }));
+
+          Swal.fire({
+            title: "Éxito",
+            text: "Reserva marcada como check-in",
+            icon: "success",
+            confirmButtonText: "Aceptar",
+          });
+        } else {
+          throw new Error("Error al marcar como check-in");
         }
-      },
-    });
-
-    if (!result.isConfirmed) {
-      return;
-    }
-
-    try {
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
-      const res = await updateStatusToCheckedIn(booking.id);
-      if (res.isSuccessful) {
-        setData((prevData) => ({
-          ...prevData,
-          arrivals: prevData.arrivals.map((arrival) =>
-            arrival.id === booking.id
-              ? { ...arrival, statusId: BOOKING_STATUS_IDS.ARRIVED }
-              : arrival
-          ),
-        }));
-
-        Swal.fire({
-          title: "Éxito",
-          text: "Reserva marcada como check-in",
-          icon: "success",
-          confirmButtonText: "Aceptar",
+      } catch (error) {
+        Swal.close();
+        await Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error al marcar como check-in",
         });
-      } else {
-        throw new Error("Error al marcar como check-in");
       }
-    } catch (error) {
-      Swal.close();
-      await Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Error al marcar como check-in",
-      });
-    }
-  }, []);
+    },
+    [hotelId]
+  );
 
-  const handleComplete = useCallback(async (booking) => {
-    const result = await Swal.fire({
-      title: "¿Desea marcar la reserva como completada?",
-      text: "Ya no podrá editar la reserva",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Sí, confirmar",
-      cancelButtonText: "Cancelar",
-      reverseButtons: true,
-      confirmButtonColor: "green",
-    });
-
-    if (!result.isConfirmed) {
-      return;
-    }
-
-    try {
-      Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
+  const handleComplete = useCallback(
+    async (booking) => {
+      const result = await Swal.fire({
+        title: "¿Desea marcar la reserva como completada?",
+        text: "Ya no podrá editar la reserva",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, confirmar",
+        cancelButtonText: "Cancelar",
+        reverseButtons: true,
+        confirmButtonColor: "green",
       });
 
-      const res = await updateStatusToCompleted(booking.id);
-      if (res.isSuccessful) {
-        setData((prevData) => ({
-          ...prevData,
-          departures: prevData.departures.map((departure) =>
-            departure.id === booking.id
-              ? { ...departure, statusId: BOOKING_STATUS_IDS.COMPLETED }
-              : departure
-          ),
-        }));
+      if (!result.isConfirmed) {
+        return;
+      }
 
+      try {
         Swal.fire({
-          title: "Éxito",
-          text: "Reserva marcada como completada",
-          icon: "success",
-          confirmButtonText: "Aceptar",
+          title: "Cargando...",
+          text: "Por favor, espere.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
         });
-      } else {
-        throw new Error("Error al marcar como completada");
+
+        const res = await updateStatusToCompleted(booking.id, hotelId);
+        if (res.isSuccessful) {
+          setData((prevData) => ({
+            ...prevData,
+            departures: prevData.departures.map((departure) =>
+              departure.id === booking.id
+                ? { ...departure, statusId: BOOKING_STATUS_IDS.COMPLETED }
+                : departure
+            ),
+          }));
+
+          Swal.fire({
+            title: "Éxito",
+            text: "Reserva marcada como completada",
+            icon: "success",
+            confirmButtonText: "Aceptar",
+          });
+        } else {
+          throw new Error("Error al marcar como completada");
+        }
+      } catch (error) {
+        Swal.close();
+        await Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error al marcar como completada",
+        });
       }
-    } catch (error) {
-      Swal.close();
-      await Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Error al marcar como completada",
-      });
-    }
-  }, []);
+    },
+    [hotelId]
+  );
 
   useEffect(() => {
     setLoadingArrivalsDepartures(true);

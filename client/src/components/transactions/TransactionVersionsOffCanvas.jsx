@@ -12,6 +12,7 @@ function TransactionVersionsOffCanvas({
   transaction,
   offCanvasOpen,
   handleToggleOffcanvas,
+  hotelId,
 }) {
   const [loading, setLoading] = useState(true);
   const [versions, setVersions] = useState({
@@ -52,7 +53,7 @@ function TransactionVersionsOffCanvas({
   useEffect(() => {
     if (offCanvasOpen) {
       setLoading(true);
-      getTransactionVersions(transaction.id)
+      getTransactionVersions(transaction.id, hotelId)
         .then((response) => {
           if (response.isSuccessful) {
             setVersions({
@@ -74,7 +75,7 @@ function TransactionVersionsOffCanvas({
           setLoading(false);
         });
     }
-  }, [offCanvasOpen, transaction.id, versions.hasFetched, mapVersion]);
+  }, [offCanvasOpen, transaction.id, mapVersion, hotelId]);
 
   return (
     <Offcanvas

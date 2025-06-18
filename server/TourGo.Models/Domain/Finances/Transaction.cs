@@ -9,8 +9,8 @@ namespace TourGo.Models.Domain.Finances
 {
     public class Transaction
     {
-		public int Id { get; set; }
-        public int? ParentId { get; set; }
+		public string Id { get; set; }
+        public string? ParentId { get; set; }
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; }
         public DateTime DateCreated { get; set; }
@@ -24,7 +24,7 @@ namespace TourGo.Models.Domain.Finances
         public UserBase ApprovedBy { get; set; } = new UserBase();
         public string CurrencyCode { get; set;} = string.Empty;
         public Lookup? FinancePartner {get ;set;}
-        public int EntityId { get; set; } 
+        public string? EntityId { get; set; } 
         public bool HasDocumentUrl { get; set; }
         public decimal Total { get; set; }
         public UserBase ModifiedBy { get; set; } = new UserBase();

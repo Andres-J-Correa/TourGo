@@ -10,6 +10,7 @@ import {
   TRANSACTION_CATEGORIES,
   TRANSACTION_CATEGORY_TYPES_IDS,
   transactionUpdateValidationSchema,
+  sanitizeUpdatedTransaction,
 } from "components/transactions/constants";
 import { update } from "services/transactionService";
 import { useLanguage } from "contexts/LanguageContext";
@@ -21,6 +22,7 @@ import { Button, Col, InputGroup, InputGroupText, Row } from "reactstrap";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import { isEqual } from "lodash";
 
 function TransactionUpdateForm({
   transaction,
@@ -41,17 +43,17 @@ function TransactionUpdateForm({
     transactionDate: transaction?.transactionDate
       ? dayjs(transaction.transactionDate).format("YYYY-MM-DD")
       : dayjs().format("YYYY-MM-DD"),
-    paymentMethodId: transaction?.paymentMethod?.id || "",
-    categoryId: transaction?.categoryId || "",
+    paymentMethodId: transaction?.paymentMethod?.id?.toString() || "",
+    categoryId: transaction?.categoryId?.toString() || "",
     categoryTypeId:
       TRANSACTION_CATEGORIES.find(
         (cat) => cat.id === Number(transaction?.categoryId)
-      )?.typeId || "",
-    subcategoryId: transaction?.subcategory?.id || "",
+      )?.typeId?.toString() || "",
+    subcategoryId: transaction?.subcategory?.id?.toString() || "",
     referenceNumber: transaction?.referenceNumber || "",
     description: transaction?.description || "",
     currencyCode: transaction?.currencyCode || "COP",
-    financePartnerId: transaction?.financePartner?.id || "",
+    financePartnerId: transaction?.financePartner?.id?.toString() || "",
   };
 
   const confirmProceedWithMismatchedCategoryAmount = (
@@ -109,7 +111,6 @@ function TransactionUpdateForm({
   };
 
   const handleSubmit = async (values, { resetForm, setFieldError }) => {
-    let updatedTransaction = null;
     try {
       if (
         (values.amount >= 0 &&
@@ -135,15 +136,15 @@ function TransactionUpdateForm({
       if (!response.isSuccessful)
         throw new Error("Error al actualizar transacción");
 
-      updatedTransaction = {
+      const updatedTransaction = {
         ...transaction,
-        ...values,
-        modifiedBy: {
-          id: user.current.id,
-          firstName: user.current.firstName,
-          lastName: user.current.lastName,
-        },
-        dateModified: dayjs().toDate(),
+        ...sanitizeUpdatedTransaction(
+          values,
+          user.current,
+          paymentMethods,
+          transactionSubcategories,
+          financePartners
+        ),
       };
 
       await Swal.fire({
@@ -185,7 +186,7 @@ function TransactionUpdateForm({
       validationSchema={transactionUpdateValidationSchema}
       onSubmit={handleSubmit}
       enableReinitialize>
-      {({ values, setFieldValue }) => {
+      {({ values, setFieldValue, initialValues }) => {
         const handleDateChange = (e) => {
           const date = e.target.value;
           setFieldValue("transactionDate", getDate(date));
@@ -195,9 +196,10 @@ function TransactionUpdateForm({
           const selectedSubcategoryId = e.target.value;
           const subcategoryCategoryId =
             e.target.options[e.target.selectedIndex].dataset.category;
-          const subcategoryTypeId = TRANSACTION_CATEGORIES.find(
-            (cat) => cat.id === Number(subcategoryCategoryId)
-          )?.typeId;
+          const subcategoryTypeId =
+            TRANSACTION_CATEGORIES.find(
+              (cat) => cat.id === Number(subcategoryCategoryId)
+            )?.typeId?.toString() || "";
 
           setFieldValue("subcategoryId", selectedSubcategoryId);
           if (subcategoryCategoryId) {
@@ -212,6 +214,7 @@ function TransactionUpdateForm({
             e.target.options[e.target.selectedIndex].dataset.type;
           setFieldValue("categoryId", selectedCategoryId);
           setFieldValue("categoryTypeId", categoryTypeId);
+          setFieldValue("subcategoryId", "");
         };
 
         return (
@@ -221,7 +224,11 @@ function TransactionUpdateForm({
             })}>
             <h5 className="mb-3 text-center">Actualizar Transacción</h5>
             <div className="d-flex justify-content-end mb-3">
-              <Button type="submit" color="success" className="me-2">
+              <Button
+                type="submit"
+                color="success"
+                className="me-2"
+                disabled={isEqual(initialValues, values)}>
                 Guardar
               </Button>
               <Button type="button" onClick={handleCancelClick}>
@@ -304,7 +311,6 @@ function TransactionUpdateForm({
                     name="categoryId"
                     as="select"
                     className="form-control"
-                    disabled={values.subcategoryId}
                     placeholder="Categoría"
                     onChange={handleCategoryChange}
                     isRequired={true}>

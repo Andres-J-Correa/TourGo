@@ -36,8 +36,7 @@ export const bookingsTableColumns = [
   {
     header: "ID",
     accessorKey: "id",
-    maxSize: 50,
-    minSize: 50,
+    maxSize: 120,
   },
   {
     header: "Nombre",

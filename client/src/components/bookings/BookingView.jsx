@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
-  getById as getBookingById,
+  getBookingById,
   updateStatusToCheckedIn,
   updateStatusToNoShow,
   updateStatusToCompleted,
@@ -115,7 +115,7 @@ function BookingView() {
         },
       });
 
-      const res = await updateStatusToCheckedIn(bookingId);
+      const res = await updateStatusToCheckedIn(bookingId, hotelId);
       if (res.isSuccessful) {
         setBooking((prevBooking) => ({
           ...prevBooking,
@@ -141,7 +141,7 @@ function BookingView() {
         text: "Error al marcar como check-in",
       });
     }
-  }, [hasBalanceDue, bookingId, modifiedBy]);
+  }, [hasBalanceDue, bookingId, modifiedBy, hotelId]);
 
   const handleNoShow = useCallback(async () => {
     const result = await Swal.fire({
@@ -169,7 +169,7 @@ function BookingView() {
         },
       });
 
-      const res = await updateStatusToNoShow(bookingId);
+      const res = await updateStatusToNoShow(bookingId, hotelId);
       if (res.isSuccessful) {
         setBooking((prevBooking) => ({
           ...prevBooking,
@@ -195,7 +195,7 @@ function BookingView() {
         text: "Error al marcar como no show",
       });
     }
-  }, [bookingId, modifiedBy]);
+  }, [bookingId, modifiedBy, hotelId]);
 
   const handleComplete = useCallback(async () => {
     const result = await Swal.fire({
@@ -223,7 +223,7 @@ function BookingView() {
         },
       });
 
-      const res = await updateStatusToCompleted(bookingId);
+      const res = await updateStatusToCompleted(bookingId, hotelId);
       if (res.isSuccessful) {
         setBooking((prevBooking) => ({
           ...prevBooking,
@@ -249,7 +249,7 @@ function BookingView() {
         text: "Error al marcar como completada",
       });
     }
-  }, [bookingId, modifiedBy]);
+  }, [bookingId, modifiedBy, hotelId]);
 
   const handleCancel = useCallback(async () => {
     const result = await Swal.fire({
@@ -277,7 +277,7 @@ function BookingView() {
         },
       });
 
-      const res = await updateStatusToCancelled(bookingId);
+      const res = await updateStatusToCancelled(bookingId, hotelId);
       if (res.isSuccessful) {
         setBooking((prevBooking) => ({
           ...prevBooking,
@@ -303,17 +303,17 @@ function BookingView() {
         text: "Error al cancelar la reserva",
       });
     }
-  }, [bookingId, modifiedBy]);
+  }, [bookingId, modifiedBy, hotelId]);
 
   useEffect(() => {
     if (bookingId) {
       setIsLoading(true);
-      getBookingById(bookingId)
+      getBookingById(bookingId, hotelId)
         .then(onGetBookingSuccess)
         .catch(onGetBookingError)
         .finally(() => setIsLoading(false));
     }
-  }, [bookingId]);
+  }, [bookingId, hotelId]);
 
   return (
     <>
