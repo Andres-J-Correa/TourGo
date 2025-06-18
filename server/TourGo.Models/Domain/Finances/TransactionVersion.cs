@@ -8,6 +8,7 @@ namespace TourGo.Models.Domain.Finances
 {
     public class TransactionVersion: Transaction
     {
+        public int Id { get; set; }
         public bool DocumentUrlChanged { get; set; }
     }
 }

@@ -14,11 +14,8 @@ namespace TourGo.Models.Requests.Finances
     public class TransactionAddRequest
     {
 
-        [Range(1, Int32.MaxValue)]
-        public int? EntityId { get; set; }
-
-        [Range(1, Int32.MaxValue)]
-        public int? ParentId { get; set; }
+        [StringLength(50, MinimumLength = 2)]
+        public string? EntityId { get; set; }
 
         [Range(1, Int32.MaxValue)]
         public int? InvoiceId { get; set; }

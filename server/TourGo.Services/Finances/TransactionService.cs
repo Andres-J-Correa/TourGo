@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -27,15 +28,14 @@ namespace TourGo.Services.Finances
             _dataProvider = provider;
         }
 
-        public int Add(TransactionAddRequest request, string userId, string hotelId)
+        public int Add(TransactionAddRequest request, string userId, string hotelId, string publicId)
         {
-            string proc = "transactions_insert_v5";
+            string proc = "transactions_insert_v6";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
-                col.AddWithValue("p_entityId", request.EntityId > 0 ? request.EntityId : DBNull.Value);
-                col.AddWithValue("p_parentId", request.ParentId > 0 ? request.ParentId: DBNull.Value);
+                col.AddWithValue("p_entityId", string.IsNullOrEmpty(request.EntityId) ? DBNull.Value : request.EntityId);
                 col.AddWithValue("p_invoiceId", request.InvoiceId > 0 ? request.InvoiceId : DBNull.Value);
                 col.AddWithValue("p_amount", request.Amount);
                 col.AddWithValue("p_transactionDate", request.TransactionDate.ToString("yyyy-MM-dd"));
@@ -50,6 +50,7 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_createdBy", userId);
                 col.AddWithValue("p_approvedBy", userId);
                 col.AddWithValue("p_hotelId", hotelId);
+                col.AddWithValue("p_publicId", publicId);
 
                 MySqlParameter resultOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
                 resultOut.Direction = ParameterDirection.Output;
@@ -59,22 +60,25 @@ namespace TourGo.Services.Finances
             {
                 object newIdObj = returnCol["p_newId"].Value;
 
-                newId = int.TryParse(newIdObj.ToString(), out newId) ? newId : 0;
+                if(newIdObj != null && int.TryParse(newIdObj.ToString(), out int parsedId)){
+                    newId = parsedId;
+                }
 
             }));
 
             return newId;
         }
 
-        public int Reverse(int txnId, string userId)
+        public int Reverse(string txnId, string userId, string publicId)
         {
-            string proc = "transactions_reverse_v3";
+            string proc = "transactions_reverse_v4";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
                 col.AddWithValue("p_txnId", txnId);
                 col.AddWithValue("p_reversedBy", userId);
+                col.AddWithValue("p_publicId", publicId);
 
                 MySqlParameter resultOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
                 resultOut.Direction = ParameterDirection.Output;
@@ -90,35 +94,11 @@ namespace TourGo.Services.Finances
 
             return newId;
         }
-
-        public List<Transaction>? GetByEntityId (int entityId)
-        {
-
-            string proc = "transactions_select_by_entity_id_v4";
-            List<Transaction>? transactions = null;
-
-            _dataProvider.ExecuteCmd(proc, (col) =>
-            {
-                col.AddWithValue("p_id", entityId);
-            }, (reader, returnCol) =>
-            {
-                int index = 0;
-
-                Transaction transaction = MapTransaction(reader, ref index);
-
-                transactions ??= new List<Transaction>();
-
-                transactions.Add(transaction);
-            });
-
-            return transactions;
-        }
-
         public Paged<Transaction>? GetPaginated(string hotelId, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
-            DateOnly? startDate, DateOnly? endDate, int? txnId, int? parentId, int? entityId, int? categoryId, int? statusId, string? referenceNumber, 
+            DateOnly? startDate, DateOnly? endDate, string? txnId, string? parentId, string? entityId, int? categoryId, int? statusId, string? referenceNumber, 
             string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
         {
-            string proc = "transactions_select_paginated_v5";
+            string proc = "transactions_select_paginated_v6";
             Paged<Transaction>? paged = null;
             List<Transaction>? transactions = null;
             int totalCount = 0;
@@ -135,9 +115,9 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_sortDirection", string.IsNullOrEmpty(sortDirection) ? DBNull.Value : sortDirection);
                 col.AddWithValue("p_startDate", startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
                 col.AddWithValue("p_endDate", endDate.HasValue ? endDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
-                col.AddWithValue("p_id", txnId > 0 ? txnId : DBNull.Value);
-                col.AddWithValue("p_parentId", parentId > 0 ? parentId : DBNull.Value);
-                col.AddWithValue("p_entityId", entityId > 0 ? entityId : DBNull.Value);
+                col.AddWithValue("p_id", string.IsNullOrEmpty(txnId) ? DBNull.Value : txnId);
+                col.AddWithValue("p_parentId", string.IsNullOrEmpty(parentId) ? DBNull.Value : parentId);
+                col.AddWithValue("p_entityId", string.IsNullOrEmpty(entityId) ? DBNull.Value : entityId);
                 col.AddWithValue("p_categoryId", categoryId > 0 ? categoryId : DBNull.Value);
                 col.AddWithValue("p_statusId", statusId > 0 ? statusId : DBNull.Value);
                 col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(referenceNumber) ? DBNull.Value : referenceNumber);
@@ -174,10 +154,10 @@ namespace TourGo.Services.Finances
             return paged;
         }
 
-        public void UpdateDocumentUrl (int transactionId, string fileKey, string userId)
+        public void UpdateDocumentUrl (string transactionId, string fileKey, string userId)
         {
 
-           string proc = "transactions_update_document_url_by_id";
+           string proc = "transactions_update_document_url_by_id_v2";
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
@@ -187,9 +167,9 @@ namespace TourGo.Services.Finances
             });
         }
 
-        public string? GetSupportDocumentUrl (int transactionId)
+        public string? GetSupportDocumentUrl (string transactionId)
         {
-            string proc = "transactions_select_document_url_by_id";
+            string proc = "transactions_select_document_url_by_id_v2";
             string? fileKey = null;
 
             _dataProvider.ExecuteCmd(proc, (col) =>
@@ -205,9 +185,9 @@ namespace TourGo.Services.Finances
             return fileKey;
         }
 
-        public string? GetVersionSupportDocumentUrl(int transactionId, int versionId)
+        public string? GetVersionSupportDocumentUrl(string transactionId, int versionId)
         {
-            string proc = "transactions_versions_select_document_url_by_id";
+            string proc = "transactions_versions_select_document_url_by_id_v2";
             string? fileKey = null;
 
             _dataProvider.ExecuteCmd(proc, (col) =>
@@ -226,7 +206,7 @@ namespace TourGo.Services.Finances
 
         public void UpdateDescription(TransactionDescriptionUpdateRequest model)
         {
-            string proc = "transactions_update_description";
+            string proc = "transactions_update_description_v2";
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
@@ -235,9 +215,9 @@ namespace TourGo.Services.Finances
             });
         }
 
-        public List<TransactionVersion>? GetVersionsByTransactionId(int transactionId)
+        public List<TransactionVersion>? GetVersionsByTransactionId(string transactionId)
         {
-            string proc = "transactions_versions_select_by_transaction_id";
+            string proc = "transactions_versions_select_by_transaction_id_v2";
             List<TransactionVersion>? transactions = null;
             _dataProvider.ExecuteCmd(proc, (col) =>
             {
@@ -256,7 +236,7 @@ namespace TourGo.Services.Finances
    
         public void Update(TransactionUpdateRequest model, string userId, string hotelId)
         {
-            string proc = "transactions_update";
+            string proc = "transactions_update_v2";
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
@@ -274,6 +254,24 @@ namespace TourGo.Services.Finances
             });
         }
 
+        public List<string>? GetAvailablePublicIds(List<string> possibleIds)
+        {
+            string proc = "transactions_select_available_public_ids";
+            List<string>? availableIds = null;
+
+            _dataProvider.ExecuteCmd(proc, (coll) =>
+            {
+                coll.AddWithValue("p_jsonData", JsonConvert.SerializeObject(possibleIds));
+            }, (reader, set) =>
+            {
+                int index = 0;
+                string availableId = reader.GetSafeString(index++);
+                availableIds ??= new List<string>();
+                availableIds.Add(availableId);
+            });
+
+            return availableIds;
+        }
         public string GetFileKey(TransactionFileAddRequest model, string hotelId)
         {
             string folder = GetFolderName(model.Amount);
@@ -306,9 +304,9 @@ namespace TourGo.Services.Finances
         {
             Transaction transaction = new();
 
-            transaction.Id = reader.GetSafeInt32(index++);
-            transaction.ParentId = reader.GetSafeInt32(index++);
-            transaction.EntityId = reader.GetSafeInt32(index++);
+            transaction.Id = reader.GetSafeString(index++);
+            transaction.ParentId = reader.GetSafeString(index++);
+            transaction.EntityId = reader.GetSafeString(index++);
             transaction.Amount = reader.GetSafeDecimal(index++);
             transaction.TransactionDate = reader.GetSafeDateTime(index++);
             transaction.DateCreated = reader.GetSafeDateTime(index++);

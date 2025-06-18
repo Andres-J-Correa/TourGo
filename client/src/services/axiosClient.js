@@ -17,8 +17,8 @@ axiosRetry(axiosClient, {
     return retryCount * 2000;
   },
   retryCondition: (error) => {
-    // Retry on network errors or idempotent requests
-    return axiosRetry.isNetworkOrIdempotentRequestError(error);
+    // Retry on network errors
+    return axiosRetry.isNetworkError(error);
   },
 });
 

@@ -47,13 +47,20 @@ const EntityTransactionsView = ({
         if (indexOfReversed !== -1) {
           const copyOfReversed = { ...newTransactions[indexOfReversed] };
           copyOfReversed.statusId = TRANSACTION_STATUS_IDS.REVERSED;
+          copyOfReversed.dateModified = dayjs().toDate();
+          copyOfReversed.modifiedBy = {
+            id: user.current.id,
+            firstName: user.current.firstName,
+            lastName: user.current.lastName,
+          };
           const reversedTransaction = {
             ...copyOfReversed,
             id: newId,
             parentId: reversedId,
             amount: -copyOfReversed.amount,
             description: "Reversal",
-            dateCreated: dayjs().format("DD/MM/YYYY - h:mm a"),
+            dateCreated: dayjs().toDate(),
+            dateModified: dayjs().toDate(),
             createdBy: {
               id: user.current.id,
               firstName: user.current.firstName,
@@ -64,6 +71,7 @@ const EntityTransactionsView = ({
               firstName: user.current.firstName,
               lastName: user.current.lastName,
             },
+            hasDocumentUrl: false,
           };
 
           newTransactions[indexOfReversed] = copyOfReversed;
@@ -125,14 +133,23 @@ const EntityTransactionsView = ({
       setEntity((prev) => {
         const newTransactions = prev.transactions.map((txn) => {
           if (txn.id === id) {
-            return { ...txn, description: newDescription };
+            return {
+              ...txn,
+              description: newDescription,
+              dateModified: dayjs().toDate(),
+              modifiedBy: {
+                id: user.current.id,
+                firstName: user.current.firstName,
+                lastName: user.current.lastName,
+              },
+            };
           }
           return txn;
         });
         return { ...prev, transactions: newTransactions };
       });
     },
-    [setEntity]
+    [setEntity, user]
   );
 
   const onEditTransaction = useCallback(

@@ -466,7 +466,7 @@ function TransactionsTableFilters({
             <InputGroup>
               <Input
                 id="transactionId"
-                type="number"
+                type="text"
                 placeholder="Id de transacción"
                 value={transactionIdInput}
                 onChange={onTransactionInputChange}
@@ -530,7 +530,7 @@ function TransactionsTableFilters({
             <InputGroup>
               <Input
                 id="entityId"
-                type="number"
+                type="text"
                 placeholder="Id de entidad"
                 value={entityIdInput}
                 onChange={onEntityIdInputChange}

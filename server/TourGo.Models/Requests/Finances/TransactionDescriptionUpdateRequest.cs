@@ -8,9 +8,9 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Finances
 {
-    public class TransactionDescriptionUpdateRequest : IModelIdentifier
+    public class TransactionDescriptionUpdateRequest : IModelIdentifierString
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [StringLength(500, MinimumLength = 2)]
         public string? Description { get; set; } = string.Empty;

@@ -146,6 +146,7 @@ function TransactionUpdateForm({
           financePartners
         ),
       };
+
       await Swal.fire({
         icon: "success",
         title: "Transacción actualizada",
@@ -213,6 +214,7 @@ function TransactionUpdateForm({
             e.target.options[e.target.selectedIndex].dataset.type;
           setFieldValue("categoryId", selectedCategoryId);
           setFieldValue("categoryTypeId", categoryTypeId);
+          setFieldValue("subcategoryId", "");
         };
 
         return (
@@ -309,7 +311,6 @@ function TransactionUpdateForm({
                     name="categoryId"
                     as="select"
                     className="form-control"
-                    disabled={values.subcategoryId}
                     placeholder="Categoría"
                     onChange={handleCategoryChange}
                     isRequired={true}>
