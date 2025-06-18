@@ -23,7 +23,6 @@ const NavbarContainer = () => {
       toggle={toggle}
       navbarItems={currentItems}
       rightCustomComponents={rightCustomComponents}
-      showLanguageSelector={false}
     />
   );
 };

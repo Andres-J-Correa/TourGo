@@ -11,10 +11,7 @@ import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomField from "components/commonUI/forms/CustomField";
 import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
-import {
-  customerSchema,
-  searchCustomerSchema,
-} from "components/bookings/booking-add-edit-view/constants";
+import useBookingSchemas from "./useBookingSchemas";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -31,6 +28,8 @@ function CustomerForm({
 }) {
   const isUpdate = booking?.id;
   const [editing, setEditing] = useState(false);
+
+  const { customerSchema, searchCustomerSchema } = useBookingSchemas();
 
   const handleDocumentSubmit = async (values) => {
     try {

@@ -19,6 +19,7 @@ import Swal from "sweetalert2";
 import BookingRow from "./BookingRow";
 import RoomHeader from "./RoomHeader";
 import "./RoomBookingTable.css"; // Custom styles for the table
+import { useLanguage } from "contexts/LanguageContext"; // add import
 
 const RoomBookingTable = ({
   startDate,
@@ -36,6 +37,7 @@ const RoomBookingTable = ({
   const [lastSelection, setLastSelection] = useState([]);
   const [dates, setDates] = useState([]);
   const [isCtrlKeyPressed, setIsCtrlKeyPressed] = useState(false);
+  const { t } = useLanguage(); // add hook
 
   const prevAndNextDays = useMemo(() => {
     const start = dayjs(startDate).subtract(1, "day").format("YYYY-MM-DD");
@@ -92,15 +94,15 @@ const RoomBookingTable = ({
   const confirmDeselection = (cellsToDeselect, isMulti) => {
     Swal.fire({
       title: isMulti
-        ? "¿Desea deseleccionar las celdas?"
-        : "¿Desea deseleccionar esta celda?",
+        ? t("booking.table.deselectCellsTitle")
+        : t("booking.table.deselectCellTitle"),
       text: isMulti
-        ? "Perderás los precios asignados a esta selección."
-        : "Esta celda se eliminará de tu selección.",
+        ? t("booking.table.deselectCellsText")
+        : t("booking.table.deselectCellText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, deseleccionar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.table.deselectConfirm"),
+      cancelButtonText: t("common.cancel"),
     }).then((result) => {
       if (result.isConfirmed) {
         setSelectedRoomBookings((prev) =>
@@ -136,12 +138,12 @@ const RoomBookingTable = ({
   const toggleModal = () => setModalOpen((prev) => !prev);
   const clearSelection = () => {
     Swal.fire({
-      title: "¿Desea borrar toda la selección?",
-      text: "Esta acción no se puede deshacer.",
+      title: t("booking.table.clearSelectionTitle"),
+      text: t("booking.table.clearSelectionText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, borrar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.table.clearSelectionConfirm"),
+      cancelButtonText: t("common.cancel"),
     }).then((result) => {
       if (result.isConfirmed) {
         setSelectedRoomBookings([]);
@@ -153,12 +155,12 @@ const RoomBookingTable = ({
   };
   const undoLast = () => {
     Swal.fire({
-      title: "¿Desea deshacer la última selección?",
-      text: "Esta acción no se puede deshacer.",
+      title: t("booking.table.undoLastTitle"),
+      text: t("booking.table.undoLastText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, deshacer",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.table.undoLastConfirm"),
+      cancelButtonText: t("common.cancel"),
     }).then((result) => {
       if (result.isConfirmed) {
         setSelectedRoomBookings((prev) =>
@@ -282,17 +284,17 @@ const RoomBookingTable = ({
   return (
     <Container fluid className="mt-4 px-0">
       <>
-        <h5>Seleccione las habitaciones y fechas</h5>
+        <h5>{t("booking.table.selectRoomsDatesTitle")}</h5>
         <div className="bg-light p-2 rounded mb-3">
           <p className="text-muted fw-bold">
-            Haga clic en las celdas para seleccionar habitaciones y fechas.
-            Puede seleccionar varias celdas oprimiendo el botón{" "}
-            <span className="text-info">"Activar Multi-Selección"</span>, o
-            presionando la tecla "Ctrl" mientras hace clic en las celdas.
+            {t("booking.table.selectRoomsDatesHelp1")}
+            <span className="text-info">{`"${t(
+              "booking.table.activateMultiSelect"
+            )}"`}</span>
+            {t("booking.table.selectRoomsDatesHelp2")}
           </p>
           <p className="fw-bold text-info">
-            ℹ️ Debe seleccionar al menos una habitación para cada una de las
-            noches en el rango de fechas.
+            {t("booking.table.selectRoomsDatesHelp3")}
           </p>
         </div>
 
@@ -308,8 +310,8 @@ const RoomBookingTable = ({
               onClick={handleActivateMultiSelect}
               disabled={isCtrlKeyPressed}>
               {isMultiSelect
-                ? "Cancelar Multi-Selección"
-                : "Activar Multi-Selección"}
+                ? t("booking.table.cancelMultiSelect")
+                : t("booking.table.activateMultiSelect")}
             </button>
             {isMultiSelect &&
               !isCtrlKeyPressed &&
@@ -319,7 +321,7 @@ const RoomBookingTable = ({
                   color="success"
                   className="ms-2"
                   onClick={toggleModal}>
-                  Finalizar Selección
+                  {t("booking.table.finishSelection")}
                 </Button>
               )}
           </Col>
@@ -330,7 +332,7 @@ const RoomBookingTable = ({
                 color="secondary"
                 className="ms-2"
                 onClick={undoLast}>
-                Deshacer Última Selección
+                {t("booking.table.undoLast")}
               </Button>
             )}
             {selectedRoomBookings.length > 0 && (
@@ -339,7 +341,7 @@ const RoomBookingTable = ({
                 color="warning"
                 className="ms-2"
                 onClick={clearSelection}>
-                Borrar Todo
+                {t("booking.table.clearAll")}
               </Button>
             )}
           </Col>
@@ -348,9 +350,11 @@ const RoomBookingTable = ({
         <div className="bookings-table-container">
           <Row>
             <Col className="text-center text-dark fw-bold">
-              {`Reservando: ${dayjs(startDate).format("DD/MM/YYYY")} - ${dayjs(
-                endDate
-              ).format("DD/MM/YYYY")} (${dates.length} noches)`}
+              {t("booking.table.reserving", {
+                start: dayjs(startDate).format("DD/MM/YYYY"),
+                end: dayjs(endDate).format("DD/MM/YYYY"),
+                nights: dates.length,
+              })}
             </Col>
           </Row>
           <Table bordered className="table-fixed">
@@ -406,7 +410,7 @@ const RoomBookingTable = ({
           toggle={toggleModal}
           backdrop="static"
           autoFocus={false}>
-          <ModalHeader>Ingresar Precio</ModalHeader>
+          <ModalHeader>{t("booking.table.enterPrice")}</ModalHeader>
           <ModalBody>
             <Form
               onSubmit={(e) => {
@@ -417,7 +421,7 @@ const RoomBookingTable = ({
                 type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="Ingrese el precio"
+                placeholder={t("booking.table.pricePlaceholder")}
                 min="0"
                 step="0.01"
                 autoFocus={true}
@@ -428,13 +432,13 @@ const RoomBookingTable = ({
                   color="primary"
                   type="submit"
                   disabled={!price}>
-                  Guardar
+                  {t("common.ok")}
                 </Button>
                 <Button
                   type="button"
                   color="secondary"
                   onClick={handlePriceCancel}>
-                  Cancelar
+                  {t("common.cancel")}
                 </Button>
               </div>
             </Form>

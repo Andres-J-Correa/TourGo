@@ -1,4 +1,9 @@
 {
+  "language": "Idioma",
+  "languages": {
+    "en": "Inglés",
+    "es": "Español"
+  },
   "common": {
     "error": "Error",
     "ok": "OK",
@@ -15,13 +20,13 @@
     "areYouProvider": "Vende tus tours, únete!"
   },
   "yup": {
-    "required": "Este campo es obligatorio",
-    "min": "El valor debe ser mayor o igual a {{min}}",
-    "max": "El valor debe ser menor o igual a {{max}}",
-    "minLength": "El valor debe tener al menos {{min}} caracteres",
-    "maxLength": "El valor debe tener como maximo {{max}} caracteres",
-    "email": "El valor debe ser un correo",
-    "phone": "El valor debe ser un numero de telefono valido",
+    "required": "{{label}} es obligatorio",
+    "min": "{{label}} debe ser mayor o igual a {{min}}",
+    "max": "{{label}} debe ser menor o igual a {{max}}",
+    "minLength": "{{label}} debe tener al menos {{min}} caracteres",
+    "maxLength": "{{label}} debe tener como maximo {{max}} caracteres",
+    "email": "{{label}} debe ser válido",
+    "phone": "{{label}} debe ser un número de teléfono válido",
     "password": {
       "lowercase": "La contraseña debe tener al menos una minuscula",
       "uppercase": "La contraseña debe tener al menos una mayuscula",
@@ -126,6 +131,121 @@
       "5000": "Error de gestión de transacciones",
       "5001": "La solicitud no es válida",
       "5002": "Ya existe una transacción con este número de referencia"
+    }
+  },
+  "booking": {
+    "errors": {
+      "loadRooms": "Error al cargar habitaciones",
+      "loadCharges": "Error al cargar cargos extras",
+      "loadProviders": "Error al cargar proveedores de reservas",
+      "loadBookings": "Error al cargar reservas",
+      "loadBooking": "Error al cargar reserva",
+      "saveBooking": "Error al guardar la reserva"
+    },
+    "table": {
+      "selected": "Seleccionado",
+      "free": "Libre",
+      "deselectCellsTitle": "¿Desea deseleccionar las celdas?",
+      "deselectCellTitle": "¿Desea deseleccionar esta celda?",
+      "deselectCellsText": "Perderás los precios asignados a esta selección.",
+      "deselectCellText": "Esta celda se eliminará de tu selección.",
+      "deselectConfirm": "Sí, deseleccionar",
+      "clearSelectionTitle": "¿Desea borrar toda la selección?",
+      "clearSelectionText": "Esta acción no se puede deshacer.",
+      "clearSelectionConfirm": "Sí, borrar",
+      "undoLastTitle": "¿Desea deshacer la última selección?",
+      "undoLastText": "Esta acción no se puede deshacer.",
+      "undoLastConfirm": "Sí, deshacer",
+      "selectRoomsDatesTitle": "Seleccione las habitaciones y fechas",
+      "selectRoomsDatesHelp1": "Haga clic en las celdas para seleccionar habitaciones y fechas. Puede seleccionar varias celdas oprimiendo el botón ",
+      "selectRoomsDatesHelp2": ", o presionando la tecla \"Ctrl\" mientras hace clic en las celdas.",
+      "selectRoomsDatesHelp3": "ℹ️ Debe seleccionar al menos una habitación para cada una de las noches en el rango de fechas.",
+      "activateMultiSelect": "Activar Multi-Selección",
+      "cancelMultiSelect": "Cancelar Multi-Selección",
+      "finishSelection": "Finalizar Selección",
+      "undoLast": "Deshacer Última Selección",
+      "clearAll": "Borrar Todo",
+      "reserving": "Reservando: {{start}} - {{end}} ({{nights}} noches)",
+      "enterPrice": "Ingresar Precio",
+      "pricePlaceholder": "Ingrese el precio"
+    },
+    "additionalInfo": {
+      "title": "Información adicional",
+      "adultGuests": "Número de Personas (5 años o más)",
+      "childGuests": "Número de Niños (0-4 años)",
+      "eta": "Fecha y Hora estimada de llegada",
+      "bookingProvider": "Proveedor de reservas (Booking/Airbnb...)",
+      "noProvider": "Sin Proveedor",
+      "externalId": "Identificación externa (Booking/Airbnb...)",
+      "externalCommission": "Comisión externa",
+      "notes": "Notas"
+    },
+    "breadcrumb": {
+      "home": "Inicio",
+      "hotels": "Hoteles",
+      "hotel": "Hotel",
+      "bookings": "Reservas",
+      "booking": "Reserva",
+      "edit": "Editar Reserva",
+      "new": "Nueva Reserva"
+    },
+    "navigation": {
+      "previous": "Anterior",
+      "goToSummary": "Ir a Resumen"
+    },
+    "loadingOverlay": {
+      "loadingInfo": "Cargando información",
+      "processing": "procesando..."
+    },
+    "form": {
+      "nextConfirmTitle": "¿Está seguro de que desea continuar?",
+      "nextConfirmText": "Los cambios no guardados se perderán.",
+      "nextConfirmYes": "Sí, descartar cambios",
+      "nextConfirmNo": "No, ir a guardar",
+      "recoverTitle": "¿Recuperar información?",
+      "recoverText": "Realizaste cambios anteriormente que no se guardaron, ¿deseas recuperarlos?",
+      "recoverYes": "Sí, recuperar",
+      "recoverNo": "No, descartar",
+      "noRoomsTitle": "No hay habitaciones disponibles",
+      "noRoomsText": "Por favor, asegúrese de crear habitaciones antes de realizar una reserva.",
+      "goToRooms": "Ir a habitaciones",
+      "selectExtraCharges": "Seleccione los cargos extras",
+      "saveBooking": "Guardar Reserva",
+      "saveConfirmTitle": "¿Está seguro de que desea guardar la reserva?",
+      "saveConfirmText": "Revise los datos antes de continuar.",
+      "saveConfirmYes": "Sí, guardar",
+      "savingTitle": "Guardando reserva",
+      "savingText": "Por favor espera",
+      "saveSuccessTitle": "Reserva guardada",
+      "saveSuccessText": "La reserva se guardó correctamente."
+    },
+    "validation": {
+      "documentShort": "Documento muy corto (mínimo {{min}} caracteres)",
+      "documentLong": "Documento muy largo (máximo {{max}} caracteres)",
+      "documentRequired": "Documento requerido",
+      "firstNameMin": "El nombre debe tener mínimo {{min}} caracteres.",
+      "firstNameMax": "El nombre debe tener máximo {{max}} caracteres.",
+      "firstNameRequired": "El nombre es obligatorio.",
+      "lastNameMin": "El apellido debe tener mínimo {{min}} caracteres.",
+      "lastNameMax": "El apellido debe tener máximo {{max}} caracteres.",
+      "lastNameRequired": "El apellido es obligatorio.",
+      "emailRequired": "El correo electrónico es obligatorio.",
+      "emailValid": "Debe ingresar un correo electrónico válido.",
+      "emailMax": "El correo debe tener máximo {{max}} caracteres.",
+      "phoneRequired": "El teléfono es obligatorio.",
+      "phoneValid": "Debe ingresar un número de teléfono válido.",
+      "etaInvalid": "Fecha y hora estimada de llegada no es válida",
+      "adultGuestsRequired": "El número de personas es obligatorio",
+      "adultGuestsMin": "El número de personas no puede ser menor a {{min}}",
+      "childGuestsMin": "El número de menores no puede ser negativo",
+      "notesMax": "Las notas son demasiado largas (máximo {{max}} caracteres)",
+      "missingDates": "Falta reservar en las fechas: {{dates}}",
+      "bookingProviderValid": "El proveedor de reservas debe ser válido",
+      "externalIdMin": "La identificación externa debe tener al menos {{min}} caracteres",
+      "externalIdMax": "La identificación externa no puede exceder los {{max}} caracteres",
+      "externalIdRequired": "La identificación externa es obligatoria",
+      "externalCommissionRequired": "La comisión externa es obligatoria",
+      "externalCommissionMin": "La comisión externa no puede ser negativa"
     }
   }
 }
