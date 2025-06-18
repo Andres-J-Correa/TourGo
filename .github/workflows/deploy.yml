@@ -14,26 +14,36 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
             # Change to repo directory
-            cd ~/TourGo
+            cd ~/TourGo || { echo "Directory ~/TourGo does not exist"; exit 1; }
 
             # Pull latest changes
-            git pull origin main
+            git pull origin main || { echo "git pull failed"; exit 1; }
 
             # Client Deployment
             cd client
-            yarn install
-            yarn build
-            sudo rsync -avz ./build/ /var/www/html/
+            yarn install || { echo "yarn install failed"; exit 1; }
+            yarn build || { echo "yarn build failed"; exit 1; }
+            if [ -d "./build" ] && [ "$(ls -A ./build)" ]; then
+                sudo rsync -avz --delete ./build/ /var/www/html/
+            else
+                echo "Build directory is missing or empty"
+                exit 1
+            fi
 
             # Server Deployment
             cd ..
-            dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish
-            sudo rsync -avz ./server/publish/ /var/www/server/
+            dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish || { echo "dotnet publish failed"; exit 1; }
+            if [ -d "./server/publish" ] && [ "$(ls -A ./server/publish)" ]; then
+                sudo rsync -avz --delete ./server/publish/ /var/www/server/
+            else
+                echo "Publish directory is missing or empty"
+                exit 1
+            fi
             sudo systemctl restart kestrel-tourgo
