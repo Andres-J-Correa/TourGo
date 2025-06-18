@@ -4,6 +4,7 @@ import { Row, Col } from "reactstrap";
 import PropTypes from "prop-types";
 import ExtraChargeCard from "components/bookings/booking-add-edit-view/ExtraChargeCard";
 import "./ExtraChargesSelector.css"; // Assuming you have some CSS for styling
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const ExtraChargesSelector = ({
   charges,
@@ -11,6 +12,8 @@ const ExtraChargesSelector = ({
   toggleCharge,
   hotelId,
 }) => {
+  const { t } = useLanguage(); // added
+
   return (
     <Row className="justify-content-center">
       {charges?.length > 0 ? (
@@ -32,12 +35,12 @@ const ExtraChargesSelector = ({
         })
       ) : (
         <Col xs="12" className="text-center">
-          <p>No hay cargos adicionales disponibles.</p>
+          <p>{t("booking.extraChargesSelector.noCharges")}</p>
           {hotelId && (
             <Link
               to={`/hotels/${hotelId}/extra-charges`}
               className="btn btn-dark">
-              Ir a crear un nuevo cargo
+              {t("booking.extraChargesSelector.createNew")}
             </Link>
           )}
         </Col>

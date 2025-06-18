@@ -32,6 +32,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 dayjs.extend(isSameOrAfter);
 
@@ -41,6 +42,7 @@ function BookingView() {
   const [booking, setBooking] = useState(null);
 
   const { user } = useAppContext();
+  const { t } = useLanguage(); // added
 
   const modifiedBy = useMemo(
     () => ({
@@ -65,10 +67,13 @@ function BookingView() {
   }, [booking]);
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
-    { label: "Reservas", path: `/hotels/${hotelId}/bookings` },
+    { label: t("booking.breadcrumb.home"), path: "/" },
+    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
+    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
+    {
+      label: t("booking.breadcrumb.bookings"),
+      path: `/hotels/${hotelId}/bookings`,
+    },
   ];
 
   const onGetBookingSuccess = (res) => {
@@ -76,27 +81,30 @@ function BookingView() {
       setBooking(res.item);
     }
   };
-  const onGetBookingError = (e) => {
-    if (e.response?.status === 404) {
-      setBooking(null);
-    } else {
-      toast.error("Error al cargar reserva");
-    }
-  };
+  const onGetBookingError = useCallback(
+    (e) => {
+      if (e.response?.status === 404) {
+        setBooking(null);
+      } else {
+        toast.error(t("booking.view.errors.loadBooking"));
+      }
+    },
+    [t]
+  );
 
   const handleCheckIn = useCallback(async () => {
-    let swalText = "Asegúrese de que el cliente ha llegado";
+    let swalText = t("booking.view.checkInConfirmText");
     if (hasBalanceDue) {
-      swalText = "La reserva tiene saldo pendiente. ¿Desea continuar?";
+      swalText = t("booking.view.checkInBalanceDueText");
     }
 
     const result = await Swal.fire({
-      title: "¿Desea marcar la reserva como arribada?",
+      title: t("booking.view.checkInConfirmTitle"),
       text: swalText,
       icon: hasBalanceDue ? "warning" : "info",
       showCancelButton: true,
-      confirmButtonText: "Sí, confirmar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.view.confirmYes"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: hasBalanceDue,
       confirmButtonColor: hasBalanceDue ? "red" : "#0d6efd",
     });
@@ -107,8 +115,8 @@ function BookingView() {
 
     try {
       Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere.",
+        title: t("common.loading"),
+        text: t("booking.view.pleaseWait"),
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -125,10 +133,10 @@ function BookingView() {
         }));
 
         Swal.fire({
-          title: "Éxito",
-          text: "Reserva marcada como check-in",
+          title: t("common.success"),
+          text: t("booking.view.checkInSuccess"),
           icon: "success",
-          confirmButtonText: "Aceptar",
+          confirmButtonText: t("common.ok"),
         });
       } else {
         throw new Error("Error al marcar como check-in");
@@ -137,20 +145,20 @@ function BookingView() {
       Swal.close();
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "Error al marcar como check-in",
+        title: t("common.error"),
+        text: t("booking.view.checkInError"),
       });
     }
-  }, [hasBalanceDue, bookingId, modifiedBy, hotelId]);
+  }, [hasBalanceDue, bookingId, modifiedBy, hotelId, t]);
 
   const handleNoShow = useCallback(async () => {
     const result = await Swal.fire({
-      title: "¿Desea marcar la reserva como no show?",
-      text: "Ya no podrá editar la reserva",
+      title: t("booking.view.noShowConfirmTitle"),
+      text: t("booking.view.noShowConfirmText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, confirmar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.view.confirmYes"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: true,
       confirmButtonColor: "red",
     });
@@ -161,8 +169,8 @@ function BookingView() {
 
     try {
       Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere.",
+        title: t("common.loading"),
+        text: t("booking.view.pleaseWait"),
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -179,10 +187,10 @@ function BookingView() {
         }));
 
         Swal.fire({
-          title: "Éxito",
-          text: "Reserva marcada como no show",
+          title: t("common.success"),
+          text: t("booking.view.noShowSuccess"),
           icon: "success",
-          confirmButtonText: "Aceptar",
+          confirmButtonText: t("common.ok"),
         });
       } else {
         throw new Error("Error al marcar como no show");
@@ -191,20 +199,20 @@ function BookingView() {
       Swal.close();
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "Error al marcar como no show",
+        title: t("common.error"),
+        text: t("booking.view.noShowError"),
       });
     }
-  }, [bookingId, modifiedBy, hotelId]);
+  }, [bookingId, modifiedBy, hotelId, t]);
 
   const handleComplete = useCallback(async () => {
     const result = await Swal.fire({
-      title: "¿Desea marcar la reserva como completada?",
-      text: "Ya no podrá editar la reserva",
+      title: t("booking.view.completeConfirmTitle"),
+      text: t("booking.view.completeConfirmText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, confirmar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.view.confirmYes"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: true,
       confirmButtonColor: "green",
     });
@@ -215,8 +223,8 @@ function BookingView() {
 
     try {
       Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere.",
+        title: t("common.loading"),
+        text: t("booking.view.pleaseWait"),
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -233,10 +241,10 @@ function BookingView() {
         }));
 
         Swal.fire({
-          title: "Éxito",
-          text: "Reserva marcada como completada",
+          title: t("common.success"),
+          text: t("booking.view.completeSuccess"),
           icon: "success",
-          confirmButtonText: "Aceptar",
+          confirmButtonText: t("common.ok"),
         });
       } else {
         throw new Error("Error al marcar como completada");
@@ -245,20 +253,20 @@ function BookingView() {
       Swal.close();
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "Error al marcar como completada",
+        title: t("common.error"),
+        text: t("booking.view.completeError"),
       });
     }
-  }, [bookingId, modifiedBy, hotelId]);
+  }, [bookingId, modifiedBy, hotelId, t]);
 
   const handleCancel = useCallback(async () => {
     const result = await Swal.fire({
-      title: "¿Desea cancelar la reserva?",
-      text: "Ya no podrá editar la reserva",
+      title: t("booking.view.cancelConfirmTitle"),
+      text: t("booking.view.cancelConfirmText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, confirmar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.view.confirmYes"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: true,
       confirmButtonColor: "red",
     });
@@ -269,8 +277,8 @@ function BookingView() {
 
     try {
       Swal.fire({
-        title: "Cargando...",
-        text: "Por favor, espere.",
+        title: t("common.loading"),
+        text: t("booking.view.pleaseWait"),
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -287,10 +295,10 @@ function BookingView() {
         }));
 
         Swal.fire({
-          title: "Éxito",
-          text: "Asegúrate de devolver depositos si corresponde",
+          title: t("common.success"),
+          text: t("booking.view.cancelSuccess"),
           icon: "info",
-          confirmButtonText: "Aceptar",
+          confirmButtonText: t("common.ok"),
         });
       } else {
         throw new Error("Error al cancelar la reserva");
@@ -299,11 +307,11 @@ function BookingView() {
       Swal.close();
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "Error al cancelar la reserva",
+        title: t("common.error"),
+        text: t("booking.view.cancelError"),
       });
     }
-  }, [bookingId, modifiedBy, hotelId]);
+  }, [bookingId, modifiedBy, hotelId, t]);
 
   useEffect(() => {
     if (bookingId) {
@@ -313,18 +321,21 @@ function BookingView() {
         .catch(onGetBookingError)
         .finally(() => setIsLoading(false));
     }
-  }, [bookingId, hotelId]);
+  }, [bookingId, hotelId, onGetBookingError]);
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Reserva" />
-      <h3 className="mb-4">Detalles de Reserva</h3>
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("booking.breadcrumb.booking")}
+      />
+      <h3 className="mb-4">{t("booking.view.title")}</h3>
       <ErrorBoundary>
         <Row className="mb-3">
           <Col className="px-3">
             {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE && (
               <Button color="outline-dark" onClick={handleCheckIn}>
-                Marcar Check-in
+                {t("booking.arrival.markCheckIn")}
                 <FontAwesomeIcon icon={faPlaneArrival} className="ms-2" />
               </Button>
             )}
@@ -334,7 +345,7 @@ function BookingView() {
                   color="outline-dark"
                   className="ms-2"
                   onClick={handleComplete}>
-                  Marcar Completada
+                  {t("booking.departure.markCompleted")}
                   <FontAwesomeIcon icon={faPlaneDeparture} className="ms-2" />
                 </Button>
               )}
@@ -344,7 +355,7 @@ function BookingView() {
                   color="outline-dark"
                   className="ms-2"
                   onClick={handleNoShow}>
-                  Marcar No Show
+                  {t("booking.view.markNoShow")}
                   <FontAwesomeIcon icon={faCalendarXmark} className="ms-2" />
                 </Button>
               )}
@@ -353,13 +364,13 @@ function BookingView() {
                 color="outline-danger"
                 className="ms-2 float-end"
                 onClick={handleCancel}>
-                Cancelar Reserva
+                {t("booking.view.cancelBooking")}
                 <FontAwesomeIcon icon={faRectangleXmark} className="ms-2" />
               </Button>
             )}
             {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
               <Link to="edit" className=" ms-2 float-end btn btn-outline-dark">
-                Editar
+                {t("booking.view.edit")}
                 <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
               </Link>
             )}
@@ -368,7 +379,7 @@ function BookingView() {
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline-dark float-end">
-              Ir a Factura
+              {t("booking.view.goToInvoice")}
               <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />
             </Link>
           </Col>
@@ -377,7 +388,7 @@ function BookingView() {
         {booking !== null && (
           <Card className="mb-4 bg-body-tertiary shadow">
             <CardHeader tag="h4" className="text-bg-dark text-center">
-              Reserva # {booking?.id}
+              {t("booking.view.reservationNumber")} {booking?.id}
               <BookingStatusBadge
                 className="float-end"
                 statusId={booking?.status?.id}

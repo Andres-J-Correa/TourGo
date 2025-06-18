@@ -15,11 +15,12 @@ import dayjs from "dayjs";
 import classNames from "classnames";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import {
-  bookingsTableColumns,
+  useBookingsTableColumns,
   LOCKED_BOOKING_STATUSES,
 } from "components/bookings/constants";
 import BookingFilters from "components/bookings/bookings-view/BookingFilters";
 import BookingsTable from "components/bookings/bookings-view/BookingsTable";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const defaultData = {
   items: [],
@@ -33,6 +34,8 @@ const BookingsView = () => {
   const { hotelId } = useParams();
   const [data, setData] = useState({ ...defaultData });
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage(); // added
+  const bookingsTableColumns = useBookingsTableColumns();
 
   const [paginationData, setPaginationData] = useState({
     pageIndex: 0,
@@ -52,14 +55,14 @@ const BookingsView = () => {
   });
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("booking.breadcrumb.home"), path: "/" },
+    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
+    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
   ];
 
   const actionsColumn = useMemo(
     () => ({
-      header: "Acciones",
+      header: t("booking.bookingsView.actions"),
       enableSorting: false,
       maxSize: 140,
       minSize: 140,
@@ -73,7 +76,7 @@ const BookingsView = () => {
               rel="noopener noreferrer"
               to={`/hotels/${hotelId}/bookings/${booking.id}`}
               onClick={(e) => e.stopPropagation()}>
-              Ver
+              {t("booking.bookingsView.view")}
             </Link>
             {!LOCKED_BOOKING_STATUSES.includes(info.row.original.statusId) && (
               <Link
@@ -82,19 +85,19 @@ const BookingsView = () => {
                 rel="noopener noreferrer"
                 to={`/hotels/${hotelId}/bookings/${booking.id}/edit`}
                 onClick={(e) => e.stopPropagation()}>
-                Editar
+                {t("booking.bookingsView.edit")}
               </Link>
             )}
           </div>
         );
       },
     }),
-    [hotelId]
+    [hotelId, t]
   );
 
   const columns = useMemo(
     () => [...bookingsTableColumns, actionsColumn],
-    [actionsColumn]
+    [actionsColumn, bookingsTableColumns]
   );
 
   const table = useReactTable({
@@ -285,8 +288,11 @@ const BookingsView = () => {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active={"Reservas"} />
-      <h3>Reservas</h3>
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("booking.breadcrumb.bookings")}
+      />
+      <h3>{t("booking.bookingsView.title")}</h3>
       <ErrorBoundary>
         <BookingFilters
           paginationData={paginationData}
@@ -309,11 +315,14 @@ const BookingsView = () => {
             className={classNames("float-end", {
               invisible: data.items.length === 0 || loading,
             })}>
-            Mostrando {paginationData.pageSize * paginationData.pageIndex + 1} a{" "}
+            {t("booking.bookingsView.showing")}{" "}
+            {paginationData.pageSize * paginationData.pageIndex + 1}{" "}
+            {t("booking.bookingsView.to")}{" "}
             {!data.hasNextPage
               ? data.totalCount
               : paginationData.pageSize * (paginationData.pageIndex + 1)}{" "}
-            de {data.totalCount} reservas
+            {t("booking.bookingsView.of")} {data.totalCount}{" "}
+            {t("booking.bookingsView.reservations")}
           </span>
 
           <BookingsTable table={table} columns={columns} loading={loading} />
@@ -322,7 +331,8 @@ const BookingsView = () => {
             className={classNames("mb-0 text-center text-dark", {
               invisible: data.items.length === 0 || loading,
             })}>
-            Página {paginationData.pageIndex + 1} de {data.totalPages}
+            {t("booking.bookingsView.page")} {paginationData.pageIndex + 1}{" "}
+            {t("booking.bookingsView.of")} {data.totalPages}
           </p>
         </div>
 

@@ -8,6 +8,7 @@ import {
   EXTRA_CHARGE_TYPE_IDS,
   formatExtraChargeAmount,
 } from "components/extra-charges/constants";
+import { useLanguage } from "contexts/LanguageContext";
 
 const ExtraChargeCard = ({
   charge,
@@ -17,11 +18,13 @@ const ExtraChargeCard = ({
   typeIdOverride,
   amountOverride,
 }) => {
+  const { t } = useLanguage();
   const typeId =
     typeIdOverride !== undefined
       ? typeIdOverride
       : charge.type?.id ?? EXTRA_CHARGE_TYPE_IDS.CUSTOM;
-  const typeLabel = EXTRA_CHARGE_TYPES_BY_ID[typeId] || "N/A";
+  const typeLabel =
+    EXTRA_CHARGE_TYPES_BY_ID[typeId] || t("booking.extraChargeCard.na");
   const amount = amountOverride !== undefined ? amountOverride : charge.amount;
 
   return (
@@ -44,11 +47,12 @@ const ExtraChargeCard = ({
         </CardTitle>
         {showType && (
           <CardText className="mb-1 fs-7">
-            <strong>Tipo:</strong> {typeLabel}
+            <strong>{t("booking.extraChargeCard.type")}</strong> {typeLabel}
           </CardText>
         )}
         <CardText className="mb-0 fs-7">
-          <strong>Monto:</strong> {formatExtraChargeAmount(amount, typeId)}
+          <strong>{t("booking.extraChargeCard.amount")}</strong>{" "}
+          {formatExtraChargeAmount(amount, typeId)}
         </CardText>
       </CardBody>
     </Card>

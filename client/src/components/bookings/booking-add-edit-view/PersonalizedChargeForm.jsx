@@ -4,20 +4,25 @@ import { Button, Col, InputGroup, InputGroupText, Row } from "reactstrap";
 import * as Yup from "yup";
 
 import CustomField from "components/commonUI/forms/CustomField";
+import { useLanguage } from "contexts/LanguageContext";
 
 const initialValues = {
   name: "",
   amount: "",
 };
 
-const validationSchema = Yup.object().shape({
-  name: Yup.string().required("El nombre es obligatorio").max(100),
-  amount: Yup.number()
-    .required("El monto es obligatorio")
-    .min(0, "El monto debe ser mayor o igual a 0"),
-});
-
 function PersonalizedChargeForm({ onSubmit }) {
+  const { t } = useLanguage();
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string()
+      .required(t("booking.personalizedChargeForm.nameRequired"))
+      .max(100),
+    amount: Yup.number()
+      .required(t("booking.personalizedChargeForm.amountRequired"))
+      .min(0, t("booking.personalizedChargeForm.amountMin")),
+  });
+
   return (
     <Formik
       initialValues={initialValues}
@@ -31,14 +36,18 @@ function PersonalizedChargeForm({ onSubmit }) {
               <CustomField
                 name="name"
                 type="text"
-                placeholder="Nombre del cargo"
+                placeholder={t(
+                  "booking.personalizedChargeForm.namePlaceholder"
+                )}
                 isRequired={true}
               />
               <InputGroupText className="mb-3">$</InputGroupText>
               <CustomField
                 name="amount"
                 type="number"
-                placeholder="Monto"
+                placeholder={t(
+                  "booking.personalizedChargeForm.amountPlaceholder"
+                )}
                 isRequired={true}
               />
             </InputGroup>
@@ -46,7 +55,7 @@ function PersonalizedChargeForm({ onSubmit }) {
           <Col md="auto" className="align-content-center">
             <div className="text-center">
               <Button type="submit" className="btn bg-success text-white mb-3">
-                Agregar
+                {t("booking.personalizedChargeForm.add")}
               </Button>
             </div>
           </Col>

@@ -1,21 +1,23 @@
 import dayjs from "dayjs";
 import { formatCurrency } from "utils/currencyHelper";
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
+import { useTranslation } from "react-i18next";
 
+// Use translation keys instead of hardcoded strings
 export const BOOKING_STATUS_BY_ID = {
-  1: "Activa",
-  2: "Cancelada",
-  3: "Completada",
-  4: "No Show",
-  5: "Arribada",
+  1: "booking.status.active",
+  2: "booking.status.cancelled",
+  3: "booking.status.completed",
+  4: "booking.status.noShow",
+  5: "booking.status.arrived",
 };
 
 export const BOOKING_STATUSES = [
-  { id: 1, name: "Activa" },
-  { id: 2, name: "Cancelada" },
-  { id: 3, name: "Completada" },
-  { id: 4, name: "No Show" },
-  { id: 5, name: "Arribada" },
+  { id: 1, name: "booking.status.active" },
+  { id: 2, name: "booking.status.cancelled" },
+  { id: 3, name: "booking.status.completed" },
+  { id: 4, name: "booking.status.noShow" },
+  { id: 5, name: "booking.status.arrived" },
 ];
 
 export const BOOKING_STATUS_IDS = {
@@ -32,54 +34,59 @@ export const LOCKED_BOOKING_STATUSES = [
   BOOKING_STATUS_IDS.COMPLETED,
 ];
 
-export const bookingsTableColumns = [
-  {
-    header: "ID",
-    accessorKey: "id",
-    maxSize: 120,
-  },
-  {
-    header: "Nombre",
-    accessorKey: "firstName",
-  },
-  {
-    header: "Apellido",
-    accessorKey: "lastName",
-  },
-  {
-    header: "Llegada",
-    accessorKey: "arrivalDate",
-    cell: ({ getValue }) => dayjs(getValue()).format("DD/MM/YYYY"),
-  },
-  {
-    header: "Salida",
-    accessorKey: "departureDate",
-    cell: ({ getValue }) => dayjs(getValue()).format("DD/MM/YYYY"),
-  },
-  {
-    header: "Total",
-    accessorKey: "total",
-    cell: ({ getValue }) => formatCurrency(getValue(), "COP"),
-  },
-  {
-    header: "Saldo",
-    accessorKey: "balanceDue",
-    cell: ({ getValue }) => formatCurrency(getValue(), "COP"),
-  },
-  {
-    header: "ID externa",
-    accessorKey: "externalBookingId",
-    minSize: "fit-content",
-    sortDescFirst: true,
-    sortingFn: "alphanumeric",
-    sortUndefined: 1,
-  },
-  {
-    header: "Estado",
-    accessorKey: "statusId",
-    cell: ({ getValue }) => {
-      const statusId = getValue();
-      return <BookingStatusBadge statusId={statusId} />;
+// Export a function to get columns with translations
+export const useBookingsTableColumns = () => {
+  const { t } = useTranslation();
+
+  return [
+    {
+      header: t("booking.table.id"),
+      accessorKey: "id",
+      maxSize: 120,
     },
-  },
-];
+    {
+      header: t("booking.table.firstName"),
+      accessorKey: "firstName",
+    },
+    {
+      header: t("booking.table.lastName"),
+      accessorKey: "lastName",
+    },
+    {
+      header: t("booking.table.arrival"),
+      accessorKey: "arrivalDate",
+      cell: ({ getValue }) => dayjs(getValue()).format("DD/MM/YYYY"),
+    },
+    {
+      header: t("booking.table.departure"),
+      accessorKey: "departureDate",
+      cell: ({ getValue }) => dayjs(getValue()).format("DD/MM/YYYY"),
+    },
+    {
+      header: t("booking.table.total"),
+      accessorKey: "total",
+      cell: ({ getValue }) => formatCurrency(getValue(), "COP"),
+    },
+    {
+      header: t("booking.table.balanceDue"),
+      accessorKey: "balanceDue",
+      cell: ({ getValue }) => formatCurrency(getValue(), "COP"),
+    },
+    {
+      header: t("booking.table.externalId"),
+      accessorKey: "externalBookingId",
+      minSize: "fit-content",
+      sortDescFirst: true,
+      sortingFn: "alphanumeric",
+      sortUndefined: 1,
+    },
+    {
+      header: t("booking.table.status"),
+      accessorKey: "statusId",
+      cell: ({ getValue }) => {
+        const statusId = getValue();
+        return <BookingStatusBadge statusId={statusId} />;
+      },
+    },
+  ];
+};

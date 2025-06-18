@@ -134,6 +134,13 @@
     }
   },
   "booking": {
+    "status": {
+      "active": "Activa",
+      "cancelled": "Cancelada",
+      "completed": "Completada",
+      "noShow": "No llegó",
+      "arrived": "Arribada"
+    },
     "errors": {
       "loadRooms": "Error al cargar habitaciones",
       "loadCharges": "Error al cargar cargos extras",
@@ -143,6 +150,15 @@
       "saveBooking": "Error al guardar la reserva"
     },
     "table": {
+      "id": "ID",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "arrival": "Llegada",
+      "departure": "Salida",
+      "total": "Total",
+      "balanceDue": "Debe",
+      "externalId": "ID Externa",
+      "status": "Estado",
       "selected": "Seleccionado",
       "free": "Libre",
       "deselectCellsTitle": "¿Desea deseleccionar las celdas?",
@@ -271,6 +287,312 @@
       "updating": "Actualizando cliente...",
       "updated": "Cliente actualizado correctamente",
       "updateError": "No se pudo actualizar el cliente, intente nuevamente"
+    },
+    "dateSelector": {
+      "title": "Seleccione las Fechas de la reserva",
+      "pastDateWarning": "Estas seleccionando fechas pasadas, por favor verifica.",
+      "startDate": "Fecha de llegada",
+      "endDate": "Fecha de salida",
+      "confirmChangeTitle": "Cambiar las fechas podría eliminar las celdas seleccionadas.",
+      "confirmChangeText": "¿Está seguro de que desea continuar?",
+      "confirmChangeYes": "Sí, cambiar"
+    },
+    "extraChargeCard": {
+      "type": "Tipo:",
+      "amount": "Monto:",
+      "na": "N/D"
+    },
+    "extraChargesSelector": {
+      "noCharges": "No hay cargos adicionales disponibles.",
+      "createNew": "Ir a crear un nuevo cargo"
+    },
+    "personalizedChargeForm": {
+      "namePlaceholder": "Nombre del cargo",
+      "amountPlaceholder": "Monto",
+      "add": "Agregar",
+      "nameRequired": "El nombre es obligatorio",
+      "amountRequired": "El monto es obligatorio",
+      "amountMin": "El monto debe ser mayor o igual a 0"
+    },
+    "personalizedCharges": {
+      "title": "Cargos Personalizados"
+    },
+    "totalsDisplay": {
+      "subtotal": "Subtotal:",
+      "charges": "Cargos:",
+      "total": "Total:"
+    },
+    "auditableInfo": {
+      "title": "Auditable",
+      "createdBy": "Creado por:",
+      "dateCreated": "Fecha de creación:",
+      "modifiedBy": "Modificado por:",
+      "dateModified": "Fecha de modificación:"
+    },
+    "details": {
+      "title": "Detalles",
+      "arrival": "Llegada (Check-in):",
+      "eta": "Llegada Estimada:",
+      "externalId": "Identificación externa",
+      "departure": "Salida (Check-out):",
+      "provider": "Proveedor",
+      "nights": "Noches:",
+      "adults": "Adultos:",
+      "children": "Niños:"
+    },
+    "financials": {
+      "subtotal": "Subtotal",
+      "charges": "Cargos",
+      "total": "Total",
+      "totalPaid": "Total Pagado",
+      "balance": "Saldo",
+      "commission": "Comisión"
+    },
+    "generalCharges": {
+      "title": "Cargos Generales"
+    },
+    "summary": {
+      "notes": "Notas:"
+    },
+    "transactions": {
+      "title": "Transacciones"
+    },
+    "customerInfo": {
+      "title": "Cliente",
+      "name": "Nombre:",
+      "email": "Email:",
+      "document": "Documento:",
+      "phone": "Teléfono:"
+    },
+    "roomCard": {
+      "night": "Noche:",
+      "price": "Precio:",
+      "subtotal": "Subtotal",
+      "total": "Total"
+    },
+    "roomList": {
+      "title": "Habitaciones"
+    },
+    "filters": {
+      "filteringBy": "Filtrando por",
+      "arrival": "Llegada",
+      "departure": "Salida",
+      "filterByCustomerName": "Filtrar por nombre de cliente:",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "filter": "Filtrar",
+      "clear": "Limpiar",
+      "filterByExternalId": "Filtrar por ID de reserva externa:",
+      "externalIdPlaceholder": "ID de reserva externa",
+      "filterByStatus": "Filtrar por estado:",
+      "removeFilter": "Quitar Filtro",
+      "select": "Seleccionar",
+      "rowsPerPage": "Filas por página:"
+    },
+    "bookingsTable": {
+      "loading": "Cargando...",
+      "noRecords": "No hay registros",
+      "createdBy": "Creado por:",
+      "dateCreated": "Fecha de creación:",
+      "modifiedBy": "Modificado por:",
+      "dateModified": "Fecha de modificación:"
+    },
+    "bookingsView": {
+      "title": "Reservas",
+      "actions": "Acciones",
+      "view": "Ver",
+      "edit": "Editar",
+      "showing": "Mostrando",
+      "to": "a",
+      "of": "de",
+      "reservations": "reservas",
+      "page": "Página"
+    },
+    "calendar": {
+      "title": "Calendario",
+      "loadingBookings": "Cargando Reservas",
+      "errors": {
+        "loadRooms": "Error al cargar habitaciones",
+        "loadBookings": "Error al cargar reservas"
+      }
+    },
+    "arrival": {
+      "reservationNumber": "Reserva #:",
+      "customer": "Cliente:",
+      "phone": "Teléfono:",
+      "document": "Documento:",
+      "externalId": "ID externa:",
+      "provider": "Proveedor:",
+      "total": "Total:",
+      "balance": "Saldo:",
+      "arrivalDate": "Fecha de llegada:",
+      "departureDate": "Fecha de salida:",
+      "nights": "Noches:",
+      "eta": "Fecha y hora de llegada:",
+      "notes": "Notas:",
+      "arrivingRooms": "Habitaciones que llegan:",
+      "otherRooms": "Habitaciones que llegan otro día:",
+      "none": "Ninguna",
+      "viewDetails": "Ver Detalles",
+      "markCheckIn": "Marcar Check-in"
+    },
+    "departure": {
+      "reservationNumber": "Reserva #:",
+      "customer": "Cliente:",
+      "phone": "Teléfono:",
+      "document": "Documento:",
+      "externalId": "ID externa:",
+      "provider": "Proveedor:",
+      "arrivalDate": "Fecha de llegada:",
+      "departureDate": "Fecha de salida:",
+      "nights": "Noches:",
+      "departingRooms": "Habitaciones que salen:",
+      "notes": "Notas:",
+      "viewDetails": "Ver Detalles",
+      "markCompleted": "Marcar Completada"
+    },
+    "minimalCard": {
+      "reservationNumber": "Reserva Número",
+      "viewDetails": "Ver detalles",
+      "name": "Nombre",
+      "externalId": "ID Externa:",
+      "arrival": "Llegada:",
+      "departure": "Salida:",
+      "total": "Total:",
+      "balanceDue": "Debe:",
+      "loading": "Cargando información...",
+      "notFound": "No se encontró la reserva"
+    },
+    "providers": {
+      "title": "Proveedores de Reservas",
+      "name": "Nombre",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "all": "Todos",
+      "actions": "Acciones",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "add": "Agregar",
+      "update": "Actualizar",
+      "addProvider": "Agregar Proveedor de Reservas",
+      "editTitle": "Editar proveedor de reservas",
+      "newTitle": "Nuevo proveedor de reservas",
+      "namePlaceholder": "Nombre del proveedor de reservas",
+      "filterByStatus": "Filtrar por Estado",
+      "confirmAddTitle": "¿Está seguro de que desea agregar el proveedor de reservas?",
+      "confirmUpdateTitle": "¿Está seguro de que desea actualizar el proveedor de reservas?",
+      "confirmText": "Revise los datos antes de continuar.",
+      "confirmSave": "Sí, guardar",
+      "savingTitle": "Guardando proveedor de reservas",
+      "savingText": "Por favor espera",
+      "saveSuccessTitle": "Proveedor de reservas guardado",
+      "saveSuccessText": "El proveedor de reservas se ha guardado correctamente",
+      "saveErrorText": "No se pudo guardar el proveedor de reservas, intente nuevamente.",
+      "deleteConfirmTitle": "¿Está seguro?",
+      "deleteConfirmText": "No podrás revertir esto!",
+      "deleteConfirmYes": "Sí, eliminar",
+      "deletingTitle": "Eliminando el proveedor de reservas",
+      "deletingText": "Por favor espera",
+      "deleteSuccessTitle": "Proveedor de reservas eliminado",
+      "deleteSuccessText": "El proveedor de reservas se ha eliminado correctamente",
+      "loadError": "Error al cargar los proveedores de reservas"
+    },
+    "stay": {
+      "reservationNumber": "Reserva #:",
+      "customer": "Cliente:",
+      "phone": "Teléfono:",
+      "document": "Documento:",
+      "externalId": "ID externa:",
+      "provider": "Proveedor:",
+      "arrivalDate": "Fecha de llegada:",
+      "departureDate": "Fecha de salida:",
+      "nights": "Noches:",
+      "occupiedRooms": "Habitaciones ocupadas:",
+      "notes": "Notas:",
+      "viewDetails": "Ver Detalles"
+    },
+    "view": {
+      "title": "Detalles de Reserva",
+      "reservationNumber": "Reserva #",
+      "edit": "Editar",
+      "goToInvoice": "Ir a Factura",
+      "cancelBooking": "Cancelar Reserva",
+      "markNoShow": "Marcar No Show",
+      "checkInConfirmTitle": "¿Desea marcar la reserva como arribada?",
+      "checkInConfirmText": "Asegúrese de que el cliente ha llegado",
+      "checkInBalanceDueText": "La reserva tiene saldo pendiente. ¿Desea continuar?",
+      "checkInSuccess": "Reserva marcada como check-in",
+      "checkInError": "Error al marcar como check-in",
+      "noShowConfirmTitle": "¿Desea marcar la reserva como no show?",
+      "noShowConfirmText": "Ya no podrá editar la reserva",
+      "noShowSuccess": "Reserva marcada como no show",
+      "noShowError": "Error al marcar como no show",
+      "completeConfirmTitle": "¿Desea marcar la reserva como completada?",
+      "completeConfirmText": "Ya no podrá editar la reserva",
+      "completeSuccess": "Reserva marcada como completada",
+      "completeError": "Error al marcar como completada",
+      "cancelConfirmTitle": "¿Desea cancelar la reserva?",
+      "cancelConfirmText": "Ya no podrá editar la reserva",
+      "cancelSuccess": "Asegúrate de devolver depositos si corresponde",
+      "cancelError": "Error al cancelar la reserva",
+      "pleaseWait": "Por favor, espere.",
+      "confirmYes": "Sí, confirmar",
+      "errors": {
+        "loadBooking": "Error al cargar reserva"
+      }
+    },
+    "viewOffCanvas": {
+      "title": "Detalles de la Reserva",
+      "goToSummary": "Ir a Resumen"
+    }
+  },
+  "commonUI": {
+    "siteUnderMaintenance": {
+      "title": "Sitio en Mantenimiento",
+      "message": "Estamos trabajando para mejorar su experiencia. Por favor, vuelva más tarde.",
+      "alt": "sitio en mantenimiento"
+    },
+    "customField": {
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "required": "Campo requerido"
+    },
+    "datePickers": {
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha fin",
+      "clear": "Limpiar fechas"
+    },
+    "dateTimePicker": {
+      "time": "Hora"
+    },
+    "dropzone": {
+      "dragOrClick": "Arrastra y suelta tus archivos aquí, o ",
+      "click": "haz clic",
+      "toSelect": "para seleccionarlos.",
+      "addMore": "Arrastra o haz clic para agregar más archivos",
+      "clearFiles": "Limpiar archivos",
+      "rejectedFiles": "Archivos rechazados:",
+      "fileTooLarge": "El archivo es demasiado grande",
+      "invalidType": "Tipo de archivo no aceptado",
+      "noPreview": "Sin vista previa"
+    },
+    "richEditorToolbar": {
+      "textColor": "Color de texto",
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "strikethrough": "Tachado",
+      "inlineCode": "Código en línea",
+      "heading": "Encabezado {{level}}",
+      "paragraph": "Párrafo",
+      "bulletList": "Lista de viñetas",
+      "orderedList": "Lista numerada",
+      "codeBlock": "Bloque de código",
+      "blockquote": "Cita",
+      "horizontalRule": "Línea horizontal",
+      "hardBreak": "Salto de línea",
+      "clearFormatting": "Limpiar formato",
+      "undo": "Deshacer",
+      "redo": "Rehacer"
     }
   }
 }

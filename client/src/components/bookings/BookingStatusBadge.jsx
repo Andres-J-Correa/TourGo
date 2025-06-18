@@ -4,8 +4,11 @@ import {
   BOOKING_STATUS_IDS,
 } from "components/bookings/constants";
 import classNames from "classnames";
+import { useLanguage } from "contexts/LanguageContext";
 
 function BookingStatusBadge({ statusId, className, ...props }) {
+  const { t } = useLanguage();
+
   return (
     <span
       {...props}
@@ -16,7 +19,7 @@ function BookingStatusBadge({ statusId, className, ...props }) {
         "bg-warning": statusId === BOOKING_STATUS_IDS.NO_SHOW,
         "bg-info": statusId === BOOKING_STATUS_IDS.ARRIVED,
       })}>
-      {BOOKING_STATUS_BY_ID[statusId]}
+      {t(BOOKING_STATUS_BY_ID[statusId])}
     </span>
   );
 }

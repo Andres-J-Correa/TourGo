@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DatePickers from "components/commonUI/forms/DatePickers";
 import classNames from "classnames";
 import { BOOKING_STATUSES } from "components/bookings/constants";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 function BookingFilters({
   paginationData,
@@ -28,6 +29,7 @@ function BookingFilters({
     lastName: "",
   });
   const [externalBookingIdInput, setExternalBookingIdInput] = useState("");
+  const { t } = useLanguage(); // added
 
   const handleCustomerNameChange = (e) => {
     const { name, value } = e.target;
@@ -99,8 +101,10 @@ function BookingFilters({
                     type="button"
                     onClick={toggleDateType}
                     disabled={loading}>
-                    Filtrando por{" "}
-                    {paginationData.isArrivalDate ? "Llegada" : "Salida"}
+                    {t("booking.filters.filteringBy")}{" "}
+                    {paginationData.isArrivalDate
+                      ? t("booking.filters.arrival")
+                      : t("booking.filters.departure")}
                     <FontAwesomeIcon
                       icon={faRepeat}
                       className="ms-2"
@@ -115,14 +119,14 @@ function BookingFilters({
         <Col lg={6} xl={4}>
           <Form onSubmit={handleCustomerNameFilterSubmit}>
             <Label for="firstName" className="text-dark">
-              Filtrar por nombre de cliente:
+              {t("booking.filters.filterByCustomerName")}
             </Label>
             <InputGroup>
               <Input
                 id="firstName"
                 type="text"
                 aria-label="First name"
-                placeholder="Nombre"
+                placeholder={t("booking.filters.firstName")}
                 name="firstName"
                 onChange={handleCustomerNameChange}
                 value={customerNameInputs?.firstName}
@@ -130,13 +134,13 @@ function BookingFilters({
               <Input
                 type="text"
                 aria-label="Last name"
-                placeholder="Apellido"
+                placeholder={t("booking.filters.lastName")}
                 name="lastName"
                 onChange={handleCustomerNameChange}
                 value={customerNameInputs?.lastName}
               />
               <Button
-                title="Filtrar"
+                title={t("booking.filters.filter")}
                 color="dark"
                 type="submit"
                 disabled={loading}>
@@ -145,7 +149,7 @@ function BookingFilters({
               <Button
                 color="outline-secondary"
                 type="button"
-                title="Limpiar"
+                title={t("booking.filters.clear")}
                 onClick={onClearCustomerNameFilter}
                 disabled={
                   loading ||
@@ -160,18 +164,18 @@ function BookingFilters({
         <Col lg={6} xl="auto">
           <Form onSubmit={handleExternalBookingIdFilterSubmit}>
             <Label for="externalBookingId" className="text-dark">
-              Filtrar por ID de reserva externa:
+              {t("booking.filters.filterByExternalId")}
             </Label>
             <InputGroup>
               <Input
                 id="externalBookingId"
                 type="text"
-                placeholder="ID de reserva externa"
+                placeholder={t("booking.filters.externalIdPlaceholder")}
                 value={externalBookingIdInput}
                 onChange={handleExternalBookingIdChange}
               />
               <Button
-                title="Filtrar"
+                title={t("booking.filters.filter")}
                 color="dark"
                 type="submit"
                 disabled={loading}>
@@ -180,7 +184,7 @@ function BookingFilters({
               <Button
                 color="outline-secondary"
                 type="button"
-                title="Limpiar"
+                title={t("booking.filters.clear")}
                 onClick={onClearExternalBookingIdFilter}
                 disabled={loading || !externalBookingIdInput}>
                 <FontAwesomeIcon icon={faBroom} />
@@ -192,7 +196,7 @@ function BookingFilters({
       <Row className="px-3 mb-3">
         <Col lg="auto" xl="auto">
           <Label for="statusId" className="text-dark">
-            Filtrar por estado:
+            {t("booking.filters.filterByStatus")}
           </Label>
           <select
             id="statusId"
@@ -210,7 +214,9 @@ function BookingFilters({
                 "bg-dark-subtle": paginationData.statusId,
               })}
               value="">
-              {paginationData.statusId ? "Quitar Filtro" : "Seleccionar"}
+              {paginationData.statusId
+                ? t("booking.filters.removeFilter")
+                : t("booking.filters.select")}
             </option>
             {BOOKING_STATUSES.map((status) => (
               <option
@@ -221,7 +227,7 @@ function BookingFilters({
                   "bg-white": Number(paginationData.statusId) !== status.id,
                 })}
                 value={status.id}>
-                {status.name}
+                {t(status.name)}
               </option>
             ))}
           </select>
@@ -229,7 +235,7 @@ function BookingFilters({
         <Col>
           <div className="float-end">
             <Label for="pageSize" className="text-dark">
-              Filas por página:
+              {t("booking.filters.rowsPerPage")}
             </Label>
             <select
               id="pageSize"

@@ -19,16 +19,15 @@ import {
   faRedo,
 } from "@fortawesome/free-solid-svg-icons";
 import { useInView } from "react-cool-inview";
-
 import "./RichEditorToolbar.scss";
+import { useLanguage } from "contexts/LanguageContext";
 
 function RichEditorToolbar({ editor, editable }) {
   const { observe, inView } = useInView({
     rootMargin: "-1px 0px 0px 0px",
     threshold: [1],
   });
-
-  // Emoji options for the emoji button
+  const { t } = useLanguage();
 
   return (
     <div
@@ -48,7 +47,7 @@ function RichEditorToolbar({ editor, editable }) {
           }
           value={editor.getAttributes("textStyle").color}
           data-testid="setColor"
-          title="Color de texto"
+          title={t("commonUI.richEditorToolbar.textColor")}
         />
         <div className="divider"></div>
         <div
@@ -58,11 +57,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().toggleBold().run()
               : () => {}
           }
-          title="Negrita">
+          title={t("commonUI.richEditorToolbar.bold")}>
           <FontAwesomeIcon
             icon={faBold}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Negrita"
+            title={t("commonUI.richEditorToolbar.bold")}
           />
         </div>
         <div
@@ -72,11 +71,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().toggleItalic().run()
               : () => {}
           }
-          title="Cursiva">
+          title={t("commonUI.richEditorToolbar.italic")}>
           <FontAwesomeIcon
             icon={faItalic}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Cursiva"
+            title={t("commonUI.richEditorToolbar.italic")}
           />
         </div>
         <div
@@ -86,11 +85,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().toggleStrike().run()
               : () => {}
           }
-          title="Tachado">
+          title={t("commonUI.richEditorToolbar.strikethrough")}>
           <FontAwesomeIcon
             icon={faStrikethrough}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Tachado"
+            title={t("commonUI.richEditorToolbar.strikethrough")}
           />
         </div>
         <div
@@ -100,104 +99,32 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().toggleCode().run()
               : () => {}
           }
-          title="Código en línea">
+          title={t("commonUI.richEditorToolbar.inlineCode")}>
           <FontAwesomeIcon
             icon={faCode}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Código en línea"
+            title={t("commonUI.richEditorToolbar.inlineCode")}
           />
         </div>
         <div className="divider"></div>
-        <div
-          className="icon"
-          onClick={
-            editable
-              ? () => editor.chain().focus().toggleHeading({ level: 1 }).run()
-              : () => {}
-          }
-          title="Encabezado 1">
-          <FontAwesomeIcon
-            icon={faHeading}
-            className={classNames({ "cursor-not-allowed": !editable })}
-            title="Encabezado 1"
-          />
-          <span style={{ fontSize: "0.7em", marginLeft: 2 }}>1</span>
-        </div>
-        <div
-          className="icon"
-          onClick={
-            editable
-              ? () => editor.chain().focus().toggleHeading({ level: 2 }).run()
-              : () => {}
-          }
-          title="Encabezado 2">
-          <FontAwesomeIcon
-            icon={faHeading}
-            className={classNames({ "cursor-not-allowed": !editable })}
-            title="Encabezado 2"
-          />
-          <span style={{ fontSize: "0.7em", marginLeft: 2 }}>2</span>
-        </div>
-        <div
-          className="icon"
-          onClick={
-            editable
-              ? () => editor.chain().focus().toggleHeading({ level: 3 }).run()
-              : () => {}
-          }
-          title="Encabezado 3">
-          <FontAwesomeIcon
-            icon={faHeading}
-            className={classNames({ "cursor-not-allowed": !editable })}
-            title="Encabezado 3"
-          />
-          <span style={{ fontSize: "0.7em", marginLeft: 2 }}>3</span>
-        </div>
-        <div
-          className="icon"
-          onClick={
-            editable
-              ? () => editor.chain().focus().toggleHeading({ level: 4 }).run()
-              : () => {}
-          }
-          title="Encabezado 4">
-          <FontAwesomeIcon
-            icon={faHeading}
-            className={classNames({ "cursor-not-allowed": !editable })}
-            title="Encabezado 4"
-          />
-          <span style={{ fontSize: "0.7em", marginLeft: 2 }}>4</span>
-        </div>
-        <div
-          className="icon"
-          onClick={
-            editable
-              ? () => editor.chain().focus().toggleHeading({ level: 5 }).run()
-              : () => {}
-          }
-          title="Encabezado 5">
-          <FontAwesomeIcon
-            icon={faHeading}
-            className={classNames({ "cursor-not-allowed": !editable })}
-            title="Encabezado 5"
-          />
-          <span style={{ fontSize: "0.7em", marginLeft: 2 }}>5</span>
-        </div>
-        <div
-          className="icon"
-          onClick={
-            editable
-              ? () => editor.chain().focus().toggleHeading({ level: 6 }).run()
-              : () => {}
-          }
-          title="Encabezado 6">
-          <FontAwesomeIcon
-            icon={faHeading}
-            className={classNames({ "cursor-not-allowed": !editable })}
-            title="Encabezado 6"
-          />
-          <span style={{ fontSize: "0.7em", marginLeft: 2 }}>6</span>
-        </div>
+        {[1, 2, 3, 4, 5, 6].map((level) => (
+          <div
+            className="icon"
+            key={level}
+            onClick={
+              editable
+                ? () => editor.chain().focus().toggleHeading({ level }).run()
+                : () => {}
+            }
+            title={t("commonUI.richEditorToolbar.heading", { level })}>
+            <FontAwesomeIcon
+              icon={faHeading}
+              className={classNames({ "cursor-not-allowed": !editable })}
+              title={t("commonUI.richEditorToolbar.heading", { level })}
+            />
+            <span style={{ fontSize: "0.7em", marginLeft: 2 }}>{level}</span>
+          </div>
+        ))}
         <div className="divider"></div>
         <div
           className="icon"
@@ -206,11 +133,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().setParagraph().run()
               : () => {}
           }
-          title="Párrafo">
+          title={t("commonUI.richEditorToolbar.paragraph")}>
           <FontAwesomeIcon
             icon={faParagraph}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Párrafo"
+            title={t("commonUI.richEditorToolbar.paragraph")}
           />
         </div>
         <div
@@ -220,11 +147,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().toggleBulletList().run()
               : () => {}
           }
-          title="Lista de viñetas">
+          title={t("commonUI.richEditorToolbar.bulletList")}>
           <FontAwesomeIcon
             icon={faListUl}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Lista de viñetas"
+            title={t("commonUI.richEditorToolbar.bulletList")}
           />
         </div>
         <div
@@ -234,11 +161,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().toggleOrderedList().run()
               : () => {}
           }
-          title="Lista numerada">
+          title={t("commonUI.richEditorToolbar.orderedList")}>
           <FontAwesomeIcon
             icon={faListOl}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Lista numerada"
+            title={t("commonUI.richEditorToolbar.orderedList")}
           />
         </div>
         <div
@@ -248,11 +175,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().toggleCodeBlock().run()
               : () => {}
           }
-          title="Bloque de código">
+          title={t("commonUI.richEditorToolbar.codeBlock")}>
           <FontAwesomeIcon
             icon={faCodeBranch}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Bloque de código"
+            title={t("commonUI.richEditorToolbar.codeBlock")}
           />
         </div>
         <div className="divider"></div>
@@ -263,11 +190,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().toggleBlockquote().run()
               : () => {}
           }
-          title="Cita">
+          title={t("commonUI.richEditorToolbar.blockquote")}>
           <FontAwesomeIcon
             icon={faQuoteLeft}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Cita"
+            title={t("commonUI.richEditorToolbar.blockquote")}
           />
         </div>
         <div
@@ -277,11 +204,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().setHorizontalRule().run()
               : () => {}
           }
-          title="Línea horizontal">
+          title={t("commonUI.richEditorToolbar.horizontalRule")}>
           <FontAwesomeIcon
             icon={faMinus}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Línea horizontal"
+            title={t("commonUI.richEditorToolbar.horizontalRule")}
           />
         </div>
         <div className="divider"></div>
@@ -292,11 +219,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().setHardBreak().run()
               : () => {}
           }
-          title="Salto de línea">
+          title={t("commonUI.richEditorToolbar.hardBreak")}>
           <FontAwesomeIcon
             icon={faTextHeight}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Salto de línea"
+            title={t("commonUI.richEditorToolbar.hardBreak")}
           />
         </div>
         <div
@@ -306,11 +233,11 @@ function RichEditorToolbar({ editor, editable }) {
               ? () => editor.chain().focus().unsetAllMarks().clearNodes().run()
               : () => {}
           }
-          title="Limpiar formato">
+          title={t("commonUI.richEditorToolbar.clearFormatting")}>
           <FontAwesomeIcon
             icon={faEraser}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Limpiar formato"
+            title={t("commonUI.richEditorToolbar.clearFormatting")}
           />
         </div>
         <div className="divider"></div>
@@ -319,11 +246,11 @@ function RichEditorToolbar({ editor, editable }) {
           onClick={
             editable ? () => editor.chain().focus().undo().run() : () => {}
           }
-          title="Deshacer">
+          title={t("commonUI.richEditorToolbar.undo")}>
           <FontAwesomeIcon
             icon={faUndo}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Deshacer"
+            title={t("commonUI.richEditorToolbar.undo")}
           />
         </div>
         <div
@@ -331,11 +258,11 @@ function RichEditorToolbar({ editor, editable }) {
           onClick={
             editable ? () => editor.chain().focus().redo().run() : () => {}
           }
-          title="Rehacer">
+          title={t("commonUI.richEditorToolbar.redo")}>
           <FontAwesomeIcon
             icon={faRedo}
             className={classNames({ "cursor-not-allowed": !editable })}
-            title="Rehacer"
+            title={t("commonUI.richEditorToolbar.redo")}
           />
         </div>
       </div>

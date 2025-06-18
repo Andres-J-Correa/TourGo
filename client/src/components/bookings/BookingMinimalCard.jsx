@@ -6,10 +6,12 @@ import { formatCurrency } from "utils/currencyHelper";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const BookingMinimalCard = ({ bookingId, hotelId }) => {
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage(); // added
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -37,13 +39,13 @@ const BookingMinimalCard = ({ bookingId, hotelId }) => {
         <>
           <CardHeader className="bg-light">
             <h5 className="mb-0">
-              Reserva Número {booking.id}{" "}
+              {t("booking.minimalCard.reservationNumber")} {booking.id}{" "}
               <Link
                 to={`/hotels/${hotelId}/bookings/${booking.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-link text-decoration-none float-end p-0"
-                title="Ver detalles">
+                title={t("booking.minimalCard.viewDetails")}>
                 <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
               </Link>
             </h5>
@@ -51,25 +53,25 @@ const BookingMinimalCard = ({ bookingId, hotelId }) => {
           <CardBody>
             <Row className="mb-2">
               <Col md="6">
-                <strong>Nombre</strong>
+                <strong>{t("booking.minimalCard.name")}</strong>
                 <p className="mb-0">
                   {booking.firstName} {booking.lastName}
                 </p>
               </Col>
               <Col md="6">
-                <strong>ID Externa:</strong>
+                <strong>{t("booking.minimalCard.externalId")}</strong>
                 <p className="mb-0">{booking.externalBookingId || "N/A"}</p>
               </Col>
             </Row>
             <Row className="mb-2">
               <Col md="6">
-                <strong>Llegada:</strong>
+                <strong>{t("booking.minimalCard.arrival")}</strong>
                 <p className="mb-0">
                   {dayjs(booking.arrivalDate).format("ddd DD/MMM/YYYY")}
                 </p>
               </Col>
               <Col md="6">
-                <strong>Salida:</strong>
+                <strong>{t("booking.minimalCard.departure")}</strong>
                 <p className="mb-0">
                   {dayjs(booking.departureDate).format("ddd DD/MMM/YYYY")}
                 </p>
@@ -77,11 +79,11 @@ const BookingMinimalCard = ({ bookingId, hotelId }) => {
             </Row>
             <Row className="mb-2">
               <Col md="6">
-                <strong>Total:</strong>
+                <strong>{t("booking.minimalCard.total")}</strong>
                 <p className="mb-0">{formatCurrency(booking.total, "COP")}</p>
               </Col>
               <Col md="6">
-                <strong>Debe:</strong>
+                <strong>{t("booking.minimalCard.balanceDue")}</strong>
                 <p className="mb-0">
                   {formatCurrency(booking.balanceDue, "COP")}
                 </p>
@@ -96,13 +98,15 @@ const BookingMinimalCard = ({ bookingId, hotelId }) => {
             <Row className="mb-2">
               <Spinner color="dark mx-auto" />
             </Row>
-            Cargando información...
+            {t("booking.minimalCard.loading")}
           </CardBody>
         </Card>
       )}
       {!booking && !loading && (
         <Card className="shadow-sm">
-          <CardBody className="text-center">No booking found</CardBody>
+          <CardBody className="text-center">
+            {t("booking.minimalCard.notFound")}
+          </CardBody>
         </Card>
       )}
     </Card>

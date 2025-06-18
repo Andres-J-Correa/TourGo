@@ -2,14 +2,17 @@ import React from "react";
 import { Col, Row } from "reactstrap";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import underMaintenance from "assets/images/under-maintenance.jpg";
+import { useLanguage } from "contexts/LanguageContext";
 
 function SiteUnderMaintenance() {
+  const { t } = useLanguage();
   return (
     <Row>
-      <h1 className="text-center text-dark mb-4">Sitio en Mantenimiento</h1>
+      <h1 className="text-center text-dark mb-4">
+        {t("commonUI.siteUnderMaintenance.title")}
+      </h1>
       <p className="text-center text-secondary mb-4">
-        Estamos trabajando para mejorar su experiencia. Por favor, vuelva más
-        tarde.
+        {t("commonUI.siteUnderMaintenance.message")}
       </p>
 
       <Col
@@ -17,7 +20,7 @@ function SiteUnderMaintenance() {
         className="d-flex flex-wrap align-content-center justify-content-center">
         <LazyLoadImage
           src={underMaintenance}
-          alt="site under construction"
+          alt={t("commonUI.siteUnderMaintenance.alt")}
           className="img-fluid border-radius-lg"
           effect="blur"
           wrapperClassName="p-1"

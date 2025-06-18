@@ -6,9 +6,11 @@ import classnames from "classnames";
 import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
-const StayItem = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
+const BookingStay = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
   const [offCanvasOpen, setOffCanvasOpen] = useState(false);
+  const { t } = useLanguage(); // added
   const toggleOffCanvas = () => setOffCanvasOpen((prev) => !prev);
 
   return (
@@ -24,37 +26,41 @@ const StayItem = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
       />
       <Row className="justify-content-between">
         <Col md={5}>
-          <strong>Reserva #:</strong> {stay.id}
+          <strong>{t("booking.stay.reservationNumber")}</strong> {stay.id}
           <div className="ms-3 display-inline">
             <BookingStatusBadge statusId={stay.statusId} />
           </div>
           <br />
-          <strong>Cliente:</strong> {stay.customer?.firstName}{" "}
-          {stay.customer?.lastName}
+          <strong>{t("booking.stay.customer")}</strong>{" "}
+          {stay.customer?.firstName} {stay.customer?.lastName}
           <br />
-          <strong>Teléfono:</strong> {stay.customer?.phone || "N/A"}
+          <strong>{t("booking.stay.phone")}</strong>{" "}
+          {stay.customer?.phone || "N/A"}
           <br />
-          <strong>Documento:</strong> {stay.customer?.documentNumber || "N/A"}
+          <strong>{t("booking.stay.document")}</strong>{" "}
+          {stay.customer?.documentNumber || "N/A"}
         </Col>
         <Col>
-          <strong>ID externa:</strong> {stay.externalBookingId}
+          <strong>{t("booking.stay.externalId")}</strong>{" "}
+          {stay.externalBookingId}
           <br />
-          <strong>Proveedor:</strong> {stay.bookingProviderName || "N/A"}
+          <strong>{t("booking.stay.provider")}</strong>{" "}
+          {stay.bookingProviderName || "N/A"}
         </Col>
         <Col md="auto">
-          <strong>Fecha de llegada:</strong>{" "}
+          <strong>{t("booking.stay.arrivalDate")}</strong>{" "}
           {dayjs(stay.arrivalDate).format("DD/MM/YYYY")}
           <br />
-          <strong>Fecha de salida:</strong>{" "}
+          <strong>{t("booking.stay.departureDate")}</strong>{" "}
           {dayjs(stay.departureDate).format("DD/MM/YYYY")}
           <br />
-          <strong>Noches:</strong> {stay.nights}
+          <strong>{t("booking.stay.nights")}</strong> {stay.nights}
           <br />
         </Col>
       </Row>
       <Row>
         <Col md={5}>
-          <strong>Habitaciones ocupadas:</strong>
+          <strong>{t("booking.stay.occupiedRooms")}</strong>
           <ul className="mb-0">
             {renderRooms
               ? renderRooms(stay.rooms)
@@ -64,7 +70,7 @@ const StayItem = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
         <Col>
           {stay.notes && (
             <>
-              <strong>Notas:</strong>
+              <strong>{t("booking.stay.notes")}</strong>
               <p className="mb-0">{stay.notes}</p>
             </>
           )}
@@ -74,8 +80,8 @@ const StayItem = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
             type="button"
             color="outline-dark"
             onClick={toggleOffCanvas}
-            title="Ver detalles de la reserva">
-            Ver Detalles
+            title={t("booking.stay.viewDetails")}>
+            {t("booking.stay.viewDetails")}
             <FontAwesomeIcon icon={faClipboardList} className="ms-2" />
           </Button>
         </Col>
@@ -84,4 +90,4 @@ const StayItem = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
   );
 };
 
-export default StayItem;
+export default BookingStay;

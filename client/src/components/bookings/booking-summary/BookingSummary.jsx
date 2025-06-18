@@ -8,6 +8,7 @@ import BookingFinancials from "components/bookings/booking-summary/BookingFinanc
 import RoomList from "components/bookings/booking-summary/RoomList";
 import BookingAuditableInfo from "components/bookings/booking-summary/BookingAuditableInfo";
 import BookingGeneralCharges from "components/bookings/booking-summary/BookingGeneralCharges";
+import { useLanguage } from "contexts/LanguageContext";
 
 const BookingSummary = ({
   bookingData,
@@ -17,6 +18,7 @@ const BookingSummary = ({
 }) => {
   const { customer } = bookingData || {};
   const groupedRooms = groupRoomBookings(roomBookings);
+  const { t } = useLanguage();
 
   return (
     <>
@@ -33,10 +35,9 @@ const BookingSummary = ({
       <hr />
       {bookingData?.notes && (
         <>
-          {" "}
           <Row>
             <Col>
-              <strong>Notas:</strong>
+              <strong>{t("booking.summary.notes")}</strong>
               <p>{bookingData?.notes}</p>
             </Col>
           </Row>

@@ -1,4 +1,9 @@
 {
+  "language": "Language",
+  "languages": {
+    "en": "English",
+    "es": "Spanish"
+  },
   "common": {
     "error": "Error",
     "ok": "OK",
@@ -12,108 +17,582 @@
     "redirecting": "Redirecting...",
     "checkEmail": "Check your email",
     "sessionExpired": "Session expired, please log in again",
-    "areYouProvider": "Sell your tours, sign up!"
+    "areYouProvider": "Sell your tours, join us!"
   },
   "yup": {
-    "required": "This field is required",
-    "min": "The value must be greater or equal to {{min}}",
-    "max": "The value must be less or equal to {{max}}",
-    "minLength": "The value must have at least {{min}} characters",
-    "maxLength": "The value must have at most {{max}} characters",
-    "email": "The value must be an email",
-    "phone": "The value must be a valid phone number",
+    "required": "{{label}} is required",
+    "min": "{{label}} must be greater than or equal to {{min}}",
+    "max": "{{label}} must be less than or equal to {{max}}",
+    "minLength": "{{label}} must be at least {{min}} characters",
+    "maxLength": "{{label}} must be at most {{max}} characters",
+    "email": "{{label}} must be valid",
+    "phone": "{{label}} must be a valid phone number",
     "password": {
-      "lowercase": "The password must have at least one lowercase letter",
-      "uppercase": "The password must have at least one uppercase letter",
-      "number": "The password must have at least one number",
-      "special": "The password must have at least one special character"
+      "lowercase": "Password must contain at least one lowercase letter",
+      "uppercase": "Password must contain at least one uppercase letter",
+      "number": "Password must contain at least one number",
+      "special": "Password must contain at least one special character"
     },
-    "confirmPassword": "The password does not match",
+    "confirmPassword": "Passwords do not match",
     "incorrectCredentials": "Incorrect credentials"
   },
   "client": {
     "navbar": {
       "account": "Account",
-      "loginRegister": "Login or Register",
-      "logout": "Logout",
+      "loginRegister": "Log in or Register",
+      "logout": "Log out",
       "logoutConfirm": "Are you sure you want to log out?"
     },
     "login": {
-      "title": "Sign In",
+      "title": "Log in",
       "subtitle": "Welcome back!",
       "email": "Email",
       "password": "Password",
-      "button": "Sign In",
+      "button": "Log in",
       "noAccount": "Don't have an account?",
-      "register": "Register"
+      "register": "Register",
+      "forgotPassword": "Forgot your password?"
     },
     "register": {
       "title": "Register",
       "subtitle": "Create an account!",
       "firstName": "First name",
-      "lastName": "Last Name",
+      "lastName": "Last name",
       "email": "Email",
       "phone": "Phone",
       "password": "Password",
-      "confirmPassword": "Confirm Password",
+      "confirmPassword": "Confirm password",
       "button": "Register",
       "alreadyHaveAccount": "Already have an account?",
-      "login": "Login"
+      "login": "Log in"
     },
     "passwordReset": {
-      "title": "Password Reset",
-      "subtitle": "You will receive an e-mail in maximum 60 seconds",
+      "title": "Reset password",
+      "subtitle": "You will receive an email with a reset code",
       "email": "Email",
-      "button": "Reset Password",
+      "button": "Reset password",
       "back": "Back to"
     },
     "passwordChange": {
-      "title": "Change Password",
-      "subtitle": "Enter your new password below",
-      "oldPassword": "Old Password",
-      "newPassword": "New Password",
-      "confirmPassword": "Confirm Password",
-      "button": "Change Password"
+      "title": "Change your password",
+      "subtitle": "Enter your new password",
+      "oldPassword": "Old password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "token": "Reset code",
+      "button": "Change your password"
     }
   },
   "providers": {
     "landing": {
-      "title": "Join Our Platform and Boost Your Sales!",
-      "subtitle": "Become a part of our community and showcase your tours to a wider audience, increasing your bookings and brand visibility.",
-      "button": "Get Started"
+      "title": "Join our platform and boost your sales!",
+      "subtitle": "Become part of our community and showcase your tours to a wider audience, increasing your bookings and brand visibility.",
+      "button": "Get started"
     }
   },
   "errors": {
     "http": {
-      "400": "Bad Request",
+      "400": "Bad request",
       "401": "Unauthorized",
       "403": "Forbidden",
       "404": "Resource not found",
-      "405": "Method Not Allowed",
-      "406": "Not Acceptable",
-      "408": "Request Timeout",
+      "405": "Method not allowed",
+      "406": "Not acceptable",
+      "408": "Request timeout",
       "409": "Conflict",
       "410": "Gone",
-      "413": "Payload Too Large",
-      "415": "Unsupported Media Type",
-      "429": "Too Many Requests",
+      "413": "Payload too large",
+      "415": "Unsupported media type",
+      "429": "Too many requests",
       "500": "Internal server error",
-      "501": "Not Implemented",
-      "502": "Bad Gateway",
-      "503": "Service Unavailable",
-      "504": "Gateway Timeout"
+      "501": "Not implemented",
+      "502": "Bad gateway",
+      "503": "Service unavailable",
+      "504": "Gateway timeout"
     },
     "custom": {
       "1000": "An unexpected error occurred. Please try again later.",
       "2000": "Authentication error",
       "2001": "User not found",
-      "2002": "Account is locked. Please reset the password.",
+      "2002": "Account is locked. Please reset your password.",
       "2003": "Incorrect email or password.",
       "2004": "Token not found",
-      "3000": "User Management error",
+      "2005": "You do not have sufficient permissions to perform this action",
+      "3000": "User management error",
       "3001": "User already exists",
       "3002": "Email already exists",
-      "3003": "Phone already exists"
+      "3003": "Phone number already exists",
+      "4000": "Hotel management error",
+      "4001": "There are active bookings associated",
+      "4002": "Changes are not allowed at this time",
+      "4003": "A record of this type already exists",
+      "4004": "No records found",
+      "4005": "You do not have sufficient permissions to perform this action",
+      "5000": "Transaction management error",
+      "5001": "The request is invalid",
+      "5002": "A transaction with this reference number already exists"
+    }
+  },
+  "booking": {
+    "status": {
+      "active": "Active",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "noShow": "No show",
+      "arrived": "Arrived"
+    },
+    "errors": {
+      "loadRooms": "Error loading rooms",
+      "loadCharges": "Error loading extra charges",
+      "loadProviders": "Error loading booking providers",
+      "loadBookings": "Error loading bookings",
+      "loadBooking": "Error loading booking",
+      "saveBooking": "Error saving booking"
+    },
+    "table": {
+      "id": "ID",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "arrival": "Arrival",
+      "departure": "Departure",
+      "total": "Total",
+      "balanceDue": "Balance due",
+      "externalId": "External ID",
+      "status": "Status",
+      "selected": "Selected",
+      "free": "Free",
+      "deselectCellsTitle": "Do you want to deselect the cells?",
+      "deselectCellTitle": "Do you want to deselect this cell?",
+      "deselectCellsText": "You will lose the prices assigned to this selection.",
+      "deselectCellText": "This cell will be removed from your selection.",
+      "deselectConfirm": "Yes, deselect",
+      "clearSelectionTitle": "Do you want to clear the entire selection?",
+      "clearSelectionText": "This action cannot be undone.",
+      "clearSelectionConfirm": "Yes, clear",
+      "undoLastTitle": "Do you want to undo the last selection?",
+      "undoLastText": "This action cannot be undone.",
+      "undoLastConfirm": "Yes, undo",
+      "selectRoomsDatesTitle": "Select rooms and dates",
+      "selectRoomsDatesHelp1": "Click on the cells to select rooms and dates. You can select multiple cells by pressing the ",
+      "selectRoomsDatesHelp2": " button, or by holding the 'Ctrl' key while clicking on the cells.",
+      "selectRoomsDatesHelp3": "ℹ️ You must select at least one room for each night in the date range.",
+      "activateMultiSelect": "Activate Multi-Selection",
+      "cancelMultiSelect": "Cancel Multi-Selection",
+      "finishSelection": "Finish Selection",
+      "undoLast": "Undo Last Selection",
+      "clearAll": "Clear All",
+      "reserving": "Reserving: {{start}} - {{end}} ({{nights}} nights)",
+      "enterPrice": "Enter Price",
+      "pricePlaceholder": "Enter the price"
+    },
+    "additionalInfo": {
+      "title": "Additional Information",
+      "adultGuests": "Number of Guests (5 years or older)",
+      "childGuests": "Number of Children (0-4 years)",
+      "eta": "Estimated Arrival Date and Time",
+      "bookingProvider": "Booking Provider (Booking/Airbnb...)",
+      "noProvider": "No Provider",
+      "externalId": "External Identification (Booking/Airbnb...)",
+      "externalCommission": "External Commission",
+      "notes": "Notes"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "hotels": "Hotels",
+      "hotel": "Hotel",
+      "bookings": "Bookings",
+      "booking": "Booking",
+      "edit": "Edit Booking",
+      "new": "New Booking"
+    },
+    "navigation": {
+      "previous": "Previous",
+      "goToSummary": "Go to Summary"
+    },
+    "loadingOverlay": {
+      "loadingInfo": "Loading information",
+      "processing": "Processing..."
+    },
+    "form": {
+      "nextConfirmTitle": "Are you sure you want to continue?",
+      "nextConfirmText": "Unsaved changes will be lost.",
+      "nextConfirmYes": "Yes, discard changes",
+      "nextConfirmNo": "No, go to save",
+      "recoverTitle": "Recover information?",
+      "recoverText": "You made changes previously that were not saved. Do you want to recover them?",
+      "recoverYes": "Yes, recover",
+      "recoverNo": "No, discard",
+      "noRoomsTitle": "No rooms available",
+      "noRoomsText": "Please ensure you create rooms before making a booking.",
+      "goToRooms": "Go to rooms",
+      "selectExtraCharges": "Select extra charges",
+      "saveBooking": "Save Booking",
+      "saveConfirmTitle": "Are you sure you want to save the booking?",
+      "saveConfirmText": "Review the details before proceeding.",
+      "saveConfirmYes": "Yes, save",
+      "savingTitle": "Saving booking",
+      "savingText": "Please wait",
+      "saveSuccessTitle": "Booking saved",
+      "saveSuccessText": "The booking was saved successfully."
+    },
+    "validation": {
+      "documentShort": "Document too short (minimum {{min}} characters)",
+      "documentLong": "Document too long (maximum {{max}} characters)",
+      "documentRequired": "Document required",
+      "firstNameMin": "First name must be at least {{min}} characters.",
+      "firstNameMax": "First name must be at most {{max}} characters.",
+      "firstNameRequired": "First name is required.",
+      "lastNameMin": "Last name must be at least {{min}} characters.",
+      "lastNameMax": "Last name must be at most {{max}} characters.",
+      "lastNameRequired": "Last name is required.",
+      "emailRequired": "Email is required.",
+      "emailValid": "Must enter a valid email.",
+      "emailMax": "Email must be at most {{max}} characters.",
+      "phoneRequired": "Phone is required.",
+      "phoneValid": "Must enter a valid phone number.",
+      "etaInvalid": "Estimated arrival date and time is invalid",
+      "adultGuestsRequired": "Number of guests is required",
+      "adultGuestsMin": "Number of guests cannot be less than {{min}}",
+      "childGuestsMin": "Number of children cannot be negative",
+      "notesMax": "Notes are too long (maximum {{max}} characters)",
+      "missingDates": "Missing booking for the dates: {{dates}}",
+      "bookingProviderValid": "Booking provider must be valid",
+      "externalIdMin": "External identification must be at least {{min}} characters",
+      "externalIdMax": "External identification cannot exceed {{max}} characters",
+      "externalIdRequired": "External identification is required",
+      "externalCommissionRequired": "External commission is required",
+      "externalCommissionMin": "External commission cannot be negative"
+    },
+    "customerForm": {
+      "searching": "Searching for customer...",
+      "found": "Customer found",
+      "notFound": "Customer not found",
+      "completeData": "Please complete the information",
+      "searchError": "Error searching for customer, please try again",
+      "creating": "Creating customer...",
+      "created": "Customer created successfully",
+      "createError": "Could not create customer, please try again",
+      "edit": "Edit",
+      "save": "Save Customer",
+      "update": "Update Customer",
+      "search": "Search Customer",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "documentNumber": "Identification Document",
+      "updateConfirmTitle": "Confirm update",
+      "updateConfirmText": "Are you sure you want to update the customer information?",
+      "updateConfirmYes": "Yes, update",
+      "updating": "Updating customer...",
+      "updated": "Customer updated successfully",
+      "updateError": "Could not update customer, please try again"
+    },
+    "dateSelector": {
+      "title": "Select Booking Dates",
+      "pastDateWarning": "You are selecting past dates, please verify.",
+      "startDate": "Arrival date",
+      "endDate": "Departure date",
+      "confirmChangeTitle": "Changing the dates may clear the selected cells.",
+      "confirmChangeText": "Are you sure you want to continue?",
+      "confirmChangeYes": "Yes, change"
+    },
+    "extraChargeCard": {
+      "type": "Type:",
+      "amount": "Amount:",
+      "na": "N/A"
+    },
+    "extraChargesSelector": {
+      "noCharges": "No additional charges available.",
+      "createNew": "Go to create a new charge"
+    },
+    "personalizedChargeForm": {
+      "namePlaceholder": "Charge name",
+      "amountPlaceholder": "Amount",
+      "add": "Add",
+      "nameRequired": "Name is required",
+      "amountRequired": "Amount is required",
+      "amountMin": "Amount must be greater than or equal to 0"
+    },
+    "personalizedCharges": {
+      "title": "Personalized Charges"
+    },
+    "totalsDisplay": {
+      "subtotal": "Subtotal:",
+      "charges": "Charges:",
+      "total": "Total:"
+    },
+    "auditableInfo": {
+      "title": "Auditable",
+      "createdBy": "Created by:",
+      "dateCreated": "Date created:",
+      "modifiedBy": "Modified by:",
+      "dateModified": "Date modified:"
+    },
+    "details": {
+      "title": "Details",
+      "arrival": "Arrival (Check-in):",
+      "eta": "Estimated Arrival:",
+      "externalId": "External Identification",
+      "departure": "Departure (Check-out):",
+      "provider": "Provider",
+      "nights": "Nights:",
+      "adults": "Adults:",
+      "children": "Children:"
+    },
+    "financials": {
+      "subtotal": "Subtotal",
+      "charges": " Charges",
+      "total": "Total",
+      "totalPaid": "Total Paid",
+      "balance": "Balance",
+      "commission": "Commission"
+    },
+    "generalCharges": {
+      "title": "General Charges"
+    },
+    "summary": {
+      "notes": "Notes:"
+    },
+    "transactions": {
+      "title": "Transactions"
+    },
+    "customerInfo": {
+      "title": "Customer",
+      "name": "Name:",
+      "email": "Email:",
+      "document": "Document:",
+      "phone": "Phone:"
+    },
+    "roomCard": {
+      "night": "Night:",
+      "price": "Price:",
+      "subtotal": "Subtotal",
+      "total": "Total"
+    },
+    "roomList": {
+      "title": "Rooms"
+    },
+    "filters": {
+      "filteringBy": "Filtering by",
+      "arrival": "Arrival",
+      "departure": "Departure",
+      "filterByCustomerName": "Filter by customer name:",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "filter": "Filter",
+      "clear": "Clear",
+      "filterByExternalId": "Filter by external booking ID:",
+      "externalIdPlaceholder": "External booking ID",
+      "filterByStatus": "Filter by status:",
+      "removeFilter": "Remove Filter",
+      "select": "Select",
+      "rowsPerPage": "Rows per page:"
+    },
+    "bookingsTable": {
+      "loading": "Loading...",
+      "noRecords": "No records",
+      "createdBy": "Created by:",
+      "dateCreated": "Date created:",
+      "modifiedBy": "Modified by:",
+      "dateModified": "Date modified:"
+    },
+    "bookingsView": {
+      "title": "Bookings",
+      "actions": "Actions",
+      "view": "View",
+      "edit": "Edit",
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "reservations": "reservations",
+      "page": "Page"
+    },
+    "calendar": {
+      "title": "Calendar",
+      "loadingBookings": "Loading Bookings",
+      "errors": {
+        "loadRooms": "Error loading rooms",
+        "loadBookings": "Error loading bookings"
+      }
+    },
+    "arrival": {
+      "reservationNumber": "Reservation #:",
+      "customer": "Customer:",
+      "phone": "Phone:",
+      "document": "Document:",
+      "externalId": "External ID:",
+      "provider": "Provider:",
+      "total": "Total:",
+      "balance": "Balance:",
+      "arrivalDate": "Arrival date:",
+      "departureDate": "Departure date:",
+      "nights": "Nights:",
+      "eta": "Estimated arrival date and time:",
+      "notes": "Notes:",
+      "arrivingRooms": "Arriving rooms:",
+      "otherRooms": "Rooms arriving on another day:",
+      "none": "None",
+      "viewDetails": "View Details",
+      "markCheckIn": "Mark Check-in"
+    },
+    "departure": {
+      "reservationNumber": "Reservation #:",
+      "customer": "Customer:",
+      "phone": "Phone:",
+      "document": "Document:",
+      "externalId": "External ID:",
+      "provider": "Provider:",
+      "arrivalDate": "Arrival date:",
+      "departureDate": "Departure date:",
+      "nights": "Nights:",
+      "departingRooms": "Departing rooms:",
+      "notes": "Notes:",
+      "viewDetails": "View Details",
+      "markCompleted": "Mark Completed"
+    },
+    "minimalCard": {
+      "reservationNumber": "Reservation Number",
+      "viewDetails": "View details",
+      "name": "Name",
+      "externalId": "External ID:",
+      "arrival": "Arrival:",
+      "departure": "Departure:",
+      "total": "Total:",
+      "balanceDue": "Balance due:",
+      "loading": "Loading information...",
+      "notFound": "Booking not found"
+    },
+    "providers": {
+      "title": "Booking Providers",
+      "name": "Name",
+      "active": "Active",
+      "inactive": "Inactive",
+      "all": "All",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "add": "Add",
+      "update": "Update",
+      "addProvider": "Add Booking Provider",
+      "editTitle": "Edit booking provider",
+      "newTitle": "New booking provider",
+      "namePlaceholder": "Booking provider name",
+      "filterByStatus": "Filter by Status",
+      "confirmAddTitle": "Are you sure you want to add the booking provider?",
+      "confirmUpdateTitle": "Are you sure you want to update the booking provider?",
+      "confirmText": "Review the details before proceeding.",
+      "confirmSave": "Yes, save",
+      "savingTitle": "Saving booking provider",
+      "savingText": "Please wait",
+      "saveSuccessTitle": "Booking provider saved",
+      "saveSuccessText": "The booking provider has been saved successfully",
+      "saveErrorText": "Could not save the booking provider, please try again.",
+      "deleteConfirmTitle": "Are you sure?",
+      "deleteConfirmText": "You won't be able to revert this!",
+      "deleteConfirmYes": "Yes, delete",
+      "deletingTitle": "Deleting booking provider",
+      "deletingText": "Please wait",
+      "deleteSuccessTitle": "Booking provider deleted",
+      "deleteSuccessText": "The booking provider has been deleted successfully",
+      "loadError": "Error loading booking providers"
+    },
+    "stay": {
+      "reservationNumber": "Reservation #:",
+      "customer": "Customer:",
+      "phone": "Phone:",
+      "document": "Document:",
+      "externalId": "External ID:",
+      "provider": "Provider:",
+      "arrivalDate": "Arrival date:",
+      "departureDate": "Departure date:",
+      "nights": "Nights:",
+      "occupiedRooms": "Occupied rooms:",
+      "notes": "Notes:",
+      "viewDetails": "View Details"
+    },
+    "view": {
+      "title": "Booking Details",
+      "reservationNumber": "Reservation #",
+      "edit": "Edit",
+      "goToInvoice": "Go to Invoice",
+      "cancelBooking": "Cancel Booking",
+      "markNoShow": "Mark No Show",
+      "checkInConfirmTitle": "Do you want to mark the booking as arrived?",
+      "checkInConfirmText": "Ensure the customer has arrived",
+      "checkInBalanceDueText": "The booking has a pending balance. Do you want to continue?",
+      "checkInSuccess": "Booking marked as check-in",
+      "checkInError": "Error marking as check-in",
+      "noShowConfirmTitle": "Do you want to mark the booking as no show?",
+      "noShowConfirmText": "You will no longer be able to edit the booking",
+      "noShowSuccess": "Booking marked as no show",
+      "noShowError": "Error marking as no show",
+      "completeConfirmTitle": "Do you want to mark the booking as completed?",
+      "completeConfirmText": "You will no longer be able to edit the booking",
+      "completeSuccess": "Booking marked as completed",
+      "completeError": "Error marking as completed",
+      "cancelConfirmTitle": "Do you want to cancel the booking?",
+      "cancelConfirmText": "You will no longer be able to edit the booking",
+      "cancelSuccess": "Ensure you refund deposits if applicable",
+      "cancelError": "Error cancelling the booking",
+      "pleaseWait": "Please wait.",
+      "confirmYes": "Yes, confirm",
+      "errors": {
+        "loadBooking": "Error loading booking"
+      }
+    },
+    "viewOffCanvas": {
+      "title": "Booking Details",
+      "goToSummary": "Go to Summary"
+    }
+  },
+  "commonUI": {
+    "siteUnderMaintenance": {
+      "title": "Site Under Maintenance",
+      "message": "We are working to improve your experience. Please come back later.",
+      "alt": "site under maintenance"
+    },
+    "customField": {
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "required": "Required field"
+    },
+    "datePickers": {
+      "startDate": "Start date",
+      "endDate": "End date",
+      "clear": "Clear dates"
+    },
+    "dateTimePicker": {
+      "time": "Time"
+    },
+    "dropzone": {
+      "dragOrClick": "Drag and drop your files here, or ",
+      "click": "click",
+      "toSelect": "to select them.",
+      "addMore": "Drag or click to add more files",
+      "clearFiles": "Clear files",
+      "rejectedFiles": "Rejected files:",
+      "fileTooLarge": "File is too large",
+      "invalidType": "File type not accepted",
+      "noPreview": "No preview"
+    },
+    "richEditorToolbar": {
+      "textColor": "Text color",
+      "bold": "Bold",
+      "italic": "Italic",
+      "strikethrough": "Strikethrough",
+      "inlineCode": "Inline code",
+      "heading": "Heading {{level}}",
+      "paragraph": "Paragraph",
+      "bulletList": "Bullet list",
+      "orderedList": "Numbered list",
+      "codeBlock": "Code block",
+      "blockquote": "Quote",
+      "horizontalRule": "Horizontal line",
+      "hardBreak": "Line break",
+      "clearFormatting": "Clear formatting",
+      "undo": "Undo",
+      "redo": "Redo"
     }
   }
 }
