@@ -75,7 +75,7 @@ function TransactionVersionsOffCanvas({
           setLoading(false);
         });
     }
-  }, [offCanvasOpen, transaction.id, versions.hasFetched, mapVersion, hotelId]);
+  }, [offCanvasOpen, transaction.id, mapVersion, hotelId]);
 
   return (
     <Offcanvas

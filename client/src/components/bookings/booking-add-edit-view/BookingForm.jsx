@@ -234,7 +234,7 @@ function BookingForm({
   };
 
   useEffect(() => {
-    if (booking.id) {
+    if (!!booking.id) {
       if (!dates.start && !dates.end) {
         setDates({
           start: booking.arrivalDate,
