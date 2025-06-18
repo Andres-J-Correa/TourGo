@@ -26,8 +26,8 @@ export const defaultBooking = {
     email: null,
   },
   bookingProvider: {
-    id: 1,
-    name: "Booking.com",
+    id: "",
+    name: "",
   },
   externalCommission: 0,
   nights: 0,

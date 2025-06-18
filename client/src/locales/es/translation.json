@@ -246,6 +246,31 @@
       "externalIdRequired": "La identificación externa es obligatoria",
       "externalCommissionRequired": "La comisión externa es obligatoria",
       "externalCommissionMin": "La comisión externa no puede ser negativa"
+    },
+    "customerForm": {
+      "searching": "Buscando cliente...",
+      "found": "Cliente encontrado",
+      "notFound": "Cliente no encontrado",
+      "completeData": "Por favor complete los datos",
+      "searchError": "Error al buscar cliente, intente nuevamente",
+      "creating": "Creando cliente...",
+      "created": "Cliente creado correctamente",
+      "createError": "No se pudo crear el cliente, intente nuevamente",
+      "edit": "Editar",
+      "save": "Guardar Cliente",
+      "update": "Actualizar Cliente",
+      "search": "Buscar Cliente",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "documentNumber": "Documento de Identidad",
+      "updateConfirmTitle": "Confirmar actualización",
+      "updateConfirmText": "¿Está seguro de que desea actualizar los datos del cliente?",
+      "updateConfirmYes": "Sí, actualizar",
+      "updating": "Actualizando cliente...",
+      "updated": "Cliente actualizado correctamente",
+      "updateError": "No se pudo actualizar el cliente, intente nuevamente"
     }
   }
 }
