@@ -41,6 +41,8 @@ namespace TourGo.Web.Api
             services.Configure<EncryptionConfig>(Configuration.GetSection("EncryptionConfig"));
             services.Configure<UsersPublicIdConfig>(Configuration.GetSection("UsersPublicIdConfig"));
             services.Configure<HotelsPublicIdConfig>(Configuration.GetSection("HotelsPublicIdConfig"));
+            services.Configure<BookingsPublicIdConfig>(Configuration.GetSection("BookingsPublicIdConfig"));
+            services.Configure<TransactionsPublicIdConfig>(Configuration.GetSection("TransactionsPublicIdConfig")); 
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

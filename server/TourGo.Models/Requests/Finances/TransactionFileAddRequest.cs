@@ -11,9 +11,9 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Finances
 {
-    public class TransactionFileAddRequest : IModelIdentifier
+    public class TransactionFileAddRequest : IModelIdentifierString
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [Required]
         public IFormFile File { get; set; }

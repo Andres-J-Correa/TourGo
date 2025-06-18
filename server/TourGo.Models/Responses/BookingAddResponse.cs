@@ -8,7 +8,7 @@ namespace TourGo.Models.Responses
 {
     public class BookingAddResponse
     {
-        public int BookingId { get; set; }
+        public string BookingId { get; set; }
         public int InvoiceId { get; set; }
     }
 }

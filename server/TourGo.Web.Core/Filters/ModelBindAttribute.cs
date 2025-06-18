@@ -18,7 +18,8 @@ namespace TourGo.Web.Core.Filters
         {
             if (context != null && context.ActionArguments != null &&
                  context.ActionArguments.ContainsKey("model") &&
-                 context.ActionArguments["model"] is IModelIdentifier)
+                 (context.ActionArguments["model"] is IModelIdentifier
+                 || context.ActionArguments["model"] is IModelIdentifierString))
             {
                 SetEntityId(context.ActionArguments, context);
             }
@@ -34,16 +35,13 @@ namespace TourGo.Web.Core.Filters
             }
         }
 
-        public virtual int? SetEntityId(IDictionary<string, object> actionArguments, ActionExecutingContext actionContext)
+        public virtual void SetEntityId(IDictionary<string, object> actionArguments, ActionExecutingContext actionContext)
         {
-            int? id = null;
             int parseId = 0;
-            object oId = null;
-            IModelIdentifier requestModel = null;
+            object? oId = null;
             string idField = "id";
-            requestModel = actionArguments["model"] as IModelIdentifier;
 
-            ControllerBase c = actionContext.Controller as ControllerBase;
+            ControllerBase? c = actionContext.Controller as ControllerBase;
 
             actionContext.RouteData?.Values?.TryGetValue(idField, out oId);
 
@@ -51,26 +49,23 @@ namespace TourGo.Web.Core.Filters
             {
                 Int32.TryParse(oId.ToString(), out parseId);
 
-                if (parseId > 0)
+                if (parseId > 0 && actionArguments["model"] is IModelIdentifier modelIdentifier)
                 {
-                    requestModel.Id = parseId;
-
+                    modelIdentifier.Id = parseId;
                     actionContext.ModelState.Clear();
-
-                    if (requestModel.Id <= 0)
-                    {
-                        c.ModelState.AddModelError("Id", "An Id is Required");
-                    }
-
-                    c.TryValidateModel(requestModel);
+                    c.TryValidateModel(modelIdentifier);
+                }
+                else if (oId is string s && !string.IsNullOrEmpty(s) && actionArguments["model"] is IModelIdentifierString stringModelIdentifier)
+                {
+                    stringModelIdentifier.Id = s;
+                    actionContext.ModelState.Clear();
+                    c.TryValidateModel(stringModelIdentifier);
                 }
                 else
                 {
                     c.ModelState.AddModelError("Id", "A valid Id is Required");
                 }
-
-            }
-            else
+            } else
             {
                 c.ModelState.AddModelError("Id", "An Id is Required");
             }
@@ -87,8 +82,6 @@ namespace TourGo.Web.Core.Filters
 
                 actionContext.Result = result;
             }
-
-            return id;
         }
     }
 }

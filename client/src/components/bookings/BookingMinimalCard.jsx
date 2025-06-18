@@ -15,7 +15,7 @@ const BookingMinimalCard = ({ bookingId, hotelId }) => {
     const loadBooking = async () => {
       setLoading(true);
       try {
-        const response = await getMinimalById(bookingId);
+        const response = await getMinimalById(bookingId, hotelId);
         if (response.isSuccessful) {
           setBooking(response.item);
         }
@@ -29,7 +29,7 @@ const BookingMinimalCard = ({ bookingId, hotelId }) => {
     if (bookingId) {
       loadBooking();
     }
-  }, [bookingId]);
+  }, [bookingId, hotelId]);
 
   return (
     <Card className="shadow-sm">

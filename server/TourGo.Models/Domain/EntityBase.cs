@@ -10,7 +10,7 @@ namespace TourGo.Models.Domain
 {
     public class EntityBase : AuditableEntity
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public decimal Subtotal { get; set; }
         public decimal Charges { get; set; }
         public decimal Total { get; set; }

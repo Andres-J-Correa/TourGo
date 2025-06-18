@@ -58,7 +58,7 @@ const renderSubItem = (subItem, subIndex) => {
 const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
   // Render dropdown menu if the nav item has a collapse property
   const renderDropdownMenu = () => (
-    <HoverDropdown nav inNavbar className="mx-2">
+    <HoverDropdown nav inNavbar className="mx-1">
       <DropdownToggle
         nav
         role="button"
@@ -99,7 +99,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
         end
         to={navItem.path}
         target={navItem.newTab ? "_blank" : undefined}
-        className={classNames("nav-action-item", {
+        className={classNames("nav-action-item mx-1", {
           "text-uppercase": navItem.uppercase,
           "text-capitalize": navItem.capitalize,
           "dropdown-item": isInnerItem,

@@ -72,7 +72,7 @@ function DefaultNavbar({
           <Link
             to={hotel.current?.id ? `/hotels/${hotel.current?.id}` : "/"}
             className="text-decoration-none text-white">
-            {hotel.current?.name || brand}
+            {hotel.isLoading ? "Cargando..." : hotel.current?.name || brand}
           </Link>
         </div>
         <NavbarToggler onClick={toggle} className="shadow-none ms-2" />

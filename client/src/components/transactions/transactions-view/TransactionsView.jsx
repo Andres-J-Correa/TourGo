@@ -96,7 +96,7 @@ function TransactionsView() {
     isLoadingHotelData,
   } = useHotelFormData(hotelId);
 
-  const { hotel } = useAppContext();
+  const { hotel, user } = useAppContext();
 
   const isUserAdmin = useMemo(
     () =>
@@ -480,17 +480,29 @@ function TransactionsView() {
     table.setExpanded({});
   }, [table]);
 
-  const onEditDescriptionSuccess = useCallback((txnId, newDescription) => {
-    setData((prev) => {
-      const newItems = prev.items.map((txn) => {
-        if (txn.id === txnId) {
-          return { ...txn, description: newDescription };
-        }
-        return txn;
+  const onEditDescriptionSuccess = useCallback(
+    (txnId, newDescription) => {
+      setData((prev) => {
+        const newItems = prev.items.map((txn) => {
+          if (txn.id === txnId) {
+            return {
+              ...txn,
+              description: newDescription,
+              dateModified: dayjs().toDate(),
+              modifiedBy: {
+                id: user.current.id,
+                firstName: user.current.firstName,
+                lastName: user.current.lastName,
+              },
+            };
+          }
+          return txn;
+        });
+        return { ...prev, items: newItems };
       });
-      return { ...prev, items: newItems };
-    });
-  }, []);
+    },
+    [user]
+  );
 
   useEffect(() => {
     const hasDates =
