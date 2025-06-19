@@ -239,9 +239,9 @@
       "saveSuccessTitle": "Booking saved",
       "saveSuccessText": "The booking was saved successfully.",
       "tabs": {
-        "customer": "Cliente",
-        "booking": "Información de la Reserva",
-        "transactions": "Transacciones"
+        "customer": "Customer",
+        "booking": "Booking Information",
+        "transactions": "Transactions"
       }
     },
     "validation": {
