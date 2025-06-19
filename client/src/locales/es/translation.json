@@ -237,7 +237,12 @@
       "savingTitle": "Guardando reserva",
       "savingText": "Por favor espera",
       "saveSuccessTitle": "Reserva guardada",
-      "saveSuccessText": "La reserva se guardó correctamente."
+      "saveSuccessText": "La reserva se guardó correctamente.",
+      "tabs": {
+        "customer": "Cliente",
+        "booking": "Información de la Reserva",
+        "transactions": "Transacciones"
+      }
     },
     "validation": {
       "documentShort": "Documento muy corto (mínimo {{min}} caracteres)",

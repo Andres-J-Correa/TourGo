@@ -237,7 +237,12 @@
       "savingTitle": "Saving booking",
       "savingText": "Please wait",
       "saveSuccessTitle": "Booking saved",
-      "saveSuccessText": "The booking was saved successfully."
+      "saveSuccessText": "The booking was saved successfully.",
+      "tabs": {
+        "customer": "Cliente",
+        "booking": "Información de la Reserva",
+        "transactions": "Transacciones"
+      }
     },
     "validation": {
       "documentShort": "Document too short (minimum {{min}} characters)",

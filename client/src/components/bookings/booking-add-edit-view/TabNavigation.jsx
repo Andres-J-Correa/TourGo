@@ -51,4 +51,11 @@ TabNavigation.propTypes = {
     2: PropTypes.bool.isRequired,
     3: PropTypes.bool.isRequired,
   }),
+  tabs: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      icon: PropTypes.object.isRequired,
+    })
+  ).isRequired,
 };

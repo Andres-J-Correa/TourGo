@@ -544,9 +544,8 @@ export default withFormik({
       setCurrentStep,
       modifiedBy,
       getTranslatedErrorMessage,
+      t,
     } = props;
-
-    const { t } = require("contexts/LanguageContext").useLanguage(); // workaround for t in static context
 
     const result = await Swal.fire({
       title: t("booking.form.saveConfirmTitle"),

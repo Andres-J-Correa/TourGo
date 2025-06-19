@@ -49,9 +49,13 @@ const BookingAddUpdateView = () => {
   ];
 
   const tabs = [
-    { id: 0, icon: faUser, name: "Cliente" },
-    { id: 1, icon: faFilePen, name: "Informacion de la Reserva" },
-    { id: 2, icon: faMoneyBill1Wave, name: "Transacciones" },
+    { id: 0, icon: faUser, name: t("booking.form.tabs.customer") },
+    { id: 1, icon: faFilePen, name: t("booking.form.tabs.booking") },
+    {
+      id: 2,
+      icon: faMoneyBill1Wave,
+      name: t("booking.form.tabs.transactions"),
+    },
   ];
 
   const { user } = useAppContext();
@@ -133,7 +137,13 @@ const BookingAddUpdateView = () => {
       setCustomer(null);
       setCurrentStep(0);
     }
-  }, [bookingId, onGetBookingSuccess, mapBookingData, hotelId, onGetBookingError]);
+  }, [
+    bookingId,
+    onGetBookingSuccess,
+    mapBookingData,
+    hotelId,
+    onGetBookingError,
+  ]);
 
   return (
     <>
@@ -190,6 +200,7 @@ const BookingAddUpdateView = () => {
               modifiedBy={modifiedBy}
               getTranslatedErrorMessage={getTranslatedErrorMessage}
               bookingSchema={bookingSchema}
+              t={t}
             />
           </TabPane>
           <TabPane tabId={2}>
