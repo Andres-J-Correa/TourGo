@@ -21,7 +21,7 @@ const initialValues = {
 };
 
 function StaffInviteForm() {
-  const { getTranslatedErrorMessage, t } = useLanguage();
+  const { getTranslatedErrorMessage, t, culture } = useLanguage();
   const { hotelId } = useParams();
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -70,7 +70,7 @@ function StaffInviteForm() {
         didOpen: () => Swal.showLoading(),
       });
 
-      const response = await inviteStaff(hotelId, values);
+      const response = await inviteStaff(hotelId, values, culture);
 
       Swal.close();
 

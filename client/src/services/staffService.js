@@ -58,15 +58,16 @@ export const deleteStaff = async (hotelId, staffId) => {
   }
 };
 
-export const inviteStaff = async (hotelId, payload) => {
+export const inviteStaff = async (hotelId, payload, culture) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "POST",
-    url: `${api}/hotel/${hotelId}/invites?culture=es-ES`,
+    url: `${api}/hotel/${hotelId}/invites?culture=${culture}`,
     data: payload,
   };
+
   try {
     const response = await axiosClient(config);
     onGlobalSuccess(response);

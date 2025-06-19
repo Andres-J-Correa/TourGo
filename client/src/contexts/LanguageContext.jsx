@@ -11,9 +11,21 @@ import i18n from "../locales/i18n";
 
 const LanguageContext = createContext();
 
+function getCultureFromLanguage(language) {
+  switch (language) {
+    case "en":
+      return "en-US";
+    case "es":
+      return "es-ES";
+    default:
+      return "es-ES";
+  }
+}
+
 export const LanguageProvider = ({ children }) => {
   const { t } = useTranslation();
   const [language, setLanguage] = useState("");
+  const [culture, setCulture] = useState(getCultureFromLanguage(language));
 
   const getTranslatedErrorMessage = useCallback(
     (error) => {
@@ -34,17 +46,25 @@ export const LanguageProvider = ({ children }) => {
     i18n.changeLanguage(lng);
     setStringInLocalStorage("language", lng);
     setLanguage(lng);
+    const newCulture = getCultureFromLanguage(lng);
+    setCulture(newCulture);
   };
 
   useEffect(() => {
     const initialLanguage = i18n.language;
     setLanguage(initialLanguage);
+    setCulture(getCultureFromLanguage(initialLanguage));
   }, []);
 
   return (
     <LanguageContext.Provider
-      value={{ language, changeLanguage, t, getTranslatedErrorMessage }}
-    >
+      value={{
+        language,
+        changeLanguage,
+        t,
+        getTranslatedErrorMessage,
+        culture,
+      }}>
       {children}
     </LanguageContext.Provider>
   );
