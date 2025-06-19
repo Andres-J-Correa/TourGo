@@ -212,7 +212,8 @@
     },
     "navigation": {
       "previous": "Anterior",
-      "goToSummary": "Ir a Resumen"
+      "goToSummary": "Ir a Resumen",
+      "next": "Siguiente"
     },
     "loadingOverlay": {
       "loadingInfo": "Cargando información"
@@ -419,6 +420,7 @@
     },
     "calendar": {
       "title": "Calendario",
+      "dates": "Fechas",
       "loadingBookings": "Cargando Reservas",
       "errors": {
         "loadRooms": "Error al cargar habitaciones",

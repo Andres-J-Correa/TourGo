@@ -212,7 +212,8 @@
     },
     "navigation": {
       "previous": "Previous",
-      "goToSummary": "Go to Summary"
+      "goToSummary": "Go to Summary",
+      "next": "Next"
     },
     "loadingOverlay": {
       "loadingInfo": "Loading information"
@@ -419,6 +420,7 @@
     },
     "calendar": {
       "title": "Calendar",
+      "dates": "Dates",
       "loadingBookings": "Loading Bookings",
       "errors": {
         "loadRooms": "Error loading rooms",

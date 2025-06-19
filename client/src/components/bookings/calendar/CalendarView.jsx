@@ -81,7 +81,7 @@ function CalendarView() {
   const columns = useMemo(() => {
     // First column for dates
     const dateColumn = columnHelper.accessor("date", {
-      header: () => "Fechas",
+      header: () => t("booking.calendar.dates"),
       cell: (info) => dayjs(info.getValue()).format("ddd DD - MMM - YYYY"),
       size: 200,
     });
@@ -120,7 +120,7 @@ function CalendarView() {
     );
 
     return [dateColumn, ...roomColumns];
-  }, [rooms, bookingMap, columnHelper, hotelId]);
+  }, [rooms, bookingMap, columnHelper, hotelId, t]);
 
   const table = useReactTable({
     data: dates,
