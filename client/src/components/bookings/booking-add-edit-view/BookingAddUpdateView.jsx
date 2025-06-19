@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 import { TabContent, TabPane, Button } from "reactstrap";
-import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faArrowLeft,
+  faFilePen,
+  faMoneyBill1Wave,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -14,10 +20,8 @@ import { useLanguage } from "contexts/LanguageContext";
 
 import { LOCKED_BOOKING_STATUSES } from "../constants";
 
-import {
-  defaultBooking,
-  bookingFormTabs as tabs,
-} from "components/bookings/booking-add-edit-view/constants";
+import { defaultBooking } from "components/bookings/booking-add-edit-view/constants";
+import useBookingSchemas from "./useBookingSchemas";
 
 import CustomerForm from "components/bookings/booking-add-edit-view/CustomerForm";
 import BookingForm from "components/bookings/booking-add-edit-view/BookingForm";
@@ -27,18 +31,35 @@ import ErrorBoundary from "components/commonUI/ErrorBoundary";
 
 const BookingAddUpdateView = () => {
   const { hotelId, bookingId } = useParams();
+  const { t, getTranslatedErrorMessage } = useLanguage(); // add t
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
-    { label: "Reservas", path: `/hotels/${hotelId}/bookings` },
+    { label: t("booking.breadcrumb.home"), path: "/" },
+    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
+    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
+    {
+      label: t("booking.breadcrumb.bookings"),
+      path: `/hotels/${hotelId}/bookings`,
+    },
     bookingId
-      ? { label: "Reserva", path: `/hotels/${hotelId}/bookings/${bookingId}` }
+      ? {
+          label: t("booking.breadcrumb.booking"),
+          path: `/hotels/${hotelId}/bookings/${bookingId}`,
+        }
       : undefined,
   ];
 
+  const tabs = [
+    { id: 0, icon: faUser, name: t("booking.form.tabs.customer") },
+    { id: 1, icon: faFilePen, name: t("booking.form.tabs.booking") },
+    {
+      id: 2,
+      icon: faMoneyBill1Wave,
+      name: t("booking.form.tabs.transactions"),
+    },
+  ];
+
   const { user } = useAppContext();
-  const { getTranslatedErrorMessage } = useLanguage();
+  const { bookingSchema } = useBookingSchemas();
 
   const modifiedBy = useMemo(
     () => ({
@@ -93,13 +114,16 @@ const BookingAddUpdateView = () => {
     [mapBookingData]
   );
 
-  const onGetBookingError = (e) => {
-    if (e.response?.status === 404) {
-      setBooking({ ...defaultBooking });
-    } else {
-      toast.error("Error al cargar reserva");
-    }
-  };
+  const onGetBookingError = useCallback(
+    (e) => {
+      if (e.response?.status === 404) {
+        setBooking({ ...defaultBooking });
+      } else {
+        toast.error(t("booking.errors.loadBooking")); // use translation
+      }
+    },
+    [t]
+  );
 
   useEffect(() => {
     if (bookingId) {
@@ -113,24 +137,37 @@ const BookingAddUpdateView = () => {
       setCustomer(null);
       setCurrentStep(0);
     }
-  }, [bookingId, onGetBookingSuccess, mapBookingData, hotelId]);
+  }, [
+    bookingId,
+    onGetBookingSuccess,
+    mapBookingData,
+    hotelId,
+    onGetBookingError,
+  ]);
 
   return (
     <>
       <LoadingOverlay
         isVisible={submitting || isLoading}
-        message={isLoading ? "Cargando información" : "procesando..."}
+        message={
+          isLoading
+            ? t("booking.loadingOverlay.loadingInfo")
+            : t("booking.loadingOverlay.processing")
+        }
       />
 
       <Breadcrumb
         breadcrumbs={breadcrumbs}
-        active={bookingId ? "Editar Reserva" : "Nueva Reserva"}
+        active={
+          bookingId ? t("booking.breadcrumb.edit") : t("booking.breadcrumb.new")
+        }
       />
       <ErrorBoundary>
         <TabNavigation
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           isStepComplete={isStepComplete}
+          tabs={tabs}
         />
         <TabContent activeTab={currentStep}>
           <h4 className="mb-3">{tabs[currentStep].name} </h4>
@@ -162,6 +199,8 @@ const BookingAddUpdateView = () => {
               bookingPersonalizedCharges={booking?.personalizedCharges}
               modifiedBy={modifiedBy}
               getTranslatedErrorMessage={getTranslatedErrorMessage}
+              bookingSchema={bookingSchema}
+              t={t}
             />
           </TabPane>
           <TabPane tabId={2}>
@@ -173,13 +212,13 @@ const BookingAddUpdateView = () => {
                 className="me-auto"
                 disabled={submitting}>
                 <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-                Anterior
+                {t("booking.navigation.previous")}
               </Button>
               {isStepComplete[2] && !submitting && (
                 <Link
                   className="ms-auto btn btn-dark"
                   to={`/hotels/${hotelId}/bookings/${booking.id}`}>
-                  Ir a Resumen
+                  {t("booking.navigation.goToSummary")}
                   <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
                 </Link>
               )}

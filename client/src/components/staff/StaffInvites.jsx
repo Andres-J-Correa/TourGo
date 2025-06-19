@@ -9,6 +9,7 @@ import InviteCard from "components/staff/StaffInviteCard";
 
 import { getStaffInvitesByHotelId, deleteInvite } from "services/staffService";
 import { INVITE_FLAGS_IDS } from "components/staff/constants";
+import { useLanguage } from "contexts/LanguageContext";
 
 const StaffInvites = () => {
   const [invites, setInvites] = useState({
@@ -17,64 +18,68 @@ const StaffInvites = () => {
   });
   const [loading, setLoading] = useState(true);
   const { hotelId } = useParams();
+  const { t } = useLanguage();
 
-  const handleDeleteClick = useCallback(async (id) => {
-    const result = await Swal.fire({
-      title: "¿Está seguro?",
-      text: "No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Sí, anular invitación",
-      cancelButtonText: "Cancelar",
-    });
-
-    if (!result.isConfirmed) {
-      return;
-    }
-
-    try {
-      Swal.fire({
-        title: "Anulando la invitación",
-        text: "Por favor espera",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
+  const handleDeleteClick = useCallback(
+    async (id) => {
+      const result = await Swal.fire({
+        title: t("staff.invites.deleteConfirmTitle"),
+        text: t("staff.invites.deleteConfirmText"),
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: t("staff.invites.deleteConfirmYes"),
+        cancelButtonText: t("common.cancel"),
       });
 
-      const response = await deleteInvite(id);
-      if (response.isSuccessful) {
-        setInvites((prev) => {
-          const index = prev.items.findIndex((invite) => invite.id === id);
-          if (index === -1) return prev;
-          const items = [...prev.items];
-          const invite = items[index];
-          items.splice(index, 1);
-          items.push({
-            ...invite,
-            flags: INVITE_FLAGS_IDS.CANCELLED,
-          });
-          return {
-            ...prev,
-            items,
-          };
-        });
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      try {
         Swal.fire({
-          icon: "success",
-          title: "Invitación anulada",
-          text: "La invitación se ha anulado correctamente",
-          timer: 1500,
-          showConfirmButton: false,
+          title: t("staff.invites.deletingTitle"),
+          text: t("staff.invites.deletingText"),
           allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        const response = await deleteInvite(id);
+        if (response.isSuccessful) {
+          setInvites((prev) => {
+            const index = prev.items.findIndex((invite) => invite.id === id);
+            if (index === -1) return prev;
+            const items = [...prev.items];
+            const invite = items[index];
+            items.splice(index, 1);
+            items.push({
+              ...invite,
+              flags: INVITE_FLAGS_IDS.CANCELLED,
+            });
+            return {
+              ...prev,
+              items,
+            };
+          });
+          Swal.fire({
+            icon: "success",
+            title: t("staff.invites.deleteSuccessTitle"),
+            text: t("staff.invites.deleteSuccessText"),
+            timer: 1500,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+          });
+        }
+      } catch (error) {
+        Swal.close();
+        await Swal.fire({
+          icon: "error",
+          title: t("common.error"),
+          text: t("staff.invites.deleteError"),
         });
       }
-    } catch (error) {
-      Swal.close();
-      await Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo anular la invitación, intente nuevamente.",
-      });
-    }
-  }, []);
+    },
+    [t]
+  );
 
   const mapInvite = useCallback(
     (invite, i) => (
@@ -94,15 +99,18 @@ const StaffInvites = () => {
     }
   };
 
-  const onGetInvitesError = (err) => {
-    if (err?.response?.status !== 404) {
-      toast.error("Error al obtener las invitaciones del hotel");
-    }
-    setInvites({
-      items: [],
-      mapped: [],
-    });
-  };
+  const onGetInvitesError = useCallback(
+    (err) => {
+      if (err?.response?.status !== 404) {
+        toast.error(t("staff.invites.loadError"));
+      }
+      setInvites({
+        items: [],
+        mapped: [],
+      });
+    },
+    [t]
+  );
 
   useEffect(() => {
     if (hotelId) {
@@ -112,7 +120,7 @@ const StaffInvites = () => {
         .catch(onGetInvitesError)
         .finally(() => setLoading(false));
     }
-  }, [hotelId]);
+  }, [hotelId, onGetInvitesError]);
 
   useEffect(() => {
     if (invites.items.length > 0) {
@@ -130,7 +138,7 @@ const StaffInvites = () => {
         invites.mapped
       ) : (
         <Col xs="12" className="text-center">
-          <p>No hay invitaciones pendientes para este hotel.</p>
+          <p>{t("staff.invites.noInvites")}</p>
         </Col>
       )}
     </Row>

@@ -3,6 +3,7 @@ import { useDropzone } from "react-dropzone";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilePdf } from "@fortawesome/free-solid-svg-icons";
 import defaultImage from "assets/images/default-image.svg"; // Default image for non-image files
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 export const baseStyle = {
   flex: 1,
@@ -80,6 +81,8 @@ const img = {
 };
 
 function Dropzone({ files, setFiles, ...props }) {
+  const { t } = useLanguage(); // added
+
   const {
     getRootProps,
     getInputProps,
@@ -126,7 +129,7 @@ function Dropzone({ files, setFiles, ...props }) {
           </div>
         ) : (
           <span style={img} className="text-center text-muted fw-bold">
-            No Preview
+            {t("commonUI.dropzone.noPreview")}
           </span>
         )}
       </div>
@@ -153,9 +156,9 @@ function Dropzone({ files, setFiles, ...props }) {
   const translateErrorMessage = (error) => {
     switch (error.code) {
       case "file-too-large":
-        return "El archivo es demasiado grande";
+        return t("commonUI.dropzone.fileTooLarge");
       case "file-invalid-type":
-        return "Tipo de archivo no aceptado";
+        return t("commonUI.dropzone.invalidType");
       default:
         return error.message;
     }
@@ -167,14 +170,14 @@ function Dropzone({ files, setFiles, ...props }) {
         <input {...getInputProps()} />
         <p className="text-center my-auto">
           {files.length > 0
-            ? "Arrastra o haz clic para agregar más archivos"
-            : "Arrastra y suelta tus archivos aquí, o "}
+            ? t("commonUI.dropzone.addMore")
+            : t("commonUI.dropzone.dragOrClick")}
           {files.length === 0 && (
             <span className="text-decoration-underline text-info">
-              haz clic
+              {t("commonUI.dropzone.click")}
             </span>
           )}{" "}
-          {files.length === 0 && "para seleccionarlos."}
+          {files.length === 0 && t("commonUI.dropzone.toSelect")}
         </p>
         {files.length > 0 && <aside style={thumbsContainer}>{thumbs}</aside>}
       </div>
@@ -182,7 +185,7 @@ function Dropzone({ files, setFiles, ...props }) {
       {fileRejections.length > 0 && (
         <div style={{ marginTop: 16 }}>
           <p className="text-center text-danger fw-bold">
-            Archivos rechazados:
+            {t("commonUI.dropzone.rejectedFiles")}
           </p>
           <ul>
             {fileRejections.map(({ file, errors }) => (
@@ -208,7 +211,7 @@ function Dropzone({ files, setFiles, ...props }) {
           onClick={() => {
             setFiles([]);
           }}>
-          Limpiar archivos
+          {t("commonUI.dropzone.clearFiles")}
         </button>
       )}
     </section>

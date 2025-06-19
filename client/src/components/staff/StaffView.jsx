@@ -7,6 +7,7 @@ import StaffList from "components/staff/StaffList";
 import StaffInvites from "components/staff/StaffInvites";
 import StaffInviteForm from "components/staff/StaffInviteForm";
 import StaffRolesPermissions from "components/staff/StaffRolesPermissions";
+import { useLanguage } from "contexts/LanguageContext";
 
 const tabComponents = {
   staff: StaffList,
@@ -19,6 +20,7 @@ const validTabs = ["staff", "invites", "new", "roles"];
 
 const StaffView = () => {
   const { hotelId } = useParams();
+  const { t } = useLanguage();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -44,15 +46,15 @@ const StaffView = () => {
   };
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("staff.view.breadcrumbs.home"), path: "/" },
+    { label: t("staff.view.breadcrumbs.hotels"), path: "/hotels" },
+    { label: t("staff.view.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
   ];
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Personal" />
-      <h3>Personal</h3>
+      <Breadcrumb breadcrumbs={breadcrumbs} active={t("staff.view.title")} />
+      <h3>{t("staff.view.title")}</h3>
       <ErrorBoundary>
         <Row className="mt-4">
           <Col md="3">
@@ -66,7 +68,7 @@ const StaffView = () => {
                   active={activeTab === "staff"}
                   onClick={() => handleTabChange("staff")}
                   className="cursor-pointer">
-                  Listado
+                  {t("staff.view.tabs.list")}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -74,7 +76,7 @@ const StaffView = () => {
                   active={activeTab === "new"}
                   onClick={() => handleTabChange("new")}
                   className="cursor-pointer">
-                  Invitar Personal
+                  {t("staff.view.tabs.invite")}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -82,7 +84,7 @@ const StaffView = () => {
                   active={activeTab === "invites"}
                   onClick={() => handleTabChange("invites")}
                   className="cursor-pointer">
-                  Invitaciones
+                  {t("staff.view.tabs.invites")}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -90,7 +92,7 @@ const StaffView = () => {
                   active={activeTab === "roles"}
                   onClick={() => handleTabChange("roles")}
                   className="cursor-pointer">
-                  Permisos de Roles
+                  {t("staff.view.tabs.roles")}
                 </NavLink>
               </NavItem>
             </Nav>

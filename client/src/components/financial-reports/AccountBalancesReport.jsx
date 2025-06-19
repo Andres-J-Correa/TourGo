@@ -10,6 +10,7 @@ import { getPaymentMethodsTotalsByHotelId } from "services/financialReportServic
 import { formatCurrency } from "utils/currencyHelper";
 import { Col, Row } from "reactstrap";
 import dayjs from "dayjs";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 function AccountBalancesReport({ hotelId }) {
   const [data, setData] = useState([]);
@@ -18,6 +19,7 @@ function AccountBalancesReport({ hotelId }) {
     start: "",
     end: "",
   });
+  const { t } = useLanguage(); // added
 
   const handleDateChange = (type) => (date) => {
     setDates((prev) => ({
@@ -38,12 +40,17 @@ function AccountBalancesReport({ hotelId }) {
       .then((res) => {
         if (res.isSuccessful && Array.isArray(res.items)) {
           const chartData = [
-            ["Cuenta", "Total", { role: "annotation" }, { role: "style" }],
+            [
+              t("financialReports.accountBalancesReport.account"),
+              t("financialReports.accountBalancesReport.total"),
+              { role: "annotation" },
+              { role: "style" },
+            ],
             ...res.items.map((item) => [
               item.paymentMethod,
               item.total,
               formatCurrency(item.total, "COP"),
-              item.total < 0 ? "color: #f44335; opacity:0.5;" : "opacity:0.5;", // Red if negative
+              item.total < 0 ? "color: #f44335; opacity:0.5;" : "opacity:0.5;",
             ]),
           ];
           setData(chartData);
@@ -51,20 +58,17 @@ function AccountBalancesReport({ hotelId }) {
       })
       .catch((error) => {
         if (error?.response?.status !== 404) {
-          toast.error("Error al cargar los datos de balances");
+          toast.error(t("financialReports.accountBalancesReport.loadError"));
         }
         setData([]);
       })
       .finally(() => setLoading(false));
-  }, [hotelId, dates]);
+  }, [hotelId, dates, t]);
 
   return (
     <div>
-      <h4>Balance en Cuentas</h4>
-      <p>
-        Muestra el saldo actual de dinero en cada cuenta o método de pago del
-        hotel.
-      </p>
+      <h4>{t("financialReports.accountBalancesReport.title")}</h4>
+      <p>{t("financialReports.accountBalancesReport.description")}</p>
       <Row>
         <Col xs={12}>
           <DatePickers
@@ -81,7 +85,9 @@ function AccountBalancesReport({ hotelId }) {
           <Col xs={12} className="mt-2">
             <Alert
               type="info"
-              message="Por favor selecciona ambas fechas si deseas filtrar por un rango de fechas."
+              message={t(
+                "financialReports.accountBalancesReport.bothDatesRequired"
+              )}
             />
           </Col>
         )}
@@ -94,15 +100,17 @@ function AccountBalancesReport({ hotelId }) {
           height="300px"
           data={data}
           options={{
-            title: "Balance en cuentas por métodos de pago",
+            title: t("financialReports.accountBalancesReport.chartTitle"),
             legend: { position: "none" },
-            hAxis: { title: "Total" },
-            vAxis: { title: "Método de pago" },
+            hAxis: { title: t("financialReports.accountBalancesReport.total") },
+            vAxis: {
+              title: t("financialReports.accountBalancesReport.paymentMethod"),
+            },
             annotations: {
               alwaysOutside: true,
               textStyle: {
                 fontSize: 14,
-                color: "#000", // Default color for positive
+                color: "#000",
                 auraColor: "none",
               },
             },

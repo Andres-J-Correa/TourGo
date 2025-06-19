@@ -9,6 +9,7 @@ import SiteUnderMaintenance from "components/commonUI/fallback/SiteUnderMaintena
 import RouteWrapper from "contexts/RouteWrapper";
 
 import { useAppContext } from "./contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 
 import { Routes, Route } from "react-router-dom";
 import { publicFlattenedRoutes, privateFlattenedRoutes } from "./routes";
@@ -34,6 +35,7 @@ const App = () => {
   const [routes, setRoutes] = useState([]);
 
   const { user, maintenanceMode } = useAppContext();
+  const { t } = useLanguage();
 
   const mapRoute = (route, idx) => (
     <Route
@@ -61,8 +63,13 @@ const App = () => {
   return (
     <HelmetProvider>
       <Suspense
-        fallback={<LoadingOverlay isVisible={true} message="cargando" />}>
-        <LoadingOverlay isVisible={user.isLoading} message="cargando usuario" />
+        fallback={
+          <LoadingOverlay isVisible={true} message={t("app.loading")} />
+        }>
+        <LoadingOverlay
+          isVisible={user.isLoading}
+          message={t("app.loadingUser")}
+        />
         {maintenanceMode ? (
           <SiteUnderMaintenance />
         ) : (

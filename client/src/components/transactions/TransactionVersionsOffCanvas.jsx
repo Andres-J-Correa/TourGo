@@ -7,6 +7,7 @@ import TransactionVersion from "components/transactions/TransactionVersion";
 import Alert from "components/commonUI/Alert";
 
 import { getTransactionVersions } from "services/transactionService";
+import { useLanguage } from "contexts/LanguageContext";
 
 function TransactionVersionsOffCanvas({
   transaction,
@@ -14,6 +15,7 @@ function TransactionVersionsOffCanvas({
   handleToggleOffcanvas,
   hotelId,
 }) {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [versions, setVersions] = useState({
     items: [],
@@ -64,7 +66,7 @@ function TransactionVersionsOffCanvas({
         })
         .catch((error) => {
           if (error?.response?.status !== 404) {
-            toast.error("Error al obtener el historial de la transacción.");
+            toast.error(t("transactions.versionsOffCanvas.loadError"));
           }
           setVersions({
             items: [],
@@ -75,7 +77,7 @@ function TransactionVersionsOffCanvas({
           setLoading(false);
         });
     }
-  }, [offCanvasOpen, transaction.id, mapVersion, hotelId]);
+  }, [offCanvasOpen, transaction.id, mapVersion, hotelId, t]);
 
   return (
     <Offcanvas
@@ -85,19 +87,16 @@ function TransactionVersionsOffCanvas({
       style={{ width: "50%", padding: "0.5rem" }}
       zIndex={5001}>
       <OffcanvasHeader toggle={handleToggleOffcanvas}>
-        Historial de Cambios para Transacción # {transaction.id}
+        {t("transactions.versionsOffCanvas.title", { id: transaction.id })}
       </OffcanvasHeader>
       <OffcanvasBody>
-        <Alert
-          type="info"
-          message="Los datos resaltados en color rojo indican modificaciones."
-        />
+        <Alert type="info" message={t("transactions.versionsOffCanvas.info")} />
         <SimpleLoader isVisible={loading} />
         {!loading && versions.items.length === 0 && (
           <div className="text-center py-5">
             <Alert
               type="warning"
-              message="No se encontraron versiones para esta transacción."
+              message={t("transactions.versionsOffCanvas.noVersions")}
             />
           </div>
         )}

@@ -2,18 +2,17 @@ import React from "react";
 import { useLanguage } from "contexts/LanguageContext";
 import { languages } from "./constants";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 
 import NavbarItem from "components/commonUI/navbars/NavbarItem";
 
 const LanguageSelector = () => {
-  const { changeLanguage, language } = useLanguage();
+  const { changeLanguage, language, t } = useLanguage();
 
-  const menuItems = Object.keys(languages).map((key) => {
+  const menuItems = languages.map((lang) => {
     const subItem = {
-      name: languages[key],
-      action: () => changeLanguage(key),
+      name: t(`languages.${lang}`),
+      action: () => changeLanguage(lang),
     };
 
     return subItem;
@@ -22,8 +21,14 @@ const LanguageSelector = () => {
   const languageItem = {
     name: language,
     uppercase: true,
-    icon: <FontAwesomeIcon icon={faGlobe} className="icon" />,
-    collapse: [...menuItems],
+    icon: faGlobe,
+    collapse: [
+      {
+        name: t("language"),
+        capitalize: true,
+        collapse: menuItems,
+      },
+    ],
   };
 
   return <NavbarItem navItem={languageItem} />;

@@ -15,25 +15,23 @@ import {
 } from "components/hotels/constants";
 import { useLanguage } from "contexts/LanguageContext";
 
-// Validation schema
-const validationSchema = Yup.object().shape({
-  email: Yup.string()
-    .email("Correo inválido")
-    .required("El correo es requerido"),
-  roleId: Yup.number()
-    .required("El rol es requerido")
-    .min(1, "Rol inválido")
-    .max(3, "Rol inválido"),
-});
-
 const initialValues = {
   email: "",
   roleId: "",
 };
 
 function StaffInviteForm() {
-  const { getTranslatedErrorMessage } = useLanguage();
+  const { getTranslatedErrorMessage, t, culture } = useLanguage();
   const { hotelId } = useParams();
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email(t("staff.inviteForm.emailInvalid"))
+      .required(t("staff.inviteForm.emailRequired")),
+    roleId: Yup.number()
+      .required(t("staff.inviteForm.roleRequired"))
+      .min(1, t("staff.inviteForm.roleInvalid"))
+      .max(3, t("staff.inviteForm.roleInvalid")),
+  });
 
   const roleOptions = useMemo(() => {
     const options = [];
@@ -41,23 +39,24 @@ function StaffInviteForm() {
       if (role.id === HOTEL_ROLES_IDS.OWNER) return;
       options.push(
         <option key={role.id} value={role.id}>
-          {role.name}
+          {t(role.name)}
         </option>
       );
     });
     return options;
-  }, []);
+  }, [t]);
 
   const handleSubmit = async (values, { resetForm }) => {
     const result = await Swal.fire({
-      title: "¿Invitar personal?",
-      text: `¿Estás seguro de que deseas invitar a ${values.email} como ${
-        HOTEL_ROLES_BY_ID[values.roleId]
-      }?`,
+      title: t("staff.inviteForm.confirmTitle"),
+      text: t("staff.inviteForm.confirmText", {
+        email: values.email,
+        role: t(HOTEL_ROLES_BY_ID[values.roleId]),
+      }),
       icon: "info",
       showCancelButton: true,
-      confirmButtonText: "Sí, invitar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("staff.inviteForm.confirmButton"),
+      cancelButtonText: t("common.cancel"),
       confirmButtonColor: "#0d6efd",
     });
 
@@ -65,13 +64,13 @@ function StaffInviteForm() {
 
     try {
       Swal.fire({
-        title: "Enviando invitación",
-        text: "Por favor espera",
+        title: t("staff.inviteForm.sendingTitle"),
+        text: t("staff.inviteForm.sendingText"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
 
-      const response = await inviteStaff(hotelId, values);
+      const response = await inviteStaff(hotelId, values, culture);
 
       Swal.close();
 
@@ -79,8 +78,8 @@ function StaffInviteForm() {
         resetForm();
         await Swal.fire({
           icon: "success",
-          title: "Invitación enviada",
-          text: "El personal recibirá un correo electrónico para unirse al hotel.",
+          title: t("staff.inviteForm.successTitle"),
+          text: t("staff.inviteForm.successText"),
           timer: 1500,
           showConfirmButton: false,
         });
@@ -93,10 +92,10 @@ function StaffInviteForm() {
       Swal.close();
 
       Swal.fire({
-        title: "Error",
+        title: t("common.error"),
         text: errorMessage,
         icon: "error",
-        confirmButtonText: "OK",
+        confirmButtonText: t("common.ok"),
       });
     }
   };
@@ -104,7 +103,7 @@ function StaffInviteForm() {
   return (
     <Card className="border-0 shadow-lg mt-3">
       <CardBody className="p-3">
-        <CardTitle tag="h5">Invitar Personal</CardTitle>
+        <CardTitle tag="h5">{t("staff.inviteForm.title")}</CardTitle>
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -118,7 +117,7 @@ function StaffInviteForm() {
                     name="email"
                     type="email"
                     className="form-control"
-                    placeholder="Correo electrónico"
+                    placeholder={t("staff.inviteForm.emailPlaceholder")}
                     isRequired={true}
                   />
                 </Col>
@@ -126,9 +125,9 @@ function StaffInviteForm() {
                   <CustomField
                     name="roleId"
                     as="select"
-                    placeholder="Rol"
+                    placeholder={t("staff.inviteForm.rolePlaceholder")}
                     isRequired={true}>
-                    <option value="">Seleccionar rol</option>
+                    <option value="">{t("staff.inviteForm.selectRole")}</option>
                     {roleOptions}
                   </CustomField>
                 </Col>
@@ -137,7 +136,7 @@ function StaffInviteForm() {
                     <Button
                       type="submit"
                       className="btn bg-success text-white mb-3">
-                      Invitar
+                      {t("staff.inviteForm.invite")}
                     </Button>
                   </div>
                 </Col>

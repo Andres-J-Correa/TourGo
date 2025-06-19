@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Col, FormGroup, Row } from "reactstrap";
 import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
-import { userPasswordChangeSchema } from "components/users/validationSchemas";
+import { useUserPasswordChangeSchema } from "components/users/validationSchemas";
 import { useLanguage } from "contexts/LanguageContext";
 import { changePassword } from "services/userAuthService";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
@@ -11,19 +11,19 @@ import { ERROR_CODES } from "constants/errorCodes";
 
 function UserPasswordChange() {
   const { t } = useLanguage();
-  const validationSchema = userPasswordChangeSchema;
+  const validationSchema = useUserPasswordChangeSchema();
 
   const handleSubmit = async (
     values,
     { setSubmitting, resetForm, setFieldError }
   ) => {
     const result = await Swal.fire({
-      title: "¿Cambiar contraseña?",
-      text: "¿Estás seguro de que deseas cambiar tu contraseña?",
+      title: t("users.passwordChange.confirmTitle"),
+      text: t("users.passwordChange.confirmText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, cambiar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("users.passwordChange.confirmButton"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: true,
     });
 
@@ -34,8 +34,8 @@ function UserPasswordChange() {
 
     try {
       Swal.fire({
-        title: "Cambiando...",
-        text: "Por favor, espera mientras se actualiza tu contraseña.",
+        title: t("users.passwordChange.changingTitle"),
+        text: t("users.passwordChange.changingText"),
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -52,18 +52,17 @@ function UserPasswordChange() {
 
       if (response?.isSuccessful) {
         Swal.fire({
-          title: "Éxito",
-          text: "Tu contraseña ha sido cambiada exitosamente.",
+          title: t("common.success"),
+          text: t("users.passwordChange.successText"),
           icon: "success",
           timer: 2000,
         });
         resetForm();
       } else {
-        throw new Error("Error al cambiar la contraseña.");
+        throw new Error(t("users.passwordChange.changeError"));
       }
     } catch (error) {
-      const errorMessage =
-        "La contraseña actual es incorrecta. Por favor, inténtalo de nuevo.";
+      const errorMessage = t("users.passwordChange.incorrectPassword");
 
       if (
         Number(error?.response?.data?.code) ===
@@ -75,10 +74,10 @@ function UserPasswordChange() {
       Swal.close();
 
       Swal.fire({
-        title: "Error",
+        title: t("common.error"),
         text: errorMessage,
         icon: "error",
-        confirmButtonText: "OK",
+        confirmButtonText: t("common.ok"),
       });
     } finally {
       setSubmitting(false);
@@ -87,7 +86,7 @@ function UserPasswordChange() {
 
   return (
     <Row className="justify-content-center">
-      <h4>Cambiar Contraseña</h4>
+      <h4>{t("users.passwordChange.title")}</h4>
       <Col md="6" className="mb-4">
         <Formik
           initialValues={{
@@ -104,7 +103,7 @@ function UserPasswordChange() {
                   name="oldPassword"
                   type="password"
                   className="form-control"
-                  placeholder={"Contraseña Actual"}
+                  placeholder={t("users.passwordChange.oldPassword")}
                   autoComplete="current-password"
                 />
               </FormGroup>
@@ -113,9 +112,7 @@ function UserPasswordChange() {
                   name="password"
                   type="password"
                   className="form-control"
-                  placeholder={
-                    t("client.passwordChange.newPassword") || "Nueva Contraseña"
-                  }
+                  placeholder={t("client.passwordChange.newPassword")}
                   autoComplete="new-password"
                 />
               </FormGroup>
@@ -124,10 +121,7 @@ function UserPasswordChange() {
                   name="confirmPassword"
                   type="password"
                   className="form-control w-100"
-                  placeholder={
-                    t("client.passwordChange.confirmPassword") ||
-                    "Confirmar Nueva Contraseña"
-                  }
+                  placeholder={t("client.passwordChange.confirmPassword")}
                   autoComplete="new-password"
                 />
               </FormGroup>
@@ -138,7 +132,7 @@ function UserPasswordChange() {
                   size="lg"
                   className="bg-gradient-success w-100 mt-3 mb-0"
                   disabled={isSubmitting}>
-                  Cambiar Contraseña
+                  {t("users.passwordChange.changeButton")}
                 </Button>
               </div>
             </Form>

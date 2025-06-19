@@ -10,6 +10,7 @@ import { TRANSACTION_STATUS_IDS } from "components/transactions/constants";
 import useHotelFormData from "components/transactions/hooks/useHotelFormData";
 import dayjs from "dayjs";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 
 const EntityTransactionsView = ({
   hotelId,
@@ -31,6 +32,7 @@ const EntityTransactionsView = ({
   } = useHotelFormData(hotelId);
 
   const { user } = useAppContext();
+  const { t } = useLanguage();
 
   const paid = entity?.transactions?.reduce((acc, txn) => acc + txn.amount, 0);
 
@@ -222,19 +224,25 @@ const EntityTransactionsView = ({
             {" "}
             <Row>
               <Col md={4}>
-                <strong className="fs-5 text">Total:</strong>
+                <strong className="fs-5 text">
+                  {t("transactions.view.total")}
+                </strong>
                 <span className="float-end mt-1">
                   {formatCurrency(entity.total, "COP")}
                 </span>
               </Col>
               <Col md={4}>
-                <strong className="fs-5 text">Pagado:</strong>
+                <strong className="fs-5 text">
+                  {t("transactions.view.paid")}
+                </strong>
                 <span className="float-end mt-1">
                   {formatCurrency(paid, "COP")}
                 </span>
               </Col>
               <Col md={4}>
-                <strong className="fs-5 text">Saldo:</strong>
+                <strong className="fs-5 text">
+                  {t("transactions.view.balance")}
+                </strong>
                 <span
                   className={classNames("float-end mt-1", {
                     "text-danger": balance < 0,
@@ -250,7 +258,7 @@ const EntityTransactionsView = ({
         {!showForm && showAddButton && (
           <div className="text-center mb-3">
             <Button color="primary" onClick={handleAddTransactionClick}>
-              Agregar Transacción
+              {t("transactions.view.addTransaction")}
             </Button>
           </div>
         )}

@@ -93,9 +93,6 @@ export const compressImage = (
 
           // Fallback if compression failed
           if (!blob || blob.size > file.size) {
-            console.warn(
-              "Compression unsuccessful or produced larger file. Returning original."
-            );
             return resolve(file);
           }
 

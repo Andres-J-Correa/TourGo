@@ -34,6 +34,7 @@ import classNames from "classnames";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import isSameorBefore from "dayjs/plugin/isSameOrBefore";
 import "./CalendarView.css";
+import { useLanguage } from "contexts/LanguageContext";
 
 dayjs.extend(isSameorBefore);
 
@@ -44,10 +45,11 @@ const ROW_HEIGHT = 56.4;
 
 function CalendarView() {
   const { hotelId } = useParams();
+  const { t } = useLanguage();
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("booking.breadcrumb.home"), path: "/" },
+    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
+    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
   ];
 
   const [rooms, setRooms] = useState([]);
@@ -135,11 +137,14 @@ function CalendarView() {
     }
   };
 
-  const onGetRoomsError = (err) => {
-    if (err?.response?.status !== 404) {
-      toast.error("Error al cargar habitaciones");
-    }
-  };
+  const onGetRoomsError = useCallback(
+    (err) => {
+      if (err?.response?.status !== 404) {
+        toast.error(t("booking.calendar.errors.loadRooms"));
+      }
+    },
+    [t]
+  );
 
   const onGetRoomBookingsSuccess = (res) => {
     if (res.isSuccessful) {
@@ -147,19 +152,25 @@ function CalendarView() {
     }
   };
 
-  const onGetRoomBookingsError = (err) => {
-    if (err?.response?.status !== 404) {
-      toast.error("Error al cargar reservas");
-    }
-  };
+  const onGetRoomBookingsError = useCallback(
+    (err) => {
+      if (err?.response?.status !== 404) {
+        toast.error(t("booking.calendar.errors.loadBookings"));
+      }
+    },
+    [t]
+  );
 
-  const fetchRoomBookings = useCallback((hotelId, dateStart, dateEnd) => {
-    setIsLoadingBookings(true);
-    getRoomBookingsByDateRange(hotelId, dateStart, dateEnd)
-      .then(onGetRoomBookingsSuccess)
-      .catch(onGetRoomBookingsError)
-      .finally(() => setIsLoadingBookings(false));
-  }, []);
+  const fetchRoomBookings = useCallback(
+    (hotelId, dateStart, dateEnd) => {
+      setIsLoadingBookings(true);
+      getRoomBookingsByDateRange(hotelId, dateStart, dateEnd)
+        .then(onGetRoomBookingsSuccess)
+        .catch(onGetRoomBookingsError)
+        .finally(() => setIsLoadingBookings(false));
+    },
+    [onGetRoomBookingsError]
+  );
 
   const { rows } = table.getRowModel();
 
@@ -292,7 +303,7 @@ function CalendarView() {
       .then(onGetRoomsSuccess)
       .catch(onGetRoomsError)
       .finally(() => setIsLoadingRooms(false));
-  }, [hotelId]);
+  }, [hotelId, onGetRoomsError]);
 
   useEffect(() => {
     if (!hotelId) return;
@@ -312,10 +323,15 @@ function CalendarView() {
     <div className="mx-n5">
       <LoadingOverlay
         isVisible={isLoadingRooms || isLoadingBookings}
-        message={isLoadingBookings ? "Cargando Reservas" : undefined}
+        message={
+          isLoadingBookings ? t("booking.calendar.loadingBookings") : undefined
+        }
       />
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Calendario" />
-      <h3>Calendario</h3>
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("booking.calendar.title")}
+      />
+      <h3>{t("booking.calendar.title")}</h3>
       <ErrorBoundary>
         <div
           ref={tableContainerRef}

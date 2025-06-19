@@ -5,8 +5,11 @@ import PersonalizedChargeForm from "components/bookings/booking-add-edit-view/Pe
 import ExtraChargeCard from "components/bookings/booking-add-edit-view/ExtraChargeCard";
 
 import { EXTRA_CHARGE_TYPE_IDS } from "components/extra-charges/constants";
+import { useLanguage } from "contexts/LanguageContext";
 
 function PersonalizedCharges({ personalizedCharges, setPersonalizedCharges }) {
+  const { t } = useLanguage();
+
   const removeCharge = (charge) => {
     setPersonalizedCharges((prevCharges) => {
       const newState = [...prevCharges];
@@ -32,7 +35,7 @@ function PersonalizedCharges({ personalizedCharges, setPersonalizedCharges }) {
 
   return (
     <div>
-      <h5 className="mb-3">Cargos Personalizados</h5>
+      <h5 className="mb-3">{t("booking.personalizedCharges.title")}</h5>
       <Row className="justify-content-center">
         {personalizedCharges.length > 0 &&
           personalizedCharges.map((charge, i) => {

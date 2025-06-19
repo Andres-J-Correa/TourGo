@@ -5,8 +5,11 @@ import {
   GENERAL_CHARGE_TYPES,
   EXTRA_CHARGE_TYPE_IDS,
 } from "components/extra-charges/constants";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const BookingGeneralCharges = ({ bookingData }) => {
+  const { t } = useLanguage(); // added
+
   const generalExtracharges = useMemo(() => {
     const extraCharges =
       bookingData?.extraCharges?.length > 0
@@ -49,7 +52,7 @@ const BookingGeneralCharges = ({ bookingData }) => {
 
   return (
     <>
-      <h5>Cargos Generales</h5>
+      <h5>{t("booking.generalCharges.title")}</h5>
       <Row className="mb-2 px-2">
         {generalExtracharges.map((charge, index) =>
           mapExtraCharge(charge, index)

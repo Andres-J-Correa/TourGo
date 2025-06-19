@@ -1,29 +1,31 @@
 import React from "react";
 import { Row, Col } from "reactstrap";
 import dayjs from "dayjs";
+import { useLanguage } from "contexts/LanguageContext";
 
 function BookingAuditableInfo({ booking }) {
+  const { t } = useLanguage();
   return (
     <Row>
-      <h5>Auditable</h5>
+      <h5>{t("booking.auditableInfo.title")}</h5>
       <Col>
-        <strong>Creado por:</strong>
+        <strong>{t("booking.auditableInfo.createdBy")}</strong>
         <p>
           {booking?.createdBy?.firstName} {booking?.createdBy?.lastName}
         </p>
       </Col>
       <Col>
-        <strong>Fecha de creación:</strong>
+        <strong>{t("booking.auditableInfo.dateCreated")}</strong>
         <p>{dayjs(booking?.dateCreated).format("DD/MM/YYYY h:mm a")}</p>
       </Col>
       <Col>
-        <strong>Modificado por:</strong>
+        <strong>{t("booking.auditableInfo.modifiedBy")}</strong>
         <p>
           {booking?.modifiedBy?.firstName} {booking?.modifiedBy?.lastName}
         </p>
       </Col>
       <Col>
-        <strong>Fecha de modificación</strong>
+        <strong>{t("booking.auditableInfo.dateModified")}</strong>
         <p>{dayjs(booking?.dateModified).format("DD/MM/YYYY h:mm a")}</p>
       </Col>
     </Row>

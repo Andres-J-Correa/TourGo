@@ -7,12 +7,13 @@ import { faRectangleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "react-datepicker/dist/react-datepicker.css";
 import "./DatePickers.css"; // Custom styles for the date picker
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const DatePickers = ({
   startDate,
   endDate,
-  startDateName = "Fecha de inicio",
-  endDateName = "Fecha fin",
+  startDateName,
+  endDateName,
   handleStartChange = () => {},
   handleEndChange = () => {},
   handleClearDates,
@@ -20,6 +21,12 @@ const DatePickers = ({
   isDisabled,
   allowSameDay = false,
 }) => {
+  const { t } = useLanguage(); // added
+
+  // Use translation keys if not provided
+  const startLabel = startDateName || t("commonUI.datePickers.startDate");
+  const endLabel = endDateName || t("commonUI.datePickers.endDate");
+
   const endDateMinDate = allowSameDay
     ? startDate
     : startDate
@@ -63,7 +70,7 @@ const DatePickers = ({
     <div className="d-flex align-items-center mb-3">
       <div className="me-2">
         <label htmlFor="start-date" className="form-label w-100">
-          {startDateName}
+          {startLabel}
         </label>
         <DatePicker
           id="start-date"
@@ -73,7 +80,7 @@ const DatePickers = ({
           maxDate={getDate(maxDate)}
           disabled={isDisabled}
           className="form-control"
-          placeholderText={startDateName}
+          placeholderText={startLabel}
           popperClassName="custom-datepicker"
           autoComplete="off"
           showYearDropdown={true}
@@ -84,7 +91,7 @@ const DatePickers = ({
 
       <div className="me-2 position-relative">
         <label htmlFor="end-date" className="form-label w-100">
-          {endDateName}
+          {endLabel}
         </label>
         <DatePicker
           id="end-date"
@@ -95,7 +102,7 @@ const DatePickers = ({
           maxDate={getDate(maxDate)}
           disabled={!startDate || isDisabled}
           className="form-control"
-          placeholderText={endDateName}
+          placeholderText={endLabel}
           popperClassName="custom-datepicker"
           autoComplete="off"
           showYearDropdown={true}
@@ -107,7 +114,7 @@ const DatePickers = ({
             <FontAwesomeIcon
               size="sm"
               color="tomato"
-              title="Limpiar fechas"
+              title={t("commonUI.datePickers.clear")}
               onClick={onClearDates}
               icon={faRectangleXmark}
               className={isDisabled ? "cursor-not-allowed" : "cursor-pointer"}

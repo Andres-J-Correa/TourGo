@@ -23,6 +23,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getBookingById } from "services/bookingService";
 import { LOCKED_BOOKING_STATUSES } from "components/bookings/constants";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 dayjs.extend(isSameOrAfter);
 
@@ -34,6 +35,7 @@ function BookingViewOffCanvas({
 }) {
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(null);
+  const { t } = useLanguage(); // added
 
   const onGetBookingSuccess = (res) => {
     if (res.isSuccessful) {
@@ -62,7 +64,7 @@ function BookingViewOffCanvas({
       style={{ width: "70%", padding: "0.5rem" }}
       zIndex={5001}>
       <OffcanvasHeader toggle={handleToggleOffcanvas}>
-        Detalles de la Reserva
+        {t("booking.viewOffCanvas.title")}
       </OffcanvasHeader>
       <OffcanvasBody>
         <SimpleLoader isVisible={loading} />
@@ -76,7 +78,7 @@ function BookingViewOffCanvas({
                     target="_blank"
                     rel="noopener noreferrer"
                     className=" ms-2 float-end btn btn-outline-dark">
-                    Editar
+                    {t("booking.view.edit")}
                     <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
                   </Link>
                 )}
@@ -85,7 +87,7 @@ function BookingViewOffCanvas({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-outline-dark float-end ms-2">
-                  Ir a Factura
+                  {t("booking.view.goToInvoice")}
                   <FontAwesomeIcon
                     icon={faFileInvoiceDollar}
                     className="ms-2"
@@ -96,14 +98,14 @@ function BookingViewOffCanvas({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-outline-dark float-end">
-                  Ir a Resumen
+                  {t("booking.viewOffCanvas.goToSummary")}
                   <FontAwesomeIcon icon={faClipboardList} className="ms-2" />
                 </Link>
               </Col>
             </Row>
             <Card className="mb-4 bg-body-tertiary shadow">
               <CardHeader tag="h4" className="text-bg-dark text-center">
-                Reserva # {booking?.id}
+                {t("booking.view.reservationNumber")} {booking?.id}
                 <BookingStatusBadge
                   className="float-end"
                   statusId={booking?.status?.id}

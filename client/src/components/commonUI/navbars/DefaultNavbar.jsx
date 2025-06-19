@@ -4,6 +4,7 @@ import { Navbar, NavbarToggler, Collapse, Nav } from "reactstrap";
 import NavbarItem from "./NavbarItem";
 import LanguageSelector from "components/commonUI/languages/LanguageSelector";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import "./navbar.css";
@@ -27,6 +28,7 @@ function DefaultNavbar({
   });
 
   const { user, hotel } = useAppContext();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const leftItems = [],
@@ -72,7 +74,9 @@ function DefaultNavbar({
           <Link
             to={hotel.current?.id ? `/hotels/${hotel.current?.id}` : "/"}
             className="text-decoration-none text-white">
-            {hotel.isLoading ? "Cargando..." : hotel.current?.name || brand}
+            {hotel.isLoading
+              ? t("commonUI.loadingOverlay.processing")
+              : hotel.current?.name || brand}
           </Link>
         </div>
         <NavbarToggler onClick={toggle} className="shadow-none ms-2" />

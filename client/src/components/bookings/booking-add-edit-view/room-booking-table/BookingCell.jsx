@@ -6,6 +6,7 @@ import { formatCurrency } from "utils/currencyHelper";
 import Popover from "components/commonUI/popover/Popover";
 import BookingMinimalCard from "components/bookings/BookingMinimalCard";
 import { useParams } from "react-router-dom";
+import { useLanguage } from "contexts/LanguageContext";
 
 const BookingCell = ({
   date,
@@ -17,6 +18,8 @@ const BookingCell = ({
   disabled,
 }) => {
   const { hotelId } = useParams();
+  const { t } = useLanguage();
+
   const getContent = () => {
     if (booking) {
       return (
@@ -35,9 +38,11 @@ const BookingCell = ({
     } else if (selected?.price) {
       return `${formatCurrency(selected.price, "COP")}`;
     } else if (currentSelected?.roomId) {
-      return "seleccionado";
+      return t("booking.table.selected");
     } else if (disabled) {
-      return <span className="text-white fw-medium">Libre</span>;
+      return (
+        <span className="text-white fw-medium">{t("booking.table.free")}</span>
+      );
     } else {
       return (
         <span className="booking-table-cell-text text-secondary">

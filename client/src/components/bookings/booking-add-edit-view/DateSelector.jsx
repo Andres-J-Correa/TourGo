@@ -4,6 +4,7 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import DatePickers from "components/commonUI/forms/DatePickers";
 import Alert from "components/commonUI/Alert";
 import Swal from "sweetalert2";
+import { useLanguage } from "contexts/LanguageContext";
 
 dayjs.extend(isSameOrAfter);
 
@@ -14,17 +15,19 @@ function DateSelector({
   selectedRoomBookings,
   setSelectedRoomBookings,
 }) {
+  const { t } = useLanguage();
+
   const isPastDate =
     dates.start && dayjs(dates.start).isBefore(dayjs().subtract(1, "day"));
 
   const confirmChange = async () => {
     const result = await Swal.fire({
-      title: "Cambiar las fechas podría eliminar las celdas seleccionadas.",
-      text: "¿Está seguro de que desea continuar?",
+      title: t("booking.dateSelector.confirmChangeTitle"),
+      text: t("booking.dateSelector.confirmChangeText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, cambiar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.dateSelector.confirmChangeYes"),
+      cancelButtonText: t("common.cancel"),
     });
     return result.isConfirmed;
   };
@@ -59,18 +62,18 @@ function DateSelector({
 
   return (
     <>
-      <h5 className="mb-3">Seleccione las Fechas de la reserva</h5>
+      <h5 className="mb-3">{t("booking.dateSelector.title")}</h5>
       {isPastDate && (
         <Alert
           type="warning"
-          message="Estas seleccionando fechas pasadas, por favor verifica."
+          message={t("booking.dateSelector.pastDateWarning")}
         />
       )}
       <DatePickers
         startDate={dates.start}
         endDate={dates.end}
-        startDateName="Fecha de llegada"
-        endDateName="Fecha de salida"
+        startDateName={t("booking.dateSelector.startDate")}
+        endDateName={t("booking.dateSelector.endDate")}
         handleStartChange={handleStartChange}
         handleEndChange={handleEndChange}
         isDisabled={isDisabled}

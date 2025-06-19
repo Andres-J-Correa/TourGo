@@ -1,4 +1,5 @@
 import { Badge } from "reactstrap";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 export const INVITE_FLAGS_IDS = {
   CANCELLED: 0,
@@ -7,30 +8,32 @@ export const INVITE_FLAGS_IDS = {
   REJECTED: 4,
 };
 
-export const getFlagBadges = (flags) => {
+// Returns a function that uses the t function from useLanguage
+export const useFlagBadges = (flags) => {
+  const { t } = useLanguage();
   const result = [];
   if (flags & INVITE_FLAGS_IDS.PENDING)
     result.push(
       <Badge color="success" key="active" className="me-1">
-        Pendiente
+        {t("staff.inviteFlags.pending")}
       </Badge>
     );
   if (flags & INVITE_FLAGS_IDS.ACCEPTED)
     result.push(
       <Badge color="primary" key="accepted" className="me-1">
-        Aceptada
+        {t("staff.inviteFlags.accepted")}
       </Badge>
     );
   if (flags & INVITE_FLAGS_IDS.REJECTED)
     result.push(
       <Badge color="danger" key="rejected" className="me-1">
-        Rechazada
+        {t("staff.inviteFlags.rejected")}
       </Badge>
     );
   if (flags === INVITE_FLAGS_IDS.CANCELLED)
     result.push(
       <Badge color="secondary" key="none" className="me-1">
-        Anulada
+        {t("staff.inviteFlags.cancelled")}
       </Badge>
     );
   return result;

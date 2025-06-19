@@ -1,46 +1,48 @@
 import * as Yup from "yup";
 import { formatCurrency } from "utils/currencyHelper";
+import { useLanguage } from "contexts/LanguageContext";
 
+// Use translation keys for labels and descriptions
 export const EXTRA_CHARGE_TYPES = [
   {
-    label: "Porcentaje",
+    label: "extraCharges.types.percentage",
     value: 1,
-    description: "Se aplica el porcentaje a los subtotales de cada habitación",
+    description: "extraCharges.types.percentageDesc",
   },
   {
-    label: "Diario",
+    label: "extraCharges.types.daily",
     value: 2,
-    description: "Se aplica un monto fijo por cada noche de cada habitación",
+    description: "extraCharges.types.dailyDesc",
   },
   {
-    label: "Por habitación",
+    label: "extraCharges.types.perRoom",
     value: 3,
-    description: "Se aplica un monto fijo por cada habitación",
+    description: "extraCharges.types.perRoomDesc",
   },
   {
-    label: "General",
+    label: "extraCharges.types.general",
     value: 4,
-    description: "Se aplica un monto fijo a la reserva completa",
+    description: "extraCharges.types.generalDesc",
   },
   {
-    label: "Por persona",
+    label: "extraCharges.types.perPerson",
     value: 5,
-    description: "Se aplica un monto fijo por cada persona en la reserva",
+    description: "extraCharges.types.perPersonDesc",
   },
   {
-    label: "Personalizado",
+    label: "extraCharges.types.custom",
     value: 6,
-    description: "Se aplica un monto personalizado al total de la reserva",
+    description: "extraCharges.types.customDesc",
   },
 ];
 
 export const EXTRA_CHARGE_TYPES_BY_ID = {
-  1: "Porcentaje",
-  2: "Diario",
-  3: "Por habitación",
-  4: "General",
-  5: "Por persona",
-  6: "Personalizado",
+  1: "extraCharges.types.percentage",
+  2: "extraCharges.types.daily",
+  3: "extraCharges.types.perRoom",
+  4: "extraCharges.types.general",
+  5: "extraCharges.types.perPerson",
+  6: "extraCharges.types.custom",
 };
 
 export const EXTRA_CHARGE_TYPE_IDS = {
@@ -64,15 +66,24 @@ export const formatExtraChargeAmount = (amount, typeId) => {
   return formatCurrency(amount, "COP");
 };
 
-export const addValidationSchema = Yup.object().shape({
-  name: Yup.string().required("El nombre es obligatorio").max(100),
-  typeId: Yup.number().required("El tipo es obligatorio"),
-  amount: Yup.number()
-    .typeError("El monto debe ser un número válido")
-    .required("El monto es obligatorio")
-    .min(0.001, "El monto mínimo es 0.001")
-    .max(9999999.999, "El monto máximo es 9,999,999.999")
-    .test("decimal-precision", "Máximo 3 decimales permitidos", (value) =>
-      /^\d+(\.\d{1,3})?$/.test(value.toString())
-    ),
-});
+export const useAddValidationSchema = () => {
+  const { t } = useLanguage();
+
+  return Yup.object().shape({
+    name: Yup.string()
+      .min(2, (params) => t("extraCharges.validation.nameMin", params))
+      .max(100, (params) => t("extraCharges.validation.nameMax", params))
+      .required((params) => t("extraCharges.validation.nameRequired", params)),
+    typeId: Yup.string()
+      .required((params) => t("extraCharges.validation.typeRequired", params))
+      .oneOf(
+        EXTRA_CHARGE_TYPES.map((type) => type.value.toString()),
+        t("extraCharges.validation.typeInvalid")
+      ),
+    amount: Yup.number()
+      .min(0, (params) => t("extraCharges.validation.amountMin", params))
+      .required((params) =>
+        t("extraCharges.validation.amountRequired", params)
+      ),
+  });
+};

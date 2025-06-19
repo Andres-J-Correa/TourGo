@@ -1,22 +1,17 @@
 import React, { useState } from "react";
 import { Formik, Form } from "formik";
 import { Row, Col, Button, FormGroup, Spinner } from "reactstrap";
-
 import PropTypes from "prop-types";
-
 import Swal from "sweetalert2";
 import { getByDocumentNumber, add, update } from "services/customerService";
-
 import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomField from "components/commonUI/forms/CustomField";
 import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
-import {
-  customerSchema,
-  searchCustomerSchema,
-} from "components/bookings/booking-add-edit-view/constants";
+import useBookingSchemas from "./useBookingSchemas";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLanguage } from "contexts/LanguageContext"; // add import
 
 function CustomerForm({
   customer,
@@ -32,12 +27,15 @@ function CustomerForm({
   const isUpdate = booking?.id;
   const [editing, setEditing] = useState(false);
 
+  const { customerSchema, searchCustomerSchema } = useBookingSchemas();
+  const { t } = useLanguage(); // add hook
+
   const handleDocumentSubmit = async (values) => {
     try {
       setSubmitting(true);
 
       Swal.fire({
-        title: "Buscando cliente...",
+        title: t("booking.customerForm.searching"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -47,7 +45,7 @@ function CustomerForm({
         values.documentNumber.trim()
       );
 
-      Swal.close(); // Close loading
+      Swal.close();
 
       if (res.item) {
         setCustomer(res.item);
@@ -58,30 +56,30 @@ function CustomerForm({
 
         await Swal.fire({
           icon: "success",
-          title: "Cliente encontrado",
+          title: t("booking.customerForm.found"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
         });
       }
     } catch (err) {
-      Swal.close(); // Close loading in case of error
+      Swal.close();
 
       if (err.response?.status === 404) {
         setCreating(true);
 
         await Swal.fire({
           icon: "info",
-          title: "Cliente no encontrado",
-          text: "Por favor complete los datos",
+          title: t("booking.customerForm.notFound"),
+          text: t("booking.customerForm.completeData"),
           timer: 3000,
           showConfirmButton: false,
         });
       } else {
         await Swal.fire({
           icon: "error",
-          title: "Error",
-          text: "Error al buscar cliente, intente nuevamente",
+          title: t("common.error"),
+          text: t("booking.customerForm.searchError"),
         });
       }
     } finally {
@@ -94,7 +92,7 @@ function CustomerForm({
       setSubmitting(true);
 
       Swal.fire({
-        title: "Creando cliente...",
+        title: t("booking.customerForm.creating"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -122,7 +120,7 @@ function CustomerForm({
 
         await Swal.fire({
           icon: "success",
-          title: "Cliente creado correctamente",
+          title: t("booking.customerForm.created"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -133,8 +131,8 @@ function CustomerForm({
 
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo crear el cliente, intente nuevamente",
+        title: t("common.error"),
+        text: t("booking.customerForm.createError"),
       });
     } finally {
       setSubmitting(false);
@@ -143,12 +141,12 @@ function CustomerForm({
 
   const handleCustomerUpdate = async (values) => {
     const result = await Swal.fire({
-      title: "Confirmar actualización",
-      text: "¿Está seguro de que desea actualizar los datos del cliente?",
+      title: t("booking.customerForm.updateConfirmTitle"),
+      text: t("booking.customerForm.updateConfirmText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, actualizar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.customerForm.updateConfirmYes"),
+      cancelButtonText: t("common.cancel"),
     });
 
     if (!result.isConfirmed) return;
@@ -156,7 +154,7 @@ function CustomerForm({
     try {
       setSubmitting(true);
       Swal.fire({
-        title: "Actualizando cliente...",
+        title: t("booking.customerForm.updating"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -170,7 +168,7 @@ function CustomerForm({
         setEditing(false);
         await Swal.fire({
           icon: "success",
-          title: "Cliente actualizado correctamente",
+          title: t("booking.customerForm.updated"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -180,8 +178,8 @@ function CustomerForm({
       Swal.close();
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo actualizar el cliente, intente nuevamente",
+        title: t("common.error"),
+        text: t("booking.customerForm.updateError"),
       });
     } finally {
       setSubmitting(false);
@@ -201,7 +199,7 @@ function CustomerForm({
             onClick={() => setCurrentStep(1)}
             color="dark"
             disabled={submitting || editing}>
-            Siguiente
+            {t("booking.navigation.next")}
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </Button>
         )}
@@ -229,7 +227,6 @@ function CustomerForm({
           const handleDocChange = (e) => {
             const docValue = e.target.value;
             setFieldValue("documentNumber", docValue);
-            // If there was a customer loaded, and docNumber is changing, reset rest
             if ((customer?.id || creating) && !editing) {
               setCustomer({
                 documentNumber: docValue,
@@ -249,7 +246,7 @@ function CustomerForm({
                 <Col md="6">
                   <CustomField
                     name="documentNumber"
-                    placeholder="Documento de Identidad"
+                    placeholder={t("booking.customerForm.documentNumber")}
                     onChange={handleDocChange}
                     value={values.documentNumber}
                     disabled={submitting || (isUpdate && !editing)}
@@ -263,7 +260,7 @@ function CustomerForm({
                       color="warning"
                       disabled={submitting}
                       className="me-2">
-                      Editar
+                      {t("booking.customerForm.edit")}
                     </Button>
                   )}
                   {editing && (
@@ -273,7 +270,7 @@ function CustomerForm({
                       className="me-2"
                       disabled={submitting}
                       onClick={() => handleCancelEdit(resetForm)}>
-                      Cancelar
+                      {t("common.cancel")}
                     </Button>
                   )}
                   <Button
@@ -283,11 +280,11 @@ function CustomerForm({
                     {submitting ? (
                       <Spinner size="sm" />
                     ) : creating ? (
-                      "Guardar Cliente"
+                      t("booking.customerForm.save")
                     ) : editing ? (
-                      "Actualizar Cliente"
+                      t("booking.customerForm.update")
                     ) : (
-                      "Buscar Cliente"
+                      t("booking.customerForm.search")
                     )}
                   </Button>
                 </Col>
@@ -299,7 +296,7 @@ function CustomerForm({
                     <Col md="6">
                       <CustomField
                         name="firstName"
-                        placeholder="Nombre"
+                        placeholder={t("booking.customerForm.firstName")}
                         disabled={(!!customer?.id && !editing) || submitting}
                         isRequired={creating || editing}
                       />
@@ -307,7 +304,7 @@ function CustomerForm({
                     <Col md="6">
                       <CustomField
                         name="lastName"
-                        placeholder="Apellido"
+                        placeholder={t("booking.customerForm.lastName")}
                         disabled={(!!customer?.id && !editing) || submitting}
                         isRequired={creating || editing}
                       />
@@ -317,7 +314,7 @@ function CustomerForm({
                     <Col md="6">
                       <CustomField
                         name="email"
-                        placeholder="Correo Electrónico"
+                        placeholder={t("booking.customerForm.email")}
                         disabled={(!!customer?.id && !editing) || submitting}
                         isRequired={creating || editing}
                         autoComplete="email"
@@ -329,7 +326,7 @@ function CustomerForm({
                           name="phone"
                           type="text"
                           className="form-control d-flex"
-                          placeholder="Teléfono"
+                          placeholder={t("booking.customerForm.phone")}
                           autoComplete="tel"
                           disabled={(!!customer?.id && !editing) || submitting}
                           isRequired={creating || editing}

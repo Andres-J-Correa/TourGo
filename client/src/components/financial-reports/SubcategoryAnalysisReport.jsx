@@ -13,6 +13,7 @@ import { Input, Row, Col, InputGroup, InputGroupText } from "reactstrap";
 import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
 import dayjs from "dayjs";
 import { formatCurrency } from "utils/currencyHelper";
+import { useLanguage } from "contexts/LanguageContext";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("year").format("YYYY-MM-DD"),
@@ -26,8 +27,15 @@ function SubcategoryAnalysisReport({ hotelId }) {
   const [showPrompt, setShowPrompt] = useState(true);
   const [data, setData] = useState([]);
 
+  const { t } = useLanguage();
+
   const chartData = [
-    ["Subcategoría", "Total", { role: "annotation" }, { role: "style" }],
+    [
+      t("financialReports.subcategoryAnalysisReport.subcategory"),
+      t("financialReports.subcategoryAnalysisReport.total"),
+      { role: "annotation" },
+      { role: "style" },
+    ],
     ...data.map((item) => {
       const value =
         category.typeId === TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE
@@ -82,7 +90,9 @@ function SubcategoryAnalysisReport({ hotelId }) {
         .catch((error) => {
           setData([]);
           if (error?.response?.status !== 404) {
-            toast.error("Error al cargar el análisis de subcategorías");
+            toast.error(
+              t("financialReports.subcategoryAnalysisReport.loadError")
+            );
           }
         })
         .finally(() => setLoading(false));
@@ -90,18 +100,15 @@ function SubcategoryAnalysisReport({ hotelId }) {
       setShowPrompt(true);
       setData([]);
     } else if (!dates.start || !dates.end) {
-      setShowPrompt(true); // Show prompt if dates are cleared
+      setShowPrompt(true);
       setData([]);
     }
-  }, [category.id, dates.start, dates.end, hotelId]);
+  }, [category.id, dates.start, dates.end, hotelId, t]);
 
   return (
     <div>
-      <h4>Análisis de Subcategorías</h4>
-      <p>
-        Permite analizar el total de ingresos o gastos por subcategoría dentro
-        de una categoría seleccionada.
-      </p>
+      <h4>{t("financialReports.subcategoryAnalysisReport.title")}</h4>
+      <p>{t("financialReports.subcategoryAnalysisReport.description")}</p>
       <Row className="mb-3">
         <Col xs={12}>
           <DatePickers
@@ -115,17 +122,21 @@ function SubcategoryAnalysisReport({ hotelId }) {
           />
         </Col>
         <Col xs={6}>
-          <label className="form-label">Categoría</label>
+          <label className="form-label">
+            {t("financialReports.subcategoryAnalysisReport.categoryLabel")}
+          </label>
           <InputGroup>
             <Input
               type="select"
               value={category.id}
               onChange={handleCategoryChange}
               disabled={loading}>
-              <option value="">Selecciona una categoría</option>
+              <option value="">
+                {t("financialReports.subcategoryAnalysisReport.selectCategory")}
+              </option>
               {TRANSACTION_CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id} data-type={cat.typeId}>
-                  {cat.name}
+                  {t(cat.name)}
                 </option>
               ))}
             </Input>
@@ -141,15 +152,19 @@ function SubcategoryAnalysisReport({ hotelId }) {
           type="info"
           message={
             !category.id
-              ? "Por favor selecciona una categoría para ver el análisis de subcategorías."
-              : "Por favor selecciona un rango de fechas para ver el análisis de subcategorías."
+              ? t(
+                  "financialReports.subcategoryAnalysisReport.selectCategoryPrompt"
+                )
+              : t(
+                  "financialReports.subcategoryAnalysisReport.selectDatesPrompt"
+                )
           }
         />
       )}
       {!showPrompt && !loading && data.length === 0 && (
         <Alert
           type="info"
-          message="No hay datos para la categoría y rango de fechas seleccionados."
+          message={t("financialReports.subcategoryAnalysisReport.noData")}
         />
       )}
       {!showPrompt && !loading && data.length > 0 && (
@@ -159,10 +174,16 @@ function SubcategoryAnalysisReport({ hotelId }) {
           height="350px"
           data={chartData}
           options={{
-            title: "Análisis de Subcategorías",
+            title: t("financialReports.subcategoryAnalysisReport.chartTitle"),
             legend: { position: "none" },
-            hAxis: { title: "Total" },
-            vAxis: { title: "Subcategoría" },
+            hAxis: {
+              title: t("financialReports.subcategoryAnalysisReport.total"),
+            },
+            vAxis: {
+              title: t(
+                "financialReports.subcategoryAnalysisReport.subcategory"
+              ),
+            },
             bars: "horizontal",
             annotations: {
               alwaysOutside: true,

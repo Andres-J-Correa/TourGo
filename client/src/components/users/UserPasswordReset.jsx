@@ -9,8 +9,8 @@ import DefaultHeader from "components/commonUI/headers/DefaultHeader";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 
 import {
-  userPasswordForgotSchema,
-  userPasswordResetSchema,
+  useUserPasswordForgotSchema,
+  useUserPasswordResetSchema,
 } from "components/users/validationSchemas";
 import { resetPassword, forgotPassword } from "services/userAuthService";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
@@ -24,6 +24,8 @@ function UserPasswordReset() {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [userEmail, setUserEmail] = useState("");
 
+  const userPasswordForgotSchema = useUserPasswordForgotSchema();
+  const userPasswordResetSchema = useUserPasswordResetSchema();
   const { t, getTranslatedErrorMessage } = useLanguage();
   const { user } = useAppContext();
   const navigate = useNavigate();
@@ -32,8 +34,8 @@ function UserPasswordReset() {
     async (values) => {
       try {
         Swal.fire({
-          title: "Procesando...",
-          text: "Estamos enviando instrucciones para restablecer tu contraseña.",
+          title: t("users.passwordReset.processingTitle"),
+          text: t("users.passwordReset.processingText"),
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
@@ -42,17 +44,17 @@ function UserPasswordReset() {
 
         const response = await forgotPassword(values);
         if (!Boolean(response?.isSuccessful)) {
-          throw new Error("User not found");
+          throw new Error(t("users.passwordReset.userNotFound"));
         }
 
         setIsCodeSent(true);
         setUserEmail(values.email);
 
         Swal.fire({
-          title: "Revisa tu correo",
-          text: "Si el correo electrónico está registrado, recibirás un código para restablecer tu contraseña.",
+          title: t("users.passwordReset.checkEmailTitle"),
+          text: t("users.passwordReset.checkEmailText"),
           icon: "info",
-          confirmButtonText: "OK",
+          confirmButtonText: t("common.ok"),
         });
       } catch (error) {
         const errorMessage = getTranslatedErrorMessage(error);
@@ -60,22 +62,22 @@ function UserPasswordReset() {
         Swal.close();
 
         Swal.fire({
-          title: "Error",
+          title: t("common.error"),
           text: errorMessage,
           icon: "error",
-          confirmButtonText: "OK",
+          confirmButtonText: t("common.ok"),
         });
       }
     },
-    [getTranslatedErrorMessage]
+    [getTranslatedErrorMessage, t]
   );
 
   const handlePasswordResetSubmit = useCallback(
     async (values, { setFieldError }) => {
       try {
         Swal.fire({
-          title: "Actualizando contraseña...",
-          text: "Por favor espera un momento.",
+          title: t("users.passwordReset.updatingTitle"),
+          text: t("users.passwordReset.updatingText"),
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
@@ -85,14 +87,14 @@ function UserPasswordReset() {
         const response = await resetPassword({ ...values, email: userEmail });
 
         if (!response?.isSuccessful) {
-          throw new Error("Error changing password");
+          throw new Error(t("users.passwordReset.changeError"));
         }
 
         Swal.fire({
-          title: "Contraseña actualizada",
+          title: t("users.passwordReset.updatedTitle"),
           text: t("common.success"),
           icon: "success",
-          confirmButtonText: "OK",
+          confirmButtonText: t("common.ok"),
           timer: 1000,
           didClose: () => {
             navigate("/");
@@ -106,10 +108,10 @@ function UserPasswordReset() {
         Swal.close();
 
         Swal.fire({
-          title: "Error",
+          title: t("common.error"),
           text: errorMessage,
           icon: "error",
-          confirmButtonText: "OK",
+          confirmButtonText: t("common.ok"),
         });
       }
     },
@@ -144,7 +146,7 @@ function UserPasswordReset() {
         </Form>
       </Formik>
     ),
-    [t, handleForgotPasswordSubmit]
+    [t, handleForgotPasswordSubmit, userPasswordForgotSchema]
   );
 
   const resetPasswordForm = useMemo(
@@ -192,7 +194,7 @@ function UserPasswordReset() {
         </Form>
       </Formik>
     ),
-    [handlePasswordResetSubmit, t]
+    [handlePasswordResetSubmit, t, userPasswordResetSchema]
   );
 
   const renderform = () => {

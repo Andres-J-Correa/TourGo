@@ -3,6 +3,7 @@ import { getInvoicesTC, upsertInvoicesTC } from "services/hotelService";
 import { toast } from "react-toastify";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import RichEditor from "components/commonUI/forms/RichEditor";
+import { useLanguage } from "contexts/LanguageContext";
 
 function InvoicesTC({ hotelId }) {
   const [loading, setLoading] = useState(true);
@@ -10,6 +11,7 @@ function InvoicesTC({ hotelId }) {
   const [editMode, setEditMode] = useState(false);
   const [terms, setTerms] = useState("");
   const [lastSavedTerms, setLastSavedTerms] = useState("");
+  const { t } = useLanguage();
 
   // Fetch terms on mount or hotelId change
   useEffect(() => {
@@ -26,14 +28,12 @@ function InvoicesTC({ hotelId }) {
       })
       .catch((error) => {
         if (error?.response?.status !== 404) {
-          toast.error(
-            "Error al cargar los términos y condiciones de las facturas"
-          );
+          toast.error(t("hotels.invoicesTC.loadError"));
         }
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
-  }, [hotelId]);
+  }, [hotelId, t]);
 
   const handleEdit = () => setEditMode(true);
   const handleCancel = () => {
@@ -47,22 +47,20 @@ function InvoicesTC({ hotelId }) {
       if (res?.isSuccessful) {
         setLastSavedTerms(terms);
         setEditMode(false);
-        toast.success("Términos y condiciones guardados con éxito");
+        toast.success(t("hotels.invoicesTC.saveSuccess"));
       } else {
         throw new Error("Failed to save terms.");
       }
     } catch (error) {
-      toast.error(
-        "Error al guardar los términos y condiciones de las facturas"
-      );
+      toast.error(t("hotels.invoicesTC.saveError"));
     } finally {
       setSaving(false);
     }
-  }, [hotelId, terms]);
+  }, [hotelId, terms, t]);
 
   return (
     <div>
-      <h4>Términos y Condiciones de las Facturas</h4>
+      <h4>{t("hotels.invoicesTC.title")}</h4>
       <SimpleLoader isVisible={loading} />
       {!loading && (
         <>
@@ -73,7 +71,7 @@ function InvoicesTC({ hotelId }) {
           />
           {!editMode ? (
             <button className="btn btn-dark mt-2" onClick={handleEdit}>
-              Editar
+              {t("hotels.invoicesTC.edit")}
             </button>
           ) : (
             <div className="mt-2">
@@ -81,13 +79,15 @@ function InvoicesTC({ hotelId }) {
                 className="btn btn-dark"
                 onClick={handleSave}
                 disabled={saving}>
-                {saving ? "Guardando..." : "Guardar"}
+                {saving
+                  ? t("hotels.invoicesTC.saving")
+                  : t("hotels.invoicesTC.save")}
               </button>
               <button
                 className="btn btn-secondary ms-2"
                 onClick={handleCancel}
                 disabled={saving}>
-                Cancelar
+                {t("hotels.invoicesTC.cancel")}
               </button>
             </div>
           )}

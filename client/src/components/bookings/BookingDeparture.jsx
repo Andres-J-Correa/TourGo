@@ -10,6 +10,7 @@ import {
 import classnames from "classnames";
 import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
 import dayjs from "dayjs";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const BookingDeparture = ({
   departure,
@@ -19,6 +20,7 @@ const BookingDeparture = ({
   renderRooms,
 }) => {
   const [offCanvasOpen, setOffCanvasOpen] = useState(false);
+  const { t } = useLanguage(); // added
   const toggleOffCanvas = () => setOffCanvasOpen((prev) => !prev);
 
   return (
@@ -34,38 +36,42 @@ const BookingDeparture = ({
       />
       <Row className="justify-content-between">
         <Col md={5}>
-          <strong>Reserva #:</strong> {departure.id}
+          <strong>{t("booking.departure.reservationNumber")}</strong>{" "}
+          {departure.id}
           <div className="ms-3 display-inline">
             <BookingStatusBadge statusId={departure.statusId} />
           </div>
           <br />
-          <strong>Cliente:</strong> {departure.customer?.firstName}{" "}
-          {departure.customer?.lastName}
+          <strong>{t("booking.departure.customer")}</strong>{" "}
+          {departure.customer?.firstName} {departure.customer?.lastName}
           <br />
-          <strong>Teléfono:</strong> {departure.customer?.phone || "N/A"}
+          <strong>{t("booking.departure.phone")}</strong>{" "}
+          {departure.customer?.phone || "N/A"}
           <br />
-          <strong>Documento:</strong>{" "}
+          <strong>{t("booking.departure.document")}</strong>{" "}
           {departure.customer?.documentNumber || "N/A"}
         </Col>
         <Col>
-          <strong>ID externa:</strong> {departure.externalBookingId}
+          <strong>{t("booking.departure.externalId")}</strong>{" "}
+          {departure.externalBookingId}
           <br />
-          <strong>Proveedor:</strong> {departure.bookingProviderName || "N/A"}
+          <strong>{t("booking.departure.provider")}</strong>{" "}
+          {departure.bookingProviderName || "N/A"}
         </Col>
         <Col md="auto">
-          <strong>Fecha de llegada:</strong>{" "}
+          <strong>{t("booking.departure.arrivalDate")}</strong>{" "}
           {dayjs(departure.arrivalDate).format("DD/MM/YYYY")}
           <br />
-          <strong>Fecha de salida:</strong>{" "}
+          <strong>{t("booking.departure.departureDate")}</strong>{" "}
           {dayjs(departure.departureDate).format("DD/MM/YYYY")}
           <br />
-          <strong>Noches:</strong> {departure.nights}
+          <strong>{t("booking.departure.nights")}</strong> {departure.nights}
           <br />
         </Col>
       </Row>
       <Row>
         <Col md={5}>
-          <strong>Habitaciones que salen:</strong>
+          <strong>{t("booking.departure.departingRooms")}</strong>
           <ul className="mb-0">
             {renderRooms
               ? renderRooms(departure.departingRooms)
@@ -77,7 +83,7 @@ const BookingDeparture = ({
         <Col>
           {departure.notes && (
             <>
-              <strong>Notas:</strong>
+              <strong>{t("booking.departure.notes")}</strong>
               <p className="mb-0">{departure.notes}</p>
             </>
           )}
@@ -88,8 +94,8 @@ const BookingDeparture = ({
               <Button
                 color="outline-dark"
                 onClick={toggleOffCanvas}
-                title="Ver detalles de la reserva">
-                Ver Detalles
+                title={t("booking.departure.viewDetails")}>
+                {t("booking.departure.viewDetails")}
                 <FontAwesomeIcon icon={faClipboardList} className="ms-2" />
               </Button>
             </Col>
@@ -100,7 +106,7 @@ const BookingDeparture = ({
                   color="outline-success"
                   className="ms-2"
                   onClick={() => handleComplete(departure)}>
-                  Marcar Completada
+                  {t("booking.departure.markCompleted")}
                   <FontAwesomeIcon icon={faPlaneDeparture} className="ms-2" />
                 </Button>
               )}

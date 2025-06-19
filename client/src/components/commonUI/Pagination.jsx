@@ -8,6 +8,7 @@ import {
   InputGroupText,
 } from "reactstrap";
 import PropTypes from "prop-types";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const PaginationComponent = ({
   pageIndex,
@@ -18,6 +19,8 @@ const PaginationComponent = ({
   maxPageNumbersToShow = 4,
 }) => {
   const [inputValue, setInputValue] = useState(pageIndex + 1);
+
+  const { t } = useLanguage(); // added
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -89,7 +92,7 @@ const PaginationComponent = ({
       </Pagination>
 
       <InputGroup style={{ width: "100px" }}>
-        <InputGroupText>Ir</InputGroupText>
+        <InputGroupText>{t("commonUI.pagination.goTo")}</InputGroupText>
         <Input
           type="number"
           min="1"

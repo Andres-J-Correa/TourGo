@@ -9,8 +9,10 @@ import {
   faAsterisk,
 } from "@fortawesome/free-solid-svg-icons";
 import "./forms.css";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const CustomField = ({ isRequired, ...props }) => {
+  const { t } = useLanguage(); // added
   const isPasswordField = useMemo(() => {
     return props.name.toLowerCase().includes("password");
   }, [props.name]);
@@ -39,14 +41,19 @@ const CustomField = ({ isRequired, ...props }) => {
       {isPasswordField && (
         <div
           className="password-toggle-icon"
-          onClick={togglePasswordVisibility}>
+          onClick={togglePasswordVisibility}
+          title={
+            isPasswordVisible
+              ? t("commonUI.customField.hidePassword")
+              : t("commonUI.customField.showPassword")
+          }>
           <FontAwesomeIcon icon={isPasswordVisible ? faEyeSlash : faEye} />
         </div>
       )}
 
       {isRequired && (
         <div
-          title="Campo requerido"
+          title={t("commonUI.customField.required")}
           className="required-icon position-absolute text-danger"
           style={{
             top: "-7px",

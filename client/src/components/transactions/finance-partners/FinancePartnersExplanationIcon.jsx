@@ -2,17 +2,15 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
 import Popover from "components/commonUI/popover/Popover";
+import { useLanguage } from "contexts/LanguageContext";
 
 function FinancePartnersExplanationIcon() {
+  const { t } = useLanguage();
   return (
     <Popover
       content={
         <div style={{ maxHeight: "50vh", overflow: "auto" }} className="p-3">
-          <span>
-            Los socios financieros son entidades que proveen o tu provees con
-            servicios o productos. Por ejemplo, agencias de viajes, proveedores
-            de implementos de aseo, servicios de limpieza, etc.
-          </span>
+          <span>{t("transactions.financePartners.explanation")}</span>
         </div>
       }
       placement="bottom"
@@ -21,7 +19,7 @@ function FinancePartnersExplanationIcon() {
         <FontAwesomeIcon
           icon={faCircleQuestion}
           className="question-icon"
-          title="Explicación"
+          title={t("transactions.financePartners.explanationTitle")}
         />
       </div>
     </Popover>

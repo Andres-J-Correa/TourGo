@@ -5,7 +5,7 @@ import CustomField from "components/commonUI/forms/CustomField";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { usersUpdate } from "services/userAuthService";
-import { userUpdateSchema } from "components/users/validationSchemas";
+import { useUserUpdateSchema } from "components/users/validationSchemas";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
@@ -13,12 +13,13 @@ import Swal from "sweetalert2";
 import { ERROR_CODES } from "constants/errorCodes";
 import { useLanguage } from "contexts/LanguageContext";
 
-const breadcrumbs = [{ label: "Inicio", path: "/" }];
-
 function UserProfile() {
   const { user } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   const { t, getTranslatedErrorMessage } = useLanguage();
+  const userUpdateSchema = useUserUpdateSchema();
+
+  const breadcrumbs = [{ label: t("common.breadcrumbs.home"), path: "/" }];
 
   const initialValues = useMemo(
     () => ({
@@ -34,12 +35,18 @@ function UserProfile() {
     const { firstName, lastName, phone } = values;
 
     const result = await Swal.fire({
-      title: "¿Guardar cambios en tu perfil?",
-      text: "¿Estás seguro de que deseas actualizar tu información?",
+      title: t(
+        "users.profile.saveConfirmTitle",
+        "¿Guardar cambios en tu perfil?"
+      ),
+      text: t(
+        "users.profile.saveConfirmText",
+        "¿Estás seguro de que deseas actualizar tu información?"
+      ),
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("users.profile.saveButton", "Guardar"),
+      cancelButtonText: t("common.cancel"),
       confirmButtonColor: "#0d6efd",
     });
 
@@ -47,8 +54,8 @@ function UserProfile() {
 
     try {
       Swal.fire({
-        title: "Actualizando perfil",
-        text: "Por favor espera",
+        title: t("users.profile.updatingTitle", "Actualizando perfil"),
+        text: t("users.profile.updatingText", "Por favor espera"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -68,14 +75,19 @@ function UserProfile() {
 
         await Swal.fire({
           icon: "success",
-          title: "Perfil actualizado",
-          text: "Tu información se ha guardado correctamente",
+          title: t("users.profile.updatedTitle", "Perfil actualizado"),
+          text: t(
+            "users.profile.updatedText",
+            "Tu información se ha guardado correctamente"
+          ),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
         });
       } else {
-        throw new Error("Error al actualizar el perfil");
+        throw new Error(
+          t("users.profile.updateError", "Error al actualizar el perfil")
+        );
       }
     } catch (error) {
       if (
@@ -91,10 +103,10 @@ function UserProfile() {
       Swal.close();
 
       Swal.fire({
-        title: "Error",
+        title: t("common.error"),
         text: errorMessage,
         icon: "error",
-        confirmButtonText: "OK",
+        confirmButtonText: t("common.ok"),
       });
     } finally {
       resetForm();
@@ -109,8 +121,11 @@ function UserProfile() {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Perfil" />
-      <h2 className="display-6 mb-4">Perfil de Usuario</h2>
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("users.profile.breadcrumbActive")}
+      />
+      <h2 className="display-6 mb-4">{t("users.profile.title")}</h2>
       <ErrorBoundary>
         <Formik
           initialValues={initialValues}
@@ -124,7 +139,7 @@ function UserProfile() {
                   <CustomField
                     name="firstName"
                     type="text"
-                    placeholder="Nombre"
+                    placeholder={t("users.profile.firstName")}
                     className="form-control"
                     disabled={!isEditing}
                     isRequired={isEditing}
@@ -134,7 +149,7 @@ function UserProfile() {
                   <CustomField
                     name="lastName"
                     type="text"
-                    placeholder="Apellido"
+                    placeholder={t("users.profile.lastName")}
                     className="form-control"
                     disabled={!isEditing}
                     isRequired={isEditing}
@@ -144,7 +159,7 @@ function UserProfile() {
                   <CustomField
                     name="email"
                     type="email"
-                    placeholder="Correo Electrónico"
+                    placeholder={t("users.profile.email")}
                     className="form-control"
                     disabled
                   />
@@ -155,7 +170,7 @@ function UserProfile() {
                       name="phone"
                       type="text"
                       className="form-control d-flex"
-                      placeholder="Teléfono"
+                      placeholder={t("users.profile.phone")}
                       autoComplete="tel"
                       disabled={!isEditing}
                     />
@@ -169,13 +184,13 @@ function UserProfile() {
                     <Button
                       type="submit"
                       className="me-2 bg-success text-white">
-                      Guardar
+                      {t("users.profile.saveButton")}
                     </Button>
                     <Button
                       type="button"
                       className="me-2 bg-secondary text-white"
                       onClick={() => handleCancel(resetForm)}>
-                      Cancelar
+                      {t("users.profile.cancelButton")}
                     </Button>
                   </>
                 )}
@@ -188,7 +203,7 @@ function UserProfile() {
             className="bg-dark text-white"
             type="button"
             onClick={() => setIsEditing(true)}>
-            Editar
+            {t("users.profile.editButton")}
           </Button>
         )}
       </ErrorBoundary>

@@ -13,6 +13,7 @@ import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
 
 import { BOOKING_STATUS_IDS } from "components/bookings/constants";
 import { formatCurrency } from "utils/currencyHelper";
+import { useLanguage } from "contexts/LanguageContext";
 
 const BookingArrival = ({
   arrival,
@@ -22,6 +23,7 @@ const BookingArrival = ({
   renderRooms,
 }) => {
   const [offCanvasOpen, setOffCanvasOpen] = useState(false);
+  const { t } = useLanguage();
 
   const toggleOffCanvas = () => setOffCanvasOpen((prev) => !prev);
 
@@ -45,61 +47,68 @@ const BookingArrival = ({
       />
       <Row className="justify-content-between">
         <Col md={5}>
-          <strong>Reserva #:</strong> {arrival.id}
+          <strong>{t("booking.arrival.reservationNumber")}</strong> {arrival.id}
           <div className="ms-3 display-inline">
             <BookingStatusBadge statusId={arrival.statusId} />
           </div>
           <br />
-          <strong>Cliente:</strong> {arrival.customer?.firstName}{" "}
-          {arrival.customer?.lastName}
+          <strong>{t("booking.arrival.customer")}</strong>{" "}
+          {arrival.customer?.firstName} {arrival.customer?.lastName}
           <br />
-          <strong>Teléfono:</strong> {arrival.customer?.phone || "N/A"}
+          <strong>{t("booking.arrival.phone")}</strong>{" "}
+          {arrival.customer?.phone || "N/A"}
           <br />
-          <strong>Documento:</strong>{" "}
+          <strong>{t("booking.arrival.document")}</strong>{" "}
           {arrival.customer?.documentNumber || "N/A"}
         </Col>
         <Col>
-          <strong>ID externa:</strong> {arrival.externalBookingId}
+          <strong>{t("booking.arrival.externalId")}</strong>{" "}
+          {arrival.externalBookingId}
           <br />
-          <strong>Proveedor:</strong> {arrival.bookingProviderName || "N/A"}
+          <strong>{t("booking.arrival.provider")}</strong>{" "}
+          {arrival.bookingProviderName || "N/A"}
           <br />
-          <strong>Total:</strong> {formatCurrency(arrival.total, "COP")}
+          <strong>{t("booking.arrival.total")}</strong>{" "}
+          {formatCurrency(arrival.total, "COP")}
           <br />
-          <strong>Saldo:</strong> {formatCurrency(arrival.balanceDue, "COP")}
+          <strong>{t("booking.arrival.balance")}</strong>{" "}
+          {formatCurrency(arrival.balanceDue, "COP")}
         </Col>
         <Col md="auto">
-          <strong>Fecha de llegada:</strong>{" "}
+          <strong>{t("booking.arrival.arrivalDate")}</strong>{" "}
           {dayjs(arrival.arrivalDate).format("DD/MM/YYYY")}
           <br />
-          <strong>Fecha de salida:</strong>{" "}
+          <strong>{t("booking.arrival.departureDate")}</strong>{" "}
           {dayjs(arrival.departureDate).format("DD/MM/YYYY")}
           <br />
-          <strong>Noches:</strong> {arrival.nights}
+          <strong>{t("booking.arrival.nights")}</strong> {arrival.nights}
         </Col>
       </Row>
       {dayjs(arrival.eta).isValid() && (
         <Row>
           <Col>
-            <strong>Fecha y hora de llegada:</strong>{" "}
+            <strong>{t("booking.arrival.eta")}</strong>{" "}
             {dayjs(arrival.eta).format("DD/MM/YYYY h:mm")}
           </Col>
         </Row>
       )}
       {arrival.notes && (
         <Row>
-          <strong>Notas:</strong>
+          <strong>{t("booking.arrival.notes")}</strong>
           <p className="mb-0">{arrival.notes}</p>
         </Row>
       )}
       <Row>
         <Col md={5}>
-          <strong>Habitaciones que llegan:</strong>{" "}
+          <strong>{t("booking.arrival.arrivingRooms")}</strong>{" "}
           <ul className="mb-0">{renderRooms(arrivingRooms)}</ul>
         </Col>
         <Col md={5}>
-          <strong>Habitaciones que llegan otro día:</strong>{" "}
+          <strong>{t("booking.arrival.otherRooms")}</strong>{" "}
           <ul className="mb-0">
-            {filteredRooms.length > 0 ? renderRooms(filteredRooms) : "Ninguna"}
+            {filteredRooms.length > 0
+              ? renderRooms(filteredRooms)
+              : t("booking.arrival.none")}
           </ul>
         </Col>
         <Col className="text-end align-content-end">
@@ -108,8 +117,8 @@ const BookingArrival = ({
               <Button
                 color="outline-dark"
                 onClick={toggleOffCanvas}
-                title="Ver detalles de la reserva">
-                Ver Detalles
+                title={t("booking.arrival.viewDetails")}>
+                {t("booking.arrival.viewDetails")}
                 <FontAwesomeIcon icon={faClipboardList} className="ms-2" />
               </Button>
             </Col>
@@ -118,7 +127,7 @@ const BookingArrival = ({
                 <Button
                   color="outline-success"
                   onClick={() => handleCheckIn(arrival)}>
-                  Marcar Check-in
+                  {t("booking.arrival.markCheckIn")}
                   <FontAwesomeIcon icon={faPlaneArrival} className="ms-2" />
                 </Button>
               )}

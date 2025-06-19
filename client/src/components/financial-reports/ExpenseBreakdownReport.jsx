@@ -7,6 +7,7 @@ import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getExpenseBreakdown } from "services/financialReportService";
 import { TRANSACTION_CATEGORIES_BY_ID } from "components/transactions/constants";
 import { toast } from "react-toastify";
+import { useLanguage } from "contexts/LanguageContext";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -19,8 +20,13 @@ function ExpenseBreakdownReport({ hotelId }) {
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
 
+  const { t } = useLanguage();
+
   const chartData = [
-    ["Categoría", "Gastos"],
+    [
+      t("financialReports.expenseBreakdownReport.category"),
+      t("financialReports.expenseBreakdownReport.expenses"),
+    ],
     ...data.map((item) => [
       TRANSACTION_CATEGORIES_BY_ID[item.categoryId] || item.category,
       item.totalExpenses,
@@ -55,7 +61,7 @@ function ExpenseBreakdownReport({ hotelId }) {
         .catch((error) => {
           setData([]);
           if (error?.response?.status !== 404) {
-            toast.error("Error al cargar el desglose de gastos");
+            toast.error(t("financialReports.expenseBreakdownReport.loadError"));
           }
         })
         .finally(() => setLoading(false));
@@ -63,15 +69,12 @@ function ExpenseBreakdownReport({ hotelId }) {
       setData([]);
       setShowPrompt(true);
     }
-  }, [dates.start, dates.end, hotelId]);
+  }, [dates.start, dates.end, hotelId, t]);
 
   return (
     <div>
-      <h4>Desglose de Gastos</h4>
-      <p>
-        Presenta cómo se distribuyen los gastos del hotel entre las diferentes
-        categorías.
-      </p>
+      <h4>{t("financialReports.expenseBreakdownReport.title")}</h4>
+      <p>{t("financialReports.expenseBreakdownReport.description")}</p>
       <div className="mb-3">
         <DatePickers
           startDate={dates.start}
@@ -87,13 +90,15 @@ function ExpenseBreakdownReport({ hotelId }) {
       {showPrompt && (
         <Alert
           type="info"
-          message="Por favor selecciona un rango de fechas para ver el desglose de gastos."
+          message={t(
+            "financialReports.expenseBreakdownReport.selectDatesPrompt"
+          )}
         />
       )}
       {!showPrompt && !loading && data.length === 0 && (
         <Alert
           type="info"
-          message="No hay datos de gastos para el rango de fechas seleccionado."
+          message={t("financialReports.expenseBreakdownReport.noData")}
         />
       )}
       {!showPrompt && !loading && data.length > 0 && (
@@ -103,7 +108,7 @@ function ExpenseBreakdownReport({ hotelId }) {
           height="350px"
           data={chartData}
           options={{
-            title: "Distribución de Gastos por Categoría",
+            title: t("financialReports.expenseBreakdownReport.chartTitle"),
             legend: { position: "right" },
             tooltip: { trigger: "focus", showColorCode: true },
             pieSliceText: "percentage",

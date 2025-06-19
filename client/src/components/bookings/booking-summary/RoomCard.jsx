@@ -4,8 +4,10 @@ import { formatCurrency } from "utils/currencyHelper";
 import dayjs from "dayjs";
 import { calculateRoomCharges } from "./helpers";
 import "./BookingSummary.css";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const RoomCard = ({ room, bookingNights, extraCharges }) => {
+  const { t } = useLanguage(); // added
   const subtotal = room?.segments?.reduce((sum, seg) => sum + seg.price, 0);
   const charges = calculateRoomCharges(extraCharges, subtotal, bookingNights);
   const total =
@@ -22,15 +24,17 @@ const RoomCard = ({ room, bookingNights, extraCharges }) => {
         <ListGroup className="mt-2 flex-grow-1">
           {room?.segments?.map((seg, i) => (
             <ListGroupItem key={i}>
-              <strong>Noche:</strong> {dayjs(seg.date).format("DD/MM/YYYY")} -{" "}
-              <strong>Precio:</strong> {formatCurrency(seg.price, "COP")}
+              <strong>{t("booking.roomCard.night")}</strong>{" "}
+              {dayjs(seg.date).format("DD/MM/YYYY")} -{" "}
+              <strong>{t("booking.roomCard.price")}</strong>{" "}
+              {formatCurrency(seg.price, "COP")}
             </ListGroupItem>
           ))}
         </ListGroup>
 
         <div className="p-2">
           <div className="line-item">
-            <span className="line-label">Subtotal</span>
+            <span className="line-label">{t("booking.roomCard.subtotal")}</span>
             <div className="line-fill" />
             <span className="line-amount">
               {formatCurrency(subtotal, "COP")}
@@ -50,7 +54,7 @@ const RoomCard = ({ room, bookingNights, extraCharges }) => {
           <hr className="mt-1" />
 
           <div className="line-item line-total">
-            <span className="line-label">Total</span>
+            <span className="line-label">{t("booking.roomCard.total")}</span>
             <div className="line-fill" />
             <span className="line-amount">{formatCurrency(total, "COP")}</span>
           </div>

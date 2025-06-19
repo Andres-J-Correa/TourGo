@@ -1,11 +1,12 @@
 // hooks/useBookingFormData.js
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getRoomBookingsByDateRange } from "services/bookingService";
 import { getBookingProvidersMinimalByHotelId } from "services/bookingProviderService";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { getByHotelId as getChargesByHotelId } from "services/extraChargeService";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
+import { useLanguage } from "contexts/LanguageContext";
 
 export default function useBookingFormData(hotelId, dates) {
   const [rooms, setRooms] = useState([]);
@@ -15,14 +16,21 @@ export default function useBookingFormData(hotelId, dates) {
   const [isLoadingHotelData, setIsLoadingHotelData] = useState(false);
   const [bookingProviderOptions, setBookingProviderOptions] = useState([]);
   const [isHotelDataInitialFetch, setIsHotelDataInitialFetch] = useState(true);
+  const { t } = useLanguage();
 
   const onGetRoomBookingsSuccess = (res) =>
     res.items?.length > 0
       ? setRoomBookings(res.items.map((b) => ({ ...b, roomId: b.room.id })))
       : setRoomBookings([]);
 
-  const onGetRoomBookingsError = (err) =>
-    err?.response?.status !== 404 && toast.error("Error al cargar reservas");
+  const onGetRoomBookingsError = useCallback(
+    (err) => {
+      if (err?.response?.status !== 404) {
+        toast.error(t("booking.errors.loadBookings"));
+      }
+    },
+    [t]
+  );
 
   useEffect(() => {
     if (!hotelId) return;
@@ -40,19 +48,19 @@ export default function useBookingFormData(hotelId, dates) {
         if (roomsResult.status === "fulfilled") {
           setRooms(roomsResult.value.items || []);
         } else if (roomsResult.reason?.response?.status !== 404) {
-          errors.push("Error al cargar habitaciones");
+          errors.push(t("booking.errors.loadRooms"));
         }
 
         if (chargesResult.status === "fulfilled") {
           setCharges(chargesResult.value.items || []);
         } else if (chargesResult.reason?.response?.status !== 404) {
-          errors.push("Error al cargar cargos extras");
+          errors.push(t("booking.errors.loadCharges"));
         }
 
         if (bookingProvidersResult.status === "fulfilled") {
           setBookingProviderOptions(bookingProvidersResult.value.items || []);
         } else if (bookingProvidersResult.reason?.response?.status !== 404) {
-          errors.push("Error al cargar proveedores de reservas");
+          errors.push(t("booking.errors.loadProviders"));
         }
 
         if (errors.length > 0) {
@@ -63,7 +71,7 @@ export default function useBookingFormData(hotelId, dates) {
         setIsLoadingHotelData(false);
         setIsHotelDataInitialFetch(false);
       });
-  }, [hotelId]);
+  }, [hotelId, t]);
 
   useEffect(() => {
     if (!hotelId || !dates.start || !dates.end) return;
@@ -85,7 +93,7 @@ export default function useBookingFormData(hotelId, dates) {
       .then(onGetRoomBookingsSuccess)
       .catch(onGetRoomBookingsError)
       .finally(() => setIsLoadingBookings(false));
-  }, [hotelId, dates]);
+  }, [hotelId, dates, onGetRoomBookingsError]);
 
   return {
     rooms,

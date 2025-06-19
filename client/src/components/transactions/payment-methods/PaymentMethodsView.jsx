@@ -28,6 +28,7 @@ import {
   updateById,
 } from "services/paymentMethodService";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 
 // Components
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -36,14 +37,8 @@ import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import DataTable from "components/commonUI/tables/DataTable"; // Add this import
 
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(100, "El nombre no puede exceder los 100 caracteres")
-    .required("El nombre es requerido"),
-});
-
 function PaymentMethodsView() {
+  const { t } = useLanguage();
   const { hotelId } = useParams();
   const { user } = useAppContext();
   const [paymentMethods, setPaymentMethods] = useState([]);
@@ -56,10 +51,20 @@ function PaymentMethodsView() {
     name: "",
   });
 
+  const validationSchema = Yup.object().shape({
+    name: Yup.string()
+      .min(2, t("transactions.paymentMethods.validation.nameMin", { min: 2 }))
+      .max(
+        100,
+        t("transactions.paymentMethods.validation.nameMax", { max: 100 })
+      )
+      .required(t("transactions.paymentMethods.validation.nameRequired")),
+  });
+
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("common.breadcrumbs.home"), path: "/" },
+    { label: t("common.breadcrumbs.hotels"), path: "/hotels" },
+    { label: t("common.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
   ];
 
   const filteredData = useMemo(() => {
@@ -269,21 +274,21 @@ function PaymentMethodsView() {
     () => [
       {
         accessorKey: "id",
-        header: "ID",
+        header: t("transactions.paymentMethods.table.id"),
         maxSize: 50,
       },
       {
         accessorKey: "name",
-        header: "Nombre",
+        header: t("transactions.paymentMethods.table.name"),
       },
       {
         accessorKey: "isActive",
-        header: "Activo",
-        cell: (info) => (info.getValue() ? "Sí" : "No"),
+        header: t("transactions.paymentMethods.table.active"),
+        cell: (info) => (info.getValue() ? t("common.yes") : t("common.no")),
         maxSize: 70,
       },
       {
-        header: "Acciones",
+        header: t("transactions.paymentMethods.table.actions"),
         enableSorting: false,
         maxSize: 140,
         cell: (info) => {
@@ -300,7 +305,7 @@ function PaymentMethodsView() {
                       e.stopPropagation();
                       handleUpdateClick(paymentMethod);
                     }}>
-                    Editar
+                    {t("commonUI.dataTable.edit")}
                   </Button>
                   <Button
                     color="danger"
@@ -310,7 +315,7 @@ function PaymentMethodsView() {
                       e.stopPropagation();
                       handleDeleteClick(paymentMethod.id);
                     }}>
-                    Eliminar
+                    {t("commonUI.dataTable.delete")}
                   </Button>
                 </div>
               )}
@@ -319,7 +324,7 @@ function PaymentMethodsView() {
         },
       },
     ],
-    [handleDeleteClick]
+    [handleDeleteClick, t]
   );
 
   const onGetPaymentMethodsSuccess = (response) => {
@@ -346,17 +351,19 @@ function PaymentMethodsView() {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Métodos de Pago" />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("transactions.paymentMethods.title")}
+      />
       <ErrorBoundary>
-        <h3>Métodos de Pago</h3>
-
+        <h3>{t("transactions.paymentMethods.title")}</h3>
         {showForm && (
           <Card className="border-0 shadow-lg mt-3">
             <CardBody className="p-3">
               <CardTitle tag="h5">
                 {initialValues.id
-                  ? "Editar método de pago"
-                  : "Nuevo método de pago"}
+                  ? t("transactions.paymentMethods.editTitle")
+                  : t("transactions.paymentMethods.newTitle")}
               </CardTitle>
               <Formik
                 initialValues={initialValues}
@@ -372,11 +379,12 @@ function PaymentMethodsView() {
                           name="name"
                           type="text"
                           className="form-control"
-                          placeholder="Nombre del método de pago"
+                          placeholder={t(
+                            "transactions.paymentMethods.namePlaceholder"
+                          )}
                           isRequired={true}
                         />
                       </Col>
-
                       <Col md="auto" className="align-content-center">
                         <div className="text-center">
                           <Button
@@ -395,9 +403,9 @@ function PaymentMethodsView() {
                             {isUploading ? (
                               <Spinner size="sm" color="light" />
                             ) : initialValues.id ? (
-                              "Actualizar"
+                              t("transactions.paymentMethods.update")
                             ) : (
-                              "Agregar"
+                              t("transactions.paymentMethods.add")
                             )}
                           </Button>
                         </div>
@@ -411,12 +419,14 @@ function PaymentMethodsView() {
         )}
         <div className="mt-4">
           <Button color={showForm ? "warning" : "dark"} onClick={toggleForm}>
-            {showForm ? "Cancelar" : "Agregar Método de Pago"}
+            {showForm
+              ? t("common.cancel")
+              : t("transactions.paymentMethods.addPaymentMethod")}
           </Button>
         </div>
         <div className="mb-3 float-end">
           <Label for="isActiveFilter" className="text-dark">
-            Filtrar por Estado
+            {t("transactions.paymentMethods.filterByStatus")}
           </Label>
           <Input
             id="isActiveFilter"
@@ -424,9 +434,13 @@ function PaymentMethodsView() {
             style={{ width: "auto" }}
             value={isActiveFilter}
             onChange={(e) => setIsActiveFilter(e.target.value)}>
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
-            <option value="all">Todos</option>
+            <option value="active">
+              {t("transactions.paymentMethods.active")}
+            </option>
+            <option value="inactive">
+              {t("transactions.paymentMethods.inactive")}
+            </option>
+            <option value="all">{t("transactions.paymentMethods.all")}</option>
           </Input>
         </div>
         <div className="table-responsive w-100">
@@ -440,12 +454,16 @@ function PaymentMethodsView() {
               <div className="p-2 border border-info-subtle bg-light">
                 <Row>
                   <Col md={6}>
-                    <strong>Creado por:</strong>{" "}
+                    <strong>
+                      {t("transactions.paymentMethods.createdBy")}
+                    </strong>{" "}
                     {row.original.createdBy?.firstName}{" "}
                     {row.original.createdBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de creación:</strong>{" "}
+                    <strong>
+                      {t("transactions.paymentMethods.dateCreated")}
+                    </strong>{" "}
                     {dayjs(row.original.dateCreated).format(
                       "DD/MM/YYYY - h:mm A"
                     )}
@@ -453,12 +471,16 @@ function PaymentMethodsView() {
                 </Row>
                 <Row>
                   <Col md={6}>
-                    <strong>Modificado por:</strong>{" "}
+                    <strong>
+                      {t("transactions.paymentMethods.modifiedBy")}
+                    </strong>{" "}
                     {row.original.modifiedBy?.firstName}{" "}
                     {row.original.modifiedBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de modificación:</strong>{" "}
+                    <strong>
+                      {t("transactions.paymentMethods.dateModified")}
+                    </strong>{" "}
                     {dayjs(row.original.dateModified).format(
                       "DD/MM/YYYY - h:mm A"
                     )}

@@ -14,7 +14,7 @@ import {
   getPagedTransactions,
   getFixedPagination,
 } from "services/transactionService";
-import { transactionsTableColumns } from "./constants";
+import { useTransactionsTableColumns } from "./constants";
 import { formatCurrency } from "utils/currencyHelper";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
@@ -23,6 +23,7 @@ import {
   TRANSACTION_STATUS_BY_ID,
 } from "components/transactions/constants";
 import useHotelFormData from "components/transactions/hooks/useHotelFormData";
+import { useLanguage } from "contexts/LanguageContext";
 
 import { Button, Col, Label, Row, Spinner } from "reactstrap";
 import classNames from "classnames";
@@ -49,30 +50,6 @@ import { mkConfig, generateCsv, download } from "export-to-csv";
 
 import "./TransactionsView.css";
 
-const columnOrderTranslated = [
-  { id: "id", label: "ID" },
-  { id: "transactionDate", label: "Fecha de Transacción" },
-  { id: "amount", label: "Monto" },
-  { id: "currencyCode", label: "Moneda" },
-  { id: "category", label: "Categoría" },
-  { id: "subcategory", label: "Subcategoría" },
-  { id: "paymentMethod-name", label: "Método de Pago" },
-  { id: "description", label: "Descripción" },
-  { id: "referenceNumber", label: "Número de Referencia" },
-  { id: "status", label: "Estado" },
-  { id: "entityId", label: "Entidad" },
-  { id: "financePartner-name", label: "Socio Financiero" },
-  { id: "parentId", label: "ID Padre" },
-  { id: "hasDocumentUrl", label: "Documento" },
-];
-
-const csvConfig = mkConfig({
-  fieldSeparator: ";",
-  filename: "transacciones",
-  decimalSeparator: ".",
-  useKeysAsHeaders: true,
-});
-
 const defaultData = {
   items: [],
   totalCount: 0,
@@ -96,7 +73,11 @@ function TransactionsView() {
     isLoadingHotelData,
   } = useHotelFormData(hotelId);
 
+  const transactionsTableColumns = useTransactionsTableColumns();
+
   const { hotel, user } = useAppContext();
+
+  const { t } = useLanguage();
 
   const isUserAdmin = useMemo(
     () =>
@@ -109,6 +90,33 @@ function TransactionsView() {
     () => (isUserAdmin ? getPagedTransactions : getFixedPagination),
     [isUserAdmin]
   );
+
+  const columnOrderTranslated = [
+    { id: "id", label: t("transactions.table.id") },
+    { id: "transactionDate", label: t("transactions.table.transactionDate") },
+    { id: "amount", label: t("transactions.table.amount") },
+    { id: "currencyCode", label: t("transactions.table.currencyCode") },
+    { id: "category", label: t("transactions.table.category") },
+    { id: "subcategory", label: t("transactions.table.subcategory") },
+    { id: "paymentMethod-name", label: t("transactions.table.paymentMethod") },
+    { id: "description", label: t("transactions.table.description") },
+    { id: "referenceNumber", label: t("transactions.table.referenceNumber") },
+    { id: "status", label: t("transactions.table.status") },
+    { id: "entityId", label: t("transactions.table.entity") },
+    {
+      id: "financePartner-name",
+      label: t("transactions.table.financePartner"),
+    },
+    { id: "parentId", label: t("transactions.table.parentId") },
+    { id: "hasDocumentUrl", label: t("transactions.table.hasDocumentUrl") },
+  ];
+
+  const csvConfig = mkConfig({
+    fieldSeparator: ";",
+    filename: t("transactions.view.title").toLowerCase(),
+    decimalSeparator: ".",
+    useKeysAsHeaders: true,
+  });
 
   const [paginationData, setPaginationData] = useState({
     pageIndex: 0,
@@ -132,12 +140,15 @@ function TransactionsView() {
   });
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("common.breadcrumbs.home"), path: "/" },
+    { label: t("common.breadcrumbs.hotels"), path: "/hotels" },
+    { label: t("common.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
   ];
 
-  const columns = useMemo(() => transactionsTableColumns, []);
+  const columns = useMemo(
+    () => transactionsTableColumns,
+    [transactionsTableColumns]
+  );
 
   const table = useReactTable({
     data: data.items,
@@ -521,9 +532,12 @@ function TransactionsView() {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active={"Transacciones"} />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("transactions.view.title")}
+      />
       <LoadingOverlay isVisible={hotel.isLoading} />
-      <h3>Transacciones</h3>
+      <h3>{t("transactions.view.title")}</h3>
       <ErrorBoundary>
         <div>
           {isUserAdmin && (
@@ -531,7 +545,7 @@ function TransactionsView() {
               className="text-dark cursor-pointer fw-bold fs-4 mb-2 ms-auto"
               style={{ maxWidth: "max-content" }}
               onClick={handleToggleFilters}>
-              Filtros
+              {t("transactions.view.filters")}
               <span className="ms-2">
                 <FontAwesomeIcon
                   size="lg"
@@ -540,7 +554,6 @@ function TransactionsView() {
               </span>
             </div>
           )}
-
           <div
             className={classNames(
               "mb-3 p-3 border shadow-sm rounded-3 bg-light",
@@ -574,7 +587,7 @@ function TransactionsView() {
         <Row className="mb-3">
           <Col md="auto" className="align-content-end">
             <span className="text-dark fw-bold fs-5">
-              Total Actual:{" "}
+              {t("transactions.view.totalActual")}:{" "}
               {data.items?.length > 0
                 ? formatCurrency(
                     data.items[0].total,
@@ -586,7 +599,7 @@ function TransactionsView() {
           <Col>
             <div className="float-end">
               <Label for="pageSize" className="text-dark">
-                Filas por página:
+                {t("transactions.view.rowsPerPage")}
               </Label>
               <select
                 id="pageSize"
@@ -617,7 +630,7 @@ function TransactionsView() {
           {!showForm && (
             <div className="text-center">
               <Button color="primary" onClick={handleAddTransactionClick}>
-                Agregar Transacción
+                {t("transactions.view.addTransaction")}
               </Button>
             </div>
           )}
@@ -628,7 +641,7 @@ function TransactionsView() {
               onClick={() => exportExcel(table.getRowModel().rows)}
               disabled={loading || table.getRowModel().rows.length === 0}>
               <FontAwesomeIcon icon={faFileCsv} className="me-2" />
-              Exportar a CSV
+              {t("transactions.view.exportCsv")}
             </Button>
           </div>
         </Row>
@@ -637,13 +650,15 @@ function TransactionsView() {
             className={classNames("float-end", {
               invisible: data.items.length === 0 || loading,
             })}>
-            Mostrando {paginationData.pageSize * paginationData.pageIndex + 1} a{" "}
+            {t("transactions.view.showing")}{" "}
+            {paginationData.pageSize * paginationData.pageIndex + 1}{" "}
+            {t("transactions.view.to")}{" "}
             {!data.hasNextPage
               ? data.totalCount
               : paginationData.pageSize * (paginationData.pageIndex + 1)}{" "}
-            de {data.totalCount} transacciones
+            {t("transactions.view.of")} {data.totalCount}{" "}
+            {t("transactions.view.title").toLowerCase()}
           </span>
-
           <table className="table-sm table table-bordered table-hover table-striped mb-1">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -705,13 +720,13 @@ function TransactionsView() {
               {loading ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center">
-                    <Spinner size="sm" /> Cargando...
+                    <Spinner size="sm" /> {t("common.loading")}
                   </td>
                 </tr>
               ) : table.getRowModel().rows.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center">
-                    No hay registros
+                    {t("commonUI.dataTable.noRecords")}
                   </td>
                 </tr>
               ) : (
@@ -767,15 +782,14 @@ function TransactionsView() {
               )}
             </tbody>
           </table>
-
           <p
             className={classNames("mb-0 text-center text-dark", {
               invisible: data.items.length === 0 || loading,
             })}>
-            Página {paginationData.pageIndex + 1} de {data.totalPages}
+            {t("transactions.view.page")} {paginationData.pageIndex + 1}{" "}
+            {t("transactions.view.of")} {data.totalPages}
           </p>
         </div>
-
         <Pagination
           pageIndex={paginationData.pageIndex}
           totalPages={data.totalPages}
@@ -783,7 +797,6 @@ function TransactionsView() {
           hasNextPage={data.hasNextPage}
           onPageChange={gotoPage}
         />
-
         <div className="mt-5">
           <TransactionAddForm
             hotelId={hotelId}

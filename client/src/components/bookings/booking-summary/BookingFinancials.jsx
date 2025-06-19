@@ -3,8 +3,10 @@ import { Row, Col } from "reactstrap";
 import { formatCurrency } from "utils/currencyHelper";
 import classNames from "classnames";
 import "./BookingSummary.css";
+import { useLanguage } from "contexts/LanguageContext";
 
 const BookingFinancials = ({ bookingData, isInvoiceView }) => {
+  const { t } = useLanguage();
   const {
     transactions = [],
     subtotal = 0,
@@ -22,7 +24,9 @@ const BookingFinancials = ({ bookingData, isInvoiceView }) => {
       <Row className="mb-2">
         <Col md={4}>
           <div className="line-item">
-            <span className="line-label fw-bold">Subtotal</span>
+            <span className="line-label fw-bold">
+              {t("booking.financials.subtotal")}
+            </span>
             <div className="line-fill" />
             <span className="line-amount">
               {formatCurrency(subtotal, "COP")}
@@ -31,7 +35,9 @@ const BookingFinancials = ({ bookingData, isInvoiceView }) => {
         </Col>
         <Col md={4}>
           <div className="line-item">
-            <span className="line-label fw-bold">Cargos</span>
+            <span className="line-label fw-bold">
+              {t("booking.financials.charges")}
+            </span>
             <div className="line-fill" />
             <span className="line-amount">
               {formatCurrency(charges, "COP")}
@@ -40,7 +46,9 @@ const BookingFinancials = ({ bookingData, isInvoiceView }) => {
         </Col>
         <Col md={4}>
           <div className="line-item">
-            <span className="line-label fw-bold">Total</span>
+            <span className="line-label fw-bold">
+              {t("booking.financials.total")}
+            </span>
             <div className="line-fill" />
             <span className="line-amount">{formatCurrency(total, "COP")}</span>
           </div>
@@ -50,7 +58,9 @@ const BookingFinancials = ({ bookingData, isInvoiceView }) => {
         <Row className="mb-2">
           <Col md={4}>
             <div className="line-item">
-              <span className="line-label fw-bold">Total Pagado</span>
+              <span className="line-label fw-bold">
+                {t("booking.financials.totalPaid")}
+              </span>
               <div className="line-fill" />
               <span className="line-amount">
                 {formatCurrency(totalPaid, "COP")}
@@ -59,7 +69,9 @@ const BookingFinancials = ({ bookingData, isInvoiceView }) => {
           </Col>
           <Col md={4}>
             <div className="line-item">
-              <span className="line-label fw-bold">Saldo</span>
+              <span className="line-label fw-bold">
+                {t("booking.financials.balance")}
+              </span>
               <div className="line-fill" />
               <span
                 className={classNames("line-amount", {
@@ -71,7 +83,9 @@ const BookingFinancials = ({ bookingData, isInvoiceView }) => {
           </Col>
           <Col>
             <div className="line-item">
-              <span className="line-label fw-bold">Comisión</span>
+              <span className="line-label fw-bold">
+                {t("booking.financials.commission")}
+              </span>
               <div className="line-fill" />
               <span
                 className={classNames("line-amount", {

@@ -9,12 +9,14 @@ import { UserSignInForm } from "components/users/UserSignInForm";
 import { SignUpForm } from "components/users/SignUpForm";
 import { Col, Row } from "reactstrap";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 
 const LandingPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const { user } = useAppContext();
+  const { t } = useLanguage();
 
   const handleSignUp = () => {
     setIsSignUp(true);
@@ -48,7 +50,7 @@ const LandingPage = () => {
     return (
       <div className="text-center">
         <Link to="/hotels" className="btn btn-dark btn-lg">
-          Ir a hoteles
+          {t("landingPage.goToHotels")}
         </Link>
       </div>
     );
@@ -56,14 +58,12 @@ const LandingPage = () => {
 
   return (
     <>
-      <Breadcrumb active="Inicio" />
+      <Breadcrumb active={t("common.breadcrumbs.home")} />
       <LoadingOverlay isVisible={loading} />
       <ErrorBoundary>
         <div className="jumbotron text-center">
-          <h1 className="display-3">Bienvenido a TourGo</h1>
-          <p className="lead">
-            Tu plataforma para administrar tu alojamiento de manera facil!
-          </p>
+          <h1 className="display-3">{t("landingPage.welcomeTitle")}</h1>
+          <p className="lead">{t("landingPage.welcomeSubtitle")}</p>
           <hr className="my-4" />
           <Row className="justify-content-center mt-5 mb-3">
             {user.current.isAuthenticated

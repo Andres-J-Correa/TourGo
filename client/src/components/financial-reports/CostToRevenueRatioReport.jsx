@@ -10,6 +10,7 @@ import {
   TRANSACTION_CATEGORY_TYPES_IDS,
 } from "components/transactions/constants";
 import dayjs from "dayjs";
+import { useLanguage } from "contexts/LanguageContext";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -23,6 +24,7 @@ function CostToRevenueRatioReport({ hotelId }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
+  const { t } = useLanguage();
 
   // Filter categories for selects
   const revenueCategories = TRANSACTION_CATEGORIES.filter(
@@ -97,7 +99,10 @@ function CostToRevenueRatioReport({ hotelId }) {
   // Prepare Gauge chart data
   const gaugeData = [
     ["Label", "Ratio"],
-    ["Costo/Ingreso", data?.costToRevenueRatio * 100 ?? 0],
+    [
+      t("financialReports.costToRevenueRatioReport.gaugeLabel"),
+      data?.costToRevenueRatio * 100 ?? 0,
+    ],
   ];
 
   const gaugeOptions = {
@@ -117,11 +122,8 @@ function CostToRevenueRatioReport({ hotelId }) {
 
   return (
     <div>
-      <h4>Relación Gasto a Ingreso</h4>
-      <p>
-        Muestra la relación entre una categoría de gastos y una categoría de
-        ingresos del hotel, mostrando qué porcentaje de los ingresos se gasta.
-      </p>
+      <h4>{t("financialReports.costToRevenueRatioReport.title")}</h4>
+      <p>{t("financialReports.costToRevenueRatioReport.description")}</p>
       <Row>
         <Col xs={12}>
           <DatePickers
@@ -137,17 +139,21 @@ function CostToRevenueRatioReport({ hotelId }) {
       </Row>
       <Row className="mb-3">
         <Col xs={12} md={5}>
-          <label className="form-label">Categoría de Ingresos</label>
+          <label className="form-label">
+            {t("financialReports.costToRevenueRatioReport.revenueCategory")}
+          </label>
           <InputGroup>
             <Input
               type="select"
               value={revenueCategoryId}
               onChange={handleRevenueChange}
               disabled={loading}>
-              <option value="">Selecciona ingresos</option>
+              <option value="">
+                {t("financialReports.costToRevenueRatioReport.selectRevenue")}
+              </option>
               {revenueCategories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.name}
+                  {t(cat.name)}
                 </option>
               ))}
             </Input>
@@ -156,17 +162,21 @@ function CostToRevenueRatioReport({ hotelId }) {
         </Col>
         <Col xs={12} md={2}></Col>
         <Col xs={12} md={5}>
-          <label className="form-label">Categoría de Gastos</label>
+          <label className="form-label">
+            {t("financialReports.costToRevenueRatioReport.expenseCategory")}
+          </label>
           <InputGroup>
             <Input
               type="select"
               value={expenseCategoryId}
               onChange={handleExpenseChange}
               disabled={loading}>
-              <option value="">Selecciona gastos</option>
+              <option value="">
+                {t("financialReports.costToRevenueRatioReport.selectExpense")}
+              </option>
               {expenseCategories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.name}
+                  {t(cat.name)}
                 </option>
               ))}
             </Input>
@@ -180,15 +190,17 @@ function CostToRevenueRatioReport({ hotelId }) {
           type="info"
           message={
             !dates.start || !dates.end
-              ? "Por favor selecciona un rango de fechas para ver la relación costo/ingreso."
-              : "Selecciona una categoría de ingresos y una de gastos, y un rango de fechas para ver la relación costo/ingreso."
+              ? t("financialReports.costToRevenueRatioReport.selectDatesPrompt")
+              : t(
+                  "financialReports.costToRevenueRatioReport.selectCategoriesPrompt"
+                )
           }
         />
       )}
       {!showPrompt && !loading && !data && (
         <Alert
           type="info"
-          message="No hay datos para la combinación y rango de fechas seleccionados."
+          message={t("financialReports.costToRevenueRatioReport.noData")}
         />
       )}
       {!showPrompt && !loading && data && (
@@ -202,7 +214,9 @@ function CostToRevenueRatioReport({ hotelId }) {
             className="d-flex justify-content-center mb-3"
           />
           <div>
-            <strong>Relación Costo/Ingreso:</strong>{" "}
+            <strong>
+              {t("financialReports.costToRevenueRatioReport.gaugeLabel")}:
+            </strong>{" "}
             {(data.costToRevenueRatio * 100).toFixed(1)}%
           </div>
         </div>

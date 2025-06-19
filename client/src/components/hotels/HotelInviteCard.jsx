@@ -2,26 +2,28 @@ import React from "react";
 import { Card, CardBody, CardTitle, Button } from "reactstrap";
 import dayjs from "dayjs";
 import { HOTEL_ROLES_BY_ID } from "components/hotels/constants";
-import { INVITE_FLAGS_IDS, getFlagBadges } from "components/staff/constants";
+import { INVITE_FLAGS_IDS, useFlagBadges } from "components/staff/constants";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const HotelInviteCard = ({ invite, onAccept, onReject }) => {
+  const { t } = useLanguage(); // added
   const isPending = (invite.flags & INVITE_FLAGS_IDS.PENDING) !== 0;
+  const flags = useFlagBadges(invite.flags);
   return (
     <Card className="mb-3 w-100 flex-fill">
-      <div className="d-flex justify-content-end pt-1">
-        {getFlagBadges(invite.flags)}
-      </div>
+      <div className="d-flex justify-content-end pt-1">{flags}</div>
       <CardBody className="pt-0">
         <CardTitle className="mb-2">
-          Invitación a:
+          {t("hotels.inviteCard.invitationTo")}
           <p className="mb-0 fw-bold">{invite.hotel?.name}</p>
         </CardTitle>
         <div>
           <div>
-            Rol: <strong>{HOTEL_ROLES_BY_ID[invite.roleId]}</strong>
+            {t("hotels.inviteCard.role")}:{" "}
+            <strong>{t(HOTEL_ROLES_BY_ID[invite.roleId])}</strong>
           </div>
           <div>
-            Expira:
+            {t("hotels.inviteCard.expires")}:
             <strong>
               {dayjs(invite.expiration).format("DD/MM/YYYY h:mm a")}
             </strong>
@@ -33,14 +35,14 @@ const HotelInviteCard = ({ invite, onAccept, onReject }) => {
             size="sm"
             onClick={() => (isPending ? onAccept(invite.id) : null)}
             disabled={!isPending}>
-            Aceptar
+            {t("hotels.inviteCard.accept")}
           </Button>
           <Button
             color="danger"
             size="sm"
             onClick={() => (isPending ? onReject(invite.id) : null)}
             disabled={!isPending}>
-            Rechazar
+            {t("hotels.inviteCard.reject")}
           </Button>
         </div>
       </CardBody>

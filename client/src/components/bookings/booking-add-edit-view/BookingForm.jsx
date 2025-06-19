@@ -34,7 +34,6 @@ import {
 } from "components/bookings/booking-add-edit-view/constants";
 
 import {
-  bookingSchema,
   bookingDefaultInitialValues,
   sanitizeBooking,
 } from "components/bookings/booking-add-edit-view/constants";
@@ -43,6 +42,7 @@ import useBookingFormData from "./hooks/useBookingFormData";
 import useBookingTotals from "./hooks/useBookingTotals";
 import ChargeTypesExplanationIcon from "components/extra-charges/ChargeTypesExplanationIcon";
 import PersonalizedCharges from "./PersonalizedCharges";
+import { useLanguage } from "contexts/LanguageContext"; // add import
 
 const emptyFormData = {
   customerId: "",
@@ -92,6 +92,7 @@ function BookingForm({
   } = useBookingFormData(hotelId, dates);
 
   const navigate = useNavigate();
+  const { t } = useLanguage(); // add hook
 
   const totals = useBookingTotals(
     values,
@@ -206,12 +207,12 @@ function BookingForm({
   const handleNextClick = () => {
     if (formChanged()) {
       Swal.fire({
-        title: "¿Está seguro de que desea continuar?",
-        text: "Los cambios no guardados se perderán.",
+        title: t("booking.form.nextConfirmTitle"),
+        text: t("booking.form.nextConfirmText"),
         icon: "warning",
         showDenyButton: true,
-        confirmButtonText: "Sí, descartar cambios",
-        denyButtonText: "No, ir a guardar",
+        confirmButtonText: t("booking.form.nextConfirmYes"),
+        denyButtonText: t("booking.form.nextConfirmNo"),
         confirmButtonColor: "red",
         reverseButtons: true,
         denyButtonColor: "green",
@@ -397,12 +398,12 @@ function BookingForm({
         if (String(currentForm?.hotelId) !== String(hotelId)) return;
 
         Swal.fire({
-          title: "¿Recuperar información?",
-          text: "Realizaste cambios anteriormente que no se guardaron, ¿deseas recuperarlos?",
+          title: t("booking.form.recoverTitle"),
+          text: t("booking.form.recoverText"),
           icon: "info",
           showDenyButton: true,
-          confirmButtonText: "Sí, recuperar",
-          denyButtonText: "No, descartar",
+          confirmButtonText: t("booking.form.recoverYes"),
+          denyButtonText: t("booking.form.recoverNo"),
           confirmButtonColor: "green",
           denyButtonColor: "red",
           allowOutsideClick: false,
@@ -417,15 +418,15 @@ function BookingForm({
         removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
       }
     }
-  }, [bookingId, autoCompleteForm, hotelId]);
+  }, [bookingId, autoCompleteForm, hotelId, t]);
 
   useEffect(() => {
     if (rooms.length === 0 && !isHotelDataInitialFetch) {
       Swal.fire({
-        title: "No hay habitaciones disponibles",
-        text: "Por favor, asegúrese de crear habitaciones antes de realizar una reserva.",
+        title: t("booking.form.noRoomsTitle"),
+        text: t("booking.form.noRoomsText"),
         icon: "warning",
-        confirmButtonText: "Ir a habitaciones",
+        confirmButtonText: t("booking.form.goToRooms"),
         allowOutsideClick: false,
       }).then((result) => {
         if (result.isConfirmed) {
@@ -433,11 +434,14 @@ function BookingForm({
         }
       });
     }
-  }, [rooms.length, hotelId, navigate, isHotelDataInitialFetch]);
+  }, [rooms.length, hotelId, navigate, isHotelDataInitialFetch, t]);
 
   return (
     <>
-      <LoadingOverlay isVisible={isLoading} message="Cargando información." />
+      <LoadingOverlay
+        isVisible={isLoading}
+        message={t("booking.loadingOverlay.loadingInfo")}
+      />
       <div className="d-flex mb-4">
         <Button
           type="button"
@@ -446,7 +450,7 @@ function BookingForm({
           className="me-auto"
           disabled={submitting || isSubmitting}>
           <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-          Anterior
+          {t("booking.navigation.previous")}
         </Button>
         {booking?.id && (
           <Button
@@ -455,7 +459,7 @@ function BookingForm({
             color="dark"
             className="ms-auto"
             disabled={submitting || isSubmitting}>
-            Siguiente
+            {t("booking.navigation.next")}
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </Button>
         )}
@@ -484,7 +488,7 @@ function BookingForm({
         />
 
         <h5 className="mt-4 mb-3">
-          Seleccione los cargos extras
+          {t("booking.form.selectExtraCharges")}
           <ChargeTypesExplanationIcon />
         </h5>
         <ExtraChargesSelector
@@ -512,7 +516,11 @@ function BookingForm({
               type="submit"
               disabled={isSubmitDisabled}
               className="bg-gradient-success">
-              {isSubmitting ? <Spinner size="sm" /> : "Guardar Reserva"}
+              {isSubmitting ? (
+                <Spinner size="sm" />
+              ) : (
+                t("booking.form.saveBooking")
+              )}
             </Button>
           </div>
         </Form>
@@ -526,7 +534,7 @@ export default withFormik({
     booking?.id
       ? { ...sanitizeBooking(booking) }
       : { ...bookingDefaultInitialValues },
-  validationSchema: bookingSchema,
+  validationSchema: (props) => props.bookingSchema,
   enableReinitialize: true,
   handleSubmit: async (values, { props, setSubmitting }) => {
     const {
@@ -536,15 +544,16 @@ export default withFormik({
       setCurrentStep,
       modifiedBy,
       getTranslatedErrorMessage,
+      t,
     } = props;
 
     const result = await Swal.fire({
-      title: "¿Está seguro de que desea guardar la reserva?",
-      text: "Revise los datos antes de continuar.",
+      title: t("booking.form.saveConfirmTitle"),
+      text: t("booking.form.saveConfirmText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.form.saveConfirmYes"),
+      cancelButtonText: t("common.cancel"),
     });
 
     if (!result.isConfirmed) {
@@ -554,8 +563,8 @@ export default withFormik({
 
     try {
       Swal.fire({
-        title: "Guardando reserva",
-        text: "Por favor espera",
+        title: t("booking.form.savingTitle"),
+        text: t("booking.form.savingText"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -609,14 +618,14 @@ export default withFormik({
 
         await Swal.fire({
           icon: "success",
-          title: "Reserva guardada",
-          text: "La reserva se guardó correctamente.",
+          title: t("booking.form.saveSuccessTitle"),
+          text: t("booking.form.saveSuccessText"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
         });
       } else {
-        throw new Error("Error al guardar la reserva");
+        throw new Error(t("booking.errors.saveBooking"));
       }
     } catch (err) {
       const errorMessage = getTranslatedErrorMessage(err);
@@ -624,7 +633,7 @@ export default withFormik({
       Swal.close();
 
       Swal.fire({
-        title: "Error",
+        title: t("common.error"),
         text: errorMessage,
         icon: "error",
         confirmButtonText: "OK",

@@ -22,6 +22,8 @@ import { faPersonWalkingLuggage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from "sweetalert2";
 
+import { useLanguage } from "contexts/LanguageContext";
+
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
@@ -42,11 +44,6 @@ import { leaveHotel } from "services/staffService";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 import { BOOKING_STATUS_IDS } from "components/bookings/constants";
 import "./HotelLandingPage.css";
-
-const breadcrumbs = [
-  { label: "Inicio", path: "/" },
-  { label: "Hoteles", path: "/hotels" },
-];
 
 const dateOptions = {
   yesterday: dayjs().subtract(1, "day").format("YYYY-MM-DD"),
@@ -71,6 +68,12 @@ const HotelLandingPage = () => {
 
   const { hotelId } = useParams();
   const { hotel } = useAppContext();
+  const { t } = useLanguage();
+
+  const breadcrumbs = [
+    { label: t("hotels.breadcrumbs.home"), path: "/" },
+    { label: t("hotels.breadcrumbs.hotels"), path: "/hotels" },
+  ];
 
   const handleDateChange = (e) => {
     if (e.target.value === "more") {
@@ -92,24 +95,24 @@ const HotelLandingPage = () => {
             {r.name}
           </li>
         ))
-      : "Sin habitaciones";
+      : t("hotels.landing.noRooms");
 
   const handleLeaveHotel = async () => {
     const result = await Swal.fire({
-      title: "¿Dejar este hotel?",
-      text: "¿Estás seguro de que deseas dejar este hotel? Perderás acceso a su información.",
+      title: t("hotels.landing.leaveTitle"),
+      text: t("hotels.landing.leaveText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, dejar hotel",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("hotels.landing.leaveConfirm"),
+      cancelButtonText: t("hotels.landing.cancel"),
     });
 
     if (!result.isConfirmed) return;
 
     try {
       Swal.fire({
-        title: "Procesando",
-        text: "Por favor espera...",
+        title: t("hotels.landing.processing"),
+        text: t("hotels.landing.pleaseWait"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -118,8 +121,8 @@ const HotelLandingPage = () => {
       if (res.isSuccessful) {
         Swal.fire({
           icon: "success",
-          title: "Has dejado el hotel",
-          text: "Ya no tienes acceso a este hotel.",
+          title: t("hotels.landing.leftTitle"),
+          text: t("hotels.landing.leftText"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -130,21 +133,20 @@ const HotelLandingPage = () => {
       Swal.close();
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo dejar el hotel, intenta nuevamente.",
+        title: t("common.error"),
+        text: t("hotels.landing.leaveError"),
       });
     }
   };
 
   const handleCheckIn = useCallback(
     async (booking) => {
-      let swalText = "Asegúrese de que el cliente ha llegado";
-      let swalTitle = "¿Desea marcar la reserva como arribada?";
+      let swalText = t("hotels.landing.checkInText");
+      let swalTitle = t("hotels.landing.checkInTitle");
       let hasBalanceDue = booking.balanceDue > 0;
       if (hasBalanceDue) {
-        swalText =
-          "Esta reserva tiene un saldo pendiente. ¿Desea marcarla como arribada?";
-        swalTitle = "Saldo pendiente!";
+        swalText = t("hotels.landing.checkInBalanceDueText");
+        swalTitle = t("hotels.landing.checkInBalanceDueTitle");
       }
 
       const result = await Swal.fire({
@@ -152,8 +154,8 @@ const HotelLandingPage = () => {
         text: swalText,
         icon: hasBalanceDue ? "warning" : "info",
         showCancelButton: true,
-        confirmButtonText: "Sí, confirmar",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: t("hotels.landing.confirmYes"),
+        cancelButtonText: t("hotels.landing.cancel"),
         reverseButtons: hasBalanceDue,
         confirmButtonColor: hasBalanceDue ? "red" : "#0d6efd",
         didOpen: () => {
@@ -176,8 +178,8 @@ const HotelLandingPage = () => {
 
       try {
         Swal.fire({
-          title: "Cargando...",
-          text: "Por favor, espere.",
+          title: t("hotels.landing.loading"),
+          text: t("hotels.landing.pleaseWait"),
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
@@ -196,10 +198,10 @@ const HotelLandingPage = () => {
           }));
 
           Swal.fire({
-            title: "Éxito",
-            text: "Reserva marcada como check-in",
+            title: t("hotels.landing.success"),
+            text: t("hotels.landing.checkInSuccess"),
             icon: "success",
-            confirmButtonText: "Aceptar",
+            confirmButtonText: t("hotels.landing.ok"),
           });
         } else {
           throw new Error("Error al marcar como check-in");
@@ -208,23 +210,23 @@ const HotelLandingPage = () => {
         Swal.close();
         await Swal.fire({
           icon: "error",
-          title: "Error",
-          text: "Error al marcar como check-in",
+          title: t("common.error"),
+          text: t("hotels.landing.checkInError"),
         });
       }
     },
-    [hotelId]
+    [hotelId, t]
   );
 
   const handleComplete = useCallback(
     async (booking) => {
       const result = await Swal.fire({
-        title: "¿Desea marcar la reserva como completada?",
-        text: "Ya no podrá editar la reserva",
+        title: t("hotels.landing.completeTitle"),
+        text: t("hotels.landing.completeText"),
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, confirmar",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: t("hotels.landing.confirmYes"),
+        cancelButtonText: t("hotels.landing.cancel"),
         reverseButtons: true,
         confirmButtonColor: "green",
       });
@@ -235,8 +237,8 @@ const HotelLandingPage = () => {
 
       try {
         Swal.fire({
-          title: "Cargando...",
-          text: "Por favor, espere.",
+          title: t("hotels.landing.loading"),
+          text: t("hotels.landing.pleaseWait"),
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
@@ -255,10 +257,10 @@ const HotelLandingPage = () => {
           }));
 
           Swal.fire({
-            title: "Éxito",
-            text: "Reserva marcada como completada",
+            title: t("hotels.landing.success"),
+            text: t("hotels.landing.completeSuccess"),
             icon: "success",
-            confirmButtonText: "Aceptar",
+            confirmButtonText: t("hotels.landing.ok"),
           });
         } else {
           throw new Error("Error al marcar como completada");
@@ -267,12 +269,12 @@ const HotelLandingPage = () => {
         Swal.close();
         await Swal.fire({
           icon: "error",
-          title: "Error",
-          text: "Error al marcar como completada",
+          title: t("common.error"),
+          text: t("hotels.landing.completeError"),
         });
       }
     },
-    [hotelId]
+    [hotelId, t]
   );
 
   useEffect(() => {
@@ -353,7 +355,10 @@ const HotelLandingPage = () => {
       <LoadingOverlay
         isVisible={hotel.isLoading || loadingArrivalsDepartures}
       />
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Hotel" />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("hotels.landing.breadcrumbActive")}
+      />
       <ErrorBoundary>
         <div className="hotel-landing-page">
           <Row className="align-items-center my-3">
@@ -372,12 +377,12 @@ const HotelLandingPage = () => {
                   icon={faPersonWalkingLuggage}
                   className="me-2"
                 />
-                Dejar Hotel
+                {t("hotels.landing.leaveHotel")}
               </Button>
             )}
           <div className="mb-4">
             <Label for="date-select" className="text-dark">
-              Fecha
+              {t("hotels.landing.date")}
             </Label>
             <Input
               id="date-select"
@@ -385,17 +390,23 @@ const HotelLandingPage = () => {
               value={date}
               onChange={handleDateChange}
               className="w-auto">
-              <option value={dateOptions.yesterday}>Ayer</option>
-              <option value={dateOptions.today}>Hoy</option>
-              <option value={dateOptions.tomorrow}>Mañana</option>
-              <option value="more">Ver más fechas</option>
+              <option value={dateOptions.yesterday}>
+                {t("hotels.landing.yesterday")}
+              </option>
+              <option value={dateOptions.today}>
+                {t("hotels.landing.today")}
+              </option>
+              <option value={dateOptions.tomorrow}>
+                {t("hotels.landing.tomorrow")}
+              </option>
+              <option value="more">{t("hotels.landing.moreDates")}</option>
             </Input>
           </div>
 
           <Row className="mb-4">
             <Card>
               <CardBody>
-                <h5>Reservas y Habitaciones</h5>
+                <h5>{t("hotels.landing.reservationsAndRooms")}</h5>
 
                 {/* Tabs for Arrivals and Departures */}
                 <Nav tabs className="mt-3">
@@ -406,7 +417,7 @@ const HotelLandingPage = () => {
                       })}
                       onClick={() => toggleTab("arrivals")}
                       style={{ cursor: "pointer" }}>
-                      Llegadas
+                      {t("hotels.landing.arrivals")}
                     </NavLink>
                   </NavItem>
                   <NavItem>
@@ -416,7 +427,7 @@ const HotelLandingPage = () => {
                       })}
                       onClick={() => toggleTab("departures")}
                       style={{ cursor: "pointer" }}>
-                      Salidas
+                      {t("hotels.landing.departures")}
                     </NavLink>
                   </NavItem>
                   <NavItem>
@@ -424,7 +435,7 @@ const HotelLandingPage = () => {
                       className={classnames({ active: activeTab === "stays" })}
                       onClick={() => toggleTab("stays")}
                       style={{ cursor: "pointer" }}>
-                      Estancias
+                      {t("hotels.landing.stays")}
                     </NavLink>
                   </NavItem>
                   <NavItem>
@@ -432,7 +443,7 @@ const HotelLandingPage = () => {
                       className={classnames({ active: activeTab === "rooms" })}
                       onClick={() => toggleTab("rooms")}
                       style={{ cursor: "pointer" }}>
-                      Habitaciones
+                      {t("hotels.landing.rooms")}
                     </NavLink>
                   </NavItem>
                 </Nav>
@@ -440,7 +451,7 @@ const HotelLandingPage = () => {
                   <TabPane tabId="arrivals">
                     {data.arrivals.length === 0 ? (
                       <div className="text-muted">
-                        No hay llegadas para esta fecha.
+                        {t("hotels.landing.noArrivals")}
                       </div>
                     ) : (
                       data.arrivals.map((arrival, i) => (
@@ -458,7 +469,7 @@ const HotelLandingPage = () => {
                   <TabPane tabId="departures">
                     {data.departures.length === 0 ? (
                       <div className="text-muted">
-                        No hay salidas para esta fecha.
+                        {t("hotels.landing.noDepartures")}
                       </div>
                     ) : (
                       data.departures.map((departure, i) => (
@@ -476,7 +487,7 @@ const HotelLandingPage = () => {
                   <TabPane tabId="stays">
                     {data.stays.length === 0 ? (
                       <div className="text-muted">
-                        No hay estancias para esta fecha.
+                        {t("hotels.landing.noStays")}
                       </div>
                     ) : (
                       data.stays.map((stay, i) => (
@@ -493,25 +504,23 @@ const HotelLandingPage = () => {
                   <TabPane tabId="rooms">
                     <Row className="mb-4">
                       <Col md={12}>
-                        <strong>Información</strong>
+                        <strong>{t("hotels.landing.infoTitle")}</strong>
                         <p className="mb-0 text-dark">
-                          Esta sección muestra habitaciones que se ocupan o
-                          salen, incluyendo:
+                          {t("hotels.landing.infoText")}
                         </p>
                         <ul>
-                          <li>
-                            Habitaciones con fechas de llegada o salida
-                            diferentes a la de la reserva principal.
-                          </li>
-                          <li>Cambios de habitación.</li>
+                          <li>{t("hotels.landing.infoArrivingOrDeparting")}</li>
+                          <li>{t("hotels.landing.infoRoomChanges")}</li>
                         </ul>
                       </Col>
 
                       <Col md={6}>
-                        <strong>Llegando</strong>
+                        <strong>{t("hotels.landing.arriving")}</strong>
                         <ul>
                           {data.arrivingRooms?.length === 0 ? (
-                            <li className="text-muted">Ninguna</li>
+                            <li className="text-muted">
+                              {t("hotels.landing.none")}
+                            </li>
                           ) : (
                             data.arrivingRooms.map((item) => (
                               <li
@@ -522,8 +531,12 @@ const HotelLandingPage = () => {
                                   to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  title="Ver detalles de la reserva">
-                                  (Reserva # {item.bookingId})
+                                  title={t(
+                                    "hotels.landing.viewBookingDetails"
+                                  )}>
+                                  {t("hotels.landing.bookingNumber", {
+                                    bookingId: item.bookingId,
+                                  })}
                                 </Link>
                               </li>
                             ))
@@ -531,10 +544,12 @@ const HotelLandingPage = () => {
                         </ul>
                       </Col>
                       <Col md={6}>
-                        <strong>Saliendo</strong>
+                        <strong>{t("hotels.landing.departing")}</strong>
                         <ul>
                           {data.departingRooms?.length === 0 ? (
-                            <li className="text-muted">Ninguna</li>
+                            <li className="text-muted">
+                              {t("hotels.landing.none")}
+                            </li>
                           ) : (
                             data.departingRooms.map((item) => (
                               <li
@@ -545,8 +560,12 @@ const HotelLandingPage = () => {
                                   to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  title="Ver detalles de la reserva">
-                                  (Reserva # {item.bookingId})
+                                  title={t(
+                                    "hotels.landing.viewBookingDetails"
+                                  )}>
+                                  {t("hotels.landing.bookingNumber", {
+                                    bookingId: item.bookingId,
+                                  })}
                                 </Link>
                               </li>
                             ))

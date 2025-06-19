@@ -8,10 +8,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
 import "./DatePickers.css"; // Custom styles for the date picker
 import "./forms.css"; // Custom styles for the form elements
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const CustomDateTimePicker = ({ isRequired, ...props }) => {
   const [field, , helpers] = useField(props.name);
   const { setFieldValue } = useFormikContext();
+  const { t } = useLanguage(); // added
 
   const handleChange = (date) => {
     setFieldValue(field.name, date);
@@ -37,11 +39,11 @@ const CustomDateTimePicker = ({ isRequired, ...props }) => {
         autoComplete="off"
         popperClassName="custom-datepicker"
         style={{ height: "58px" }}
-        timeCaption="Hora"
+        timeCaption={t("commonUI.dateTimePicker.time")}
       />
       {isRequired && (
         <div
-          title="Campo requerido"
+          title={t("commonUI.customField.required")}
           className="required-icon position-absolute text-danger"
           style={{ top: "-7px", right: "-3px", fontSize: "0.65rem" }}>
           <FontAwesomeIcon icon={faAsterisk} />

@@ -16,6 +16,7 @@ import { getTransactionSubcategories } from "services/transactionsSubcategorySer
 
 import classNames from "classnames";
 import { toast } from "react-toastify";
+import { useLanguage } from "contexts/LanguageContext";
 
 function TransactionsTableFilters({
   hotelId,
@@ -35,6 +36,7 @@ function TransactionsTableFilters({
   handleHasDocumentUrlChange,
   handleClearAllFilters,
 }) {
+  const { t } = useLanguage();
   const [selectData, setSelectData] = useState({
     paymentMethods: [],
     transactionSubcategories: [],
@@ -56,7 +58,7 @@ function TransactionsTableFilters({
             "selected-option":
               Number(paginationData.categoryId) === category.id,
           })}>
-          {category.name}
+          {t(category.name)}
         </option>
       )
     );
@@ -68,7 +70,7 @@ function TransactionsTableFilters({
         className={classNames({
           "selected-option": Number(paginationData.statusId) === status.id,
         })}>
-        {status.name}
+        {t(status.name)}
       </option>
     ));
 
@@ -116,7 +118,7 @@ function TransactionsTableFilters({
       transactionSubcategories: transactionSubcategoriesOptions,
       financePartners: financePartnersOptions,
     };
-  }, [selectData, paginationData]);
+  }, [selectData, paginationData, t]);
 
   const onTransactionInputChange = (e) => {
     const { value } = e.target;
@@ -283,7 +285,7 @@ function TransactionsTableFilters({
         </Col>
         <Col lg="auto" xl="auto" className="mb-3">
           <Label for="transaction-category" className="text-dark">
-            Categoría:
+            {t("transactions.table.category")}
           </Label>
           <select
             id="transaction-category"
@@ -301,14 +303,16 @@ function TransactionsTableFilters({
                 "bg-dark-subtle": paginationData.categoryId,
               })}
               value="">
-              {paginationData.categoryId ? "Quitar Filtro" : "Seleccionar"}
+              {paginationData.categoryId
+                ? t("transactions.filters.clearFilter")
+                : t("transactions.filters.select")}
             </option>
             {selectOptions.transactionCategories}
           </select>
         </Col>
         <Col lg="auto" xl="auto" className="mb-3">
           <Label for="transaction-subcategory" className="text-dark">
-            Subcategoría:
+            {t("transactions.table.subcategory")}
           </Label>
           <select
             id="transaction-subcategory"
@@ -327,17 +331,17 @@ function TransactionsTableFilters({
               })}
               value="">
               {isLoadingSelectData
-                ? "cargando..."
+                ? t("transactions.filters.loading")
                 : paginationData.subcategoryId
-                ? "Quitar Filtro"
-                : "Seleccionar"}
+                ? t("transactions.filters.clearFilter")
+                : t("transactions.filters.select")}
             </option>
             {selectOptions.transactionSubcategories}
           </select>
         </Col>
         <Col lg="auto" xl="auto" className="mb-3">
           <Label for="payment-method" className="text-dark">
-            Método de pago:
+            {t("transactions.table.paymentMethod")}
           </Label>
           <select
             id="payment-method"
@@ -356,17 +360,17 @@ function TransactionsTableFilters({
               })}
               value="">
               {isLoadingSelectData
-                ? "cargando..."
+                ? t("transactions.filters.loading")
                 : paginationData.paymentMethodId
-                ? "Quitar Filtro"
-                : "Seleccionar"}
+                ? t("transactions.filters.clearFilter")
+                : t("transactions.filters.select")}
             </option>
             {selectOptions.paymentMethods}
           </select>
         </Col>
         <Col lg="auto" xl="auto" className="mb-3">
           <Label for="finance-partner" className="text-dark">
-            Socio Financiero:
+            {t("transactions.table.financePartner")}
           </Label>
           <select
             id="finance-partner"
@@ -385,17 +389,17 @@ function TransactionsTableFilters({
               })}
               value="">
               {isLoadingSelectData
-                ? "cargando..."
+                ? t("transactions.filters.loading")
                 : paginationData.financePartnerId
-                ? "Quitar Filtro"
-                : "Seleccionar"}
+                ? t("transactions.filters.clearFilter")
+                : t("transactions.filters.select")}
             </option>
             {selectOptions.financePartners}
           </select>
         </Col>
         <Col lg="auto" xl="auto" className="mb-3">
           <Label for="statusId" className="text-dark">
-            Estado:
+            {t("transactions.table.status")}
           </Label>
           <select
             id="statusId"
@@ -413,14 +417,16 @@ function TransactionsTableFilters({
                 "bg-dark-subtle": paginationData.statusId,
               })}
               value="">
-              {paginationData.statusId ? "Quitar Filtro" : "Seleccionar"}
+              {paginationData.statusId
+                ? t("transactions.filters.clearFilter")
+                : t("transactions.filters.select")}
             </option>
             {selectOptions.transactionStatuses}
           </select>
         </Col>
         <Col lg="auto" xl="auto" className="mb-3">
           <Label for="hasDocumentUrl" className="text-dark">
-            Comprobante
+            {t("transactions.filters.document")}
           </Label>
           <select
             id="hasDocumentUrl"
@@ -438,21 +444,21 @@ function TransactionsTableFilters({
               className={classNames({
                 "bg-dark-subtle": paginationData.hasDocumentUrl,
               })}>
-              Todos
+              {t("transactions.filters.all")}
             </option>
             <option
               value="true"
               className={classNames({
                 "selected-option": paginationData.hasDocumentUrl === "true",
               })}>
-              Con Comprobante
+              {t("transactions.filters.withDocument")}
             </option>
             <option
               value="false"
               className={classNames({
                 "selected-option": paginationData.hasDocumentUrl === "false",
               })}>
-              Sin Comprobante
+              {t("transactions.filters.withoutDocument")}
             </option>
           </select>
         </Col>
@@ -461,19 +467,19 @@ function TransactionsTableFilters({
         <Col lg={6} xl={3} className="mb-3">
           <Form onSubmit={handleTransactionIdFilterSubmit}>
             <Label for="transactionId" className="text-dark">
-              Id de transacción:
+              {t("transactions.filters.transactionId")}
             </Label>
             <InputGroup>
               <Input
                 id="transactionId"
                 type="text"
-                placeholder="Id de transacción"
+                placeholder={t("transactions.filters.transactionIdPlaceholder")}
                 value={transactionIdInput}
                 onChange={onTransactionInputChange}
                 disabled={loading}
               />
               <Button
-                title="Filtrar"
+                title={t("transactions.filters.filter")}
                 color="dark"
                 type="submit"
                 disabled={loading}>
@@ -482,7 +488,7 @@ function TransactionsTableFilters({
               <Button
                 color="outline-secondary"
                 type="button"
-                title="Limpiar filtro"
+                title={t("transactions.filters.clear")}
                 onClick={onClearTransactionId}
                 disabled={loading || !transactionIdInput}>
                 <FontAwesomeIcon icon={faBroom} />
@@ -493,19 +499,21 @@ function TransactionsTableFilters({
         <Col lg={6} xl={3} className="mb-3">
           <Form onSubmit={handleReferenceNumberFilterSubmit}>
             <Label for="referenceNumber" className="text-dark">
-              Número de referencia:
+              {t("transactions.filters.referenceNumber")}
             </Label>
             <InputGroup>
               <Input
                 id="referenceNumber"
                 type="text"
-                placeholder="Número de referencia"
+                placeholder={t(
+                  "transactions.filters.referenceNumberPlaceholder"
+                )}
                 value={referenceNumberInput}
                 disabled={loading}
                 onChange={onReferenceNumberInputChange}
               />
               <Button
-                title="Filtrar"
+                title={t("transactions.filters.filter")}
                 color="dark"
                 type="submit"
                 disabled={loading}>
@@ -514,7 +522,7 @@ function TransactionsTableFilters({
               <Button
                 color="outline-secondary"
                 type="button"
-                title="Limpiar filtro"
+                title={t("transactions.filters.clear")}
                 onClick={onClearReferenceNumber}
                 disabled={loading || !referenceNumberInput}>
                 <FontAwesomeIcon icon={faBroom} />
@@ -525,19 +533,19 @@ function TransactionsTableFilters({
         <Col lg={6} xl={3} className="mb-3">
           <Form onSubmit={handleEntityIdFilterSubmit}>
             <Label for="entityId" className="text-dark">
-              Id de Entidad Asociada:
+              {t("transactions.filters.entityId")}
             </Label>
             <InputGroup>
               <Input
                 id="entityId"
                 type="text"
-                placeholder="Id de entidad"
+                placeholder={t("transactions.filters.entityIdPlaceholder")}
                 value={entityIdInput}
                 onChange={onEntityIdInputChange}
                 disabled={loading}
               />
               <Button
-                title="Filtrar"
+                title={t("transactions.filters.filter")}
                 color="dark"
                 type="submit"
                 disabled={loading}>
@@ -546,7 +554,7 @@ function TransactionsTableFilters({
               <Button
                 color="outline-secondary"
                 type="button"
-                title="Limpiar filtro"
+                title={t("transactions.filters.clear")}
                 onClick={onClearEntityId}
                 disabled={loading || !entityIdInput}>
                 <FontAwesomeIcon icon={faBroom} />
@@ -557,19 +565,19 @@ function TransactionsTableFilters({
         <Col lg={6} xl={3} className="mb-3">
           <Form onSubmit={handleDescriptionFilterSubmit}>
             <Label for="description" className="text-dark">
-              Descripción:
+              {t("transactions.filters.description")}
             </Label>
             <InputGroup>
               <Input
                 id="description"
                 type="text"
-                placeholder="Descripción"
+                placeholder={t("transactions.filters.descriptionPlaceholder")}
                 value={descriptionInput}
                 onChange={onDescriptionInputChange}
                 disabled={loading}
               />
               <Button
-                title="Filtrar"
+                title={t("transactions.filters.filter")}
                 color="dark"
                 type="submit"
                 disabled={loading}>
@@ -578,7 +586,7 @@ function TransactionsTableFilters({
               <Button
                 color="outline-secondary"
                 type="button"
-                title="Limpiar filtro"
+                title={t("transactions.filters.clear")}
                 onClick={onClearDescription}
                 disabled={loading || !descriptionInput}>
                 <FontAwesomeIcon icon={faBroom} />
@@ -595,7 +603,7 @@ function TransactionsTableFilters({
             className="float-end"
             onClick={onClearAllFilters}
             disabled={loading}>
-            Limpiar Filtros
+            {t("transactions.filters.clearAll")}
           </Button>
         </Col>
       </Row>

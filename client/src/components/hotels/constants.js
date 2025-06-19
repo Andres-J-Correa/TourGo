@@ -1,21 +1,27 @@
 import * as Yup from "yup";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
-export const addValidationSchema = Yup.object().shape({
-  name: Yup.string()
-    .required("El nombre es obligatorio")
-    .max(100, "Máximo 100 caracteres"),
-  phone: Yup.string()
-    .required("El teléfono es obligatorio")
-    .max(20, "Máximo 20 caracteres"),
-  address: Yup.string()
-    .required("La dirección es obligatoria")
-    .max(200, "Máximo 200 caracteres"),
-  email: Yup.string()
-    .required("El correo electrónico es obligatorio")
-    .email("Formato de correo inválido")
-    .max(100),
-  taxId: Yup.string().required("El ID Fiscal es obligatorio").max(100),
-});
+export const useAddValidationSchema = () => {
+  const { t } = useLanguage();
+  return Yup.object().shape({
+    name: Yup.string()
+      .required(t("hotels.validation.nameRequired"))
+      .max(100, t("hotels.validation.nameMax")),
+    phone: Yup.string()
+      .required(t("hotels.validation.phoneRequired"))
+      .max(20, t("hotels.validation.phoneMax")),
+    address: Yup.string()
+      .required(t("hotels.validation.addressRequired"))
+      .max(200, t("hotels.validation.addressMax")),
+    email: Yup.string()
+      .required(t("hotels.validation.emailRequired"))
+      .email(t("hotels.validation.emailInvalid"))
+      .max(100, t("hotels.validation.emailMax")),
+    taxId: Yup.string()
+      .required(t("hotels.validation.taxIdRequired"))
+      .max(100, t("hotels.validation.taxIdMax")),
+  });
+};
 
 export const HOTEL_ROLES_IDS = {
   OWNER: 1,
@@ -24,38 +30,38 @@ export const HOTEL_ROLES_IDS = {
 };
 
 export const HOTEL_ROLES_BY_ID = {
-  1: "Propietario",
-  2: "Administrador",
-  3: "Recepcionista",
+  1: "hotels.roles.owner",
+  2: "hotels.roles.admin",
+  3: "hotels.roles.receptionist",
 };
 
 export const HOTEL_ROLES = [
   {
     id: 1,
-    name: "Propietario",
+    name: "hotels.roles.owner",
   },
   {
     id: 2,
-    name: "Administrador",
+    name: "hotels.roles.admin",
   },
   {
     id: 3,
-    name: "Recepcionista",
+    name: "hotels.roles.receptionist",
   },
 ];
 
 export const HOTEL_RESOURCES_BY_ID = {
-  1: "Hotel",
-  2: "Habitaciones",
-  3: "Reservas",
-  4: "Transacciones",
-  5: "Clientes",
-  6: "Cargos Extra",
-  7: "Facturas",
-  8: "Subcategorías de Transacciones",
-  9: "Métodos de Pago",
-  10: "Proveedores de Reservas",
-  11: "Socios financieros",
-  12: "Invitaciones de Personal",
-  13: "Reportes financieros",
+  1: "hotels.resources.hotel",
+  2: "hotels.resources.rooms",
+  3: "hotels.resources.bookings",
+  4: "hotels.resources.transactions",
+  5: "hotels.resources.customers",
+  6: "hotels.resources.extraCharges",
+  7: "hotels.resources.invoices",
+  8: "hotels.resources.transactionSubcategories",
+  9: "hotels.resources.paymentMethods",
+  10: "hotels.resources.bookingProviders",
+  11: "hotels.resources.financePartners",
+  12: "hotels.resources.staffInvites",
+  13: "hotels.resources.financialReports",
 };

@@ -12,7 +12,8 @@ import {
   updateStaffRole,
   deleteStaff,
 } from "services/staffService";
-import { HOTEL_ROLES } from "components/hotels/constants";
+import { HOTEL_ROLES, HOTEL_ROLES_IDS } from "components/hotels/constants";
+import { useLanguage } from "contexts/LanguageContext";
 
 const StaffList = () => {
   const [staff, setStaff] = useState({
@@ -22,16 +23,17 @@ const StaffList = () => {
   const [loading, setLoading] = useState(true);
 
   const { hotelId } = useParams();
+  const { t } = useLanguage();
 
   const handleDeleteClick = useCallback(
     async (id) => {
       const result = await Swal.fire({
-        title: "¿Está seguro?",
-        text: "No podrás revertir esto!",
+        title: t("staff.list.deleteConfirmTitle"),
+        text: t("staff.list.deleteConfirmText"),
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, eliminar personal",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: t("staff.list.deleteConfirmYes"),
+        cancelButtonText: t("common.cancel"),
       });
 
       if (!result.isConfirmed) {
@@ -40,8 +42,8 @@ const StaffList = () => {
 
       try {
         Swal.fire({
-          title: "Eliminando personal",
-          text: "Por favor espera",
+          title: t("staff.list.deletingTitle"),
+          text: t("staff.list.deletingText"),
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
@@ -60,8 +62,8 @@ const StaffList = () => {
           });
           Swal.fire({
             icon: "success",
-            title: "Personal eliminado",
-            text: "El personal se ha eliminado correctamente",
+            title: t("staff.list.deleteSuccessTitle"),
+            text: t("staff.list.deleteSuccessText"),
             timer: 1500,
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -71,35 +73,36 @@ const StaffList = () => {
         Swal.close();
         await Swal.fire({
           icon: "error",
-          title: "Error",
-          text: "No se pudo eliminar el personal, intente nuevamente.",
+          title: t("common.error"),
+          text: t("staff.list.deleteError"),
         });
       }
     },
-    [hotelId]
+    [hotelId, t]
   );
 
   const handleUpdateRoleClick = useCallback(
     async (staffId, currentRoleId) => {
       const inputOptions = {};
       HOTEL_ROLES.forEach((role) => {
-        inputOptions[role.id] = role.name;
+        if (role.id === HOTEL_ROLES_IDS.OWNER) return;
+        inputOptions[role.id] = t(role.name);
       });
 
       const { value: selectedRoleId, isConfirmed } = await Swal.fire({
-        title: "Actualizar rol del personal",
+        title: t("staff.list.updateRoleTitle"),
         input: "select",
         inputOptions,
         inputValue: currentRoleId,
         showCancelButton: true,
-        confirmButtonText: "Actualizar",
-        cancelButtonText: "Cancelar",
-        inputLabel: "Selecciona un nuevo rol",
+        confirmButtonText: t("staff.list.updateRoleConfirm"),
+        cancelButtonText: t("common.cancel"),
+        inputLabel: t("staff.list.updateRoleLabel"),
         inputValidator: (value) => {
           if (!value) {
-            return "Debes seleccionar un rol";
+            return t("staff.list.updateRoleRequired");
           } else if (Number(value) === Number(currentRoleId)) {
-            return "El rol seleccionado es el mismo que el actual";
+            return t("staff.list.updateRoleSame");
           }
         },
       });
@@ -108,8 +111,8 @@ const StaffList = () => {
 
       try {
         Swal.fire({
-          title: "Actualizando rol",
-          text: "Por favor espera",
+          title: t("staff.list.updatingRoleTitle"),
+          text: t("staff.list.updatingRoleText"),
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
@@ -128,8 +131,8 @@ const StaffList = () => {
           });
           Swal.fire({
             icon: "success",
-            title: "Rol actualizado",
-            text: "El rol del personal se ha actualizado correctamente",
+            title: t("staff.list.updateRoleSuccessTitle"),
+            text: t("staff.list.updateRoleSuccessText"),
             timer: 1500,
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -139,12 +142,12 @@ const StaffList = () => {
         Swal.close();
         await Swal.fire({
           icon: "error",
-          title: "Error",
-          text: "No se pudo actualizar el rol, intente nuevamente.",
+          title: t("common.error"),
+          text: t("staff.list.updateRoleError"),
         });
       }
     },
-    [hotelId]
+    [hotelId, t]
   );
 
   const mapStaff = useCallback(
@@ -176,12 +179,15 @@ const StaffList = () => {
     }
   };
 
-  const onGetStaffError = (err) => {
-    if (err?.response?.status !== 404) {
-      toast.error("Error al obtener el personal del hotel");
-    }
-    setStaff([]);
-  };
+  const onGetStaffError = useCallback(
+    (err) => {
+      if (err?.response?.status !== 404) {
+        toast.error(t("staff.list.loadError"));
+      }
+      setStaff([]);
+    },
+    [t]
+  );
 
   useEffect(() => {
     if (hotelId) {
@@ -193,7 +199,7 @@ const StaffList = () => {
           setLoading(false);
         });
     }
-  }, [hotelId]);
+  }, [hotelId, onGetStaffError]);
 
   useEffect(() => {
     if (staff.items.length > 0) {

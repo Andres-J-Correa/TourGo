@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { Container, Row } from "reactstrap";
+import { withTranslation } from "react-i18next";
 
 // Error Boundary Component (Class-based)
 class ErrorBoundary extends React.Component {
@@ -30,7 +31,7 @@ class ErrorBoundary extends React.Component {
   // Render the fallback UI or children based on error state
   render() {
     const { errorInfo, error } = this.state;
-    const { children, fallbackUI } = this.props;
+    const { children, fallbackUI, t } = this.props; // Add t from props
 
     // If there's no error, render the children normally
     if (!errorInfo) {
@@ -44,12 +45,9 @@ class ErrorBoundary extends React.Component {
       <Container>
         <Row>
           <div>
-            <h2>Algo salió mal</h2>
-            <h3>Lo sentimos, ha ocurrido un error inesperado.</h3>
-            <h4>
-              Recarga la pagina, si el error persiste, toma pantallazo y
-              contacta al administrador.
-            </h4>
+            <h2>{t("commonUI.errorBoundary.title")}</h2>
+            <h3>{t("commonUI.errorBoundary.subtitle")}</h3>
+            <h4>{t("commonUI.errorBoundary.instructions")}</h4>
             <span>{error && error.toString()}</span>
             <br />
             {errorInfo.componentStack}
@@ -65,4 +63,4 @@ ErrorBoundary.propTypes = {
   fallbackUI: PropTypes.element, // Optional custom fallback UI
 };
 
-export default ErrorBoundary;
+export default withTranslation()(ErrorBoundary);

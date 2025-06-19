@@ -8,11 +8,13 @@ import CustomField from "components/commonUI/forms/CustomField";
 import DateTimePicker from "components/commonUI/forms/DateTimePicker";
 
 import dayjs from "dayjs";
+import { useLanguage } from "contexts/LanguageContext";
 
 function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
   const [mappedBookingProviderOptions, setMappedBookingProviderOptions] =
     useState([]);
   const { setFieldValue, values } = useFormikContext();
+  const { t } = useLanguage();
 
   const handleInputChange = (e, fieldName) => {
     const value = e.target.value;
@@ -62,13 +64,13 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
 
   return (
     <>
-      <h5 className="mt-4 mb-3">Información adicional</h5>
+      <h5 className="mt-4 mb-3">{t("booking.additionalInfo.title")}</h5>
       <Row>
         <Col md="4">
           <CustomField
             name="adultGuests"
             type="number"
-            placeholder="Número de Personas (5 años o más)"
+            placeholder={t("booking.additionalInfo.adultGuests")}
             isRequired={true}
             disabled={submitting}
             onChange={(e) => handleInputChange(e, "adultGuests")}
@@ -78,7 +80,7 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
           <CustomField
             name="childGuests"
             type="number"
-            placeholder="Número de Niños (0-4 años)"
+            placeholder={t("booking.additionalInfo.childGuests")}
             disabled={submitting}
             onChange={(e) => handleInputChange(e, "childGuests")}
           />
@@ -86,7 +88,7 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
         <Col md="4">
           <DateTimePicker
             name="eta"
-            placeholder="Fecha y Hora estimada de llegada"
+            placeholder={t("booking.additionalInfo.eta")}
             onChange={(date) => handleEtaChange(date)}
             disabled={submitting}
           />
@@ -98,10 +100,10 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
             as="select"
             name="bookingProviderId"
             className="form-select"
-            placeholder="Proveedor de reservas (Booking/Airbnb...)"
+            placeholder={t("booking.additionalInfo.bookingProvider")}
             disabled={submitting}
             onChange={handleBookingProviderChange}>
-            <option value="">Sin Proveedor</option>
+            <option value="">{t("booking.additionalInfo.noProvider")}</option>
             {mappedBookingProviderOptions}
           </CustomField>
         </Col>
@@ -109,7 +111,7 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
           <CustomField
             name="externalId"
             type="text"
-            placeholder="Identificación externa (Booking/Airbnb...)"
+            placeholder={t("booking.additionalInfo.externalId")}
             isRequired={Boolean(values.bookingProviderId)}
             disabled={submitting || !Boolean(values.bookingProviderId)}
             onChange={(e) => handleInputChange(e, "externalId")}
@@ -119,7 +121,7 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
           <CustomField
             name="externalCommission"
             type="number"
-            placeholder="Comision externa"
+            placeholder={t("booking.additionalInfo.externalCommission")}
             step="0.01"
             isRequired={Boolean(values.bookingProviderId)}
             disabled={submitting || !Boolean(values.bookingProviderId)}
@@ -132,7 +134,7 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
           <CustomField
             as="textarea"
             name="notes"
-            placeholder="Notas"
+            placeholder={t("booking.additionalInfo.notes")}
             disabled={submitting}
             onChange={(e) => handleInputChange(e, "notes")}
           />

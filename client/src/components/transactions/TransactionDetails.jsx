@@ -38,14 +38,17 @@ const TransactionDetails = ({
   const [documentUrl, setDocumentUrl] = useState(null);
   const [offCanvasOpen, setOffcanvasOpen] = useState(false);
 
-  const { getTranslatedErrorMessage } = useLanguage();
+  const { t, getTranslatedErrorMessage } = useLanguage();
 
   const { hotelId } = useParams();
 
-  const category =
-    TRANSACTION_CATEGORIES_BY_ID[txn.categoryId] || "Desconocido";
+  const category = TRANSACTION_CATEGORIES_BY_ID[txn.categoryId]
+    ? t(TRANSACTION_CATEGORIES_BY_ID[txn.categoryId])
+    : t("transactions.details.unknown");
 
-  const status = TRANSACTION_STATUS_BY_ID[txn.statusId] || "Desconocido";
+  const status = TRANSACTION_STATUS_BY_ID[txn.statusId]
+    ? t(TRANSACTION_STATUS_BY_ID[txn.statusId])
+    : t("transactions.details.unknown");
 
   const handleToggleOffcanvas = () => {
     setOffcanvasOpen((prev) => !prev);
@@ -63,7 +66,11 @@ const TransactionDetails = ({
         throw new Error("Error loading document");
       }
     } catch {
-      Swal.fire("Error", "No se pudo cargar el comprobante", "error");
+      Swal.fire(
+        t("common.error"),
+        t("transactions.details.loadDocumentError"),
+        "error"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -71,12 +78,12 @@ const TransactionDetails = ({
 
   const handleFileSubmit = async () => {
     const result = await Swal.fire({
-      title: "¿Subir comprobante?",
-      text: "Este comprobante no podrá cambiarse después",
+      title: t("transactions.details.uploadTitle"),
+      text: t("transactions.details.uploadText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, subir",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("transactions.details.uploadConfirm"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: true,
     });
 
@@ -87,8 +94,8 @@ const TransactionDetails = ({
     try {
       setSubmitting(true);
       Swal.fire({
-        title: "Subiendo comprobante",
-        text: "Por favor espera",
+        title: t("transactions.details.uploadingTitle"),
+        text: t("transactions.details.uploadingText"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -104,13 +111,21 @@ const TransactionDetails = ({
 
       if (uploadResponse.isSuccessful) {
         updateHasDocumentUrl(txn.id, true);
-        Swal.fire("Éxito", "Comprobante subido correctamente", "success");
+        Swal.fire(
+          t("common.success"),
+          t("transactions.details.uploadSuccess"),
+          "success"
+        );
         setShowUploader(false);
       } else {
         throw new Error("Upload failed");
       }
     } catch {
-      Swal.fire("Error", "No se pudo subir el comprobante", "error");
+      Swal.fire(
+        t("common.error"),
+        t("transactions.details.uploadError"),
+        "error"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -119,13 +134,13 @@ const TransactionDetails = ({
   const handleReverseTransaction = async (e) => {
     e.preventDefault();
     const result = await Swal.fire({
-      title: "¿Revertir transacción?",
-      text: "Esta acción generará una transacción de reversión que cancelará esta transacción. ¿Estás seguro?",
+      title: t("transactions.details.reverseTitle"),
+      text: t("transactions.details.reverseText"),
       icon: "warning",
       showConfirmButton: true,
       showCancelButton: true,
-      confirmButtonText: "Sí, revertir",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("transactions.details.reverseConfirm"),
+      cancelButtonText: t("common.cancel"),
       confirmButtonColor: "red",
       reverseButtons: true,
       didOpen: () => {
@@ -144,8 +159,8 @@ const TransactionDetails = ({
     if (!result.isConfirmed) return;
 
     Swal.fire({
-      title: "Revirtiendo transacción",
-      text: "Por favor espera",
+      title: t("transactions.details.reversingTitle"),
+      text: t("transactions.details.reversingText"),
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading(),
     });
@@ -155,10 +170,10 @@ const TransactionDetails = ({
       if (response.isSuccessful) {
         onReverseSuccess(txn.id, response.item);
         Swal.fire({
-          title: "Éxito",
-          text: "Transacción revertida correctamente",
+          title: t("common.success"),
+          text: t("transactions.details.reverseSuccess"),
           icon: "success",
-          confirmButtonText: "OK",
+          confirmButtonText: t("common.ok"),
         });
       } else {
         throw new Error("Error reverting transaction");
@@ -169,37 +184,37 @@ const TransactionDetails = ({
       Swal.close();
 
       Swal.fire({
-        title: "Error",
+        title: t("common.error"),
         text: errorMessage,
         icon: "error",
-        confirmButtonText: "OK",
+        confirmButtonText: t("common.ok"),
       });
     }
   };
 
   const handleEditDescription = async () => {
     const { value: newDescription } = await Swal.fire({
-      title: "Editar Descripción",
+      title: t("transactions.details.editDescriptionTitle"),
       input: "textarea",
-      inputLabel: "Nueva descripción",
+      inputLabel: t("transactions.details.editDescriptionLabel"),
       inputValue: txn.description || "",
-      inputPlaceholder: "Escribe la nueva descripción aquí...",
+      inputPlaceholder: t("transactions.details.editDescriptionPlaceholder"),
       showCancelButton: true,
-      confirmButtonText: "Guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("transactions.details.save"),
+      cancelButtonText: t("common.cancel"),
       inputAttributes: {
-        "aria-label": "Nueva descripción",
+        "aria-label": t("transactions.details.editDescriptionLabel"),
       },
       inputValidator: (value) => {
         if (value.length > 500) {
-          return "La descripción no puede exceder los 500 caracteres";
+          return t("transactions.validation.descriptionMax");
         }
       },
     });
 
     if (newDescription !== undefined && newDescription !== txn.description) {
       Swal.fire({
-        title: "Guardando...",
+        title: t("transactions.details.savingTitle"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -210,14 +225,22 @@ const TransactionDetails = ({
           hotelId
         );
         if (response.isSuccessful) {
-          Swal.fire("Éxito", "Descripción actualizada", "success").then(() => {
+          Swal.fire(
+            t("common.success"),
+            t("transactions.details.editDescriptionSuccess"),
+            "success"
+          ).then(() => {
             onEditDescriptionSuccess(txn.id, newDescription);
           });
         } else {
-          throw new Error("No se pudo actualizar la descripción");
+          throw new Error(t("transactions.details.editDescriptionError"));
         }
       } catch {
-        Swal.fire("Error", "No se pudo actualizar la descripción", "error");
+        Swal.fire(
+          t("common.error"),
+          t("transactions.details.editDescriptionError"),
+          "error"
+        );
       }
     }
   };
@@ -227,64 +250,64 @@ const TransactionDetails = ({
       <LoadingOverlay isVisible={isLoading} />
       <Row>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Transacción #</strong>
+          <strong>{t("transactions.details.transactionId")}</strong>
           <br />
           {txn.id}
         </Col>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Id Precursor:</strong> <br />
+          <strong>{t("transactions.details.parentId")}</strong> <br />
           {txn.parentId || " - "}
         </Col>
         <Col xl={3} md={12} className="mb-2">
-          <strong>Referencia:</strong> <br />{" "}
-          {txn.referenceNumber || "Sin referencia"}
+          <strong>{t("transactions.details.reference")}</strong> <br />{" "}
+          {txn.referenceNumber || t("transactions.details.noReference")}
         </Col>
       </Row>
 
       <Row>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Estado:</strong> <br />
+          <strong>{t("transactions.details.status")}</strong> <br />
           {status}
         </Col>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Subcategoría:</strong> <br />
-          {txn.subcategory?.name || "Sin subcategoría"}
+          <strong>{t("transactions.details.subcategory")}</strong> <br />
+          {txn.subcategory?.name || t("transactions.details.noSubcategory")}
         </Col>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Categoría:</strong> <br />
+          <strong>{t("transactions.details.category")}</strong> <br />
           {category}
         </Col>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Método de Pago:</strong> <br />
+          <strong>{t("transactions.details.paymentMethod")}</strong> <br />
           {txn.paymentMethod?.name}
         </Col>
       </Row>
 
       <Row>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Aprobada por:</strong> <br />
+          <strong>{t("transactions.details.approvedBy")}</strong> <br />
           {txn.approvedBy?.firstName} {txn.approvedBy?.lastName || " - "}
         </Col>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Socio Financiero:</strong> <br />
+          <strong>{t("transactions.details.financePartner")}</strong> <br />
           {txn.financePartner?.name || " - "}
         </Col>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Creada por:</strong> <br />
+          <strong>{t("transactions.details.createdBy")}</strong> <br />
           {txn.createdBy?.firstName} {txn.createdBy?.lastName}
         </Col>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Creada el:</strong> <br />
+          <strong>{t("transactions.details.createdAt")}</strong> <br />
           {dayjs(txn.dateCreated).format("DD/MMM/YYYY - h:mm A")}
         </Col>
       </Row>
       <Row>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Modificada por:</strong> <br />
+          <strong>{t("transactions.details.modifiedBy")}</strong> <br />
           {txn.modifiedBy?.firstName} {txn.modifiedBy?.lastName}
         </Col>
         <Col xl={3} md={6} className="mb-2">
-          <strong>Modificada el:</strong> <br />
+          <strong>{t("transactions.details.modifiedAt")}</strong> <br />
           {dayjs(txn.dateModified).format("DD/MMM/YYYY - h:mm A")}
         </Col>
       </Row>
@@ -292,7 +315,8 @@ const TransactionDetails = ({
       {txn?.description && (
         <Row>
           <Col>
-            <strong>Descripción:</strong> <br /> {txn.description}
+            <strong>{t("transactions.details.description")}</strong> <br />{" "}
+            {txn.description}
           </Col>
         </Row>
       )}
@@ -304,7 +328,7 @@ const TransactionDetails = ({
               color="secondary"
               onClick={handleEditDescription}
               className="float-start">
-              Editar Descripción
+              {t("transactions.details.editDescription")}
             </Button>
           )}
           {Boolean(onEditTransaction) &&
@@ -315,7 +339,7 @@ const TransactionDetails = ({
                 color="outline-danger"
                 onClick={() => onEditTransaction(txn)}
                 className="float-start">
-                Editar Transacción
+                {t("transactions.details.editTransaction")}
               </Button>
             )}
           {updateHasDocumentUrl &&
@@ -329,10 +353,10 @@ const TransactionDetails = ({
                   setShowUploader((prev) => !prev);
                 }}>
                 {showUploader
-                  ? "Cancelar"
+                  ? t("common.cancel")
                   : txn.hasDocumentUrl
-                  ? "Cambiar Comprobante"
-                  : "Adjuntar Comprobante"}
+                  ? t("transactions.details.changeDocument")
+                  : t("transactions.details.attachDocument")}
               </Button>
             )}
           {txn.hasDocumentUrl && (
@@ -341,7 +365,7 @@ const TransactionDetails = ({
               color="outline-success"
               onClick={handleViewDocument}
               className="me-2">
-              Ver comprobante
+              {t("transactions.details.viewDocument")}
             </Button>
           )}
           {!txn.parentId && (
@@ -349,7 +373,7 @@ const TransactionDetails = ({
               size="sm"
               color="outline-secondary"
               onClick={handleToggleOffcanvas}>
-              Ver Historial
+              {t("transactions.details.viewHistory")}
             </Button>
           )}
           {onReverseSuccess &&
@@ -359,7 +383,7 @@ const TransactionDetails = ({
                 color="outline-danger"
                 className="float-end"
                 onClick={handleReverseTransaction}>
-                Revertir
+                {t("transactions.details.reverse")}
               </Button>
             )}
         </Col>
@@ -369,10 +393,12 @@ const TransactionDetails = ({
         <Row className="mt-3">
           <Col>
             <h6 className="text-center mt-3 mb-1">
-              Adjuntar Comprobante
+              {t("transactions.details.attachDocument")}
               <span className="text-muted"> (.png, .jpg, .jpeg, .webp)</span>
               <br />
-              <span className="text-muted">(Máx. 1 MB)</span>
+              <span className="text-muted">
+                {t("transactions.details.maxSize")}
+              </span>
             </h6>
             <Dropzone
               onDropAccepted={(acceptedFiles) => setFiles(acceptedFiles)}
@@ -392,7 +418,7 @@ const TransactionDetails = ({
                   color="success"
                   onClick={handleFileSubmit}
                   disabled={submitting || files.length === 0}>
-                  Subir comprobante
+                  {t("transactions.details.uploadDocument")}
                 </Button>
               </div>
             }

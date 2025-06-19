@@ -7,6 +7,7 @@ import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import InvoicesTC from "components/hotels/InvoicesTC";
+import { useLanguage } from "contexts/LanguageContext";
 
 const tabComponents = {
   edit: HotelEdit,
@@ -21,6 +22,7 @@ const HotelSettings = () => {
   const location = useLocation();
   const { hotelId } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const activeTab = useMemo(
     () => new URLSearchParams(location.search).get("tab") || "edit",
@@ -28,9 +30,9 @@ const HotelSettings = () => {
   );
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("hotels.breadcrumbs.home"), path: "/" },
+    { label: t("hotels.breadcrumbs.hotels"), path: "/hotels" },
+    { label: t("hotels.settings.breadcrumbHotel"), path: `/hotels/${hotelId}` },
   ];
 
   const handleTabChange = (tab) => {
@@ -48,12 +50,15 @@ const HotelSettings = () => {
     if (Component) {
       return <Component hotelId={hotelId} />;
     }
-    return <div>Seleccione una opción 👈</div>;
+    return <div>{t("hotels.settings.selectOption")}</div>;
   };
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Configuración" />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("hotels.settings.title")}
+      />
       <ErrorBoundary>
         <LoadingOverlay isVisible={user.isLoading} />
         <Row className="min-vh-50">
@@ -68,7 +73,7 @@ const HotelSettings = () => {
                   active={activeTab === "edit"}
                   onClick={() => handleTabChange("edit")}
                   className="cursor-pointer">
-                  Editar Hotel
+                  {t("hotels.settings.editTab")}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -76,7 +81,7 @@ const HotelSettings = () => {
                   active={activeTab === "invoices"}
                   onClick={() => handleTabChange("invoices")}
                   className="cursor-pointer">
-                  T&C Facturas
+                  {t("hotels.settings.invoicesTab")}
                 </NavLink>
               </NavItem>
             </Nav>

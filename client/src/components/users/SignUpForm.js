@@ -7,7 +7,7 @@ import CustomField from "components/commonUI/forms/CustomField";
 import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
-import { userSignUpSchema } from "components/users/validationSchemas";
+import { useUserSignUpSchema } from "components/users/validationSchemas";
 import { useLanguage } from "contexts/LanguageContext";
 import { usersRegister } from "services/userAuthService";
 import { ERROR_CODES } from "constants/errorCodes";
@@ -27,14 +27,14 @@ const initialValues = {
 function SignUpForm({ onSignIn, loading, setLoading }) {
   const { t, getTranslatedErrorMessage } = useLanguage();
   const formRef = useRef(null);
-  const validationSchema = userSignUpSchema;
+  const validationSchema = useUserSignUpSchema();
 
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
       const response = await usersRegister(values);
       if (!Boolean(response?.item)) {
-        throw new Error("User not found");
+        throw new Error(t("users.signUpForm.userNotFound"));
       }
       toast.success(t("common.success"));
       if (onSignIn) onSignIn();

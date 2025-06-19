@@ -46,7 +46,7 @@ const validationSchema = Yup.object().shape({
 function BookingProvidersView() {
   const { hotelId } = useParams();
   const { user } = useAppContext();
-  const { getTranslatedErrorMessage } = useLanguage();
+  const { getTranslatedErrorMessage, t } = useLanguage(); // changed
   const [bookingProviders, setBookingProviders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState([]);
@@ -58,9 +58,9 @@ function BookingProvidersView() {
   });
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("booking.breadcrumb.home"), path: "/" },
+    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
+    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
   ];
 
   const filteredData = useMemo(() => {
@@ -97,14 +97,14 @@ function BookingProvidersView() {
     const { id, ...data } = values;
 
     const result = await Swal.fire({
-      title: `Está seguro de que desea ${
-        id ? "actualizar" : "agregar"
-      } el proveedor de reservas?`,
-      text: "Revise los datos antes de continuar.",
+      title: id
+        ? t("booking.providers.confirmUpdateTitle")
+        : t("booking.providers.confirmAddTitle"),
+      text: t("booking.providers.confirmText"),
       icon: "info",
       showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("booking.providers.confirmSave"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: Boolean(id),
     });
 
@@ -114,8 +114,8 @@ function BookingProvidersView() {
 
     try {
       Swal.fire({
-        title: "Guardando proveedor de reservas",
-        text: "Por favor espera",
+        title: t("booking.providers.savingTitle"),
+        text: t("booking.providers.savingText"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -169,8 +169,8 @@ function BookingProvidersView() {
         toggleForm();
         await Swal.fire({
           icon: "success",
-          title: "Proveedor de reservas guardado",
-          text: "El proveedor de reservas se ha guardado correctamente",
+          title: t("booking.providers.saveSuccessTitle"),
+          text: t("booking.providers.saveSuccessText"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -182,8 +182,8 @@ function BookingProvidersView() {
       Swal.close(); // Close loading
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo guardar el proveedor de reservas, intente nuevamente.",
+        title: t("common.error"),
+        text: t("booking.providers.saveErrorText"),
       });
     } finally {
       setIsUploading(false);
@@ -201,12 +201,12 @@ function BookingProvidersView() {
   const handleDeleteClick = useCallback(
     async (id) => {
       const result = await Swal.fire({
-        title: "¿Está seguro?",
-        text: "No podrás revertir esto!",
+        title: t("booking.providers.deleteConfirmTitle"),
+        text: t("booking.providers.deleteConfirmText"),
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: t("booking.providers.deleteConfirmYes"),
+        cancelButtonText: t("common.cancel"),
       });
 
       if (!result.isConfirmed) {
@@ -216,8 +216,8 @@ function BookingProvidersView() {
       try {
         setIsUploading(true);
         Swal.fire({
-          title: "Eliminando el proveedor de reservas",
-          text: "Por favor espera",
+          title: t("booking.providers.deletingTitle"),
+          text: t("booking.providers.deletingText"),
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
@@ -242,8 +242,8 @@ function BookingProvidersView() {
           });
           await Swal.fire({
             icon: "success",
-            title: "Proveedor de reservas eliminado",
-            text: "El proveedor de reservas se ha eliminado correctamente",
+            title: t("booking.providers.deleteSuccessTitle"),
+            text: t("booking.providers.deleteSuccessText"),
             timer: 1500,
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -255,16 +255,16 @@ function BookingProvidersView() {
         Swal.close();
 
         Swal.fire({
-          title: "Error",
+          title: t("common.error"),
           text: errorMessage,
           icon: "error",
-          confirmButtonText: "OK",
+          confirmButtonText: t("common.ok"),
         });
       } finally {
         setIsUploading(false);
       }
     },
-    [currentUser, getTranslatedErrorMessage]
+    [currentUser, getTranslatedErrorMessage, t]
   );
 
   const columns = useMemo(
@@ -276,16 +276,16 @@ function BookingProvidersView() {
       },
       {
         accessorKey: "name",
-        header: "Nombre",
+        header: t("booking.providers.name"),
       },
       {
         accessorKey: "isActive",
-        header: "Activo",
+        header: t("booking.providers.active"),
         maxSize: 70,
-        cell: (info) => (info.getValue() ? "Sí" : "No"),
+        cell: (info) => (info.getValue() ? t("common.yes") : t("common.no")),
       },
       {
-        header: "Acciones",
+        header: t("booking.providers.actions"),
         enableSorting: false,
         maxSize: 140,
         cell: (info) => {
@@ -302,7 +302,7 @@ function BookingProvidersView() {
                       e.stopPropagation();
                       handleUpdateClick(bookingProvider);
                     }}>
-                    Editar
+                    {t("booking.providers.edit")}
                   </Button>
                   <Button
                     color="danger"
@@ -312,7 +312,7 @@ function BookingProvidersView() {
                       e.stopPropagation();
                       handleDeleteClick(bookingProvider.id);
                     }}>
-                    Eliminar
+                    {t("booking.providers.delete")}
                   </Button>
                 </div>
               )}
@@ -321,7 +321,7 @@ function BookingProvidersView() {
         },
       },
     ],
-    [handleDeleteClick]
+    [handleDeleteClick, t]
   );
 
   const onGetBookingProvidersSuccess = (response) => {
@@ -330,11 +330,14 @@ function BookingProvidersView() {
     }
   };
 
-  const onGetBookingProvidersError = (error) => {
-    if (error?.response?.status !== 404) {
-      toast.error("Error al cargar los métodos de pago");
-    }
-  };
+  const onGetBookingProvidersError = useCallback(
+    (error) => {
+      if (error?.response?.status !== 404) {
+        toast.error(t("booking.providers.loadError"));
+      }
+    },
+    [t]
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -344,21 +347,24 @@ function BookingProvidersView() {
       .finally(() => {
         setLoading(false);
       });
-  }, [hotelId]);
+  }, [hotelId, onGetBookingProvidersError]);
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Proveedores de Reservas" />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("booking.providers.title")}
+      />
       <ErrorBoundary>
-        <h3>Proveedores de Reservas</h3>
+        <h3>{t("booking.providers.title")}</h3>
 
         {showForm && (
           <Card className="border-0 shadow-lg mt-3">
             <CardBody className="p-3">
               <CardTitle tag="h5">
                 {initialValues.id
-                  ? "Editar proveedor de reservas"
-                  : "Nuevo proveedor de reservas"}
+                  ? t("booking.providers.editTitle")
+                  : t("booking.providers.newTitle")}
               </CardTitle>
               <Formik
                 initialValues={initialValues}
@@ -374,7 +380,7 @@ function BookingProvidersView() {
                           name="name"
                           type="text"
                           className="form-control"
-                          placeholder="Nombre del proveedor de reservas"
+                          placeholder={t("booking.providers.namePlaceholder")}
                           isRequired={true}
                         />
                       </Col>
@@ -397,9 +403,9 @@ function BookingProvidersView() {
                             {isUploading ? (
                               <Spinner size="sm" color="light" />
                             ) : initialValues.id ? (
-                              "Actualizar"
+                              t("booking.providers.update")
                             ) : (
-                              "Agregar"
+                              t("booking.providers.add")
                             )}
                           </Button>
                         </div>
@@ -413,12 +419,12 @@ function BookingProvidersView() {
         )}
         <div className="mt-4">
           <Button color={showForm ? "warning" : "dark"} onClick={toggleForm}>
-            {showForm ? "Cancelar" : "Agregar Proveedor de Reservas"}
+            {showForm ? t("common.cancel") : t("booking.providers.addProvider")}
           </Button>
         </div>
         <div className="mb-3 float-end">
           <Label for="isActiveFilter" className="text-dark">
-            Filtrar por Estado
+            {t("booking.providers.filterByStatus")}
           </Label>
           <Input
             id="isActiveFilter"
@@ -426,9 +432,9 @@ function BookingProvidersView() {
             style={{ width: "auto" }}
             value={isActiveFilter}
             onChange={(e) => setIsActiveFilter(e.target.value)}>
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
-            <option value="all">Todos</option>
+            <option value="active">{t("booking.providers.active")}</option>
+            <option value="inactive">{t("booking.providers.inactive")}</option>
+            <option value="all">{t("booking.providers.all")}</option>
           </Input>
         </div>
         <div className="table-responsive w-100">
@@ -442,12 +448,12 @@ function BookingProvidersView() {
               <div className="p-2 border border-info-subtle bg-light">
                 <Row>
                   <Col md={6}>
-                    <strong>Creado por:</strong>{" "}
+                    <strong>{t("booking.auditableInfo.createdBy")}</strong>{" "}
                     {row.original.createdBy?.firstName}{" "}
                     {row.original.createdBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de creación:</strong>{" "}
+                    <strong>{t("booking.auditableInfo.dateCreated")}</strong>{" "}
                     {dayjs(row.original.dateCreated).format(
                       "DD/MM/YYYY - h:mm A"
                     )}
@@ -455,12 +461,12 @@ function BookingProvidersView() {
                 </Row>
                 <Row>
                   <Col md={6}>
-                    <strong>Modificado por:</strong>{" "}
+                    <strong>{t("booking.auditableInfo.modifiedBy")}</strong>{" "}
                     {row.original.modifiedBy?.firstName}{" "}
                     {row.original.modifiedBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de modificación:</strong>{" "}
+                    <strong>{t("booking.auditableInfo.dateModified")}</strong>{" "}
                     {dayjs(row.original.dateModified).format(
                       "DD/MM/YYYY - h:mm A"
                     )}

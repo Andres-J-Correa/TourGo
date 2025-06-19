@@ -7,6 +7,7 @@ import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getRevPAROverTime } from "services/financialReportService";
 import { toast } from "react-toastify";
 import { Row, Col } from "reactstrap";
+import { useLanguage } from "contexts/LanguageContext";
 
 const getYearRange = () => ({
   start: dayjs().startOf("year").format("YYYY-MM-DD"),
@@ -18,12 +19,19 @@ function RevPAROverTimeReport({ hotelId }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
-  const [goal, setGoal] = useState(500000); // New state for RevPAR goal
-  const [showBars, setShowBars] = useState(false); // New state for bars
+  const [goal, setGoal] = useState(500000);
+  const [showBars, setShowBars] = useState(false);
+
+  const { t } = useLanguage();
 
   // Combo chart data: RevPAR (line), Habitaciones Disponibles (bars), Meta RevPAR (line)
   const chartData = [
-    ["Mes", "RevPAR", "Habitaciones Disponibles", "Meta RevPAR"],
+    [
+      t("financialReports.revPAROverTimeReport.month"),
+      t("financialReports.revPAROverTimeReport.revpar"),
+      t("financialReports.revPAROverTimeReport.totalRooms"),
+      t("financialReports.revPAROverTimeReport.goal"),
+    ],
     ...data.map((item) => [
       dayjs(item.monthLabel).format("MMM YYYY"),
       item.revPAR,
@@ -60,7 +68,7 @@ function RevPAROverTimeReport({ hotelId }) {
         .catch((error) => {
           setData([]);
           if (error?.response?.status !== 404) {
-            toast.error("Error al cargar el RevPAR en el tiempo");
+            toast.error(t("financialReports.revPAROverTimeReport.loadError"));
           }
         })
         .finally(() => setLoading(false));
@@ -68,29 +76,29 @@ function RevPAROverTimeReport({ hotelId }) {
       setShowPrompt(true);
       setData([]);
     }
-  }, [hotelId, dates.start, dates.end]);
+  }, [hotelId, dates.start, dates.end, t]);
 
   // Chart options with conditional bars
   const chartOptions = {
-    title: "RevPAR y Habitaciones Totales por Mes",
+    title: t("financialReports.revPAROverTimeReport.chartTitle"),
     legend: { position: "bottom" },
-    hAxis: { title: "Mes" },
+    hAxis: { title: t("financialReports.revPAROverTimeReport.month") },
     vAxes: {
-      0: { title: "RevPAR" },
-      1: { title: "Habitaciones Totales" },
+      0: { title: t("financialReports.revPAROverTimeReport.revpar") },
+      1: { title: t("financialReports.revPAROverTimeReport.totalRooms") },
     },
     seriesType: "line",
     series: {
-      0: { type: "line", targetAxisIndex: 0, color: "#4caf50" }, // RevPAR
+      0: { type: "line", targetAxisIndex: 0, color: "#4caf50" },
       1: showBars
         ? { type: "bars", targetAxisIndex: 1 }
-        : { type: "line", color: "transparent", targetAxisIndex: 1 }, // Hide bars
+        : { type: "line", color: "transparent", targetAxisIndex: 1 },
       2: {
         type: "line",
         targetAxisIndex: 0,
         lineDashStyle: [4, 4],
         color: "#FF9800",
-      }, // Meta RevPAR
+      },
     },
     curveType: "function",
     pointSize: 5,
@@ -98,11 +106,8 @@ function RevPAROverTimeReport({ hotelId }) {
 
   return (
     <div>
-      <h4>Ingresos por Habitación Disponible</h4>
-      <p>
-        Permite ver cómo ha cambiado el ingreso promedio por habitación
-        disponible (RevPAR) a lo largo del tiempo.
-      </p>
+      <h4>{t("financialReports.revPAROverTimeReport.title")}</h4>
+      <p>{t("financialReports.revPAROverTimeReport.description")}</p>
       <Row className="mb-3">
         <Col xs={12} md={8}>
           <DatePickers
@@ -116,7 +121,9 @@ function RevPAROverTimeReport({ hotelId }) {
           />
         </Col>
         <Col xs={12} md={4} className="d-flex align-items-center">
-          <label className="me-2 mb-0">Meta RevPAR:</label>
+          <label className="me-2 mb-0">
+            {t("financialReports.revPAROverTimeReport.goalLabel")}
+          </label>
           <input
             type="number"
             min={0}
@@ -134,21 +141,21 @@ function RevPAROverTimeReport({ hotelId }) {
           onClick={() => setShowBars((prev) => !prev)}
           disabled={loading}>
           {showBars
-            ? "Ocultar barras de habitaciones"
-            : "Mostrar barras de habitaciones"}
+            ? t("financialReports.revPAROverTimeReport.hideBars")
+            : t("financialReports.revPAROverTimeReport.showBars")}
         </button>
       </div>
       <SimpleLoader isVisible={loading} />
       {showPrompt && (
         <Alert
           type="info"
-          message="Por favor selecciona un rango de fechas para ver el RevPAR en el tiempo."
+          message={t("financialReports.revPAROverTimeReport.selectDatesPrompt")}
         />
       )}
       {!showPrompt && !loading && data.length === 0 && (
         <Alert
           type="info"
-          message="No hay datos para el rango de fechas seleccionado."
+          message={t("financialReports.revPAROverTimeReport.noData")}
         />
       )}
       {!showPrompt && !loading && data.length > 0 && (

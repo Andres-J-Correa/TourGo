@@ -2,9 +2,13 @@ import { Nav, NavItem, NavLink } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classnames from "classnames";
 import PropTypes from "prop-types";
-import { bookingFormTabs as tabs } from "components/bookings/booking-add-edit-view/constants";
 
-const TabNavigation = ({ currentStep, setCurrentStep, isStepComplete }) => {
+const TabNavigation = ({
+  currentStep,
+  setCurrentStep,
+  isStepComplete,
+  tabs,
+}) => {
   return (
     <Nav tabs className="mb-4 mt-4 justify-content-between">
       {tabs.map((tab, index) => (
@@ -47,4 +51,11 @@ TabNavigation.propTypes = {
     2: PropTypes.bool.isRequired,
     3: PropTypes.bool.isRequired,
   }),
+  tabs: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      icon: PropTypes.object.isRequired,
+    })
+  ).isRequired,
 };

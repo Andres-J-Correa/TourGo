@@ -1,6 +1,7 @@
 import React from "react";
 import { Row, Col } from "reactstrap";
 import RoomCard from "./RoomCard";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 // Helper to get column sizes based on parentSize
 const getColSizes = (parentSize) => ({
@@ -11,10 +12,11 @@ const getColSizes = (parentSize) => ({
 
 const RoomList = ({ rooms, extraCharges, parentSize }) => {
   const colSizes = getColSizes(parentSize);
+  const { t } = useLanguage(); // added
 
   return (
     <>
-      <h5>Habitaciones</h5>
+      <h5>{t("booking.roomList.title")}</h5>
       <Row className="justify-content-around">
         {rooms.map((room, idx) => (
           <Col

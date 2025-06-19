@@ -11,7 +11,7 @@ import { compressImage } from "utils/fileHelper";
 import {
   TRANSACTION_CATEGORIES,
   TRANSACTION_CATEGORY_TYPES_IDS,
-  transactionAddValidationSchema,
+  useTransactionAddValidationSchema,
   sanitizeNewTransaction,
 } from "components/transactions/constants";
 import { add, updateDocumentUrl } from "services/transactionService";
@@ -39,6 +39,7 @@ function TransactionAddForm({
 }) {
   const { user } = useAppContext();
   const { t, getTranslatedErrorMessage } = useLanguage();
+  const transactionAddValidationSchema = useTransactionAddValidationSchema();
 
   const [files, setFiles] = useState([]);
 
@@ -77,18 +78,18 @@ function TransactionAddForm({
     let message = "";
     const isIncome = categoryTypeId === TRANSACTION_CATEGORY_TYPES_IDS.INCOME;
     if (amount >= 0 && !isIncome) {
-      message = "El monto es positivo, pero la categoría es de tipo Gasto.";
+      message = t("transactions.addForm.mismatchPositiveExpense");
     } else if (amount < 0 && isIncome) {
-      message = "El monto es negativo, pero la categoría es de tipo Ingreso.";
+      message = t("transactions.addForm.mismatchNegativeIncome");
     }
     return Swal.fire({
       icon: "warning",
-      title: "¡Posible error de categoría!",
+      title: t("transactions.addForm.mismatchTitle"),
       text: message,
       showCancelButton: true,
-      confirmButtonText: "Continuar",
+      confirmButtonText: t("transactions.addForm.continue"),
       confirmButtonColor: "red",
-      cancelButtonText: "Revisar categoría",
+      cancelButtonText: t("transactions.addForm.reviewCategory"),
       reverseButtons: true,
       cancelButtonColor: "green",
       didOpen: () => {
@@ -107,12 +108,12 @@ function TransactionAddForm({
   const confirmProceedWithoutFile = () => {
     return Swal.fire({
       icon: "warning",
-      title: "No se ha adjuntado un comprobante",
-      text: "¿Deseas continuar sin adjuntar un comprobante?",
+      title: t("transactions.addForm.noFileTitle"),
+      text: t("transactions.addForm.noFileText"),
       showCancelButton: true,
-      confirmButtonText: "Sí, continuar",
+      confirmButtonText: t("transactions.addForm.yesContinue"),
       confirmButtonColor: "red",
-      cancelButtonText: "No, adjuntar comprobante",
+      cancelButtonText: t("transactions.addForm.noAttach"),
       reverseButtons: true,
       cancelButtonColor: "green",
     });
@@ -120,19 +121,19 @@ function TransactionAddForm({
 
   const confirmTransactionSave = () => {
     return Swal.fire({
-      title: "¿Guardar Transacción?",
-      html: "<strong>Revisa los datos antes de continuar.</strong>",
+      title: t("transactions.addForm.saveTitle"),
+      html: `<strong>${t("transactions.addForm.saveText")}</strong>`,
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("transactions.addForm.saveConfirm"),
+      cancelButtonText: t("common.cancel"),
     });
   };
 
-  const showLoading = (title = "Guardando...") => {
+  const showLoading = (title = t("transactions.addForm.savingTitle")) => {
     Swal.fire({
       title,
-      text: "Por favor espera",
+      text: t("transactions.addForm.savingText"),
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading(),
     });
@@ -303,13 +304,15 @@ function TransactionAddForm({
             className={classNames("mt-4 p-3 border rounded shadow-lg", {
               "d-none": !showForm,
             })}>
-            <h5 className="mb-3 text-center">Agregar Transacción</h5>
+            <h5 className="mb-3 text-center">
+              {t("transactions.addForm.title")}
+            </h5>
             <div className="d-flex justify-content-end mb-3">
               <Button type="submit" color="success" className="me-2">
-                Guardar
+                {t("transactions.addForm.save")}
               </Button>
               <Button type="button" onClick={handleCancelClick}>
-                Cancelar
+                {t("common.cancel")}
               </Button>
             </div>
             <ErrorAlert />
@@ -319,7 +322,7 @@ function TransactionAddForm({
                   name="amount"
                   type="number"
                   className="form-control"
-                  placeholder="Monto"
+                  placeholder={t("transactions.table.amount")}
                   step="0.01"
                   isRequired={true}
                 />
@@ -329,7 +332,7 @@ function TransactionAddForm({
                   name="transactionDate"
                   type="date"
                   className="form-control"
-                  placeholder="Fecha de la Transacción"
+                  placeholder={t("transactions.table.transactionDate")}
                   onChange={handleDateChange}
                   isRequired={true}
                 />
@@ -338,7 +341,7 @@ function TransactionAddForm({
                 <CustomField
                   name="referenceNumber"
                   className="form-control"
-                  placeholder="Número de Referencia"
+                  placeholder={t("transactions.table.referenceNumber")}
                 />
               </Col>
             </Row>
@@ -349,10 +352,12 @@ function TransactionAddForm({
                   name="paymentMethodId"
                   as="select"
                   className="form-control"
-                  placeholder="Método de Pago"
+                  placeholder={t("transactions.table.paymentMethod")}
                   isRequired={true}>
                   <option value="">
-                    {isLoadingHotelData ? "Cargando..." : "Seleccionar"}
+                    {isLoadingHotelData
+                      ? t("transactions.filters.loading")
+                      : t("transactions.filters.select")}
                   </option>
                   {paymentMethods.map((pm) => (
                     <option key={pm.id} value={pm.id}>
@@ -366,10 +371,12 @@ function TransactionAddForm({
                   name="subcategoryId"
                   as="select"
                   className="form-control"
-                  placeholder="Subcategoría"
+                  placeholder={t("transactions.table.subcategory")}
                   onChange={handleSubcategoryChange}>
                   <option value="">
-                    {isLoadingHotelData ? "Cargando..." : "Opcional"}
+                    {isLoadingHotelData
+                      ? t("transactions.filters.loading")
+                      : t("transactions.addForm.optional")}
                   </option>
                   {transactionSubcategories.map((sub) => (
                     <option
@@ -387,16 +394,16 @@ function TransactionAddForm({
                     name="categoryId"
                     as="select"
                     className="form-control"
-                    placeholder="Categoría"
+                    placeholder={t("transactions.table.category")}
                     onChange={handleCategoryChange}
                     isRequired={true}>
-                    <option value="">Seleccionar</option>
+                    <option value="">{t("transactions.filters.select")}</option>
                     {TRANSACTION_CATEGORIES.map((cat) => (
                       <option
                         key={cat.id}
                         value={cat.id}
                         data-type={cat.typeId}>
-                        {cat.name}
+                        {t(cat.name)}
                       </option>
                     ))}
                   </CustomField>
@@ -410,9 +417,11 @@ function TransactionAddForm({
                   name="financePartnerId"
                   as="select"
                   className="form-control"
-                  placeholder="Socio Financiero">
+                  placeholder={t("transactions.table.financePartner")}>
                   <option value="">
-                    {isLoadingHotelData ? "Cargando..." : "Opcional"}
+                    {isLoadingHotelData
+                      ? t("transactions.filters.loading")
+                      : t("transactions.addForm.optional")}
                   </option>
                   {financePartners.map((fp) => (
                     <option key={fp.id} value={fp.id}>
@@ -428,14 +437,16 @@ function TransactionAddForm({
               rows="3"
               name="description"
               className="form-control"
-              placeholder="Descripción"
+              placeholder={t("transactions.table.description")}
             />
 
             <h6 className="text-center mt-3 mb-1">
-              Adjuntar Comprobante
+              {t("transactions.addForm.attachDocument")}
               <span className="text-muted"> (.png, .jpg, .jpeg, .webp)</span>
               <br />
-              <span className="text-muted">(Máx. 1 MB)</span>
+              <span className="text-muted">
+                {t("transactions.addForm.maxSize")}
+              </span>
             </h6>
             <Dropzone
               onDropAccepted={(files) => {

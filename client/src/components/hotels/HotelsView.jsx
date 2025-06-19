@@ -9,13 +9,15 @@ import { toast } from "react-toastify";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import HotelDefaultImage from "assets/images/default-hotel.jpg"; // Adjust the path as necessary
 import "./hotelsview.css";
-
-const breadcrumbs = [{ label: "Inicio", path: "/" }];
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const HotelsView = () => {
   const [hotels, setHotels] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { t } = useLanguage(); // added
+
+  const breadcrumbs = [{ label: t("hotels.breadcrumbs.home"), path: "/" }];
 
   const fetchHotels = useCallback(async () => {
     try {
@@ -26,12 +28,12 @@ const HotelsView = () => {
       }
     } catch (error) {
       if (error?.response?.status !== 404) {
-        toast.error("Hubo un error al cargar los hoteles");
+        toast.error(t("hotels.view.loadError"));
       }
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchHotels();
@@ -43,8 +45,11 @@ const HotelsView = () => {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Hoteles" />
-      <LoadingOverlay isVisible={isLoading} message="Cargando..." />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("hotels.breadcrumbs.hotels")}
+      />
+      <LoadingOverlay isVisible={isLoading} message={t("common.loading")} />
       <ErrorBoundary>
         <Row>
           {hotels.length > 0 ? (
@@ -70,9 +75,9 @@ const HotelsView = () => {
             ))
           ) : (
             <Col xs="12" className="text-center">
-              <h5>No hay hoteles disponibles</h5>
+              <h5>{t("hotels.view.noHotels")}</h5>
               <Link to="/hotels/add" className="btn btn-dark mt-3">
-                Agregar Hotel
+                {t("hotels.view.addHotel")}
               </Link>
             </Col>
           )}
