@@ -1,8 +1,10 @@
 import React from "react";
 import { Modal, ModalBody, ModalHeader } from "reactstrap";
 import defaultImage from "assets/images/default-image.svg";
+import { useLanguage } from "contexts/LanguageContext";
 
 function SupportDocumentModal({ modalOpen, setModalOpen, documentUrl }) {
+  const { t } = useLanguage();
   return (
     <Modal
       isOpen={modalOpen}
@@ -12,21 +14,21 @@ function SupportDocumentModal({ modalOpen, setModalOpen, documentUrl }) {
       <ModalHeader
         toggle={() => setModalOpen(false)}
         className="bg-primary-subtle">
-        Comprobante
+        {t("transactions.supportDocument.title")}
       </ModalHeader>
       <ModalBody className="text-center">
         <div className="shadow-lg p-3 bg-body rounded">
           {documentUrl?.includes(".pdf") ? (
             <iframe
               src={documentUrl}
-              title="Comprobante"
+              title={t("transactions.supportDocument.iframeTitle")}
               width="100%"
               height="600px"
             />
           ) : (
             <img
               src={documentUrl}
-              alt="Comprobante"
+              alt={t("transactions.supportDocument.imgAlt")}
               style={{ maxWidth: "100%", maxHeight: "500px" }}
               onError={(e) => {
                 e.target.src = defaultImage;

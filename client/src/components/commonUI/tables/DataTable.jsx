@@ -15,6 +15,7 @@ import {
   faArrowDownWideShort,
   faSort,
 } from "@fortawesome/free-solid-svg-icons";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const DataTable = ({
   data,
@@ -24,10 +25,11 @@ const DataTable = ({
   onSortingChange,
   expandedRowRender,
   getRowCanExpand = () => true,
-  emptyMessage = "No hay registros",
+  emptyMessage,
   rowClassName,
   onRowClick,
 }) => {
+  const { t } = useLanguage(); // added
   const table = useReactTable({
     data,
     columns,
@@ -94,13 +96,13 @@ const DataTable = ({
         {loading ? (
           <tr>
             <td colSpan={columns.length} className="text-center">
-              <Spinner size="sm" /> Cargando...
+              <Spinner size="sm" /> {t("commonUI.dataTable.loading")}
             </td>
           </tr>
         ) : table.getRowModel().rows.length === 0 ? (
           <tr>
             <td colSpan={columns.length} className="text-center">
-              {emptyMessage}
+              {emptyMessage || t("commonUI.dataTable.noRecords")}
             </td>
           </tr>
         ) : (

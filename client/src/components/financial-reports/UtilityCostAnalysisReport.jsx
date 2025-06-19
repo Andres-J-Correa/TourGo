@@ -7,6 +7,7 @@ import { getUtilityCostAnalysis } from "services/financialReportService";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { toast } from "react-toastify";
 import { formatCurrency } from "utils/currencyHelper";
+import { useLanguage } from "contexts/LanguageContext";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -19,8 +20,15 @@ function UtilityCostAnalysisReport({ hotelId }) {
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
 
+  const { t } = useLanguage();
+
   const chartData = [
-    ["Subcategoría", "Total", { role: "style" }, { role: "annotation" }],
+    [
+      t("financialReports.utilityCostAnalysisReport.subcategory"),
+      t("financialReports.utilityCostAnalysisReport.total"),
+      { role: "style" },
+      { role: "annotation" },
+    ],
     ...items.map((item) => [
       item.subcategory,
       item.total,
@@ -58,7 +66,7 @@ function UtilityCostAnalysisReport({ hotelId }) {
           setItems([]);
           if (error?.response?.status !== 404) {
             toast.error(
-              "Error al cargar el análisis de costos de servicios públicos"
+              t("financialReports.utilityCostAnalysisReport.loadError")
             );
           }
         })
@@ -67,15 +75,12 @@ function UtilityCostAnalysisReport({ hotelId }) {
       setItems([]);
       setShowPrompt(true);
     }
-  }, [dates.start, dates.end, hotelId]);
+  }, [dates.start, dates.end, hotelId, t]);
 
   return (
     <div>
-      <h4>Análisis de Costos de Servicios Públicos</h4>
-      <p>
-        Presenta cuánto se ha gastado en servicios públicos (agua, luz, etc.)
-        por cada subcategoría.
-      </p>
+      <h4>{t("financialReports.utilityCostAnalysisReport.title")}</h4>
+      <p>{t("financialReports.utilityCostAnalysisReport.description")}</p>
       <div className="mb-3">
         <DatePickers
           startDate={dates.start}
@@ -91,7 +96,9 @@ function UtilityCostAnalysisReport({ hotelId }) {
       {showPrompt && (
         <Alert
           type="info"
-          message="Por favor selecciona un rango de fechas para ver el análisis de costos de servicios públicos."
+          message={t(
+            "financialReports.utilityCostAnalysisReport.selectDatesPrompt"
+          )}
         />
       )}
       {!showPrompt && !loading && (
@@ -101,10 +108,18 @@ function UtilityCostAnalysisReport({ hotelId }) {
           height="350px"
           data={chartData}
           options={{
-            title: "Costos por Subcategoría de Servicios Públicos",
+            title: t("financialReports.utilityCostAnalysisReport.chartTitle"),
             legend: { position: "none" },
-            vAxis: { title: "Subcategoría" },
-            hAxis: { title: "Total (COP)" },
+            vAxis: {
+              title: t(
+                "financialReports.utilityCostAnalysisReport.subcategory"
+              ),
+            },
+            hAxis: {
+              title: t(
+                "financialReports.utilityCostAnalysisReport.totalWithCurrency"
+              ),
+            },
             annotations: {
               alwaysOutside: true,
               textStyle: { fontSize: 14, color: "#000", auraColor: "none" },

@@ -4,12 +4,16 @@ import { Button, Row, Col, Spinner } from "reactstrap";
 import { Formik, Form } from "formik";
 import CustomField from "components/commonUI/forms/CustomField";
 import { getDetailsById, updateById, deleteById } from "services/hotelService";
-import { addValidationSchema, HOTEL_ROLES } from "components/hotels/constants";
+import {
+  useAddValidationSchema,
+  HOTEL_ROLES,
+} from "components/hotels/constants";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
+import { useLanguage } from "contexts/LanguageContext";
 
 const HotelEdit = ({ hotelId }) => {
   const [hotel, setHotel] = useState(null);
@@ -18,8 +22,10 @@ const HotelEdit = ({ hotelId }) => {
   const [isUploading, setIsUploading] = useState(false);
 
   const { hotel: currentHotel } = useAppContext();
+  const addValidationSchema = useAddValidationSchema();
 
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // Handles form cancel action
   const handleCancel = (resetForm) => {
@@ -33,26 +39,26 @@ const HotelEdit = ({ hotelId }) => {
       .then((res) => {
         if (res.isSuccessful) {
           setHotel((prev) => ({ ...prev, ...values }));
-          toast.success("Hotel actualizado con éxito");
+          toast.success(t("hotels.edit.success"));
           setIsEditing(false);
         }
       })
       .catch(() => {
-        toast.error("Hubo un error al actualizar el hotel");
+        toast.error(t("hotels.edit.updateError"));
       })
       .finally(() => setIsUploading(false));
   };
 
   const handleSubmit = (values) => {
     Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¿Quieres actualizar los datos del hotel?",
+      title: t("hotels.edit.confirmUpdateTitle"),
+      text: t("hotels.edit.confirmUpdateText"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Sí",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("hotels.edit.confirmYes"),
+      cancelButtonText: t("hotels.edit.confirmNo"),
     }).then((result) => {
       if (result.isConfirmed) {
         updateHotel(values);
@@ -65,28 +71,28 @@ const HotelEdit = ({ hotelId }) => {
     deleteById(hotelId)
       .then((res) => {
         if (res.isSuccessful) {
-          toast.success("Hotel eliminado con éxito");
+          toast.success(t("hotels.edit.deleteSuccess"));
           setTimeout(() => {
             navigate("/hotels");
           }, 2000);
         }
       })
       .catch(() => {
-        toast.error("Hubo un error al eliminar el hotel");
+        toast.error(t("hotels.edit.deleteError"));
       })
       .finally(() => setIsUploading(false));
   };
 
   const handleDelete = () => {
     Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¿Quieres eliminar este hotel?",
+      title: t("hotels.edit.confirmDeleteTitle"),
+      text: t("hotels.edit.confirmDeleteText"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("hotels.edit.confirmYes"),
+      cancelButtonText: t("hotels.edit.confirmNo"),
     }).then((result) => {
       if (result.isConfirmed) {
         deletehotel();
@@ -104,15 +110,15 @@ const HotelEdit = ({ hotelId }) => {
       })
       .catch((err) => {
         if (err?.response?.status !== 404) {
-          toast.error("Hubo un error al cargar los detalles del hotel");
+          toast.error(t("hotels.edit.loadError"));
         }
       })
       .finally(() => setIsLoading(false));
-  }, [hotelId]);
+  }, [hotelId, t]);
 
   return (
     <>
-      <h4 className="display-6 mb-4">Editar Hotel</h4>
+      <h4 className="display-6 mb-4">{t("hotels.edit.title")}</h4>
       <SimpleLoader isVisible={isLoading} />
       {!isLoading && (
         <div>
@@ -135,7 +141,7 @@ const HotelEdit = ({ hotelId }) => {
                     <CustomField
                       name="name"
                       type="text"
-                      placeholder="Nombre del Hotel"
+                      placeholder={t("hotels.add.placeholders.name")}
                       className="form-control"
                       disabled={!isEditing || isUploading}
                     />
@@ -145,7 +151,7 @@ const HotelEdit = ({ hotelId }) => {
                     <CustomField
                       name="phone"
                       type="text"
-                      placeholder="Teléfono"
+                      placeholder={t("hotels.add.placeholders.phone")}
                       className="form-control"
                       disabled={!isEditing || isUploading}
                     />
@@ -155,7 +161,7 @@ const HotelEdit = ({ hotelId }) => {
                     <CustomField
                       name="address"
                       type="text"
-                      placeholder="Dirección"
+                      placeholder={t("hotels.add.placeholders.address")}
                       className="form-control"
                       disabled={!isEditing || isUploading}
                     />
@@ -165,7 +171,7 @@ const HotelEdit = ({ hotelId }) => {
                     <CustomField
                       name="email"
                       type="email"
-                      placeholder="Correo Electrónico"
+                      placeholder={t("hotels.add.placeholders.email")}
                       className="form-control"
                       disabled={!isEditing || isUploading}
                     />
@@ -175,7 +181,7 @@ const HotelEdit = ({ hotelId }) => {
                     <CustomField
                       name="taxId"
                       type="text"
-                      placeholder="Identificación Fiscal (NIT)"
+                      placeholder={t("hotels.add.placeholders.taxId")}
                       className="form-control"
                       disabled={!isEditing || isUploading}
                     />
@@ -190,14 +196,18 @@ const HotelEdit = ({ hotelId }) => {
                         type="submit"
                         className="me-2 bg-success text-white"
                         disabled={isUploading}>
-                        {isUploading ? <Spinner size="sm" /> : "Guardar"}
+                        {isUploading ? (
+                          <Spinner size="sm" />
+                        ) : (
+                          t("hotels.edit.save")
+                        )}
                       </Button>
                       <Button
                         type="button"
                         className="me-2 bg-secondary text-white"
                         disabled={isUploading}
                         onClick={() => handleCancel(resetForm)}>
-                        Cancelar
+                        {t("hotels.edit.cancel")}
                       </Button>
                     </>
                   )}
@@ -212,7 +222,7 @@ const HotelEdit = ({ hotelId }) => {
                 type="button"
                 disabled={isUploading}
                 onClick={() => setIsEditing(true)}>
-                Editar
+                {t("hotels.edit.edit")}
               </Button>
               {currentHotel.current.roleId === HOTEL_ROLES.OWNER && (
                 <Button
@@ -220,41 +230,44 @@ const HotelEdit = ({ hotelId }) => {
                   type="button"
                   onClick={handleDelete}
                   disabled={isUploading}>
-                  {isUploading ? <Spinner size="sm" /> : "Eliminar Hotel"}
+                  {isUploading ? (
+                    <Spinner size="sm" />
+                  ) : (
+                    t("hotels.edit.delete")
+                  )}
                 </Button>
               )}
             </>
           )}
           <Row className="mt-4">
             <Col>
-              <strong>Propietario:</strong>{" "}
+              <strong>{t("hotels.edit.owner")}:</strong>{" "}
               <p>
-                {" "}
                 {hotel?.owner
                   ? `${hotel.owner.firstName} ${hotel.owner.lastName}`
-                  : "N/A"}
+                  : t("hotels.edit.na")}
               </p>
             </Col>
           </Row>
           <Row className="mb-3">
             <Col>
-              <strong>Creado por:</strong>
+              <strong>{t("hotels.edit.createdBy")}:</strong>
               <p>
                 {hotel?.createdBy?.firstName} {hotel?.createdBy?.lastName}
               </p>
             </Col>
             <Col>
-              <strong>Fecha de creación:</strong>
+              <strong>{t("hotels.edit.dateCreated")}:</strong>
               <p>{dayjs(hotel?.dateCreated).format("DD/MM/YYYY h:mm a")}</p>
             </Col>
             <Col>
-              <strong>Modificado por:</strong>
+              <strong>{t("hotels.edit.modifiedBy")}:</strong>
               <p>
                 {hotel?.modifiedBy?.firstName} {hotel?.modifiedBy?.lastName}
               </p>
             </Col>
             <Col>
-              <strong>Fecha de modificación</strong>
+              <strong>{t("hotels.edit.dateModified")}</strong>
               <p>{dayjs(hotel?.dateModified).format("DD/MM/YYYY h:mm a")}</p>
             </Col>
           </Row>

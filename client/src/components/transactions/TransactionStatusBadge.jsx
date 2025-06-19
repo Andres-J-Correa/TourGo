@@ -11,6 +11,7 @@ import {
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLanguage } from "contexts/LanguageContext";
 
 const statusIcons = {
   [TRANSACTION_STATUS_IDS.PENDING]: faHourglass,
@@ -20,10 +21,14 @@ const statusIcons = {
 };
 
 function TransactionStatusBadge({ statusId, className, ...props }) {
+  const { t } = useLanguage();
+  const label = TRANSACTION_STATUS_BY_ID[statusId]
+    ? t(TRANSACTION_STATUS_BY_ID[statusId])
+    : t("transactions.statusBadge.unknown");
   return (
     <span
-      aria-label={TRANSACTION_STATUS_BY_ID[statusId] || "Estado desconocido"}
-      title={TRANSACTION_STATUS_BY_ID[statusId] || "Estado desconocido"}
+      aria-label={label}
+      title={label}
       className={classNames("badge rounded-5", className, {
         "bg-warning": statusId === TRANSACTION_STATUS_IDS.PENDING,
         "bg-success": statusId === TRANSACTION_STATUS_IDS.COMPLETED,

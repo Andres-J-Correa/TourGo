@@ -13,6 +13,7 @@ import {
 } from "components/transactions/constants";
 import { getVersionSupportDocumentUrl } from "services/transactionService";
 import classNames from "classnames";
+import { useLanguage } from "contexts/LanguageContext";
 
 const VersionDetails = ({ txn }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,11 +21,15 @@ const VersionDetails = ({ txn }) => {
   const [documentUrl, setDocumentUrl] = useState(null);
 
   const { hotelId } = useParams();
+  const { t } = useLanguage();
 
-  const category =
-    TRANSACTION_CATEGORIES_BY_ID[txn.categoryId] || "Desconocido";
+  const category = TRANSACTION_CATEGORIES_BY_ID[txn.categoryId]
+    ? t(TRANSACTION_CATEGORIES_BY_ID[txn.categoryId])
+    : t("transactions.versionDetails.unknown");
 
-  const status = TRANSACTION_STATUS_BY_ID[txn.statusId] || "Desconocido";
+  const status = TRANSACTION_STATUS_BY_ID[txn.statusId]
+    ? t(TRANSACTION_STATUS_BY_ID[txn.statusId])
+    : t("transactions.versionDetails.unknown");
 
   const handleViewDocument = async () => {
     setIsLoading(true);
@@ -42,7 +47,11 @@ const VersionDetails = ({ txn }) => {
         throw new Error("Error loading document");
       }
     } catch {
-      Swal.fire("Error", "No se pudo cargar el comprobante", "error");
+      Swal.fire(
+        t("common.error"),
+        t("transactions.versionDetails.loadDocumentError"),
+        "error"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -53,51 +62,53 @@ const VersionDetails = ({ txn }) => {
       <LoadingOverlay isVisible={isLoading} />
       <Row>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Modificada por:</strong> <br />
+          <strong>{t("transactions.versionDetails.modifiedBy")}</strong> <br />
           {txn.modifiedBy?.firstName} {txn.modifiedBy?.lastName}
         </Col>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Modificada el:</strong> <br />
+          <strong>{t("transactions.versionDetails.modifiedAt")}</strong> <br />
           {dayjs(txn.dateModified).format("DD/MMM/YYYY - h:mm A")}
         </Col>
       </Row>
       <Row>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Versión #</strong>
+          <strong>{t("transactions.versionDetails.versionId")}</strong>
           <br />
           {txn.id}
         </Col>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Id Precursor:</strong> <br />
+          <strong>{t("transactions.versionDetails.parentId")}</strong> <br />
           {txn.parentId || " - "}
         </Col>
         <Col xl={12} md={12} className="mb-2">
-          <strong>Referencia:</strong> <br />{" "}
+          <strong>{t("transactions.versionDetails.reference")}</strong> <br />{" "}
           <span
             className={classNames({
               "text-danger": txn.changes?.referenceNumber,
             })}>
-            {txn.referenceNumber || "Sin referencia"}
+            {txn.referenceNumber ||
+              t("transactions.versionDetails.noReference")}
           </span>
         </Col>
       </Row>
 
       <Row>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Estado:</strong> <br />
+          <strong>{t("transactions.versionDetails.status")}</strong> <br />
           {status}
         </Col>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Subcategoría:</strong> <br />
+          <strong>{t("transactions.versionDetails.subcategory")}</strong> <br />
           <span
             className={classNames({
               "text-danger": txn.changes?.subcategory,
             })}>
-            {txn.subcategory?.name || "Sin subcategoría"}
+            {txn.subcategory?.name ||
+              t("transactions.versionDetails.noSubcategory")}
           </span>
         </Col>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Categoría:</strong> <br />
+          <strong>{t("transactions.versionDetails.category")}</strong> <br />
           <span
             className={classNames({
               "text-danger": txn.changes?.categoryId,
@@ -106,7 +117,8 @@ const VersionDetails = ({ txn }) => {
           </span>
         </Col>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Método de Pago:</strong> <br />
+          <strong>{t("transactions.versionDetails.paymentMethod")}</strong>{" "}
+          <br />
           <span
             className={classNames({
               "text-danger": txn.changes?.paymentMethod,
@@ -118,11 +130,12 @@ const VersionDetails = ({ txn }) => {
 
       <Row>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Aprobada por:</strong> <br />
+          <strong>{t("transactions.versionDetails.approvedBy")}</strong> <br />
           {txn.approvedBy?.firstName} {txn.approvedBy?.lastName || " - "}
         </Col>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Socio Financiero:</strong> <br />
+          <strong>{t("transactions.versionDetails.financePartner")}</strong>{" "}
+          <br />
           <span
             className={classNames({
               "text-danger": txn.changes?.financePartner,
@@ -131,11 +144,11 @@ const VersionDetails = ({ txn }) => {
           </span>
         </Col>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Creada por:</strong> <br />
+          <strong>{t("transactions.versionDetails.createdBy")}</strong> <br />
           {txn.createdBy?.firstName} {txn.createdBy?.lastName}
         </Col>
         <Col xl={6} md={12} className="mb-2">
-          <strong>Creada el:</strong> <br />
+          <strong>{t("transactions.versionDetails.createdAt")}</strong> <br />
           {dayjs(txn.dateCreated).format("DD/MMM/YYYY - h:mm A")}
         </Col>
       </Row>
@@ -143,7 +156,8 @@ const VersionDetails = ({ txn }) => {
       {txn?.description && (
         <Row>
           <Col>
-            <strong>Descripción:</strong> <br />
+            <strong>{t("transactions.versionDetails.description")}</strong>{" "}
+            <br />
             <span
               className={classNames({
                 "text-danger": txn.changes?.description,
@@ -163,7 +177,7 @@ const VersionDetails = ({ txn }) => {
               }
               onClick={handleViewDocument}
               className="me-2">
-              Ver comprobante
+              {t("transactions.versionDetails.viewDocument")}
             </Button>
           )}
         </Col>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
 import { Button, Spinner } from "reactstrap";
 import CustomField from "components/commonUI/forms/CustomField";
-import { userSignInSchema } from "components/users/validationSchemas";
+import { useUserSignInSchema } from "components/users/validationSchemas";
 import { usersLogin } from "services/userAuthService";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
@@ -23,7 +23,7 @@ function UserSignInForm({
   const { user } = useAppContext();
   const { t, getTranslatedErrorMessage } = useLanguage();
   const formRef = useRef(null);
-  const validationSchema = userSignInSchema;
+  const validationSchema = useUserSignInSchema();
   const navigate = useNavigate();
 
   const handleSubmit = async (values) => {
@@ -31,7 +31,7 @@ function UserSignInForm({
       setLoading(true);
       const response = await usersLogin(values);
       if (!Boolean(response?.item)) {
-        throw new Error("User not found");
+        throw new Error(t("users.signUpForm.userNotFound"));
       }
       toast.success(t("common.success"));
       if (redirect) navigate("/hotels");

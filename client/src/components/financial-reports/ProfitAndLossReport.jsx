@@ -7,6 +7,7 @@ import { getProfitAndLossSummary } from "services/financialReportService";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { toast } from "react-toastify";
 import { formatCurrency } from "utils/currencyHelper";
+import { useLanguage } from "contexts/LanguageContext";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -23,22 +24,29 @@ function ProfitAndLossReport({ hotelId }) {
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
 
+  const { t } = useLanguage();
+
   const chartData = [
-    ["Tipo", "Total", { role: "style" }, { role: "annotation" }],
     [
-      "Ingresos",
+      t("financialReports.profitAndLossReport.type"),
+      t("financialReports.profitAndLossReport.total"),
+      { role: "style" },
+      { role: "annotation" },
+    ],
+    [
+      t("financialReports.profitAndLossReport.revenue"),
       totals.totalRevenue,
       `color: #4caf50; opacity:0.5`,
       formatCurrency(totals.totalRevenue, "COP"),
     ],
     [
-      "Gastos",
+      t("financialReports.profitAndLossReport.expenses"),
       totals.totalExpenses,
       `color: #f44335; opacity:0.5`,
       formatCurrency(totals.totalExpenses, "COP"),
     ],
     [
-      "Utilidad Neta",
+      t("financialReports.profitAndLossReport.netProfit"),
       totals.netProfit,
       `opacity:0.5`,
       formatCurrency(totals.netProfit, "COP"),
@@ -77,7 +85,7 @@ function ProfitAndLossReport({ hotelId }) {
         .catch((error) => {
           setTotals({ totalRevenue: 0, totalExpenses: 0, netProfit: 0 });
           if (error?.response?.status !== 404) {
-            toast.error("Error al cargar el reporte de ingresos y gastos");
+            toast.error(t("financialReports.profitAndLossReport.loadError"));
           }
         })
         .finally(() => setLoading(false));
@@ -85,14 +93,12 @@ function ProfitAndLossReport({ hotelId }) {
       setTotals({ totalRevenue: 0, totalExpenses: 0, netProfit: 0 });
       setShowPrompt(true);
     }
-  }, [dates.start, dates.end, hotelId]);
+  }, [dates.start, dates.end, hotelId, t]);
+
   return (
     <div>
-      <h4>Ganancias y Pérdidas</h4>
-      <p>
-        Resume los ingresos, gastos y la utilidad neta del hotel en un periodo
-        determinado.
-      </p>
+      <h4>{t("financialReports.profitAndLossReport.title")}</h4>
+      <p>{t("financialReports.profitAndLossReport.description")}</p>
       <div className="mb-3">
         <DatePickers
           startDate={dates.start}
@@ -108,7 +114,7 @@ function ProfitAndLossReport({ hotelId }) {
       {showPrompt && (
         <Alert
           type="info"
-          message="Por favor selecciona un rango de fechas para ver el reporte de ingresos y gastos."
+          message={t("financialReports.profitAndLossReport.selectDatesPrompt")}
         />
       )}
       {!showPrompt && !loading && (
@@ -118,10 +124,14 @@ function ProfitAndLossReport({ hotelId }) {
           height="350px"
           data={chartData}
           options={{
-            title: "Resumen de Ingresos y Gastos",
+            title: t("financialReports.profitAndLossReport.chartTitle"),
             legend: { position: "none" },
-            vAxis: { title: "Total (COP)" },
-            hAxis: { title: "Tipo" },
+            vAxis: {
+              title: t("financialReports.profitAndLossReport.vAxisTitle"),
+            },
+            hAxis: {
+              title: t("financialReports.profitAndLossReport.hAxisTitle"),
+            },
             annotations: {
               alwaysOutside: true,
               textStyle: { fontSize: 14, color: "#000", auraColor: "none" },

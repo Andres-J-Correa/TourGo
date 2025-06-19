@@ -4,8 +4,10 @@ import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
 import TransactionCategoriesExplanation from "components/transactions/TransactionCategoriesExplanation";
 
 import Popover from "components/commonUI/popover/Popover";
+import { useLanguage } from "contexts/LanguageContext";
 
 function TransactionCategoriesExplanationIcon() {
+  const { t } = useLanguage();
   return (
     <Popover
       content={<TransactionCategoriesExplanation />}
@@ -16,7 +18,7 @@ function TransactionCategoriesExplanationIcon() {
           icon={faCircleQuestion}
           className="question-icon"
           size="lg"
-          title="Explicación"
+          title={t("transactions.categoriesExplanation.iconTitle")}
         />
       </div>
     </Popover>

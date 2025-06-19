@@ -17,11 +17,7 @@ import {
   rejectInvite,
 } from "services/staffService";
 import { INVITE_FLAGS_IDS } from "components/staff/constants";
-
-const breadcrumbs = [
-  { label: "Inicio", path: "/" },
-  { label: "Hoteles", path: "/hotels" },
-];
+import { useLanguage } from "contexts/LanguageContext";
 
 function HotelInvites() {
   const [invites, setInvites] = useState([]);
@@ -30,6 +26,12 @@ function HotelInvites() {
   const userSignInToggleCount = useRef(0);
 
   const { user, toggleUserSignInModal } = useAppContext();
+  const { t } = useLanguage();
+
+  const breadcrumbs = [
+    { label: t("hotels.breadcrumbs.home"), path: "/" },
+    { label: t("hotels.breadcrumbs.hotels"), path: "/hotels" },
+  ];
 
   useEffect(() => {
     if (user.current.isAuthenticated && user.current.hasFetched) {
@@ -45,14 +47,14 @@ function HotelInvites() {
             error?.response?.status !== 404 &&
             error?.response?.status !== 403
           ) {
-            toast.error("Error al cargar las invitaciones");
+            toast.error(t("hotels.invites.loadError"));
           }
         })
         .finally(() => {
           setLoading(false);
         });
     }
-  }, [user]);
+  }, [user, t]);
 
   useEffect(() => {
     if (
@@ -72,12 +74,12 @@ function HotelInvites() {
 
   const handleAccept = async (inviteId) => {
     const result = await Swal.fire({
-      title: "¿Aceptar invitación?",
-      text: "¿Estás seguro de que deseas aceptar esta invitación?",
+      title: t("hotels.invites.acceptTitle"),
+      text: t("hotels.invites.acceptText"),
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Sí, aceptar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("hotels.invites.acceptConfirm"),
+      cancelButtonText: t("hotels.invites.cancel"),
     });
 
     if (!result.isConfirmed) {
@@ -86,8 +88,8 @@ function HotelInvites() {
 
     try {
       Swal.fire({
-        title: "Aceptando invitación",
-        text: "Por favor espera",
+        title: t("hotels.invites.acceptingTitle"),
+        text: t("hotels.invites.pleaseWait"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -107,8 +109,8 @@ function HotelInvites() {
 
         Swal.fire({
           icon: "success",
-          title: "Invitación aceptada",
-          text: "Has aceptado la invitación correctamente",
+          title: t("hotels.invites.acceptedTitle"),
+          text: t("hotels.invites.acceptedText"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -118,20 +120,20 @@ function HotelInvites() {
       Swal.close();
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo aceptar la invitación, intente nuevamente.",
+        title: t("common.error"),
+        text: t("hotels.invites.acceptError"),
       });
     }
   };
 
   const handleReject = async (inviteId) => {
     const result = await Swal.fire({
-      title: "¿Rechazar invitación?",
-      text: "¿Estás seguro de que deseas rechazar esta invitación?",
+      title: t("hotels.invites.rejectTitle"),
+      text: t("hotels.invites.rejectText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, rechazar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("hotels.invites.rejectConfirm"),
+      cancelButtonText: t("hotels.invites.cancel"),
     });
 
     if (!result.isConfirmed) {
@@ -140,8 +142,8 @@ function HotelInvites() {
 
     try {
       Swal.fire({
-        title: "Rechazando invitación",
-        text: "Por favor espera",
+        title: t("hotels.invites.rejectingTitle"),
+        text: t("hotels.invites.pleaseWait"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -161,8 +163,8 @@ function HotelInvites() {
 
         Swal.fire({
           icon: "info",
-          title: "Invitación rechazada",
-          text: "Has rechazado la invitación correctamente",
+          title: t("hotels.invites.rejectedTitle"),
+          text: t("hotels.invites.rejectedText"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -172,8 +174,8 @@ function HotelInvites() {
       Swal.close();
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo rechazar la invitación, intente nuevamente.",
+        title: t("common.error"),
+        text: t("hotels.invites.rejectError"),
       });
     }
   };
@@ -181,8 +183,11 @@ function HotelInvites() {
   if (!user.current.isVerified) {
     return (
       <>
-        <Breadcrumb breadcrumbs={breadcrumbs} active="Invitaciones" />
-        <h3>Invitaciones a hoteles</h3>
+        <Breadcrumb
+          breadcrumbs={breadcrumbs}
+          active={t("hotels.invites.breadcrumbActive")}
+        />
+        <h3>{t("hotels.invites.title")}</h3>
         <VerifyAccountFallback />
       </>
     );
@@ -190,17 +195,17 @@ function HotelInvites() {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Invitaciones" />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("hotels.invites.breadcrumbActive")}
+      />
       <LoadingOverlay isVisible={loading} />
-      <h3>Invitaciones a hoteles</h3>
+      <h3>{t("hotels.invites.title")}</h3>
       <ErrorBoundary>
-        <p>
-          Aquí puedes gestionar las invitaciones que tienes para unirte a un
-          hotel
-        </p>
+        <p>{t("hotels.invites.description")}</p>
         <div>
           {invites.length === 0 && !loading && (
-            <div className="text-muted">No tienes invitaciones pendientes.</div>
+            <div className="text-muted">{t("hotels.invites.noInvites")}</div>
           )}
           <Row>
             {invites.map((invite) => (

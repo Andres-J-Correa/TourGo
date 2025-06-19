@@ -8,6 +8,7 @@ import { getRoomOccupancyByDateRange } from "services/financialReportService";
 import dayjs from "dayjs";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { toast } from "react-toastify";
+import { useLanguage } from "contexts/LanguageContext";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -22,6 +23,8 @@ function RoomOccupancyReport({ hotelId }) {
   const [loading, setLoading] = useState(false);
   const [loadingRooms, setLoadingRooms] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
+
+  const { t } = useLanguage();
 
   const handleDateChange = (type) => (date) => {
     setDates((prev) => ({
@@ -43,8 +46,14 @@ function RoomOccupancyReport({ hotelId }) {
   };
 
   const gaugeData = [
-    ["Label", "Ocupación"],
-    ["Ocupación", data !== null ? data * 100 : 0],
+    [
+      t("financialReports.roomOccupancyReport.gaugeLabel"),
+      t("financialReports.roomOccupancyReport.occupancy"),
+    ],
+    [
+      t("financialReports.roomOccupancyReport.occupancy"),
+      data !== null ? data * 100 : 0,
+    ],
   ];
 
   const gaugeOptions = {
@@ -93,23 +102,18 @@ function RoomOccupancyReport({ hotelId }) {
       })
       .catch((error) => {
         if (error?.response?.status !== 404) {
-          toast.error(
-            "Ocurrió un error al obtener las habitaciones del hotel."
-          );
+          toast.error(t("financialReports.roomOccupancyReport.loadRoomsError"));
         }
       })
       .finally(() => {
         setLoadingRooms(false);
       });
-  }, [hotelId]);
+  }, [hotelId, t]);
 
   return (
     <div>
-      <h4>Ocupación de Habitación</h4>
-      <p>
-        Muestra el porcentaje de ocupación de una habitación específica en un
-        rango de fechas.
-      </p>
+      <h4>{t("financialReports.roomOccupancyReport.title")}</h4>
+      <p>{t("financialReports.roomOccupancyReport.description")}</p>
       <Row>
         <Col xs={12}>
           <DatePickers
@@ -125,7 +129,9 @@ function RoomOccupancyReport({ hotelId }) {
       </Row>
       <Row className="mb-3">
         <Col xs={12} md={6}>
-          <label className="form-label">Habitación</label>
+          <label className="form-label">
+            {t("financialReports.roomOccupancyReport.roomLabel")}
+          </label>
           <InputGroup>
             <Input
               type="select"
@@ -133,7 +139,9 @@ function RoomOccupancyReport({ hotelId }) {
               onChange={handleRoomChange}
               disabled={loading}>
               <option value="">
-                {loadingRooms ? "cargando..." : "Selecciona una habitación"}
+                {loadingRooms
+                  ? t("financialReports.roomOccupancyReport.loadingRooms")
+                  : t("financialReports.roomOccupancyReport.selectRoom")}
               </option>
               {rooms.length > 0 &&
                 rooms.map((room) => (
@@ -152,15 +160,15 @@ function RoomOccupancyReport({ hotelId }) {
           type="info"
           message={
             !dates.start || !dates.end
-              ? "Por favor selecciona un rango de fechas para ver la ocupación."
-              : "Selecciona una habitación y un rango de fechas para ver la ocupación."
+              ? t("financialReports.roomOccupancyReport.selectDatesPrompt")
+              : t("financialReports.roomOccupancyReport.selectRoomPrompt")
           }
         />
       )}
       {!showPrompt && !loading && data === null && (
         <Alert
           type="info"
-          message="No hay datos para la combinación y rango de fechas seleccionados."
+          message={t("financialReports.roomOccupancyReport.noData")}
         />
       )}
       {!showPrompt && !loading && data !== null && (
@@ -174,7 +182,10 @@ function RoomOccupancyReport({ hotelId }) {
             className="d-flex justify-content-center mb-3"
           />
           <div>
-            <strong>Ocupación:</strong> {(data * 100).toFixed(1)}%
+            <strong>
+              {t("financialReports.roomOccupancyReport.occupancy")}:
+            </strong>{" "}
+            {(data * 100).toFixed(1)}%
           </div>
         </div>
       )}

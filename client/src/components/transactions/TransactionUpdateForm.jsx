@@ -9,7 +9,7 @@ import { getDate } from "utils/dateHelper";
 import {
   TRANSACTION_CATEGORIES,
   TRANSACTION_CATEGORY_TYPES_IDS,
-  transactionUpdateValidationSchema,
+  useTransactionUpdateValidationSchema,
   sanitizeUpdatedTransaction,
 } from "components/transactions/constants";
 import { update } from "services/transactionService";
@@ -37,6 +37,8 @@ function TransactionUpdateForm({
 }) {
   const { user } = useAppContext();
   const { t, getTranslatedErrorMessage } = useLanguage();
+  const transactionUpdateValidationSchema =
+    useTransactionUpdateValidationSchema();
 
   const initialValues = {
     amount: transaction?.amount || 0,
@@ -63,18 +65,18 @@ function TransactionUpdateForm({
     let message = "";
     const isIncome = categoryTypeId === TRANSACTION_CATEGORY_TYPES_IDS.INCOME;
     if (amount >= 0 && !isIncome) {
-      message = "El monto es positivo, pero la categoría es de tipo Gasto.";
+      message = t("transactions.updateForm.mismatchPositiveExpense");
     } else if (amount < 0 && isIncome) {
-      message = "El monto es negativo, pero la categoría es de tipo Ingreso.";
+      message = t("transactions.updateForm.mismatchNegativeIncome");
     }
     return Swal.fire({
       icon: "warning",
-      title: "¡Posible error de categoría!",
+      title: t("transactions.updateForm.mismatchTitle"),
       text: message,
       showCancelButton: true,
-      confirmButtonText: "Continuar",
+      confirmButtonText: t("transactions.updateForm.continue"),
       confirmButtonColor: "red",
-      cancelButtonText: "Revisar categoría",
+      cancelButtonText: t("transactions.updateForm.reviewCategory"),
       reverseButtons: true,
       cancelButtonColor: "green",
       didOpen: () => {
@@ -92,19 +94,19 @@ function TransactionUpdateForm({
 
   const confirmTransactionSave = () => {
     return Swal.fire({
-      title: "¿Actualizar Transacción?",
-      html: "<strong>Revisa los datos antes de continuar.</strong>",
+      title: t("transactions.updateForm.saveTitle"),
+      html: `<strong>${t("transactions.updateForm.saveText")}</strong>`,
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("transactions.updateForm.saveConfirm"),
+      cancelButtonText: t("common.cancel"),
     });
   };
 
-  const showLoading = (title = "Guardando...") => {
+  const showLoading = (title = t("transactions.updateForm.savingTitle")) => {
     Swal.fire({
       title,
-      text: "Por favor espera",
+      text: t("transactions.updateForm.savingText"),
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading(),
     });
@@ -222,17 +224,19 @@ function TransactionUpdateForm({
             className={classNames("mt-4 p-3 border rounded shadow-lg", {
               "d-none": !showForm,
             })}>
-            <h5 className="mb-3 text-center">Actualizar Transacción</h5>
+            <h5 className="mb-3 text-center">
+              {t("transactions.updateForm.title")}
+            </h5>
             <div className="d-flex justify-content-end mb-3">
               <Button
                 type="submit"
                 color="success"
                 className="me-2"
                 disabled={isEqual(initialValues, values)}>
-                Guardar
+                {t("transactions.updateForm.save")}
               </Button>
               <Button type="button" onClick={handleCancelClick}>
-                Cancelar
+                {t("common.cancel")}
               </Button>
             </div>
             <ErrorAlert />
@@ -242,7 +246,7 @@ function TransactionUpdateForm({
                   name="amount"
                   type="number"
                   className="form-control"
-                  placeholder="Monto"
+                  placeholder={t("transactions.table.amount")}
                   step="0.01"
                   isRequired={true}
                   disabled={true}
@@ -253,7 +257,7 @@ function TransactionUpdateForm({
                   name="transactionDate"
                   type="date"
                   className="form-control"
-                  placeholder="Fecha de la Transacción"
+                  placeholder={t("transactions.table.transactionDate")}
                   onChange={handleDateChange}
                   isRequired={true}
                 />
@@ -262,7 +266,7 @@ function TransactionUpdateForm({
                 <CustomField
                   name="referenceNumber"
                   className="form-control"
-                  placeholder="Número de Referencia"
+                  placeholder={t("transactions.table.referenceNumber")}
                 />
               </Col>
             </Row>
@@ -273,10 +277,12 @@ function TransactionUpdateForm({
                   name="paymentMethodId"
                   as="select"
                   className="form-control"
-                  placeholder="Método de Pago"
+                  placeholder={t("transactions.table.paymentMethod")}
                   isRequired={true}>
                   <option value="">
-                    {isLoadingHotelData ? "Cargando..." : "Seleccionar"}
+                    {isLoadingHotelData
+                      ? t("transactions.filters.loading")
+                      : t("transactions.filters.select")}
                   </option>
                   {paymentMethods.map((pm) => (
                     <option key={pm.id} value={pm.id}>
@@ -290,10 +296,12 @@ function TransactionUpdateForm({
                   name="subcategoryId"
                   as="select"
                   className="form-control"
-                  placeholder="Subcategoría"
+                  placeholder={t("transactions.table.subcategory")}
                   onChange={handleSubcategoryChange}>
                   <option value="">
-                    {isLoadingHotelData ? "Cargando..." : "Opcional"}
+                    {isLoadingHotelData
+                      ? t("transactions.filters.loading")
+                      : t("transactions.updateForm.optional")}
                   </option>
                   {transactionSubcategories.map((sub) => (
                     <option
@@ -311,16 +319,16 @@ function TransactionUpdateForm({
                     name="categoryId"
                     as="select"
                     className="form-control"
-                    placeholder="Categoría"
+                    placeholder={t("transactions.table.category")}
                     onChange={handleCategoryChange}
                     isRequired={true}>
-                    <option value="">Seleccionar</option>
+                    <option value="">{t("transactions.filters.select")}</option>
                     {TRANSACTION_CATEGORIES.map((cat) => (
                       <option
                         key={cat.id}
                         value={cat.id}
                         data-type={cat.typeId}>
-                        {cat.name}
+                        {t(cat.name)}
                       </option>
                     ))}
                   </CustomField>
@@ -334,9 +342,11 @@ function TransactionUpdateForm({
                   name="financePartnerId"
                   as="select"
                   className="form-control"
-                  placeholder="Socio Financiero">
+                  placeholder={t("transactions.table.financePartner")}>
                   <option value="">
-                    {isLoadingHotelData ? "Cargando..." : "Opcional"}
+                    {isLoadingHotelData
+                      ? t("transactions.filters.loading")
+                      : t("transactions.updateForm.optional")}
                   </option>
                   {financePartners.map((fp) => (
                     <option key={fp.id} value={fp.id}>
@@ -352,7 +362,7 @@ function TransactionUpdateForm({
               rows="3"
               name="description"
               className="form-control"
-              placeholder="Descripción"
+              placeholder={t("transactions.table.description")}
             />
           </Form>
         );

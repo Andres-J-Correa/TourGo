@@ -1,14 +1,15 @@
 import React, { useMemo } from "react";
 import { Card, CardBody, CardTitle, CardSubtitle, Button } from "reactstrap";
 import { useAppContext } from "contexts/GlobalAppContext";
-
 import {
   HOTEL_ROLES_BY_ID,
   HOTEL_ROLES_IDS,
 } from "components/hotels/constants";
+import { useLanguage } from "contexts/LanguageContext";
 
 function StaffCard({ staff, handleDeleteClick, handleUpdateRoleClick }) {
   const { user, hotel } = useAppContext();
+  const { t } = useLanguage();
 
   const isOwner = useMemo(
     () =>
@@ -40,7 +41,8 @@ function StaffCard({ staff, handleDeleteClick, handleUpdateRoleClick }) {
         </CardTitle>
         <CardSubtitle className="mb-2 text-muted">{staff.email}</CardSubtitle>
         <p className="mb-2">
-          <strong>Rol:</strong> {HOTEL_ROLES_BY_ID[staff.roleId]}
+          <strong>{t("staff.card.role")}:</strong>{" "}
+          {t(HOTEL_ROLES_BY_ID[staff.roleId])}
         </p>
         {!isOwner && (
           <div className="mt-auto">
@@ -48,10 +50,10 @@ function StaffCard({ staff, handleDeleteClick, handleUpdateRoleClick }) {
               color="dark"
               className="me-2"
               onClick={() => handleUpdateRoleClick(staff.id, staff.roleId)}>
-              Cambiar Rol
+              {t("staff.card.changeRole")}
             </Button>
             <Button color="danger" onClick={() => handleDeleteClick(staff.id)}>
-              Eliminar
+              {t("staff.card.delete")}
             </Button>
           </div>
         )}

@@ -2,7 +2,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Formik, Form } from "formik";
-import * as Yup from "yup";
 import { toast } from "react-toastify";
 import {
   Button,
@@ -38,26 +37,10 @@ import {
   formatExtraChargeAmount,
   EXTRA_CHARGE_TYPES_BY_ID,
   EXTRA_CHARGE_TYPE_IDS,
+  useAddValidationSchema,
 } from "components/extra-charges/constants";
-import { useLanguage } from "contexts/LanguageContext";
+import { useLanguage } from "contexts/LanguageContext"; // already imported
 import DataTable from "components/commonUI/tables/DataTable"; // Add this import
-
-// Validation Schema
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(100, "El nombre no puede exceder los 100 caracteres")
-    .required("El nombre es requerido"),
-  typeId: Yup.string()
-    .required("El tipo es requerido")
-    .oneOf(
-      EXTRA_CHARGE_TYPES.map((type) => type.value.toString()),
-      "Tipo inválido"
-    ),
-  amount: Yup.number()
-    .min(0, "El monto debe ser mayor o igual a 0")
-    .required("El monto es requerido"),
-});
 
 const ExtraChargesView = () => {
   const { hotelId } = useParams();
@@ -74,12 +57,13 @@ const ExtraChargesView = () => {
     amount: "",
   });
 
-  const { getTranslatedErrorMessage } = useLanguage();
+  const { getTranslatedErrorMessage, t } = useLanguage(); // changed
+  const validationSchema = useAddValidationSchema();
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("booking.breadcrumb.home"), path: "/" },
+    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
+    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
   ];
 
   const filteredData = useMemo(() => {
@@ -117,16 +101,16 @@ const ExtraChargesView = () => {
       Number(values.typeId) === 1 ? values.amount / 100 : values.amount;
 
     const result = await Swal.fire({
-      title: `Está seguro de que desea ${
-        id ? "actualizar" : "agregar"
-      } el cargo adicional?`,
+      title: id
+        ? t("extraCharges.confirmUpdateTitle")
+        : t("extraCharges.confirmAddTitle"),
       text: id
-        ? "Esta acción puede afectar reservas existentes."
-        : "Revise los datos antes de continuar.",
+        ? t("extraCharges.confirmUpdateText")
+        : t("extraCharges.confirmAddText"),
       icon: id ? "warning" : "info",
       showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("extraCharges.confirmSave"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: Boolean(id),
       confirmButtonColor: id ? "red" : "#0d6efd",
     });
@@ -137,8 +121,8 @@ const ExtraChargesView = () => {
 
     try {
       Swal.fire({
-        title: "Guardando cargo adicional",
-        text: "Por favor espera",
+        title: t("extraCharges.savingTitle"),
+        text: t("extraCharges.savingText"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -190,8 +174,8 @@ const ExtraChargesView = () => {
         toggleForm();
         await Swal.fire({
           icon: "success",
-          title: "Cargo adicional guardado",
-          text: "El cargo adicional se ha guardado correctamente",
+          title: t("extraCharges.saveSuccessTitle"),
+          text: t("extraCharges.saveSuccessText"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -203,8 +187,8 @@ const ExtraChargesView = () => {
       Swal.close();
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo guardar el cargo adicional, intente nuevamente.",
+        title: t("common.error"),
+        text: t("extraCharges.saveErrorText"),
       });
     } finally {
       setIsUploading(false);
@@ -227,12 +211,12 @@ const ExtraChargesView = () => {
   const handleDeleteClick = useCallback(
     async (id) => {
       const result = await Swal.fire({
-        title: "¿Está seguro?",
-        text: "No podrás revertir esto!",
+        title: t("extraCharges.deleteConfirmTitle"),
+        text: t("extraCharges.deleteConfirmText"),
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: t("extraCharges.deleteConfirmYes"),
+        cancelButtonText: t("common.cancel"),
       });
 
       if (!result.isConfirmed) {
@@ -242,8 +226,8 @@ const ExtraChargesView = () => {
       try {
         setIsUploading(true);
         Swal.fire({
-          title: "Eliminando el cargo adicional",
-          text: "Por favor espera",
+          title: t("extraCharges.deletingTitle"),
+          text: t("extraCharges.deletingText"),
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
@@ -266,8 +250,8 @@ const ExtraChargesView = () => {
           });
           await Swal.fire({
             icon: "success",
-            title: "Cargo adicional eliminado",
-            text: "El cargo adicional se ha eliminado correctamente",
+            title: t("extraCharges.deleteSuccessTitle"),
+            text: t("extraCharges.deleteSuccessText"),
             timer: 1500,
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -279,16 +263,16 @@ const ExtraChargesView = () => {
         Swal.close();
 
         Swal.fire({
-          title: "Error",
+          title: t("common.error"),
           text: errorMessage,
           icon: "error",
-          confirmButtonText: "OK",
+          confirmButtonText: t("common.ok"),
         });
       } finally {
         setIsUploading(false);
       }
     },
-    [currentUser, getTranslatedErrorMessage]
+    [currentUser, getTranslatedErrorMessage, t]
   );
 
   const columns = useMemo(
@@ -300,29 +284,31 @@ const ExtraChargesView = () => {
       },
       {
         accessorKey: "name",
-        header: "Nombre",
+        header: t("extraCharges.name"),
         minSize: 200,
       },
       {
         accessorKey: "amount",
-        header: "Monto",
+        header: t("extraCharges.amount"),
         maxSize: 200,
         cell: (info) =>
           formatExtraChargeAmount(info.getValue(), info.row.original.type.id),
       },
       {
         accessorKey: "type",
-        header: "Tipo",
-        cell: (info) => EXTRA_CHARGE_TYPES_BY_ID[info.getValue().id] || "N/A",
+        header: t("extraCharges.type"),
+        cell: (info) =>
+          t(EXTRA_CHARGE_TYPES_BY_ID[info.getValue().id]) ||
+          t("extraCharges.na"),
       },
       {
         accessorKey: "isActive",
-        header: "Activo",
+        header: t("extraCharges.active"),
         maxSize: 70,
-        cell: (info) => (info.getValue() ? "Sí" : "No"),
+        cell: (info) => (info.getValue() ? t("common.yes") : t("common.no")),
       },
       {
-        header: "Acciones",
+        header: t("extraCharges.actions"),
         enableSorting: false,
         maxSize: 140,
         cell: (info) => {
@@ -339,7 +325,7 @@ const ExtraChargesView = () => {
                       e.stopPropagation();
                       handleUpdateClick(charge);
                     }}>
-                    Editar
+                    {t("extraCharges.edit")}
                   </Button>
                   <Button
                     color="danger"
@@ -349,7 +335,7 @@ const ExtraChargesView = () => {
                       e.stopPropagation();
                       handleDeleteClick(charge.id);
                     }}>
-                    Eliminar
+                    {t("extraCharges.delete")}
                   </Button>
                 </div>
               )}
@@ -358,7 +344,7 @@ const ExtraChargesView = () => {
         },
       },
     ],
-    [handleDeleteClick]
+    [handleDeleteClick, t]
   );
 
   const onGetExtraChargesSuccess = (response) => {
@@ -367,11 +353,14 @@ const ExtraChargesView = () => {
     }
   };
 
-  const onGetExtraChargesError = (error) => {
-    if (error?.response?.status !== 404) {
-      toast.error("Hubo un error al cargar los cargos adicionales");
-    }
-  };
+  const onGetExtraChargesError = useCallback(
+    (error) => {
+      if (error?.response?.status !== 404) {
+        toast.error(t("extraCharges.loadError"));
+      }
+    },
+    [t]
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -381,13 +370,13 @@ const ExtraChargesView = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [hotelId]);
+  }, [hotelId, onGetExtraChargesError]);
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Cargos Adicionales" />
+      <Breadcrumb breadcrumbs={breadcrumbs} active={t("extraCharges.title")} />
       <h3>
-        Cargos Adicionales
+        {t("extraCharges.title")}
         <ChargeTypesExplanationIcon />
       </h3>
 
@@ -397,8 +386,8 @@ const ExtraChargesView = () => {
             <CardBody className="p-3">
               <CardTitle tag="h5">
                 {initialValues.id
-                  ? "Editar cargo adicional"
-                  : "Nuevo cargo adicional"}
+                  ? t("extraCharges.editTitle")
+                  : t("extraCharges.newTitle")}
               </CardTitle>
               <Formik
                 initialValues={initialValues}
@@ -414,7 +403,7 @@ const ExtraChargesView = () => {
                           name="name"
                           type="text"
                           className="form-control"
-                          placeholder="Nombre del cargo"
+                          placeholder={t("extraCharges.namePlaceholder")}
                           isRequired={true}
                         />
                       </Col>
@@ -427,7 +416,7 @@ const ExtraChargesView = () => {
                             name="amount"
                             type="number"
                             className="form-control"
-                            placeholder="Monto"
+                            placeholder={t("extraCharges.amountPlaceholder")}
                             isRequired={true}
                           />
                           {values.typeId && Number(values.typeId) === 1 && (
@@ -437,17 +426,17 @@ const ExtraChargesView = () => {
                             name="typeId"
                             as="select"
                             className="form-select"
-                            placeholder="Tipo"
+                            placeholder={t("extraCharges.typePlaceholder")}
                             isRequired={true}>
                             <option value="" disabled>
-                              Seleccione el tipo
+                              {t("extraCharges.typeSelect")}
                             </option>
                             {EXTRA_CHARGE_TYPES.filter(
                               (type) =>
                                 type.value !== EXTRA_CHARGE_TYPE_IDS.CUSTOM
                             ).map((type) => (
                               <option key={type.value} value={type.value}>
-                                {type.label}
+                                {t(type.label)}
                               </option>
                             ))}
                           </CustomField>
@@ -462,9 +451,9 @@ const ExtraChargesView = () => {
                             {isUploading ? (
                               <Spinner size="sm" color="light" />
                             ) : initialValues.id ? (
-                              "Actualizar"
+                              t("extraCharges.update")
                             ) : (
-                              "Agregar"
+                              t("extraCharges.add")
                             )}
                           </Button>
                         </div>
@@ -478,12 +467,12 @@ const ExtraChargesView = () => {
         )}
         <div className="mt-4">
           <Button color={showForm ? "warning" : "dark"} onClick={toggleForm}>
-            {showForm ? "Cancelar" : "Agregar Cargo Adicional"}
+            {showForm ? t("common.cancel") : t("extraCharges.addExtraCharge")}
           </Button>
         </div>
         <div className="mb-3 float-end">
           <Label for="isActiveFilter" className="text-dark">
-            Filtrar por Estado
+            {t("extraCharges.filterByStatus")}
           </Label>
           <Input
             id="isActiveFilter"
@@ -491,9 +480,9 @@ const ExtraChargesView = () => {
             style={{ width: "auto" }}
             value={isActiveFilter}
             onChange={(e) => setIsActiveFilter(e.target.value)}>
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
-            <option value="all">Todos</option>
+            <option value="active">{t("extraCharges.active")}</option>
+            <option value="inactive">{t("extraCharges.inactive")}</option>
+            <option value="all">{t("extraCharges.all")}</option>
           </Input>
         </div>
         <div className="table-responsive w-100">
@@ -507,12 +496,12 @@ const ExtraChargesView = () => {
               <div className="p-2 border border-info-subtle bg-light">
                 <Row>
                   <Col md={6}>
-                    <strong>Creado por:</strong>{" "}
+                    <strong>{t("extraCharges.createdBy")}</strong>{" "}
                     {row.original.createdBy?.firstName}{" "}
                     {row.original.createdBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de creación:</strong>{" "}
+                    <strong>{t("extraCharges.dateCreated")}</strong>{" "}
                     {dayjs(row.original.dateCreated).format(
                       "DD/MM/YYYY - h:mm A"
                     )}
@@ -520,12 +509,12 @@ const ExtraChargesView = () => {
                 </Row>
                 <Row>
                   <Col md={6}>
-                    <strong>Modificado por:</strong>{" "}
+                    <strong>{t("extraCharges.modifiedBy")}</strong>{" "}
                     {row.original.modifiedBy?.firstName}{" "}
                     {row.original.modifiedBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de modificación:</strong>{" "}
+                    <strong>{t("extraCharges.dateModified")}</strong>{" "}
                     {dayjs(row.original.dateModified).format(
                       "DD/MM/YYYY - h:mm A"
                     )}

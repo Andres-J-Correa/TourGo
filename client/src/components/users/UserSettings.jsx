@@ -7,6 +7,7 @@ import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import UserPasswordChange from "components/users/UserPasswordChange";
+import { useLanguage } from "contexts/LanguageContext";
 
 const tabComponents = {
   email: EmailVerification,
@@ -16,15 +17,16 @@ const tabComponents = {
 
 const validTabs = ["email", "password"];
 
-const breadcrumbs = [
-  { label: "Inicio", path: "/" },
-  { label: "Perfil", path: "/profile" },
-];
-
 const UserSettingsView = () => {
   const { user } = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
+
+  const breadcrumbs = [
+    { label: t("common.breadcrumbs.home"), path: "/" },
+    { label: t("users.profile.breadcrumbActive"), path: "/profile" },
+  ];
 
   const activeTab = useMemo(
     () => new URLSearchParams(location.search).get("tab") || "email",
@@ -46,12 +48,15 @@ const UserSettingsView = () => {
     if (Component) {
       return <Component user={user} />;
     }
-    return <div>Seleccione una opción 👈</div>;
+    return <div>{t("users.settings.selectOption")}</div>;
   };
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Configuración" />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("users.accountDropdown.settings")}
+      />
       <ErrorBoundary>
         <LoadingOverlay isVisible={user.isLoading} />
         <Row className="min-vh-50">
@@ -66,7 +71,7 @@ const UserSettingsView = () => {
                   active={activeTab === "email"}
                   onClick={() => handleTabChange("email")}
                   className="cursor-pointer">
-                  Verificación de Email
+                  {t("users.settings.emailVerification")}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -74,11 +79,13 @@ const UserSettingsView = () => {
                   active={activeTab === "password"}
                   onClick={() => handleTabChange("password")}
                   className="cursor-pointer">
-                  Cambiar Contraseña
+                  {t("users.settings.changePassword")}
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink disabled>Preferencias de Notificaciones</NavLink>
+                <NavLink disabled>
+                  {t("users.settings.notificationPreferences")}
+                </NavLink>
               </NavItem>
             </Nav>
           </Col>

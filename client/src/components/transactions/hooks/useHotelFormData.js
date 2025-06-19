@@ -3,12 +3,14 @@ import { getFinancePartnersMinimalByHotelId } from "services/financePartnerServi
 import { getTransactionSubcategoriesMinimal } from "services/transactionsSubcategoryService";
 import { getPaymentMethodsMinimalByHotelId } from "services/paymentMethodService";
 import { toast } from "react-toastify";
+import { useLanguage } from "contexts/LanguageContext";
 
 export default function useHotelFormData(hotelId) {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [financePartners, setFinancePartners] = useState([]);
   const [transactionSubcategories, setTransactionSubcategories] = useState([]);
   const [isLoadingHotelData, setIsLoadingHotelData] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!hotelId) return;
@@ -31,13 +33,13 @@ export default function useHotelFormData(hotelId) {
           if (paymentMethodsResult.status === "fulfilled") {
             setPaymentMethods(paymentMethodsResult.value.items || []);
           } else if (paymentMethodsResult.reason?.response?.status !== 404) {
-            errors.push("Error al cargar métodos de pago");
+            errors.push(t("transactions.errors.loadPaymentMethods"));
           }
 
           if (financePartnersResult.status === "fulfilled") {
             setFinancePartners(financePartnersResult.value.items || []);
           } else if (financePartnersResult.reason?.response?.status !== 404) {
-            errors.push("Error al cargar socios financieros");
+            errors.push(t("transactions.errors.loadFinancePartners"));
           }
 
           if (transactionSubcategoriesResult.status === "fulfilled") {
@@ -47,7 +49,7 @@ export default function useHotelFormData(hotelId) {
           } else if (
             transactionSubcategoriesResult.reason?.response?.status !== 404
           ) {
-            errors.push("Error al cargar subcategorías de transacciones");
+            errors.push(t("transactions.errors.loadTransactionSubcategories"));
           }
 
           if (errors.length > 0) {
@@ -58,7 +60,7 @@ export default function useHotelFormData(hotelId) {
       .finally(() => {
         setIsLoadingHotelData(false);
       });
-  }, [hotelId]);
+  }, [hotelId, t]);
 
   return {
     paymentMethods,

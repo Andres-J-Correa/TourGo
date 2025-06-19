@@ -29,6 +29,7 @@ import {
   updateById,
 } from "services/transactionsSubcategoryService";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 
 // Components
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -41,17 +42,10 @@ import TransactionCategoriesExplanationIcon from "components/transactions/Transa
 // Constants/Static Data
 import { TRANSACTION_CATEGORIES } from "components/transactions/constants";
 
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(100, "El nombre no puede exceder los 100 caracteres")
-    .required("El nombre es requerido"),
-  categoryId: Yup.string().required("La categoría es requerida"),
-});
-
 function TransactionSubcategoriesView() {
   const { hotelId } = useParams();
   const { user } = useAppContext();
+  const { t } = useLanguage();
   const [transactionSubcategories, setTransactionSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState([]);
@@ -64,10 +58,24 @@ function TransactionSubcategoriesView() {
   });
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("common.breadcrumbs.home"), path: "/" },
+    { label: t("common.breadcrumbs.hotels"), path: "/hotels" },
+    { label: t("common.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
   ];
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string()
+      .min(2, (params) =>
+        t("transactions.subcategories.validation.nameMin", params)
+      )
+      .max(100, (params) =>
+        t("transactions.subcategories.validation.nameMax", params)
+      )
+      .required(t("transactions.subcategories.validation.nameRequired")),
+    categoryId: Yup.string().required(
+      t("transactions.subcategories.validation.categoryRequired")
+    ),
+  });
 
   const filteredData = useMemo(() => {
     switch (isActiveFilter) {
@@ -105,18 +113,17 @@ function TransactionSubcategoriesView() {
 
   const handleSubmit = async (values) => {
     const { id, ...data } = values;
-
     const result = await Swal.fire({
-      title: `Está seguro de que desea ${
-        id ? "actualizar" : "agregar"
-      } la subcategoría?`,
+      title: id
+        ? t("transactions.subcategories.confirmUpdateTitle")
+        : t("transactions.subcategories.confirmAddTitle"),
       text: id
-        ? "Esta acción puede afectar transacciones existentes."
-        : "Revise los datos antes de continuar.",
+        ? t("transactions.subcategories.confirmUpdateText")
+        : t("transactions.subcategories.confirmAddText"),
       icon: id ? "warning" : "info",
       showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("transactions.subcategories.confirmSave"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: Boolean(id),
       confirmButtonColor: id ? "red" : "#0d6efd",
     });
@@ -127,8 +134,8 @@ function TransactionSubcategoriesView() {
 
     try {
       Swal.fire({
-        title: "Guardando Subcategoría",
-        text: "Por favor espera",
+        title: t("transactions.subcategories.savingTitle"),
+        text: t("transactions.subcategories.savingText"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -182,8 +189,8 @@ function TransactionSubcategoriesView() {
         toggleForm();
         await Swal.fire({
           icon: "success",
-          title: "Subcategoría guardada",
-          text: "La subcategoría se ha guardado correctamente",
+          title: t("transactions.subcategories.saveSuccessTitle"),
+          text: t("transactions.subcategories.saveSuccessText"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -195,8 +202,8 @@ function TransactionSubcategoriesView() {
       Swal.close(); // Close loading
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo guardar la subcategoría, intente nuevamente.",
+        title: t("common.error"),
+        text: t("transactions.subcategories.saveErrorText"),
       });
     } finally {
       setIsUploading(false);
@@ -215,12 +222,12 @@ function TransactionSubcategoriesView() {
   const handleDeleteClick = useCallback(
     async (id) => {
       const result = await Swal.fire({
-        title: "¿Está seguro?",
-        text: "No podrás revertir esto!",
+        title: t("transactions.subcategories.deleteConfirmTitle"),
+        text: t("transactions.subcategories.deleteConfirmText"),
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: t("transactions.subcategories.deleteConfirmYes"),
+        cancelButtonText: t("common.cancel"),
       });
 
       if (!result.isConfirmed) {
@@ -230,8 +237,8 @@ function TransactionSubcategoriesView() {
       try {
         setIsUploading(true);
         Swal.fire({
-          title: "Eliminando Subcategoría",
-          text: "Por favor espera",
+          title: t("transactions.subcategories.deletingTitle"),
+          text: t("transactions.subcategories.deletingText"),
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
@@ -256,8 +263,8 @@ function TransactionSubcategoriesView() {
           });
           await Swal.fire({
             icon: "success",
-            title: "Subcategoría eliminada",
-            text: "La subcategoría se ha eliminado correctamente",
+            title: t("transactions.subcategories.deleteSuccessTitle"),
+            text: t("transactions.subcategories.deleteSuccessText"),
             timer: 1500,
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -267,46 +274,49 @@ function TransactionSubcategoriesView() {
         Swal.close(); // Close loading
         await Swal.fire({
           icon: "error",
-          title: "Error",
-          text: "No se pudo eliminar la subcategoría, intente nuevamente.",
+          title: t("common.error"),
+          text: t("transactions.subcategories.saveErrorText"),
         });
       } finally {
         setIsUploading(false);
       }
     },
-    [currentUser]
+    [currentUser, t]
   );
 
   const columns = useMemo(
     () => [
       {
         accessorKey: "id",
-        header: "ID",
+        header: t("rooms.table.id"),
         maxSize: 50,
       },
       {
         accessorKey: "name",
-        header: "Nombre",
+        header: t("transactions.subcategories.name"),
       },
       {
         accessorKey: "categoryId",
-        header: "Categoría",
+        header: t("transactions.subcategories.category"),
         maxSize: 150,
         cell: (info) => {
           const category = TRANSACTION_CATEGORIES.find(
             (cat) => Number(cat.id) === Number(info.getValue())
           );
-          return category ? category.name : "N/A";
+          return category ? t(category.name) : t("hotels.edit.na");
         },
       },
       {
         accessorKey: "isActive",
-        header: "Activo",
+        header: t("rooms.table.active"),
         maxSize: 70,
-        cell: (info) => (info.getValue() ? "Sí" : "No"),
+        cell: (info) =>
+          info.getValue()
+            ? t("extraCharges.active")
+            : t("extraCharges.inactive"),
       },
       {
-        header: "Acciones",
+        header: t("extraCharges.actions"),
         enableSorting: false,
         maxSize: 140,
         cell: (info) => {
@@ -323,7 +333,7 @@ function TransactionSubcategoriesView() {
                       e.stopPropagation();
                       handleUpdateClick(subcategory);
                     }}>
-                    Editar
+                    {t("extraCharges.edit")}
                   </Button>
                   <Button
                     color="danger"
@@ -333,7 +343,7 @@ function TransactionSubcategoriesView() {
                       e.stopPropagation();
                       handleDeleteClick(subcategory.id);
                     }}>
-                    Eliminar
+                    {t("extraCharges.delete")}
                   </Button>
                 </div>
               )}
@@ -342,7 +352,7 @@ function TransactionSubcategoriesView() {
         },
       },
     ],
-    [handleDeleteClick]
+    [handleDeleteClick, t]
   );
 
   const onGetTransactionSubcategoriesSuccess = (response) => {
@@ -351,11 +361,14 @@ function TransactionSubcategoriesView() {
     }
   };
 
-  const onGetTransactionSubcategoriesError = (error) => {
-    if (error?.response?.status !== 404) {
-      toast.error("Error al cargar las subcategorías de transacciones");
-    }
-  };
+  const onGetTransactionSubcategoriesError = useCallback(
+    (error) => {
+      if (error?.response?.status !== 404) {
+        toast.error(t("transactions.errors.loadTransactionSubcategories"));
+      }
+    },
+    [t]
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -365,24 +378,23 @@ function TransactionSubcategoriesView() {
       .finally(() => {
         setLoading(false);
       });
-  }, [hotelId]);
+  }, [hotelId, onGetTransactionSubcategoriesError]);
 
   return (
     <>
       <Breadcrumb
         breadcrumbs={breadcrumbs}
-        active="Subcategoría de Transacciones"
+        active={t("transactions.subcategories.title")}
       />
       <ErrorBoundary>
-        <h3>Subcategoría de Transacciones</h3>
-
+        <h3>{t("transactions.subcategories.title")}</h3>
         {showForm && (
           <Card className="border-0 shadow-lg mt-3">
             <CardBody className="p-3">
               <CardTitle tag="h5">
                 {initialValues.id
-                  ? "Editar Subcategoría"
-                  : "Nueva Subcategoría"}
+                  ? t("transactions.subcategories.editTitle")
+                  : t("transactions.subcategories.newTitle")}
               </CardTitle>
               <Formik
                 initialValues={initialValues}
@@ -398,23 +410,26 @@ function TransactionSubcategoriesView() {
                           name="name"
                           type="text"
                           className="form-control"
-                          placeholder="Nombre de la subcategoría"
+                          placeholder={t("transactions.subcategories.name")}
                           isRequired={true}
                         />
                       </Col>
-
                       <Col md="4">
                         <InputGroup>
                           <CustomField
                             name="categoryId"
                             as="select"
                             className="form-control"
-                            placeholder="Categoría"
+                            placeholder={t(
+                              "transactions.subcategories.category"
+                            )}
                             isRequired={true}>
-                            <option value="">Seleccionar</option>
+                            <option value="">
+                              {t("transactions.subcategories.category")}
+                            </option>
                             {TRANSACTION_CATEGORIES.map((cat) => (
                               <option key={cat.id} value={cat.id}>
-                                {cat.name}
+                                {t(cat.name)}
                               </option>
                             ))}
                           </CustomField>
@@ -423,7 +438,6 @@ function TransactionSubcategoriesView() {
                           </InputGroupText>
                         </InputGroup>
                       </Col>
-
                       <Col md="4" className="align-content-center">
                         <div className="text-center">
                           <Button
@@ -442,9 +456,9 @@ function TransactionSubcategoriesView() {
                             {isUploading ? (
                               <Spinner size="sm" color="light" />
                             ) : initialValues.id ? (
-                              "Actualizar"
+                              t("extraCharges.update")
                             ) : (
-                              "Agregar"
+                              t("extraCharges.add")
                             )}
                           </Button>
                         </div>
@@ -458,12 +472,14 @@ function TransactionSubcategoriesView() {
         )}
         <div className="mt-4">
           <Button color={showForm ? "warning" : "dark"} onClick={toggleForm}>
-            {showForm ? "Cancelar" : "Agregar Subcategoría"}
+            {showForm
+              ? t("transactions.subcategories.cancel")
+              : t("transactions.subcategories.add")}
           </Button>
         </div>
         <div className="mb-3 float-end">
           <Label for="isActiveFilter" className="text-dark">
-            Filtrar por Estado
+            {t("transactions.subcategories.filterByStatus")}
           </Label>
           <Input
             id="isActiveFilter"
@@ -471,9 +487,9 @@ function TransactionSubcategoriesView() {
             style={{ width: "auto" }}
             value={isActiveFilter}
             onChange={(e) => setIsActiveFilter(e.target.value)}>
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
-            <option value="all">Todos</option>
+            <option value="active">{t("extraCharges.active")}</option>
+            <option value="inactive">{t("extraCharges.inactive")}</option>
+            <option value="all">{t("extraCharges.all")}</option>
           </Input>
         </div>
         <div className="table-responsive w-100">
@@ -487,12 +503,12 @@ function TransactionSubcategoriesView() {
               <div className="p-2 border border-info-subtle bg-light">
                 <Row>
                   <Col md={6}>
-                    <strong>Creado por:</strong>{" "}
+                    <strong>{t("extraCharges.createdBy")}</strong>{" "}
                     {row.original.createdBy?.firstName}{" "}
                     {row.original.createdBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de creación:</strong>{" "}
+                    <strong>{t("extraCharges.dateCreated")}</strong>{" "}
                     {dayjs(row.original.dateCreated).format(
                       "DD/MM/YYYY - h:mm A"
                     )}
@@ -500,12 +516,12 @@ function TransactionSubcategoriesView() {
                 </Row>
                 <Row>
                   <Col md={6}>
-                    <strong>Modificado por:</strong>{" "}
+                    <strong>{t("extraCharges.modifiedBy")}</strong>{" "}
                     {row.original.modifiedBy?.firstName}{" "}
                     {row.original.modifiedBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de modificación:</strong>{" "}
+                    <strong>{t("extraCharges.dateModified")}</strong>{" "}
                     {dayjs(row.original.dateModified).format(
                       "DD/MM/YYYY - h:mm A"
                     )}

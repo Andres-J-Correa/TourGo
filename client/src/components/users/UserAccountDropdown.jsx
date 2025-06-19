@@ -29,20 +29,20 @@ function UserAccountDropdown() {
     collapse: user.current.isAuthenticated
       ? [
           {
-            name: "Cuenta",
+            name: t("users.accountDropdown.account"),
             collapse: [
               {
-                name: "Perfil",
+                name: t("users.accountDropdown.profile"),
                 path: "/profile",
               },
               {
-                name: "Configuración",
+                name: t("users.accountDropdown.settings"),
                 path: "/profile/settings?tab=email",
               },
             ],
           },
           {
-            name: "Acciones",
+            name: t("users.accountDropdown.actions"),
             collapse: [
               {
                 name: t("client.navbar.logout"),

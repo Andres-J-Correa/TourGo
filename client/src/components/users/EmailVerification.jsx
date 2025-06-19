@@ -5,24 +5,26 @@ import {
   verifyEmail,
 } from "services/userAuthService";
 import Swal from "sweetalert2";
+import { useLanguage } from "contexts/LanguageContext";
 
 const EmailVerification = ({ user }) => {
+  const { t } = useLanguage();
   const handleRequestVerification = async () => {
     const result = await Swal.fire({
-      title: "Solicitud de Verificación",
-      text: "¿Deseas solicitar un nuevo código de verificación?",
+      title: t("users.emailVerification.requestTitle"),
+      text: t("users.emailVerification.requestText"),
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Sí, solicitar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("users.emailVerification.requestConfirm"),
+      cancelButtonText: t("common.cancel"),
     });
 
     if (!result.isConfirmed) return;
 
     try {
       Swal.fire({
-        title: "Enviando...",
-        text: "Por favor, espera mientras se envía el código de verificación.",
+        title: t("users.emailVerification.sendingTitle"),
+        text: t("users.emailVerification.sendingText"),
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -32,8 +34,8 @@ const EmailVerification = ({ user }) => {
       const response = await requestEmailVerification();
       if (response?.isSuccessful) {
         Swal.fire({
-          title: "Éxito",
-          text: "Se ha enviado un nuevo código de verificación a tu correo.",
+          title: t("common.success"),
+          text: t("users.emailVerification.sentText"),
           icon: "success",
         });
       } else {
@@ -42,8 +44,8 @@ const EmailVerification = ({ user }) => {
     } catch {
       Swal.close();
       Swal.fire({
-        title: "Error",
-        text: "Hubo un problema al solicitar el código de verificación. Por favor, inténtalo de nuevo más tarde.",
+        title: t("common.error"),
+        text: t("users.emailVerification.requestError"),
         icon: "error",
       });
     }
@@ -55,21 +57,21 @@ const EmailVerification = ({ user }) => {
     const code = e.target.verificationCode.value;
     if (code.trim() === "") {
       Swal.fire({
-        title: "Error",
-        text: "Por favor, ingresa el código de verificación.",
+        title: t("common.error"),
+        text: t("users.emailVerification.codeRequired"),
         icon: "error",
-        confirmButtonText: "Aceptar",
+        confirmButtonText: t("common.ok"),
       });
       return;
     }
 
     const result = await Swal.fire({
-      title: "Estas seguro?",
-      text: "Revisa que el código sea correcto antes de continuar.",
+      title: t("users.emailVerification.confirmTitle"),
+      text: t("users.emailVerification.confirmText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, verificar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("users.emailVerification.confirmVerify"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: true,
     });
 
@@ -77,8 +79,8 @@ const EmailVerification = ({ user }) => {
 
     try {
       Swal.fire({
-        title: "Verificando...",
-        text: "Por favor, espera mientras se verifica tu correo.",
+        title: t("users.emailVerification.verifyingTitle"),
+        text: t("users.emailVerification.verifyingText"),
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -92,8 +94,8 @@ const EmailVerification = ({ user }) => {
           isVerified: true,
         }));
         Swal.fire({
-          title: "Éxito",
-          text: "Tu correo ha sido verificado exitosamente.",
+          title: t("common.success"),
+          text: t("users.emailVerification.verifiedText"),
           icon: "success",
           timer: 2000,
         });
@@ -103,8 +105,8 @@ const EmailVerification = ({ user }) => {
     } catch (error) {
       Swal.close();
       Swal.fire({
-        title: "Error",
-        text: "Hubo un problema al verificar tu correo. Por favor, revisa el código e inténtalo de nuevo.",
+        title: t("common.error"),
+        text: t("users.emailVerification.verifyError"),
         icon: "error",
       });
     }
@@ -112,29 +114,29 @@ const EmailVerification = ({ user }) => {
 
   return (
     <div>
-      <h4>Verificación de Correo</h4>
+      <h4>{t("users.emailVerification.title")}</h4>
       {user.current.isVerified ? (
-        <p className="text-success">Tú correo está verificado ✅</p>
+        <p className="text-success">{t("users.emailVerification.verified")}</p>
       ) : (
         <>
           <Button color="dark" onClick={handleRequestVerification}>
-            Solicitar Código de Verificación
+            {t("users.emailVerification.requestButton")}
           </Button>
 
           <Form className="mt-4" onSubmit={handleVerifyEmail}>
             <FormGroup>
               <Label for="verificationCode">
-                Ingrese el código de verificación
+                {t("users.emailVerification.codeLabel")}
               </Label>
               <Input
                 type="text"
                 name="verificationCode"
                 id="verificationCode"
-                placeholder="00000000-0000-0000-0000-000000000000"
+                placeholder={t("users.emailVerification.codePlaceholder")}
               />
             </FormGroup>
             <Button type="submit" color="success">
-              Verificar
+              {t("users.emailVerification.verifyButton")}
             </Button>
           </Form>
         </>

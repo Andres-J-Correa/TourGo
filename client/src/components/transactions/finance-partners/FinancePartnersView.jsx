@@ -27,6 +27,7 @@ import {
   updateById,
 } from "services/financePartnerService";
 import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 
 // Components
 import Breadcrumb from "components/commonUI/Breadcrumb";
@@ -46,6 +47,7 @@ const validationSchema = Yup.object().shape({
 function FinancePartnersView() {
   const { hotelId } = useParams();
   const { user } = useAppContext();
+  const { t } = useLanguage();
   const [financePartners, setFinancePartners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState([]);
@@ -57,9 +59,9 @@ function FinancePartnersView() {
   });
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("common.breadcrumbs.home"), path: "/" },
+    { label: t("common.breadcrumbs.hotels"), path: "/hotels" },
+    { label: t("common.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
   ];
 
   const filteredData = useMemo(() => {
@@ -96,16 +98,16 @@ function FinancePartnersView() {
     const { id, ...data } = values;
 
     const result = await Swal.fire({
-      title: `¿Está seguro de que desea ${
-        id ? "actualizar" : "agregar"
-      } el socio financiero?`,
+      title: id
+        ? t("transactions.financePartners.confirmUpdateTitle")
+        : t("transactions.financePartners.confirmAddTitle"),
       text: id
-        ? "Esta acción puede afectar transacciones existentes."
-        : "Revise los datos antes de continuar.",
+        ? t("transactions.financePartners.confirmUpdateText")
+        : t("transactions.financePartners.confirmAddText"),
       icon: id ? "warning" : "info",
       showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("transactions.financePartners.confirmSave"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: Boolean(id),
       confirmButtonColor: id ? "red" : "#0d6efd",
     });
@@ -116,8 +118,8 @@ function FinancePartnersView() {
 
     try {
       Swal.fire({
-        title: "Guardando socio financiero",
-        text: "Por favor espera",
+        title: t("transactions.financePartners.savingTitle"),
+        text: t("transactions.financePartners.savingText"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -171,8 +173,8 @@ function FinancePartnersView() {
         toggleForm();
         await Swal.fire({
           icon: "success",
-          title: "Socio financiero guardado",
-          text: "El socio financiero se ha guardado correctamente",
+          title: t("transactions.financePartners.saveSuccessTitle"),
+          text: t("transactions.financePartners.saveSuccessText"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -184,8 +186,8 @@ function FinancePartnersView() {
       Swal.close(); // Close loading
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo guardar el socio financiero, intente nuevamente.",
+        title: t("common.error"),
+        text: t("transactions.financePartners.saveErrorText"),
       });
     } finally {
       setIsUploading(false);
@@ -203,12 +205,12 @@ function FinancePartnersView() {
   const handleDeleteClick = useCallback(
     async (id) => {
       const result = await Swal.fire({
-        title: "¿Está seguro?",
-        text: "¡No podrás revertir esto!",
+        title: t("transactions.financePartners.deleteConfirmTitle"),
+        text: t("transactions.financePartners.deleteConfirmText"),
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: t("transactions.financePartners.deleteConfirmYes"),
+        cancelButtonText: t("common.cancel"),
       });
 
       if (!result.isConfirmed) {
@@ -218,8 +220,8 @@ function FinancePartnersView() {
       try {
         setIsUploading(true);
         Swal.fire({
-          title: "Eliminando el socio financiero",
-          text: "Por favor espera",
+          title: t("transactions.financePartners.deletingTitle"),
+          text: t("transactions.financePartners.deletingText"),
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
@@ -244,8 +246,8 @@ function FinancePartnersView() {
           });
           await Swal.fire({
             icon: "success",
-            title: "Socio financiero eliminado",
-            text: "El socio financiero se ha eliminado correctamente",
+            title: t("transactions.financePartners.deleteSuccessTitle"),
+            text: t("transactions.financePartners.deleteSuccessText"),
             timer: 1500,
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -255,14 +257,14 @@ function FinancePartnersView() {
         Swal.close(); // Close loading
         await Swal.fire({
           icon: "error",
-          title: "Error",
-          text: "No se pudo eliminar el socio financiero, intente nuevamente.",
+          title: t("common.error"),
+          text: t("transactions.financePartners.deleteErrorText"),
         });
       } finally {
         setIsUploading(false);
       }
     },
-    [currentUser]
+    [currentUser, t]
   );
 
   const columns = useMemo(
@@ -274,16 +276,16 @@ function FinancePartnersView() {
       },
       {
         accessorKey: "name",
-        header: "Nombre",
+        header: t("transactions.financePartners.name"),
       },
       {
         accessorKey: "isActive",
-        header: "Activo",
+        header: t("transactions.financePartners.active"),
         maxSize: 70,
-        cell: (info) => (info.getValue() ? "Sí" : "No"),
+        cell: (info) => (info.getValue() ? t("common.yes") : t("common.no")),
       },
       {
-        header: "Acciones",
+        header: t("transactions.financePartners.actions"),
         enableSorting: false,
         maxSize: 140,
         cell: (info) => {
@@ -300,7 +302,7 @@ function FinancePartnersView() {
                       e.stopPropagation();
                       handleUpdateClick(financePartner);
                     }}>
-                    Editar
+                    {t("transactions.financePartners.edit")}
                   </Button>
                   <Button
                     color="danger"
@@ -310,7 +312,7 @@ function FinancePartnersView() {
                       e.stopPropagation();
                       handleDeleteClick(financePartner.id);
                     }}>
-                    Eliminar
+                    {t("transactions.financePartners.delete")}
                   </Button>
                 </div>
               )}
@@ -319,7 +321,7 @@ function FinancePartnersView() {
         },
       },
     ],
-    [handleDeleteClick]
+    [handleDeleteClick, t]
   );
 
   const onGetFinancePartnersSuccess = (response) => {
@@ -328,11 +330,14 @@ function FinancePartnersView() {
     }
   };
 
-  const onGetFinancePartnersError = (error) => {
-    if (error?.response?.status !== 404) {
-      toast.error("Error al cargar los socios financieros");
-    }
-  };
+  const onGetFinancePartnersError = useCallback(
+    (error) => {
+      if (error?.response?.status !== 404) {
+        toast.error(t("transactions.financePartners.loadError"));
+      }
+    },
+    [t]
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -342,14 +347,18 @@ function FinancePartnersView() {
       .finally(() => {
         setLoading(false);
       });
-  }, [hotelId]);
+  }, [hotelId, onGetFinancePartnersError]);
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Socios Financieros" />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("transactions.financePartners.title")}
+      />
       <ErrorBoundary>
         <h3>
-          Socios Financieros <FinancePartnersExplanationIcon />
+          {t("transactions.financePartners.title")}{" "}
+          <FinancePartnersExplanationIcon />
         </h3>
 
         {showForm && (
@@ -357,8 +366,8 @@ function FinancePartnersView() {
             <CardBody className="p-3">
               <CardTitle tag="h5">
                 {initialValues.id
-                  ? "Editar socio financiero"
-                  : "Nuevo socio financiero"}
+                  ? t("transactions.financePartners.editTitle")
+                  : t("transactions.financePartners.newTitle")}
               </CardTitle>
               <Formik
                 initialValues={initialValues}
@@ -374,7 +383,9 @@ function FinancePartnersView() {
                           name="name"
                           type="text"
                           className="form-control"
-                          placeholder="Nombre del socio financiero"
+                          placeholder={t(
+                            "transactions.financePartners.namePlaceholder"
+                          )}
                           isRequired={true}
                         />
                       </Col>
@@ -397,9 +408,9 @@ function FinancePartnersView() {
                             {isUploading ? (
                               <Spinner size="sm" color="light" />
                             ) : initialValues.id ? (
-                              "Actualizar"
+                              t("transactions.financePartners.update")
                             ) : (
-                              "Agregar"
+                              t("transactions.financePartners.add")
                             )}
                           </Button>
                         </div>
@@ -413,12 +424,14 @@ function FinancePartnersView() {
         )}
         <div className="mt-4">
           <Button color={showForm ? "warning" : "dark"} onClick={toggleForm}>
-            {showForm ? "Cancelar" : "Agregar Socio Financiero"}
+            {showForm
+              ? t("common.cancel")
+              : t("transactions.financePartners.addFinancePartner")}
           </Button>
         </div>
         <div className="mb-3 float-end">
           <Label for="isActiveFilter" className="text-dark">
-            Filtrar por Estado
+            {t("transactions.financePartners.filterByStatus")}
           </Label>
           <Input
             id="isActiveFilter"
@@ -426,9 +439,13 @@ function FinancePartnersView() {
             style={{ width: "auto" }}
             value={isActiveFilter}
             onChange={(e) => setIsActiveFilter(e.target.value)}>
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
-            <option value="all">Todos</option>
+            <option value="active">
+              {t("transactions.financePartners.active")}
+            </option>
+            <option value="inactive">
+              {t("transactions.financePartners.inactive")}
+            </option>
+            <option value="all">{t("transactions.financePartners.all")}</option>
           </Input>
         </div>
         <div className="table-responsive w-100">
@@ -442,12 +459,16 @@ function FinancePartnersView() {
               <div className="p-2 border border-info-subtle bg-light">
                 <Row>
                   <Col md={6}>
-                    <strong>Creado por:</strong>{" "}
+                    <strong>
+                      {t("transactions.financePartners.createdBy")}:
+                    </strong>{" "}
                     {row.original.createdBy?.firstName}{" "}
                     {row.original.createdBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de creación:</strong>{" "}
+                    <strong>
+                      {t("transactions.financePartners.dateCreated")}:
+                    </strong>{" "}
                     {dayjs(row.original.dateCreated).format(
                       "DD/MM/YYYY - h:mm A"
                     )}
@@ -455,12 +476,16 @@ function FinancePartnersView() {
                 </Row>
                 <Row>
                   <Col md={6}>
-                    <strong>Modificado por:</strong>{" "}
+                    <strong>
+                      {t("transactions.financePartners.modifiedBy")}:
+                    </strong>{" "}
                     {row.original.modifiedBy?.firstName}{" "}
                     {row.original.modifiedBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de modificación:</strong>{" "}
+                    <strong>
+                      {t("transactions.financePartners.dateModified")}:
+                    </strong>{" "}
                     {dayjs(row.original.dateModified).format(
                       "DD/MM/YYYY - h:mm A"
                     )}

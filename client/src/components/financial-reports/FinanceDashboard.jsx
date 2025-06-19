@@ -14,33 +14,40 @@ import CostToRevenueRatioReport from "components/financial-reports/CostToRevenue
 import UtilityCostAnalysisReport from "components/financial-reports/UtilityCostAnalysisReport";
 import HotelOccupancyOverTimeReport from "components/financial-reports/HotelOccupancyOverTimeReport";
 import RoomOccupancyReport from "components/financial-reports/RoomOccupancyReport";
+import { useLanguage } from "contexts/LanguageContext";
 
 const TABS = [
-  { key: "balance", label: "Balance en cuentas" },
-  { key: "profitLoss", label: "Resumen de Ganancias y Pérdidas" },
-  { key: "revenue", label: "Desglose de Ingresos" },
-  { key: "expenses", label: "Desglose de Gastos" },
+  { key: "balance", labelKey: "financialReports.dashboard.tabs.balance" },
+  { key: "profitLoss", labelKey: "financialReports.dashboard.tabs.profitLoss" },
+  { key: "revenue", labelKey: "financialReports.dashboard.tabs.revenue" },
+  { key: "expenses", labelKey: "financialReports.dashboard.tabs.expenses" },
   {
     key: "revPAROverTime",
-    label: "RevPAR en el Tiempo",
+    labelKey: "financialReports.dashboard.tabs.revPAROverTime",
   },
   {
     key: "hotelOccupancyOverTime",
-    label: "Ocupación del Hotel en el Tiempo",
+    labelKey: "financialReports.dashboard.tabs.hotelOccupancyOverTime",
   },
   {
     key: "roomOccupancy",
-    label: "Ocupación de Habitaciones",
+    labelKey: "financialReports.dashboard.tabs.roomOccupancy",
   },
   {
     key: "categoryPerformance",
-    label: "Desempeño de Categoría en el Tiempo",
+    labelKey: "financialReports.dashboard.tabs.categoryPerformance",
   },
-  { key: "subcategoryAnalysis", label: "Análisis por Subcategoría" },
-  { key: "costToRevenueRatio", label: "Relación de Gasto a Ingreso" },
+  {
+    key: "subcategoryAnalysis",
+    labelKey: "financialReports.dashboard.tabs.subcategoryAnalysis",
+  },
+  {
+    key: "costToRevenueRatio",
+    labelKey: "financialReports.dashboard.tabs.costToRevenueRatio",
+  },
   {
     key: "utilityCostAnalysis",
-    label: "Análisis de Costos de Servicios Públicos",
+    labelKey: "financialReports.dashboard.tabs.utilityCostAnalysis",
   },
 ];
 
@@ -62,6 +69,7 @@ function FinanceDashboard() {
   const { hotelId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const activeTab = useMemo(() => {
     const tab = new URLSearchParams(location.search).get("tab");
@@ -78,8 +86,11 @@ function FinanceDashboard() {
   };
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("financialReports.dashboard.breadcrumbs.home"), path: "/" },
+    {
+      label: t("financialReports.dashboard.breadcrumbs.hotel"),
+      path: `/hotels/${hotelId}`,
+    },
   ];
 
   const renderContent = () => {
@@ -89,8 +100,11 @@ function FinanceDashboard() {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Panel de finanzas" />
-      <h3 className="mb-4">Panel de finanzas</h3>
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("financialReports.dashboard.title")}
+      />
+      <h3 className="mb-4">{t("financialReports.dashboard.title")}</h3>
       <ErrorBoundary>
         <Row>
           <Col md="3">
@@ -105,7 +119,7 @@ function FinanceDashboard() {
                     active={activeTab === tab.key}
                     onClick={() => handleTabChange(tab.key)}
                     className="cursor-pointer">
-                    {tab.label}
+                    {t(tab.labelKey)}
                   </NavLink>
                 </NavItem>
               ))}

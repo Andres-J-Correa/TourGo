@@ -9,37 +9,40 @@ import {
   HOTEL_ROLES_BY_ID,
   HOTEL_ROLES_IDS,
 } from "components/hotels/constants";
+import { useLanguage } from "contexts/LanguageContext";
 
 const ACTION_KEYS = ["create", "read", "update", "delete"];
-const ACTION_LABELS = {
-  create: "Crear",
-  read: "Ver",
-  update: "Editar",
-  delete: "Eliminar",
-};
-
-const groupPermissionsByRole = (data) => {
-  const grouped = {};
-
-  data.forEach(({ roleId, resourceTypeId, ...actions }) => {
-    if (roleId === HOTEL_ROLES_IDS.OWNER) return;
-
-    if (!grouped[roleId]) grouped[roleId] = {};
-    if (!grouped[roleId][resourceTypeId]) {
-      grouped[roleId][resourceTypeId] = {};
-    }
-
-    ACTION_KEYS.forEach((action) => {
-      grouped[roleId][resourceTypeId][action] = !!actions[action];
-    });
-  });
-
-  return grouped;
-};
 
 const StaffRolePermissions = () => {
   const [rolesData, setRolesData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
+
+  const ACTION_LABELS = {
+    create: t("staff.rolesPermissions.create"),
+    read: t("staff.rolesPermissions.read"),
+    update: t("staff.rolesPermissions.update"),
+    delete: t("staff.rolesPermissions.delete"),
+  };
+
+  const groupPermissionsByRole = (data) => {
+    const grouped = {};
+
+    data.forEach(({ roleId, resourceTypeId, ...actions }) => {
+      if (roleId === HOTEL_ROLES_IDS.OWNER) return;
+
+      if (!grouped[roleId]) grouped[roleId] = {};
+      if (!grouped[roleId][resourceTypeId]) {
+        grouped[roleId][resourceTypeId] = {};
+      }
+
+      ACTION_KEYS.forEach((action) => {
+        grouped[roleId][resourceTypeId][action] = !!actions[action];
+      });
+    });
+
+    return grouped;
+  };
 
   const roleDescriptions = groupPermissionsByRole(rolesData);
 
@@ -53,11 +56,11 @@ const StaffRolePermissions = () => {
       })
       .catch((err) => {
         if (err?.response?.status !== 404) {
-          toast.error("Error al cargar los permisos de roles del personal.");
+          toast.error(t("staff.rolesPermissions.loadError"));
         }
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   return (
     <>
@@ -65,7 +68,7 @@ const StaffRolePermissions = () => {
       <Row>
         <Col>
           <h2 className="text-center mb-4">
-            Descripción de Roles del Personal
+            {t("staff.rolesPermissions.title")}
           </h2>
         </Col>
       </Row>
@@ -75,9 +78,9 @@ const StaffRolePermissions = () => {
           <Card className="shadow-sm">
             <CardBody>
               <CardTitle tag="h5">
-                {HOTEL_ROLES_BY_ID[HOTEL_ROLES_IDS.OWNER]}
+                {t(HOTEL_ROLES_BY_ID[HOTEL_ROLES_IDS.OWNER])}
               </CardTitle>
-              <p>Este rol tiene control total sobre la propiedad.</p>
+              <p>{t("staff.rolesPermissions.ownerDescription")}</p>
             </CardBody>
           </Card>
         </Col>
@@ -87,12 +90,13 @@ const StaffRolePermissions = () => {
             <Card className="shadow-sm">
               <CardBody>
                 <CardTitle tag="h5" className="mb-3">
-                  {HOTEL_ROLES_BY_ID[roleId] || "Rol Desconocido"}
+                  {t(HOTEL_ROLES_BY_ID[roleId]) ||
+                    t("staff.rolesPermissions.unknownRole")}
                 </CardTitle>
                 <Table bordered responsive>
                   <thead className="table-light">
                     <tr>
-                      <th>Recurso</th>
+                      <th>{t("staff.rolesPermissions.resource")}</th>
                       {ACTION_KEYS.map((action) => (
                         <th className="text-center" key={action}>
                           {ACTION_LABELS[action]}
@@ -104,7 +108,7 @@ const StaffRolePermissions = () => {
                     {Object.entries(resources).map(
                       ([resourceTypeId, actions]) => (
                         <tr key={resourceTypeId}>
-                          <td>{HOTEL_RESOURCES_BY_ID[resourceTypeId]}</td>
+                          <td>{t(HOTEL_RESOURCES_BY_ID[resourceTypeId])}</td>
                           {ACTION_KEYS.map((action) => (
                             <td key={action} className="text-center">
                               {actions[action] ? "✅" : "❌"}

@@ -1,17 +1,19 @@
 import React from "react";
 import { Button } from "reactstrap";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 function VerifyAccountFallback() {
   const navigate = useNavigate();
+  const { t } = useLanguage(); // added
   return (
     <div className="text-center mt-5">
-      <h2>Verifica tu correo electrónico</h2>
-      <p>Es necesario verificar tu cuenta para usar esta funcionalidad.</p>
+      <h2>{t("commonUI.verifyAccountFallback.title")}</h2>
+      <p>{t("commonUI.verifyAccountFallback.message")}</p>
       <Button
         color="dark"
         onClick={() => navigate("/profile/settings?tab=email")}>
-        Ir a Verificar Correo
+        {t("commonUI.verifyAccountFallback.button")}
       </Button>
     </div>
   );

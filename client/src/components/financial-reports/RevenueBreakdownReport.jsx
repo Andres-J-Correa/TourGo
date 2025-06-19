@@ -7,6 +7,7 @@ import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getRevenueBreakdown } from "services/financialReportService";
 import { TRANSACTION_CATEGORIES_BY_ID } from "components/transactions/constants";
 import { toast } from "react-toastify";
+import { useLanguage } from "contexts/LanguageContext";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -19,8 +20,13 @@ function RevenueBreakdownReport({ hotelId }) {
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
 
+  const { t } = useLanguage();
+
   const chartData = [
-    ["Categoría", "Ingresos"],
+    [
+      t("financialReports.revenueBreakdownReport.category"),
+      t("financialReports.revenueBreakdownReport.revenue"),
+    ],
     ...data.map((item) => [
       TRANSACTION_CATEGORIES_BY_ID[item.categoryId] || item.category,
       item.totalRevenue,
@@ -55,7 +61,7 @@ function RevenueBreakdownReport({ hotelId }) {
         .catch((error) => {
           setData([]);
           if (error?.response?.status !== 404) {
-            toast.error("Error al cargar el desglose de ingresos");
+            toast.error(t("financialReports.revenueBreakdownReport.loadError"));
           }
         })
         .finally(() => setLoading(false));
@@ -63,15 +69,12 @@ function RevenueBreakdownReport({ hotelId }) {
       setData([]);
       setShowPrompt(true);
     }
-  }, [dates.start, dates.end, hotelId]);
+  }, [dates.start, dates.end, hotelId, t]);
 
   return (
     <div>
-      <h4>Desglose de Ingresos</h4>
-      <p>
-        Muestra de dónde provienen los ingresos del hotel, desglosados por
-        categorías.
-      </p>
+      <h4>{t("financialReports.revenueBreakdownReport.title")}</h4>
+      <p>{t("financialReports.revenueBreakdownReport.description")}</p>
       <div className="mb-3">
         <DatePickers
           startDate={dates.start}
@@ -87,13 +90,15 @@ function RevenueBreakdownReport({ hotelId }) {
       {showPrompt && (
         <Alert
           type="info"
-          message="Por favor selecciona un rango de fechas para ver el desglose de ingresos."
+          message={t(
+            "financialReports.revenueBreakdownReport.selectDatesPrompt"
+          )}
         />
       )}
       {!showPrompt && !loading && data.length === 0 && (
         <Alert
           type="info"
-          message="No hay datos de ingresos para el rango de fechas seleccionado."
+          message={t("financialReports.revenueBreakdownReport.noData")}
         />
       )}
       {!showPrompt && !loading && data.length > 0 && (
@@ -103,7 +108,7 @@ function RevenueBreakdownReport({ hotelId }) {
           height="350px"
           data={chartData}
           options={{
-            title: "Distribución de Ingresos por Categoría",
+            title: t("financialReports.revenueBreakdownReport.chartTitle"),
             legend: { position: "right" },
             tooltip: { trigger: "focus", showColorCode: true },
             pieSliceText: "percentage",

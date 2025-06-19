@@ -92,20 +92,20 @@ export const AppContextProvider = ({ children }) => {
 
   const handleLogout = useCallback(async () => {
     const result = await Swal.fire({
-      title: "Cerrar sesión",
-      text: "¿Seguro que quieres cerrar la sesión?",
+      title: t("globalAppContext.logoutTitle"),
+      text: t("globalAppContext.logoutText"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, cerrar sesión",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("globalAppContext.logoutConfirmButton"),
+      cancelButtonText: t("globalAppContext.logoutCancelButton"),
     });
 
     if (!result.isConfirmed) return;
 
     try {
       Swal.fire({
-        title: "Cerrando sesión...",
-        text: "Por favor espera un momento.",
+        title: t("globalAppContext.loggingOutTitle"),
+        text: t("globalAppContext.loggingOutText"),
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -115,8 +115,8 @@ export const AppContextProvider = ({ children }) => {
       await usersLogout();
 
       Swal.fire({
-        title: "Sesión cerrada",
-        text: "Has cerrado sesión correctamente.",
+        title: t("globalAppContext.logoutSuccessTitle"),
+        text: t("globalAppContext.logoutSuccessText"),
         icon: "success",
         allowOutsideClick: false,
         showConfirmButton: false,
@@ -130,12 +130,12 @@ export const AppContextProvider = ({ children }) => {
     } catch (error) {
       Swal.close();
       Swal.fire({
-        title: "Error",
-        text: "Hubo un problema al cerrar la sesión. Por favor, intenta nuevamente.",
+        title: t("globalAppContext.logoutErrorTitle"),
+        text: t("globalAppContext.logoutErrorText"),
         icon: "error",
       });
     }
-  }, [navigate]);
+  }, [navigate, t]);
 
   const setHotelId = useCallback(
     (hotelId) => {
@@ -248,7 +248,7 @@ export const AppContextProvider = ({ children }) => {
         })
         .catch((error) => {
           if (error?.response?.status !== 404) {
-            toast.error("Hubo un error al cargar el hotel");
+            toast.error(t("globalAppContext.hotelLoadError"));
           }
           setHotel({ ...defaultHotel });
         })
@@ -258,7 +258,7 @@ export const AppContextProvider = ({ children }) => {
     } else if (hotel.id !== 0 && !currentUser.isAuthenticated) {
       setHotel({ ...defaultHotel });
     }
-  }, [hotelIdParam, hotel.id, currentUser]);
+  }, [hotelIdParam, hotel.id, currentUser, t]);
 
   useEffect(() => {
     const interceptor = axiosClient.interceptors.response.use(

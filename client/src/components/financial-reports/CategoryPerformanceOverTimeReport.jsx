@@ -12,6 +12,7 @@ import {
 import { toast } from "react-toastify";
 import { InputGroup, InputGroupText, Input, Row, Col } from "reactstrap";
 import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
+import { useLanguage } from "contexts/LanguageContext";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("year").format("YYYY-MM-DD"),
@@ -27,9 +28,13 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
+  const { t } = useLanguage();
 
   const chartData = [
-    ["Mes", "Total"],
+    [
+      t("financialReports.categoryPerformanceOverTimeReport.month"),
+      t("financialReports.categoryPerformanceOverTimeReport.total"),
+    ],
     ...data.map((item) => [
       dayjs(item.month).format("MMM YYYY"),
       category.typeId === TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE
@@ -83,7 +88,9 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
         .catch((error) => {
           setData([]);
           if (error?.response?.status !== 404) {
-            toast.error("Error al cargar el desempeño de la categoría");
+            toast.error(
+              t("financialReports.categoryPerformanceOverTimeReport.loadError")
+            );
           }
         })
         .finally(() => setLoading(false));
@@ -91,17 +98,16 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
       setShowPrompt(true);
       setData([]);
     } else if (!dates.start || !dates.end) {
-      setShowPrompt(true); // Show prompt if dates are cleared
+      setShowPrompt(true);
       setData([]);
     }
-  }, [category.id, dates.start, dates.end, hotelId]);
+  }, [category.id, dates.start, dates.end, hotelId, t]);
 
   return (
     <div>
-      <h4>Desempeño de Categoría en el Tiempo</h4>
+      <h4>{t("financialReports.categoryPerformanceOverTimeReport.title")}</h4>
       <p>
-        Permite ver cómo ha cambiado el total de ingresos o gastos de una
-        categoría específica a lo largo del tiempo.
+        {t("financialReports.categoryPerformanceOverTimeReport.description")}
       </p>
       <Row className="mb-3">
         <Col xs={12}>
@@ -116,17 +122,23 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
           />
         </Col>
         <Col xs={6}>
-          <label className="form-label">Categoría</label>
+          <label className="form-label">
+            {t("financialReports.categoryPerformanceOverTimeReport.category")}
+          </label>
           <InputGroup>
             <Input
               type="select"
               value={category.id}
               onChange={handleCategoryChange}
               disabled={loading}>
-              <option value="">Selecciona una categoría</option>
+              <option value="">
+                {t(
+                  "financialReports.categoryPerformanceOverTimeReport.selectCategory"
+                )}
+              </option>
               {TRANSACTION_CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id} data-type={cat.typeId}>
-                  {cat.name}
+                  {t(cat.name)}
                 </option>
               ))}
             </Input>
@@ -142,15 +154,21 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
           type="info"
           message={
             !category.id
-              ? "Por favor selecciona una categoría para ver el desempeño en el tiempo."
-              : "Por favor selecciona un rango de fechas para ver el desempeño en el tiempo."
+              ? t(
+                  "financialReports.categoryPerformanceOverTimeReport.selectCategoryPrompt"
+                )
+              : t(
+                  "financialReports.categoryPerformanceOverTimeReport.selectDatesPrompt"
+                )
           }
         />
       )}
       {!showPrompt && !loading && data.length === 0 && (
         <Alert
           type="info"
-          message="No hay datos para la categoría y rango de fechas seleccionados."
+          message={t(
+            "financialReports.categoryPerformanceOverTimeReport.noData"
+          )}
         />
       )}
       {!showPrompt && !loading && data.length > 0 && (
@@ -160,10 +178,20 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
           height="350px"
           data={chartData}
           options={{
-            title: "Desempeño de la Categoría por Mes",
+            title: t(
+              "financialReports.categoryPerformanceOverTimeReport.chartTitle"
+            ),
             legend: { position: "bottom" },
-            hAxis: { title: "Mes" },
-            vAxis: { title: "Total" },
+            hAxis: {
+              title: t(
+                "financialReports.categoryPerformanceOverTimeReport.month"
+              ),
+            },
+            vAxis: {
+              title: t(
+                "financialReports.categoryPerformanceOverTimeReport.total"
+              ),
+            },
             curveType: "function",
             pointSize: 5,
           }}

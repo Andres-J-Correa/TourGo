@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Alert as ExternalAlert } from "reactstrap";
+import DOMPurify from "dompurify";
 import PropTypes from "prop-types";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const Alert = ({ message, type, className, children }) => {
+  const { t } = useLanguage(); // added
+  const sanitizedMessage = useMemo(() => {
+    return (
+      DOMPurify.sanitize(message) || `<p>${t("commonUI.alert.noContent")}</p>`
+    );
+  }, [message, t]);
+
   return (
     <ExternalAlert
       className={`alert-${type} ${className}`}
       transition={{ timeout: 0 }}>
-      {children || <div dangerouslySetInnerHTML={{ __html: message }}></div>}
+      {children || (
+        <div dangerouslySetInnerHTML={{ __html: sanitizedMessage }}></div>
+      )}
     </ExternalAlert>
   );
 };

@@ -33,21 +33,6 @@ import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import DataTable from "components/commonUI/tables/DataTable";
 
-// Validation Schema
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(100, "El nombre no puede exceder los 100 caracteres")
-    .required("El nombre es requerido"),
-  capacity: Yup.number()
-    .min(1, "La capacidad debe ser al menos 1")
-    .max(50, "La capacidad no puede exceder los 50")
-    .required("La capacidad es requerida"),
-  description: Yup.string()
-    .min(2, "La descripción debe tener al menos 2 caracteres")
-    .max(100, "La descripción no puede exceder los 100 caracteres"),
-});
-
 const RoomsView = () => {
   const { hotelId } = useParams();
   const { user } = useAppContext(); // Assuming you have user context
@@ -63,12 +48,12 @@ const RoomsView = () => {
     description: "",
   });
 
-  const { getTranslatedErrorMessage } = useLanguage();
+  const { getTranslatedErrorMessage, t } = useLanguage();
 
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("rooms.breadcrumbs.home"), path: "/" },
+    { label: t("rooms.breadcrumbs.hotels"), path: "/hotels" },
+    { label: t("rooms.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
   ];
 
   const filteredData = useMemo(() => {
@@ -116,20 +101,39 @@ const RoomsView = () => {
     return rooms?.length > 0 ? rooms.filter((room) => room.isActive).length : 0;
   }, [rooms]);
 
+  // Validation schema with translation
+  const validationSchema = React.useMemo(
+    () =>
+      Yup.object().shape({
+        name: Yup.string()
+          .min(2, t("rooms.validation.nameMin"))
+          .max(100, t("rooms.validation.nameMax"))
+          .required(t("rooms.validation.nameRequired")),
+        capacity: Yup.number()
+          .min(1, t("rooms.validation.capacityMin"))
+          .max(50, t("rooms.validation.capacityMax"))
+          .required(t("rooms.validation.capacityRequired")),
+        description: Yup.string()
+          .min(2, t("rooms.validation.descriptionMin"))
+          .max(100, t("rooms.validation.descriptionMax")),
+      }),
+    [t]
+  );
+
   const handleSubmit = async (values) => {
     const { id, ...data } = values;
 
     const result = await Swal.fire({
-      title: `Está seguro de que desea ${
-        id ? "actualizar" : "agregar"
-      } la habitación?`,
+      title: id
+        ? t("rooms.form.updateConfirmTitle")
+        : t("rooms.form.addConfirmTitle"),
       text: id
-        ? "Esta acción puede afectar reservas existentes."
-        : "Revise los datos antes de continuar.",
+        ? t("rooms.form.updateConfirmText")
+        : t("rooms.form.addConfirmText"),
       icon: id ? "warning" : "info",
       showCancelButton: true,
-      confirmButtonText: "Sí, guardar",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: t("rooms.form.save"),
+      cancelButtonText: t("common.cancel"),
       reverseButtons: Boolean(id),
       confirmButtonColor: id ? "red" : "#0d6efd",
     });
@@ -140,8 +144,8 @@ const RoomsView = () => {
 
     try {
       Swal.fire({
-        title: "Guardando habitación",
-        text: "Por favor espera",
+        title: t("rooms.form.savingTitle"),
+        text: t("rooms.form.savingText"),
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -189,8 +193,8 @@ const RoomsView = () => {
         toggleForm();
         await Swal.fire({
           icon: "success",
-          title: "Habitación guardada",
-          text: "La habitación se ha guardado correctamente",
+          title: t("rooms.form.saveSuccessTitle"),
+          text: t("rooms.form.saveSuccessText"),
           timer: 1500,
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -202,8 +206,8 @@ const RoomsView = () => {
       Swal.close();
       await Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "No se pudo guardar la habitación, intente nuevamente.",
+        title: t("common.error"),
+        text: t("rooms.form.saveErrorText"),
       });
     } finally {
       setIsUploading(false);
@@ -224,12 +228,12 @@ const RoomsView = () => {
   const handleDeleteClick = useCallback(
     async (id) => {
       const result = await Swal.fire({
-        title: "¿Está seguro?",
-        text: "No podrás revertir esto!",
+        title: t("rooms.form.deleteConfirmTitle"),
+        text: t("rooms.form.deleteConfirmText"),
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: t("rooms.form.deleteConfirmYes"),
+        cancelButtonText: t("common.cancel"),
       });
 
       if (!result.isConfirmed) {
@@ -239,8 +243,8 @@ const RoomsView = () => {
       try {
         setIsUploading(true);
         Swal.fire({
-          title: "Eliminando la habitación",
-          text: "Por favor espera",
+          title: t("rooms.form.deletingTitle"),
+          text: t("rooms.form.deletingText"),
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading(),
         });
@@ -263,8 +267,8 @@ const RoomsView = () => {
           });
           await Swal.fire({
             icon: "success",
-            title: "Habitación eliminada",
-            text: "La habitación se ha eliminado correctamente",
+            title: t("rooms.form.deleteSuccessTitle"),
+            text: t("rooms.form.deleteSuccessText"),
             timer: 1500,
             showConfirmButton: false,
             allowOutsideClick: false,
@@ -276,49 +280,49 @@ const RoomsView = () => {
         Swal.close();
 
         Swal.fire({
-          title: "Error",
+          title: t("common.error"),
           text: errorMessage,
           icon: "error",
-          confirmButtonText: "OK",
+          confirmButtonText: t("common.ok"),
         });
       } finally {
         setIsUploading(false);
       }
     },
-    [currentUser, getTranslatedErrorMessage]
+    [currentUser, getTranslatedErrorMessage, t]
   );
 
   const columns = useMemo(
     () => [
       {
         accessorKey: "id",
-        header: "ID",
+        header: t("rooms.table.id"),
         maxSize: 50,
       },
       {
         accessorKey: "name",
-        header: "Nombre",
+        header: t("rooms.table.name"),
       },
       {
         accessorKey: "capacity",
-        header: "Capacidad",
+        header: t("rooms.table.capacity"),
         maxSize: 80,
-        cell: (info) => `${info.getValue()} personas`,
+        cell: (info) => `${info.getValue()} ${t("rooms.table.people")}`,
       },
       {
         accessorKey: "isActive",
-        header: "Activo",
+        header: t("rooms.table.active"),
         maxSize: 70,
-        cell: (info) => (info.getValue() ? "Sí" : "No"),
+        cell: (info) => (info.getValue() ? t("common.yes") : t("common.no")),
       },
       {
         accessorKey: "description",
-        header: "Descripción",
+        header: t("rooms.table.description"),
         maxSize: 300,
         minSize: 150,
       },
       {
-        header: "Acciones",
+        header: t("rooms.table.actions"),
         enableSorting: false,
         maxSize: 140,
         cell: (info) => {
@@ -335,7 +339,7 @@ const RoomsView = () => {
                       e.stopPropagation();
                       handleUpdateClick(room);
                     }}>
-                    Editar
+                    {t("rooms.table.edit")}
                   </Button>
                   <Button
                     color="danger"
@@ -345,7 +349,7 @@ const RoomsView = () => {
                       e.stopPropagation();
                       handleDeleteClick(room.id);
                     }}>
-                    Eliminar
+                    {t("rooms.table.delete")}
                   </Button>
                 </div>
               )}
@@ -354,7 +358,7 @@ const RoomsView = () => {
         },
       },
     ],
-    [handleDeleteClick]
+    [handleDeleteClick, t]
   );
 
   const onGetRoomsSuccess = (response) => {
@@ -363,11 +367,14 @@ const RoomsView = () => {
     }
   };
 
-  const onGetRoomsError = (error) => {
-    if (error?.response?.status !== 404) {
-      toast.error("Hubo un error al cargar las habitaciones");
-    }
-  };
+  const onGetRoomsError = useCallback(
+    (error) => {
+      if (error?.response?.status !== 404) {
+        toast.error(t("rooms.loadError"));
+      }
+    },
+    [t]
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -377,19 +384,24 @@ const RoomsView = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [hotelId]);
+  }, [hotelId, onGetRoomsError]);
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active="Habitaciones" />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("rooms.breadcrumbActive")}
+      />
       <ErrorBoundary>
-        <h3>Habitaciones</h3>
+        <h3>{t("rooms.title")}</h3>
 
         {showForm && (
           <Card className="border-0 shadow-lg mt-3">
             <CardBody className="p-3">
               <CardTitle tag="h5">
-                {initialValues.id ? "Editar habitación" : "Nueva habitación"}
+                {initialValues.id
+                  ? t("rooms.form.editTitle")
+                  : t("rooms.form.newTitle")}
               </CardTitle>
               <Formik
                 initialValues={initialValues}
@@ -405,7 +417,7 @@ const RoomsView = () => {
                           name="name"
                           type="text"
                           className="form-control"
-                          placeholder="Nombre de la habitación"
+                          placeholder={t("rooms.form.namePlaceholder")}
                           isRequired={true}
                         />
                       </Col>
@@ -414,7 +426,7 @@ const RoomsView = () => {
                           name="capacity"
                           type="number"
                           className="form-control"
-                          placeholder="Capacidad"
+                          placeholder={t("rooms.form.capacityPlaceholder")}
                           isRequired={true}
                         />
                       </Col>
@@ -423,7 +435,7 @@ const RoomsView = () => {
                           name="description"
                           type="text"
                           className="form-control"
-                          placeholder="Descripción"
+                          placeholder={t("rooms.form.descriptionPlaceholder")}
                         />
                       </Col>
                       <Col md="auto" className="align-content-center">
@@ -435,9 +447,9 @@ const RoomsView = () => {
                             {isUploading ? (
                               <Spinner size="sm" color="light" />
                             ) : initialValues.id ? (
-                              "Actualizar"
+                              t("rooms.form.update")
                             ) : (
-                              "Agregar"
+                              t("rooms.form.add")
                             )}
                           </Button>
                         </div>
@@ -451,22 +463,23 @@ const RoomsView = () => {
         )}
         <div className="mt-4">
           <Button color={showForm ? "warning" : "dark"} onClick={toggleForm}>
-            {showForm ? "Cancelar" : "Agregar Habitación"}
+            {showForm ? t("common.cancel") : t("rooms.form.addRoom")}
           </Button>
         </div>
         <Row>
           <Col md="auto" className="align-content-end">
             <p className="text-dark fw-bold fs-5 mb-0">
-              Total de habitaciones: {roomsCount}
+              {t("rooms.totalRooms")}: {roomsCount}
             </p>
             <p className="text-dark fw-bold fs-5 mb-0">
-              Capacidad total: {roomsTotalCapacity} personas
+              {t("rooms.totalCapacity")}: {roomsTotalCapacity}{" "}
+              {t("rooms.table.people")}
             </p>
           </Col>
           <Col>
             <div className="mb-3 float-end">
               <Label for="isActiveFilter" className="text-dark">
-                Filtrar por Estado
+                {t("rooms.filterByStatus")}
               </Label>
               <Input
                 id="isActiveFilter"
@@ -474,9 +487,9 @@ const RoomsView = () => {
                 style={{ width: "auto" }}
                 value={isActiveFilter}
                 onChange={(e) => setIsActiveFilter(e.target.value)}>
-                <option value="active">Activo</option>
-                <option value="inactive">Inactivo</option>
-                <option value="all">Todos</option>
+                <option value="active">{t("rooms.active")}</option>
+                <option value="inactive">{t("rooms.inactive")}</option>
+                <option value="all">{t("rooms.all")}</option>
               </Input>
             </div>
           </Col>
@@ -493,12 +506,12 @@ const RoomsView = () => {
               <div className="p-2 border border-info-subtle bg-light">
                 <Row>
                   <Col md={6}>
-                    <strong>Creado por:</strong>{" "}
+                    <strong>{t("rooms.table.createdBy")}</strong>{" "}
                     {row.original.createdBy?.firstName}{" "}
                     {row.original.createdBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de creación:</strong>{" "}
+                    <strong>{t("rooms.table.dateCreated")}</strong>{" "}
                     {dayjs(row.original.dateCreated).format(
                       "DD/MM/YYYY - h:mm A"
                     )}
@@ -506,12 +519,12 @@ const RoomsView = () => {
                 </Row>
                 <Row>
                   <Col md={6}>
-                    <strong>Modificado por:</strong>{" "}
+                    <strong>{t("rooms.table.modifiedBy")}</strong>{" "}
                     {row.original.modifiedBy?.firstName}{" "}
                     {row.original.modifiedBy?.lastName}
                   </Col>
                   <Col md={6}>
-                    <strong>Fecha de modificación:</strong>{" "}
+                    <strong>{t("rooms.table.dateModified")}</strong>{" "}
                     {dayjs(row.original.dateModified).format(
                       "DD/MM/YYYY - h:mm A"
                     )}

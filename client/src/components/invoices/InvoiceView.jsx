@@ -24,6 +24,7 @@ import { Margin, usePDF } from "react-to-pdf";
 import classNames from "classnames";
 import DOMPurify from "dompurify";
 import "./InvoiceView.css";
+import { useLanguage } from "contexts/LanguageContext"; // added
 
 const InvoiceView = () => {
   const [invoiceData, setInvoiceData] = useState({
@@ -40,18 +41,20 @@ const InvoiceView = () => {
     },
   });
 
+  const { t } = useLanguage(); // added
+
   const breadcrumbs = [
-    { label: "Inicio", path: "/" },
-    { label: "Hoteles", path: "/hotels" },
-    { label: "Hotel", path: `/hotels/${hotelId}` },
+    { label: t("invoices.view.breadcrumbs.home"), path: "/" },
+    { label: t("invoices.view.breadcrumbs.hotels"), path: "/hotels" },
+    { label: t("invoices.view.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
   ];
 
   const sanitizedTerms = useMemo(() => {
     return (
       DOMPurify.sanitize(invoiceData?.details?.terms) ||
-      "<p>No hay términos y condiciones disponibles.</p>"
+      `<p>${t("invoices.view.noTerms")}</p>`
     );
-  }, [invoiceData?.details?.terms]);
+  }, [invoiceData?.details?.terms, t]);
 
   useEffect(() => {
     if (!hotelId || !invoiceId) return;
@@ -69,7 +72,7 @@ const InvoiceView = () => {
             hotel: hotelResult.value.item,
           }));
         } else if (hotelResult.reason?.response?.status !== 404) {
-          errors.push("Error al cargar el hotel");
+          errors.push(t("invoices.view.loadHotelError"));
         }
 
         if (invoiceResult.status === "fulfilled") {
@@ -78,7 +81,7 @@ const InvoiceView = () => {
             details: invoiceResult.value.item,
           }));
         } else if (invoiceResult.reason?.response?.status !== 404) {
-          errors.push("Error al cargar los detalles de la factura");
+          errors.push(t("invoices.view.loadInvoiceError"));
         }
 
         if (errors.length > 0) {
@@ -88,24 +91,29 @@ const InvoiceView = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [hotelId, invoiceId]);
+  }, [hotelId, invoiceId, t]);
 
   return (
     <div>
-      <Breadcrumb breadcrumbs={breadcrumbs} active={"Factura"} />
+      <Breadcrumb
+        breadcrumbs={breadcrumbs}
+        active={t("invoices.view.breadcrumbActive")}
+      />
       <LoadingOverlay isVisible={loading} />
       <ErrorBoundary>
         <Button
           color="dark"
           className="no-print float-end mt-5"
           onClick={toPDF}>
-          Descargar PDF
+          {t("invoices.view.downloadPDF")}
         </Button>
         <div ref={targetRef} className="w-75 mx-auto my-5">
           <Row>
             <Col className="text-center">
               <h2>{invoiceData?.hotel?.name}</h2>
-              <span className="me-4">NIT: {invoiceData?.hotel?.taxId}</span>
+              <span className="me-4">
+                {t("invoices.view.nit")}: {invoiceData?.hotel?.taxId}
+              </span>
               <span className="text-capitalize">
                 {invoiceData?.hotel?.type}
               </span>
@@ -130,16 +138,17 @@ const InvoiceView = () => {
 
           <Row className="mb-4">
             <h4 className="text-end mb-3">
-              Cuenta de Cobro # {invoiceData?.details?.invoiceNumber}
+              {t("invoices.view.invoiceNumber")}{" "}
+              {invoiceData?.details?.invoiceNumber}
             </h4>
             <Col className="border-end">
-              <h5 className="text-start">Cliente</h5>
+              <h5 className="text-start">{t("invoices.view.customer")}</h5>
               <Row className="mb-3">
                 <Col>
                   <Row>
                     <Col>
                       <span>
-                        <strong>Nombre:</strong>
+                        <strong>{t("invoices.view.name")}</strong>
                         <p>
                           {invoiceData?.details?.customer?.firstName}{" "}
                           {invoiceData?.details?.customer?.lastName}
@@ -148,7 +157,7 @@ const InvoiceView = () => {
                     </Col>
                     <Col>
                       <span>
-                        <strong>Documento:</strong>
+                        <strong>{t("invoices.view.document")}</strong>
                         <p>{invoiceData?.details?.customer?.documentNumber}</p>
                       </span>
                     </Col>
@@ -156,13 +165,13 @@ const InvoiceView = () => {
                   <Row>
                     <Col>
                       <span>
-                        <strong>Email:</strong>
+                        <strong>{t("invoices.view.email")}</strong>
                         <p>{invoiceData?.details?.customer?.email}</p>
                       </span>
                     </Col>
                     <Col>
                       <span>
-                        <strong>Teléfono:</strong>
+                        <strong>{t("invoices.view.phone")}</strong>
                         <p>{invoiceData?.details?.customer?.phone}</p>
                       </span>
                     </Col>
@@ -172,18 +181,18 @@ const InvoiceView = () => {
             </Col>
             <Col>
               <Row className="mb-3">
-                <h5>Detalles de la factura</h5>
+                <h5>{t("invoices.view.invoiceDetails")}</h5>
                 <Col>
                   <Row>
                     <Col>
                       <span>
-                        <strong>Id Externa: </strong>
+                        <strong>{t("invoices.view.externalId")}</strong>
                         <p>{invoiceData?.details?.externalId || "N/A"}</p>
                       </span>
                     </Col>
                     <Col>
                       <span>
-                        <strong>Fecha de emisión:</strong>
+                        <strong>{t("invoices.view.issueDate")}</strong>
                         <p>{dayjs().format("DD-MM-YYYY")}</p>
                       </span>
                     </Col>
@@ -215,7 +224,9 @@ const InvoiceView = () => {
             <Row className="mb-2">
               <Col md={4}>
                 <div className="line-item">
-                  <span className="line-label fw-bold">Subtotal</span>
+                  <span className="line-label fw-bold">
+                    {t("invoices.view.subtotal")}
+                  </span>
                   <div className="line-fill" />
                   <span className="line-amount">
                     {formatCurrency(invoiceData?.details?.subtotal, "COP")}
@@ -224,7 +235,9 @@ const InvoiceView = () => {
               </Col>
               <Col md={4}>
                 <div className="line-item">
-                  <span className="line-label fw-bold">Cargos</span>
+                  <span className="line-label fw-bold">
+                    {t("invoices.view.charges")}
+                  </span>
                   <div className="line-fill" />
                   <span className="line-amount">
                     {formatCurrency(invoiceData?.details?.charges, "COP")}
@@ -233,7 +246,9 @@ const InvoiceView = () => {
               </Col>
               <Col md={4}>
                 <div className="line-item">
-                  <span className="line-label fw-bold">Total</span>
+                  <span className="line-label fw-bold">
+                    {t("invoices.view.total")}
+                  </span>
                   <div className="line-fill" />
                   <span className="line-amount">
                     {formatCurrency(invoiceData?.details?.total, "COP")}
@@ -244,7 +259,9 @@ const InvoiceView = () => {
             <Row className="mb-2">
               <Col md={4}>
                 <div className="line-item">
-                  <span className="line-label fw-bold">Total Pagado</span>
+                  <span className="line-label fw-bold">
+                    {t("invoices.view.totalPaid")}
+                  </span>
                   <div className="line-fill" />
                   <span className="line-amount">
                     {formatCurrency(invoiceData?.details?.paid, "COP")}
@@ -253,7 +270,9 @@ const InvoiceView = () => {
               </Col>
               <Col md={4}>
                 <div className="line-item">
-                  <span className="line-label fw-bold">Saldo</span>
+                  <span className="line-label fw-bold">
+                    {t("invoices.view.balance")}
+                  </span>
                   <div className="line-fill" />
                   <span
                     className={classNames("line-amount", {
@@ -268,7 +287,7 @@ const InvoiceView = () => {
 
           <hr />
 
-          <h5 className="mb-4">Servicios ⬇️</h5>
+          <h5 className="mb-4">{t("invoices.view.services")}</h5>
           {invoiceData?.details?.bookings?.map((booking, index) => {
             const groupedRooms = groupRoomBookings(booking?.roomBookings);
 
@@ -280,13 +299,13 @@ const InvoiceView = () => {
                 <CardHeader
                   tag="h5"
                   className="text-bg-dark text-center booking-card-header-print">
-                  Concepto: Alojamiento -{" "}
+                  {t("invoices.view.conceptAccommodation")}{" "}
                   <Link
                     to={`/hotels/${hotelId}/bookings/${booking.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white text-decoration-none booking-card-header-print">
-                    Reserva # {booking?.id}
+                    {t("invoices.view.bookingNumber", { id: booking?.id })}
                   </Link>
                 </CardHeader>
                 <CardBody>
@@ -295,7 +314,7 @@ const InvoiceView = () => {
                       <Row>
                         <Col>
                           <span>
-                            <strong>Fecha de llegada:</strong>
+                            <strong>{t("invoices.view.arrivalDate")}</strong>
                             <p>
                               {dayjs(booking.arrivalDate).format("DD/MM/YYYY")}
                             </p>
@@ -303,7 +322,7 @@ const InvoiceView = () => {
                         </Col>
                         <Col>
                           <span>
-                            <strong>Fecha de Salida</strong>
+                            <strong>{t("invoices.view.departureDate")}</strong>
                             <p>
                               {dayjs(booking.departureDate).format(
                                 "DD/MM/YYYY"
@@ -313,9 +332,10 @@ const InvoiceView = () => {
                         </Col>
                         <Col>
                           <span>
-                            <strong>Número de Huespedes:</strong>
+                            <strong>{t("invoices.view.guestCount")}</strong>
                             <p>
-                              Adultos: {booking.adultGuests} - Niños:{" "}
+                              {t("invoices.view.adults")}: {booking.adultGuests}{" "}
+                              - {t("invoices.view.children")}:{" "}
                               {booking.childGuests || 0}
                             </p>
                           </span>
@@ -326,7 +346,7 @@ const InvoiceView = () => {
                   <hr />
                   <Row className="mb-3 booking-card-content">
                     <BookingGeneralCharges bookingData={booking} />
-                    <h5>Totales de la reserva</h5>
+                    <h5>{t("invoices.view.bookingTotals")}</h5>
                     <BookingFinancials
                       bookingData={booking}
                       isInvoiceView={true}
@@ -334,7 +354,7 @@ const InvoiceView = () => {
                     <hr />
                   </Row>
 
-                  <h5>Habitaciones</h5>
+                  <h5>{t("invoices.view.rooms")}</h5>
                   <Row>
                     {groupedRooms.map((room, idx) => (
                       <Col
@@ -353,7 +373,7 @@ const InvoiceView = () => {
                   <hr />
                   <Row className="mb-3 booking-card-content">
                     <Col>
-                      <h5>Términos y Condiciones</h5>
+                      <h5>{t("invoices.view.termsTitle")}</h5>
                       <div
                         dangerouslySetInnerHTML={{ __html: sanitizedTerms }}
                       />
