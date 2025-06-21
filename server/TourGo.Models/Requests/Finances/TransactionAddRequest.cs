@@ -17,8 +17,8 @@ namespace TourGo.Models.Requests.Finances
         [StringLength(50, MinimumLength = 2)]
         public string? EntityId { get; set; }
 
-        [Range(1, Int32.MaxValue)]
-        public int? InvoiceId { get; set; }
+        [StringLength(50, MinimumLength = 2)]
+        public string? InvoiceId { get; set; }
 
         [Required]
         [Range(double.MinValue, double.MaxValue)]

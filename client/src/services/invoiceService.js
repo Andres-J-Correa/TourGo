@@ -5,12 +5,12 @@ import {
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-const api = `${API_HOST_PREFIX}/invoices`;
+const api = `${API_HOST_PREFIX}/hotel/{hotelId}/invoices`;
 
-export const getWithEntitiesById = async (id) => {
+export const getWithEntitiesById = async (id, hotelId) => {
   const config = {
     method: "GET",
-    url: `${api}/${id}/entities`,
+    url: `${api.replace(/{hotelId}/, hotelId)}/${id}/entities`,
   };
   try {
     const response = await axiosClient(config);

@@ -11,10 +11,9 @@ namespace TourGo.Models.Domain.Invoices
 {
     public class Invoice : AuditableEntity
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         public Customer Customer { get; set; } = new Customer();
-        public string? InvoiceNumber { get; set; }
-        public int ? ParentId { get; set; }
+        public string ? ParentId { get; set; }
         public string? ExternalId { get; set; }
         public int TypeId { get; set; }
         public int StatusId { get; set; }

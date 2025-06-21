@@ -10,6 +10,14 @@ import "./index.css";
 
 import * as serviceWorker from "./serviceWorker";
 import reportWebVitals from "./reportWebVitals";
+import { registerLocale } from "react-datepicker";
+import { es } from "date-fns/locale/es";
+
+import dayjs from "dayjs";
+
+require("dayjs/locale/es"); // Import Spanish locale
+dayjs.locale("es");
+registerLocale("es", es);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

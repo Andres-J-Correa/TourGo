@@ -15,7 +15,6 @@ namespace TourGo.Models.Domain.Invoices
         public InvoiceWithEntities(Invoice invoiceBase)
         {
             Id = invoiceBase.Id;
-            InvoiceNumber = invoiceBase.InvoiceNumber;
             ParentId = invoiceBase.ParentId;
             ExternalId = invoiceBase.ExternalId;
             TypeId = invoiceBase.TypeId;

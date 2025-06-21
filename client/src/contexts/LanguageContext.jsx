@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { setStringInLocalStorage } from "utils/localStorageHelper";
+import { setDefaultLocale } from "react-datepicker";
 import i18n from "../locales/i18n";
 
 const LanguageContext = createContext();
@@ -26,6 +27,8 @@ export const LanguageProvider = ({ children }) => {
   const { t } = useTranslation();
   const [language, setLanguage] = useState("");
   const [culture, setCulture] = useState(getCultureFromLanguage(language));
+
+  setDefaultLocale(language);
 
   const getTranslatedErrorMessage = useCallback(
     (error) => {

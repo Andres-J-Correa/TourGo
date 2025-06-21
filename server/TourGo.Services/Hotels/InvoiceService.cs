@@ -79,14 +79,15 @@ namespace TourGo.Services.Hotels
             });
         }
 
-        public InvoiceWithEntities? GetWithEntitiesById(int invoiceId)
+        public InvoiceWithEntities? GetWithEntitiesById(string invoiceId, string hotelId)
         {
-            string proc = "invoices_select_with_entities_by_id_v5";
+            string proc = "invoices_select_with_entities_by_id_v6";
             InvoiceWithEntities? invoiceWithEntities = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
                 param.AddWithValue("p_invoiceId", invoiceId);
+                param.AddWithValue("p_hotelId", hotelId);
             }, (IDataReader reader, short set) =>
             {
                 int index = 0;
@@ -126,9 +127,8 @@ namespace TourGo.Services.Hotels
         private static Invoice MapInvoice(IDataReader reader, ref int index)
         {
             Invoice invoice = new Invoice();
-            invoice.Id = reader.GetSafeInt32(index++);
-            invoice.ParentId = reader.GetSafeInt32(index++);
-            invoice.InvoiceNumber = reader.GetSafeString(index++);
+            invoice.Id = reader.GetSafeString(index++);
+            invoice.ParentId = reader.GetSafeString(index++);
             invoice.ExternalId = reader.GetSafeString(index++);
             invoice.TypeId = reader.GetSafeInt32(index++);
             invoice.Subtotal = reader.GetSafeDecimal(index++);

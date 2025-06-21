@@ -15,7 +15,7 @@ namespace TourGo.Models.Domain
         public decimal Charges { get; set; }
         public decimal Total { get; set; }
         public List<Transaction>? Transactions { get; set; }
-        public int InvoiceId { get; set; }
+        public string InvoiceId { get; set; }
         public Customer? Customer { get; set; }
     }
 }
