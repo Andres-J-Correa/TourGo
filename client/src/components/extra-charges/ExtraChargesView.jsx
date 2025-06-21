@@ -130,7 +130,7 @@ const ExtraChargesView = () => {
       setIsUploading(true);
       let response;
       if (values.id) {
-        response = await updateById({ ...values, amount }, id);
+        response = await updateById({ ...values, amount }, id, hotelId);
       } else {
         response = await add({ ...values, amount }, hotelId);
       }
@@ -147,7 +147,7 @@ const ExtraChargesView = () => {
                 ...copyOfPrev[index],
                 ...data,
                 amount,
-                type: { id: values.typeId },
+                type: { id: Number(values.typeId) },
                 modifiedBy: { ...currentUser },
                 dateModified: new Date(),
               };
@@ -162,7 +162,7 @@ const ExtraChargesView = () => {
               ...data,
               amount,
               id: response.item,
-              type: { id: values.typeId },
+              type: { id: Number(values.typeId) },
               createdBy: { ...currentUser },
               dateCreated: new Date(),
               modifiedBy: { ...currentUser },
@@ -232,7 +232,7 @@ const ExtraChargesView = () => {
           didOpen: () => Swal.showLoading(),
         });
 
-        const response = await deleteById(id);
+        const response = await deleteById(id, hotelId);
         if (response.isSuccessful) {
           setExtraCharges((prev) => {
             const copyOfPrev = [...prev];
@@ -272,7 +272,7 @@ const ExtraChargesView = () => {
         setIsUploading(false);
       }
     },
-    [currentUser, getTranslatedErrorMessage, t]
+    [currentUser, getTranslatedErrorMessage, t, hotelId]
   );
 
   const columns = useMemo(

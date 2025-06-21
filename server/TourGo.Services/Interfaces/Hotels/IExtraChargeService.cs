@@ -7,7 +7,7 @@ namespace TourGo.Services.Interfaces.Hotels
     {
         int Create(ExtraChargeAddRequest model, string userId, string hotelId);
         List<ExtraCharge>? GetByHotel(string hotelId, bool? isActive);
-        void Update(ExtraChargeUpdateRequest model, string userId);
-        void Delete(int id, string userId);
+        void Update(ExtraChargeUpdateRequest model, string userId, string hotelId);
+        void Delete(int id, string userId, string hotelId);
     }
 }
