@@ -13,7 +13,7 @@ using TourGo.Services.Interfaces;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
-    [Route("api/invoices")]
+    [Route("api/hotel/{hotelId}/invoices")]
     [ApiController]
     public class InvoicesController : BaseApiController
     {
@@ -32,68 +32,15 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _errorLoggingService = errorLoggingService;
         }
 
-        [HttpPost("hotel/{hotelId}")]
-        [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> Add(InvoiceAddRequest model, string hotelId)
-        {
-            ObjectResult? result = null;
-
-            try
-            {
-                string userId = _webAuthService.GetCurrentUserId();
-                int id = _invoiceService.Add(model, userId, hotelId);
-
-                if (id == 0)
-                {
-                    throw new Exception("Unable to add invoice. Please try again later.");
-                }
-
-                ItemResponse<int> response = new ItemResponse<int> { Item = id };
-                result = Created201(response);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                ErrorResponse response = new ErrorResponse();
-                result = StatusCode(500, response);
-            }
-
-            return result;
-        }
-
-        [HttpPut("{id:int}")]
-        [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(InvoiceUpdateRequest model)
-        {
-            ObjectResult? result = null;
-
-            try
-            {
-                string userId = _webAuthService.GetCurrentUserId();
-                _invoiceService.Update(model, userId);
-
-                SuccessResponse response = new SuccessResponse();
-                result = Ok200(response);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
-                ErrorResponse response = new ErrorResponse();
-                result = StatusCode(500, response);
-            }
-
-            return result;
-        }
-
-        [HttpGet("{id:int}/entities")]
+        [HttpGet("{id}/entities")]
         [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Read)]
-        public ActionResult<ItemResponse<InvoiceWithEntities>> GetWithEntitiesById(int id)
+        public ActionResult<ItemResponse<InvoiceWithEntities>> GetWithEntitiesById(string id, string hotelId)
         {
             ObjectResult? result = null;
 
             try
             {
-                InvoiceWithEntities? invoiceWithEntities = _invoiceService.GetWithEntitiesById(id);
+                InvoiceWithEntities? invoiceWithEntities = _invoiceService.GetWithEntitiesById(id, hotelId);
 
                 if (invoiceWithEntities == null)
                 {

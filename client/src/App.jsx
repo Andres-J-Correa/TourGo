@@ -20,16 +20,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-import { setDefaultLocale, registerLocale } from "react-datepicker";
-import { es } from "date-fns/locale/es";
-
-import dayjs from "dayjs";
 import Footer from "components/commonUI/Footer";
-
-require("dayjs/locale/es"); // Import Spanish locale
-dayjs.locale("es");
-registerLocale("es", es);
-setDefaultLocale("es");
 
 const App = () => {
   const [routes, setRoutes] = useState([]);

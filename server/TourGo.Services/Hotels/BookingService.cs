@@ -36,7 +36,7 @@ namespace TourGo.Services.Hotels
 
         public Booking? GetById(string id, string hotelId)
         {
-            string proc = "bookings_select_details_by_id_v8";
+            string proc = "bookings_select_details_by_id_v9";
             Booking? booking = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -176,7 +176,7 @@ namespace TourGo.Services.Hotels
         {
             BookingAddResponse? response = null;
 
-            string proc = "bookings_insert_v5";
+            string proc = "bookings_insert_v6";
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
                 param.AddWithValue("p_customerId", model.CustomerId);
@@ -203,9 +203,9 @@ namespace TourGo.Services.Hotels
             {             
                 int index = 0;
                 int newBookingId = reader.GetSafeInt32(index++);
-                int newInvoiceId = reader.GetSafeInt32(index++);
+                string newInvoiceId = reader.GetSafeString(index++);
 
-                if (newBookingId <= 0 || newInvoiceId <= 0)
+                if (newBookingId <= 0)
                 {
                     return;
                 }
@@ -478,7 +478,7 @@ namespace TourGo.Services.Hotels
             booking.Total = reader.GetSafeDecimal(index++);
             booking.Subtotal = reader.GetSafeDecimal(index++);
             booking.Charges = reader.GetSafeDecimal(index++);
-            booking.InvoiceId = reader.GetSafeInt32(index++);
+            booking.InvoiceId = reader.GetSafeString(index++);
 
             return booking;
         }

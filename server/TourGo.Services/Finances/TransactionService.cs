@@ -30,13 +30,13 @@ namespace TourGo.Services.Finances
 
         public int Add(TransactionAddRequest request, string userId, string hotelId, string publicId)
         {
-            string proc = "transactions_insert_v6";
+            string proc = "transactions_insert_v7";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
                 col.AddWithValue("p_entityId", string.IsNullOrEmpty(request.EntityId) ? DBNull.Value : request.EntityId);
-                col.AddWithValue("p_invoiceId", request.InvoiceId > 0 ? request.InvoiceId : DBNull.Value);
+                col.AddWithValue("p_invoiceId", string.IsNullOrEmpty(request.InvoiceId) ? DBNull.Value : request.InvoiceId);
                 col.AddWithValue("p_amount", request.Amount);
                 col.AddWithValue("p_transactionDate", request.TransactionDate.ToString("yyyy-MM-dd"));
                 col.AddWithValue("p_paymentMethodId", request.PaymentMethodId);

@@ -24,7 +24,7 @@ const ExtraChargeCard = ({
       ? typeIdOverride
       : charge.type?.id ?? EXTRA_CHARGE_TYPE_IDS.CUSTOM;
   const typeLabel =
-    EXTRA_CHARGE_TYPES_BY_ID[typeId] || t("booking.extraChargeCard.na");
+    t(EXTRA_CHARGE_TYPES_BY_ID[typeId]) || t("booking.extraChargeCard.na");
   const amount = amountOverride !== undefined ? amountOverride : charge.amount;
 
   return (

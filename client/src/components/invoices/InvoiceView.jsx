@@ -34,7 +34,7 @@ const InvoiceView = () => {
   const [loading, setLoading] = useState(true);
   const { hotelId, invoiceId } = useParams();
   const { toPDF, targetRef } = usePDF({
-    filename: `CxC-${invoiceData?.details?.invoiceNumber}-${invoiceData?.details?.customer?.firstName}-${invoiceData?.details?.customer?.lastName}.pdf`,
+    filename: `CxC-${invoiceData?.details?.id}-${invoiceData?.details?.customer?.firstName}-${invoiceData?.details?.customer?.lastName}.pdf`,
     page: {
       margin: Margin.MEDIUM,
       page: "letter",
@@ -61,7 +61,7 @@ const InvoiceView = () => {
     setLoading(true);
     Promise.allSettled([
       getHotelDetailsById(hotelId),
-      getInvoiceDetailsById(invoiceId),
+      getInvoiceDetailsById(invoiceId, hotelId),
     ])
       .then(([hotelResult, invoiceResult]) => {
         const errors = [];
@@ -138,8 +138,7 @@ const InvoiceView = () => {
 
           <Row className="mb-4">
             <h4 className="text-end mb-3">
-              {t("invoices.view.invoiceNumber")}{" "}
-              {invoiceData?.details?.invoiceNumber}
+              {t("invoices.view.invoiceNumber")} {invoiceData?.details?.id}
             </h4>
             <Col className="border-end">
               <h5 className="text-start">{t("invoices.view.customer")}</h5>
