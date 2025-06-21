@@ -14,7 +14,7 @@ using TourGo.Web.Models.Enums;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
-    [Route("api/extra-charges")]
+    [Route("api/hotel/{hotelId}/extra-charges")]
     [ApiController]
     public class ExtraChargesController : BaseApiController
     {
@@ -32,7 +32,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _errorLoggingService = errorLoggingService;
         }
 
-        [HttpPost("hotel/{hotelId}")]
+        [HttpPost]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Create)]
         public ActionResult<ItemResponse<int>> Create(ExtraChargeAddRequest model, string hotelId)
         {
@@ -62,7 +62,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{hotelId}")]
+        [HttpGet]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<ExtraCharge>> GetByHotel(string hotelId, [FromQuery] bool? isActive)
         {
@@ -95,14 +95,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(ExtraChargeUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(ExtraChargeUpdateRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _extraChargeService.Update(model, userId);
+                _extraChargeService.Update(model, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
@@ -120,14 +120,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpDelete("{id:int}")]
         [EntityAuth(EntityTypeEnum.Charges, EntityActionTypeEnum.Delete)]
-        public ActionResult<SuccessResponse> Delete(int id)
+        public ActionResult<SuccessResponse> Delete(int id, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _extraChargeService.Delete(id, userId);
+                _extraChargeService.Delete(id, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
