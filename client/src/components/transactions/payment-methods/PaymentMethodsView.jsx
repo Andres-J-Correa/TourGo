@@ -130,7 +130,7 @@ function PaymentMethodsView() {
       setIsUploading(true);
       let response;
       if (values.id) {
-        response = await updateById(values, id);
+        response = await updateById(values, id, hotelId);
       } else {
         response = await add(values, hotelId);
       }
@@ -229,7 +229,7 @@ function PaymentMethodsView() {
           didOpen: () => Swal.showLoading(),
         });
 
-        const response = await deleteById(id);
+        const response = await deleteById(id, hotelId);
         if (response.isSuccessful) {
           setPaymentMethods((prev) => {
             const copyOfPrev = [...prev];
@@ -267,7 +267,7 @@ function PaymentMethodsView() {
         setIsUploading(false);
       }
     },
-    [currentUser]
+    [currentUser, hotelId]
   );
 
   const columns = useMemo(
@@ -305,7 +305,7 @@ function PaymentMethodsView() {
                       e.stopPropagation();
                       handleUpdateClick(paymentMethod);
                     }}>
-                    {t("commonUI.dataTable.edit")}
+                    {t("transactions.paymentMethods.table.edit")}
                   </Button>
                   <Button
                     color="danger"
@@ -315,7 +315,7 @@ function PaymentMethodsView() {
                       e.stopPropagation();
                       handleDeleteClick(paymentMethod.id);
                     }}>
-                    {t("commonUI.dataTable.delete")}
+                    {t("transactions.paymentMethods.table.delete")}
                   </Button>
                 </div>
               )}

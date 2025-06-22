@@ -1397,7 +1397,9 @@
         "id": "ID",
         "name": "Nombre",
         "active": "Activo",
-        "actions": "Acciones"
+        "actions": "Acciones",
+        "edit": "Editar",
+        "delete": "Eliminar"
       },
       "createdBy": "Creado por:",
       "dateCreated": "Fecha de creación:",

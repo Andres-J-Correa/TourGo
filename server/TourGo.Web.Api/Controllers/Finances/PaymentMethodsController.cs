@@ -14,7 +14,7 @@ using TourGo.Services.Interfaces.Finances;
 
 namespace TourGo.Web.Api.Controllers.Finances
 {
-    [Route("api/payment-methods")]
+    [Route("api/hotel/{hotelId}/payment-methods")]
     [ApiController]
     public class PaymentMethodsController : BaseApiController
     {
@@ -32,7 +32,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             _webAuthService = webAuthService;
         }
 
-        [HttpGet("hotel/{hotelId}")]
+        [HttpGet]
         [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<PaymentMethod>> Get(string hotelId)
         {
@@ -63,7 +63,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{hotelId}/minimal")]
+        [HttpGet("minimal")]
         [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<Lookup>> GetMinimal(string hotelId)
         {
@@ -94,7 +94,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpPost("hotel/{hotelId}")]
+        [HttpPost]
         [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Create)]
         public ActionResult<ItemResponse<int>> Add(PaymentMethodAddRequest model, string hotelId)
         {
@@ -127,14 +127,14 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(PaymentMethodUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(PaymentMethodUpdateRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _paymentMethodService.Update(model, userId);
+                _paymentMethodService.Update(model, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
@@ -151,14 +151,14 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpDelete("{id:int}")]
         [EntityAuth(EntityTypeEnum.PaymentMethods, EntityActionTypeEnum.Delete)]
-        public ActionResult<SuccessResponse> Delete(int id)
+        public ActionResult<SuccessResponse> Delete(int id, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _paymentMethodService.Delete(id, userId);
+                _paymentMethodService.Delete(id, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
