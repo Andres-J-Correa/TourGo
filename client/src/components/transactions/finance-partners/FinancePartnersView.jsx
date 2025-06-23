@@ -127,7 +127,7 @@ function FinancePartnersView() {
       setIsUploading(true);
       let response;
       if (values.id) {
-        response = await updateById(values);
+        response = await updateById(values, hotelId);
       } else {
         response = await add(values, hotelId);
       }
@@ -226,7 +226,7 @@ function FinancePartnersView() {
           didOpen: () => Swal.showLoading(),
         });
 
-        const response = await deleteById(id);
+        const response = await deleteById(id, hotelId);
         if (response.isSuccessful) {
           setFinancePartners((prev) => {
             const copyOfPrev = [...prev];
@@ -264,7 +264,7 @@ function FinancePartnersView() {
         setIsUploading(false);
       }
     },
-    [currentUser, t]
+    [currentUser, t, hotelId]
   );
 
   const columns = useMemo(

@@ -13,7 +13,7 @@ using TourGo.Services.Interfaces.Finances;
 
 namespace TourGo.Web.Api.Controllers.Finances
 {
-    [Route("api/transaction-subcategories")]
+    [Route("api/hotel/{hotelId}/transaction-subcategories")]
     [ApiController]
     public class TransactionSubcategoriesController : BaseApiController
     {
@@ -32,7 +32,7 @@ namespace TourGo.Web.Api.Controllers.Finances
         }
 
 
-        [HttpPost("hotel/{hotelId}")]
+        [HttpPost]
         [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Create)]
         public ActionResult<ItemResponse<int>> Add(TransactionSubcategoryAddRequest model, string hotelId)
         {
@@ -63,14 +63,14 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(TransactionSubcategoryUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(TransactionSubcategoryUpdateRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _transactionSubcategoryService.Update(model, userId);
+                _transactionSubcategoryService.Update(model, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
@@ -87,14 +87,14 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpDelete("{id:int}")]
         [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Delete)]
-        public ActionResult<SuccessResponse> Delete(int id)
+        public ActionResult<SuccessResponse> Delete(int id, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _transactionSubcategoryService.Delete(id, userId);
+                _transactionSubcategoryService.Delete(id, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
@@ -109,7 +109,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{hotelId}/minimal")]
+        [HttpGet("minimal")]
         [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<TransactionSubcategoryBase>> GetMinimal(string hotelId)
         {
@@ -140,7 +140,7 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
-        [HttpGet("hotel/{hotelId}")]
+        [HttpGet]
         [EntityAuth(EntityTypeEnum.TransactionSubcategories, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<TransactionSubcategory>> Get(string hotelId)
         {

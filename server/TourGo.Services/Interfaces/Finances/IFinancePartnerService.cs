@@ -7,9 +7,9 @@ namespace TourGo.Services.Interfaces.Finances
     public interface IFinancePartnerService
     {
         int Add(FinancePartnerAddRequest model, string userId, string hotelId);
-        void Delete(int id, string userId);
+        void Delete(int id, string userId, string hotelId);
         List<FinancePartner>? Get(string hotelId);
         List<Lookup>? GetMinimal(string hotelId);
-        void Update(FinancePartnerUpdateRequest model, string userId);
+        void Update(FinancePartnerUpdateRequest model, string userId, string hotelId);
     }
 }

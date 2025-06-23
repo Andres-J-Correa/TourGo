@@ -36,7 +36,7 @@ namespace TourGo.Services.Hotels
 
         public Booking? GetById(string id, string hotelId)
         {
-            string proc = "bookings_select_details_by_id_v9";
+            string proc = "bookings_select_details_by_id_v10";
             Booking? booking = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -281,7 +281,7 @@ namespace TourGo.Services.Hotels
 
         public List<BookingArrival>? GetArrivalsByDate(DateOnly arrivalDate, string hotelId)
         {
-            string proc = "bookings_select_by_arrival_date_v3";
+            string proc = "bookings_select_by_arrival_date_v4";
             List<BookingArrival>? bookings = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -302,7 +302,7 @@ namespace TourGo.Services.Hotels
 
         public List<BookingDeparture>? GetDeparturesByDate(DateOnly departureDate, string hotelId)
         {
-            string proc = "bookings_select_by_departure_date_v3";
+            string proc = "bookings_select_by_departure_date_v4";
             List<BookingDeparture>? bookings = null;
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
@@ -373,7 +373,7 @@ namespace TourGo.Services.Hotels
 
         public List<BookingStay>? GetStaysByDate(DateOnly date, string hotelId)
         {
-            string proc = "bookings_select_by_stay_date_v3";
+            string proc = "bookings_select_by_stay_date_v4";
             List<BookingStay>? stays = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>

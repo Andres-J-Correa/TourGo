@@ -98,7 +98,7 @@ namespace TourGo.Services.Finances
             DateOnly? startDate, DateOnly? endDate, string? txnId, string? parentId, string? entityId, int? categoryId, int? statusId, string? referenceNumber, 
             string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
         {
-            string proc = "transactions_select_paginated_v6";
+            string proc = "transactions_select_paginated_v7";
             Paged<Transaction>? paged = null;
             List<Transaction>? transactions = null;
             int totalCount = 0;
