@@ -18,7 +18,7 @@ using TourGo.Web.Models.Enums;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
-    [Route("api/booking-providers")]
+    [Route("api/hotel/{hotelId}/booking-providers")]
     [ApiController]
     public class BookingProvidersController : BaseApiController
     {
@@ -36,7 +36,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _webAuthService = webAuthService;
         }
 
-        [HttpPost("hotel/{hotelId}")]
+        [HttpPost]
         [EntityAuth(EntityTypeEnum.BookingProviders, EntityActionTypeEnum.Create)]
         public ActionResult<ItemResponse<int>> Add(BookingProviderAddRequest model, string hotelId)
         {
@@ -67,14 +67,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.BookingProviders, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(BookingProviderUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(BookingProviderUpdateRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _bookingProviderService.Update(model, userId);
+                _bookingProviderService.Update(model, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
@@ -91,14 +91,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpDelete("{id:int}")]
         [EntityAuth(EntityTypeEnum.BookingProviders, EntityActionTypeEnum.Delete)]
-        public ActionResult<SuccessResponse> Delete(int id)
+        public ActionResult<SuccessResponse> Delete(int id, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _bookingProviderService.Delete(id, userId);
+                _bookingProviderService.Delete(id, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);
@@ -128,7 +128,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{hotelId}/minimal")]
+        [HttpGet("minimal")]
         [EntityAuth(EntityTypeEnum.BookingProviders, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<Lookup>> GetMinimal(string hotelId)
         {
@@ -159,7 +159,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{hotelId}")]
+        [HttpGet]
         [EntityAuth(EntityTypeEnum.BookingProviders, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<BookingProvider>> Get(string hotelId)
         {
