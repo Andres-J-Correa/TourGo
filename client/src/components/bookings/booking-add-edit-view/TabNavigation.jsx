@@ -19,15 +19,15 @@ const TabNavigation = ({
               "bg-dark text-white active": currentStep === tab.id,
             })}
             onClick={() => {
-              if (tab.id > 0) {
-                isStepComplete[tab.id - 1] && setCurrentStep(tab.id);
+              if (Number(tab.id) > 0) {
+                isStepComplete[Number(tab.id) - 1] && setCurrentStep(tab.id);
               } else {
                 setCurrentStep(tab.id);
               }
             }}
             style={{
               cursor:
-                tab.id > 0 && !isStepComplete[tab.id - 1]
+                Number(tab.id) > 0 && !isStepComplete[Number(tab.id) - 1]
                   ? "not-allowed"
                   : "pointer",
             }}>

@@ -191,7 +191,6 @@
       "pricePlaceholder": "Ingrese el precio"
     },
     "additionalInfo": {
-      "title": "Información adicional",
       "adultGuests": "Número de Personas (5 años o más)",
       "childGuests": "Número de Niños (0-4 años)",
       "eta": "Fecha y Hora estimada de llegada",
@@ -199,7 +198,9 @@
       "noProvider": "Sin Proveedor",
       "externalId": "Identificación externa (Booking/Airbnb...)",
       "externalCommission": "Comisión externa",
-      "notes": "Notas"
+      "notes": "Notas",
+      "requiredInfo": "Información requerida",
+      "optionalInfo": "Información opcional"
     },
     "breadcrumb": {
       "home": "Inicio",
@@ -325,7 +326,7 @@
       "amountMin": "El monto debe ser mayor o igual a 0"
     },
     "personalizedCharges": {
-      "title": "Cargos Personalizados"
+      "title": "Cargos Personalizados (Opcional)"
     },
     "totalsDisplay": {
       "subtotal": "Subtotal:",

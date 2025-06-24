@@ -6,7 +6,7 @@ import {
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-const api = `${API_HOST_PREFIX}/rooms`;
+const api = `${API_HOST_PREFIX}/hotel/{hotelId}/rooms`;
 
 /**
  *
@@ -25,7 +25,7 @@ export const getByHotelId = async (hotelId, isActive) => {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url: `${api}/hotel/${hotelId}?${queryParams.toString()}`,
+    url: `${api.replace(/{hotelId}/, hotelId)}?${queryParams.toString()}`,
   };
   try {
     const response = await axiosClient(config);
@@ -47,7 +47,7 @@ export const add = async (payload, hotelId) => {
       "Content-Type": "application/json",
     },
     method: "POST",
-    url: `${api}/hotel/${hotelId}`,
+    url: `${api.replace(/{hotelId}/, hotelId)}`,
     data: replaceEmptyStringsWithNull(payload),
   };
   try {
@@ -64,13 +64,13 @@ export const add = async (payload, hotelId) => {
  * @param {number} id
  * @returns {Promise<{item: number, isSuccessful: boolean, transactionId: string}>}
  */
-export const updateById = async (payload, id) => {
+export const updateById = async (payload, id, hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "PUT",
-    url: `${api}/${id}`,
+    url: `${api.replace(/{hotelId}/, hotelId)}/${id}`,
     data: replaceEmptyStringsWithNull(payload),
   };
   try {
@@ -86,13 +86,13 @@ export const updateById = async (payload, id) => {
  * @param {number} id
  * @returns {Promise<{isSuccessful: boolean, transactionId: string}>}
  */
-export const deleteById = async (id) => {
+export const deleteById = async (id, hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "DELETE",
-    url: `${api}/${id}`,
+    url: `${api.replace(/{hotelId}/, hotelId)}/${id}`,
   };
   try {
     const response = await axiosClient(config);

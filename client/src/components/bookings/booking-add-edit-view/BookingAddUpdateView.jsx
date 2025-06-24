@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { TabContent, TabPane, Button } from "reactstrap";
 import {
   faArrowRight,
@@ -30,8 +30,34 @@ import EntityTransactionsView from "components/transactions/EntityTransactionsVi
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 
 const BookingAddUpdateView = () => {
+  const [customer, setCustomer] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [booking, setBooking] = useState({ ...defaultBooking });
+  const [isLoading, setIsLoading] = useState(false);
+
   const { hotelId, bookingId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const { t, getTranslatedErrorMessage } = useLanguage(); // add t
+  const { user } = useAppContext();
+  const { bookingSchema } = useBookingSchemas();
+
+  const currentStep = useMemo(() => {
+    const step = new URLSearchParams(location.search).get("step") || "0";
+    return step;
+  }, [location.search]);
+
+  const modifiedBy = useMemo(
+    () => ({
+      id: user.current?.id,
+      firstName: user.current?.firstName,
+      lastName: user.current?.lastName,
+    }),
+    [user]
+  );
+
   const breadcrumbs = [
     { label: t("booking.breadcrumb.home"), path: "/" },
     { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
@@ -49,33 +75,14 @@ const BookingAddUpdateView = () => {
   ];
 
   const tabs = [
-    { id: 0, icon: faUser, name: t("booking.form.tabs.customer") },
-    { id: 1, icon: faFilePen, name: t("booking.form.tabs.booking") },
+    { id: "0", icon: faUser, name: t("booking.form.tabs.customer") },
+    { id: "1", icon: faFilePen, name: t("booking.form.tabs.booking") },
     {
-      id: 2,
+      id: "2",
       icon: faMoneyBill1Wave,
       name: t("booking.form.tabs.transactions"),
     },
   ];
-
-  const { user } = useAppContext();
-  const { bookingSchema } = useBookingSchemas();
-
-  const modifiedBy = useMemo(
-    () => ({
-      id: user.current?.id,
-      firstName: user.current?.firstName,
-      lastName: user.current?.lastName,
-    }),
-    [user]
-  );
-
-  const [currentStep, setCurrentStep] = useState(0);
-  const [customer, setCustomer] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [booking, setBooking] = useState({ ...defaultBooking });
-  const [isLoading, setIsLoading] = useState(false);
 
   const isStepComplete = {
     0: customer?.id > 0,
@@ -83,6 +90,18 @@ const BookingAddUpdateView = () => {
     2: booking?.transactions?.length > 0,
     3: false,
   };
+
+  const setCurrentStep = useCallback(
+    (step) => {
+      const newParams = new URLSearchParams(location.search);
+      newParams.set("step", step);
+      navigate({
+        pathname: location.pathname,
+        search: newParams.toString(),
+      });
+    },
+    [location, navigate]
+  );
 
   const mapBookingData = useCallback((bookingData) => {
     const mappedRoomBookings =
@@ -135,7 +154,6 @@ const BookingAddUpdateView = () => {
     } else {
       setBooking({ ...defaultBooking });
       setCustomer(null);
-      setCurrentStep(0);
     }
   }, [
     bookingId,
@@ -171,7 +189,7 @@ const BookingAddUpdateView = () => {
         />
         <TabContent activeTab={currentStep}>
           <h4 className="mb-3">{tabs[currentStep].name} </h4>
-          <TabPane tabId={0}>
+          <TabPane tabId={"0"}>
             <CustomerForm
               customer={customer}
               setCustomer={setCustomer}
@@ -184,7 +202,7 @@ const BookingAddUpdateView = () => {
               booking={booking}
             />
           </TabPane>
-          <TabPane tabId={1}>
+          <TabPane tabId={"1"}>
             <BookingForm
               setCurrentStep={setCurrentStep}
               submitting={submitting}
@@ -201,9 +219,10 @@ const BookingAddUpdateView = () => {
               getTranslatedErrorMessage={getTranslatedErrorMessage}
               bookingSchema={bookingSchema}
               t={t}
+              navigate={navigate}
             />
           </TabPane>
-          <TabPane tabId={2}>
+          <TabPane tabId={"2"}>
             <div className="d-flex mb-4">
               <Button
                 type="button"

@@ -191,7 +191,6 @@
       "pricePlaceholder": "Enter the price"
     },
     "additionalInfo": {
-      "title": "Additional Information",
       "adultGuests": "Number of Guests (5 years or older)",
       "childGuests": "Number of Children (0-4 years)",
       "eta": "Estimated Arrival Date and Time",
@@ -199,7 +198,9 @@
       "noProvider": "No Provider",
       "externalId": "External Identification (Booking/Airbnb...)",
       "externalCommission": "External Commission",
-      "notes": "Notes"
+      "notes": "Notes",
+      "requiredInfo": "Required information",
+      "optionalInfo": "Optional information"
     },
     "breadcrumb": {
       "home": "Home",
@@ -325,7 +326,7 @@
       "amountMin": "Amount must be greater than or equal to 0"
     },
     "personalizedCharges": {
-      "title": "Personalized Charges"
+      "title": "Personalized Charges (Optional)"
     },
     "totalsDisplay": {
       "subtotal": "Subtotal:",

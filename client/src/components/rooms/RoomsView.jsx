@@ -153,7 +153,7 @@ const RoomsView = () => {
       setIsUploading(true);
       let response;
       if (values.id) {
-        response = await updateById(values, id);
+        response = await updateById(values, id, hotelId);
       } else {
         response = await add(values, hotelId);
       }
@@ -249,7 +249,7 @@ const RoomsView = () => {
           didOpen: () => Swal.showLoading(),
         });
 
-        const response = await deleteById(id);
+        const response = await deleteById(id, hotelId);
         if (response.isSuccessful) {
           setRooms((prev) => {
             const copyOfPrev = [...prev];
@@ -289,7 +289,7 @@ const RoomsView = () => {
         setIsUploading(false);
       }
     },
-    [currentUser, getTranslatedErrorMessage, t]
+    [currentUser, getTranslatedErrorMessage, t, hotelId]
   );
 
   const columns = useMemo(

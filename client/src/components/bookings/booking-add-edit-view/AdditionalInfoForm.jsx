@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useFormikContext } from "formik";
 import { Row, Col } from "reactstrap";
+import { faPlusSquare, faMinusSquare } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import dayjs from "dayjs";
 
-import { setLocalStorageForm } from "utils/localStorageHelper";
-import { LOCAL_STORAGE_FORM_KEYS } from "components/bookings/booking-add-edit-view/constants";
 import CustomField from "components/commonUI/forms/CustomField";
 import DateTimePicker from "components/commonUI/forms/DateTimePicker";
 
-import dayjs from "dayjs";
+import { setLocalStorageForm } from "utils/localStorageHelper";
+import { LOCAL_STORAGE_FORM_KEYS } from "components/bookings/booking-add-edit-view/constants";
 import { useLanguage } from "contexts/LanguageContext";
 
 function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
   const [mappedBookingProviderOptions, setMappedBookingProviderOptions] =
     useState([]);
+  const [showOptionalFields, setShowOptionalFields] = useState(false);
   const { setFieldValue, values } = useFormikContext();
   const { t } = useLanguage();
 
@@ -64,7 +67,7 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
 
   return (
     <>
-      <h5 className="mt-4 mb-3">{t("booking.additionalInfo.title")}</h5>
+      <h5 className="mt-4 mb-3">{t("booking.additionalInfo.requiredInfo")}</h5>
       <Row>
         <Col md="4">
           <CustomField
@@ -76,70 +79,87 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
             onChange={(e) => handleInputChange(e, "adultGuests")}
           />
         </Col>
-        <Col md="4">
-          <CustomField
-            name="childGuests"
-            type="number"
-            placeholder={t("booking.additionalInfo.childGuests")}
-            disabled={submitting}
-            onChange={(e) => handleInputChange(e, "childGuests")}
-          />
-        </Col>
-        <Col md="4">
-          <DateTimePicker
-            name="eta"
-            placeholder={t("booking.additionalInfo.eta")}
-            onChange={(date) => handleEtaChange(date)}
-            disabled={submitting}
-          />
-        </Col>
       </Row>
-      <Row>
-        <Col md="4">
-          <CustomField
-            as="select"
-            name="bookingProviderId"
-            className="form-select"
-            placeholder={t("booking.additionalInfo.bookingProvider")}
-            disabled={submitting}
-            onChange={handleBookingProviderChange}>
-            <option value="">{t("booking.additionalInfo.noProvider")}</option>
-            {mappedBookingProviderOptions}
-          </CustomField>
-        </Col>
-        <Col md="4">
-          <CustomField
-            name="externalId"
-            type="text"
-            placeholder={t("booking.additionalInfo.externalId")}
-            isRequired={Boolean(values.bookingProviderId)}
-            disabled={submitting || !Boolean(values.bookingProviderId)}
-            onChange={(e) => handleInputChange(e, "externalId")}
-          />
-        </Col>
-        <Col md="4">
-          <CustomField
-            name="externalCommission"
-            type="number"
-            placeholder={t("booking.additionalInfo.externalCommission")}
-            step="0.01"
-            isRequired={Boolean(values.bookingProviderId)}
-            disabled={submitting || !Boolean(values.bookingProviderId)}
-            onChange={(e) => handleInputChange(e, "externalCommission")}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col md="12">
-          <CustomField
-            as="textarea"
-            name="notes"
-            placeholder={t("booking.additionalInfo.notes")}
-            disabled={submitting}
-            onChange={(e) => handleInputChange(e, "notes")}
-          />
-        </Col>
-      </Row>
+      <h5 className="mt-4 mb-3">
+        {t("booking.additionalInfo.optionalInfo")}
+        <FontAwesomeIcon
+          icon={showOptionalFields ? faMinusSquare : faPlusSquare}
+          className="ms-2"
+          style={{ cursor: "pointer" }}
+          onClick={() => setShowOptionalFields(!showOptionalFields)}
+        />
+      </h5>
+      {showOptionalFields && (
+        <>
+          <Row>
+            <Col md="4">
+              <CustomField
+                name="childGuests"
+                type="number"
+                placeholder={t("booking.additionalInfo.childGuests")}
+                disabled={submitting}
+                onChange={(e) => handleInputChange(e, "childGuests")}
+              />
+            </Col>
+            <Col md="4">
+              <DateTimePicker
+                name="eta"
+                placeholder={t("booking.additionalInfo.eta")}
+                onChange={(date) => handleEtaChange(date)}
+                disabled={submitting}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col md="4">
+              <CustomField
+                as="select"
+                name="bookingProviderId"
+                className="form-select"
+                placeholder={t("booking.additionalInfo.bookingProvider")}
+                disabled={submitting}
+                onChange={handleBookingProviderChange}>
+                <option value="">
+                  {t("booking.additionalInfo.noProvider")}
+                </option>
+                {mappedBookingProviderOptions}
+              </CustomField>
+            </Col>
+            <Col md="4">
+              <CustomField
+                name="externalId"
+                type="text"
+                placeholder={t("booking.additionalInfo.externalId")}
+                isRequired={Boolean(values.bookingProviderId)}
+                disabled={submitting || !Boolean(values.bookingProviderId)}
+                onChange={(e) => handleInputChange(e, "externalId")}
+              />
+            </Col>
+            <Col md="4">
+              <CustomField
+                name="externalCommission"
+                type="number"
+                placeholder={t("booking.additionalInfo.externalCommission")}
+                step="0.01"
+                isRequired={Boolean(values.bookingProviderId)}
+                disabled={submitting || !Boolean(values.bookingProviderId)}
+                onChange={(e) => handleInputChange(e, "externalCommission")}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col md="12">
+              <CustomField
+                as="textarea"
+                name="notes"
+                placeholder={t("booking.additionalInfo.notes")}
+                disabled={submitting}
+                onChange={(e) => handleInputChange(e, "notes")}
+              />
+            </Col>
+          </Row>
+        </>
+      )}
     </>
   );
 }
