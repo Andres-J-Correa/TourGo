@@ -1,9 +1,13 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import HoverDropdown from "./HoverDropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
+import {
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  UncontrolledDropdown,
+} from "reactstrap";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import "./navbaritem.css";
@@ -58,7 +62,7 @@ const renderSubItem = (subItem, subIndex) => {
 const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
   // Render dropdown menu if the nav item has a collapse property
   const renderDropdownMenu = () => (
-    <HoverDropdown nav inNavbar className="mx-1">
+    <UncontrolledDropdown nav inNavbar className="mx-1">
       <DropdownToggle
         nav
         role="button"
@@ -89,7 +93,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
         <div className="hidden-box">{/* For hover effect */}</div>
         {navItem.collapse.map(renderSubItem)}
       </DropdownMenu>
-    </HoverDropdown>
+    </UncontrolledDropdown>
   );
 
   // Render a link if the nav item has a path property

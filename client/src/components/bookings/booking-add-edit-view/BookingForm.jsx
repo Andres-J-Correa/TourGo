@@ -541,10 +541,10 @@ export default withFormik({
       hotelId,
       customer,
       setBooking,
-      setCurrentStep,
       modifiedBy,
       getTranslatedErrorMessage,
       t,
+      navigate,
     } = props;
 
     const result = await Swal.fire({
@@ -579,11 +579,8 @@ export default withFormik({
       Swal.close(); // Close loading
 
       if (res.isSuccessful) {
-        setBooking({
+        const newBooking = {
           ...values,
-          ...(values.id
-            ? {}
-            : { id: res.item.bookingId, invoiceId: res.item.invoiceId }),
           total: Number(values.charges) + Number(values.subtotal),
           customer,
           roomBookings: [...values.roomBookings],
@@ -598,13 +595,15 @@ export default withFormik({
           },
           modifiedBy: { ...modifiedBy },
           dateModified: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-          ...(!values.id
-            ? {
-                createdBy: { ...modifiedBy },
-                dateCreated: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-              }
-            : {}),
-        });
+        };
+        if (!values.id) {
+          newBooking.id = res.item.bookingId;
+          newBooking.invoiceId = res.item.invoiceId;
+          newBooking.createdBy = { ...modifiedBy };
+          newBooking.dateCreated = dayjs().format("YYYY-MM-DD HH:mm:ss");
+        }
+
+        setBooking(newBooking);
 
         setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
           ...values,
@@ -612,17 +611,16 @@ export default withFormik({
         });
         removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
 
-        setTimeout(() => {
-          setCurrentStep(2);
-        }, 1500);
-
         await Swal.fire({
           icon: "success",
           title: t("booking.form.saveSuccessTitle"),
           text: t("booking.form.saveSuccessText"),
           timer: 1500,
-          showConfirmButton: false,
-          allowOutsideClick: false,
+          didClose: () => {
+            navigate(
+              `/hotels/${hotelId}/bookings/${newBooking.id}/edit?step=2`
+            );
+          },
         });
       } else {
         throw new Error(t("booking.errors.saveBooking"));

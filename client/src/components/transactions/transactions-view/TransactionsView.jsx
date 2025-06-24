@@ -197,8 +197,8 @@ function TransactionsView() {
     let rowData = rows.map((row) => {
       let copy = { ...row.original };
       copy = flattenObject(copy);
-      copy.category = TRANSACTION_CATEGORIES_BY_ID[copy.categoryId] || "";
-      copy.status = TRANSACTION_STATUS_BY_ID[copy.statusId] || "";
+      copy.category = t(TRANSACTION_CATEGORIES_BY_ID[copy.categoryId]) || "";
+      copy.status = t(TRANSACTION_STATUS_BY_ID[copy.statusId]) || "";
       copy.transactionDate = dayjs(copy.transactionDate).format("YYYY-MM-DD");
 
       return copy;

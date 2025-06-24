@@ -65,7 +65,6 @@ export const useNavbarItems = () => {
                 name: t("commonUI.navbar.newBooking"),
                 path: `/hotels/${hotel.current.id}/bookings/new`,
                 capitalize: true,
-                newTab: true,
               },
               {
                 name: t("commonUI.navbar.bookingsList"),

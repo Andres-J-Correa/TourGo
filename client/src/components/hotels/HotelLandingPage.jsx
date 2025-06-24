@@ -529,8 +529,6 @@ const HotelLandingPage = () => {
                                 {item.firstName} {item.lastName}{" "}
                                 <Link
                                   to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
                                   title={t(
                                     "hotels.landing.viewBookingDetails"
                                   )}>
@@ -558,8 +556,6 @@ const HotelLandingPage = () => {
                                 {item.firstName} {item.lastName}{" "}
                                 <Link
                                   to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
                                   title={t(
                                     "hotels.landing.viewBookingDetails"
                                   )}>

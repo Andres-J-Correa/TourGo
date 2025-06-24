@@ -5,7 +5,7 @@ import {
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-const api = `${API_HOST_PREFIX}/finance-partners`;
+const api = `${API_HOST_PREFIX}/hotel/{hotelId}/finance-partners`;
 
 export const getFinancePartnersMinimalByHotelId = async (hotelId) => {
   const config = {
@@ -13,7 +13,7 @@ export const getFinancePartnersMinimalByHotelId = async (hotelId) => {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url: `${api}/hotel/${hotelId}/minimal`,
+    url: `${api.replace(/{hotelId}/, hotelId)}/minimal`,
   };
   try {
     const response = await axiosClient(config);
@@ -30,7 +30,7 @@ export const getFinancePartnersByHotelId = async (hotelId) => {
       "Content-Type": "application/json",
     },
     method: "GET",
-    url: `${api}/hotel/${hotelId}`,
+    url: `${api.replace(/{hotelId}/, hotelId)}`,
   };
   try {
     const response = await axiosClient(config);
@@ -47,7 +47,7 @@ export const add = async (payload, hotelId) => {
       "Content-Type": "application/json",
     },
     method: "POST",
-    url: `${api}/hotel/${hotelId}`,
+    url: `${api.replace(/{hotelId}/, hotelId)}`,
     data: payload,
   };
   try {
@@ -59,13 +59,13 @@ export const add = async (payload, hotelId) => {
   }
 };
 
-export const updateById = async (payload) => {
+export const updateById = async (payload, hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "PUT",
-    url: `${api}/${payload.id}`,
+    url: `${api.replace(/{hotelId}/, hotelId)}/${payload.id}`,
     data: payload,
   };
   try {
@@ -77,13 +77,13 @@ export const updateById = async (payload) => {
   }
 };
 
-export const deleteById = async (id) => {
+export const deleteById = async (id, hotelId) => {
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
     method: "DELETE",
-    url: `${api}/${id}`,
+    url: `${api.replace(/{hotelId}/, hotelId)}/${id}`,
   };
   try {
     const response = await axiosClient(config);

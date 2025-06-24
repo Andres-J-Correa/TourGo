@@ -7,9 +7,9 @@ namespace TourGo.Services.Interfaces.Finances
     public interface IPaymentMethodService
     {
         int Add(PaymentMethodAddRequest model, string userId, string hotelId);
-        void Delete(int id, string userId);
+        void Delete(int id, string userId, string hotelId);
         List<PaymentMethod>? Get(string hotelId);
         List<Lookup>? GetMinimal(string hotelId);
-        void Update(PaymentMethodUpdateRequest model, string userId);
+        void Update(PaymentMethodUpdateRequest model, string userId, string hotelId);
     }
 }

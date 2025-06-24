@@ -72,8 +72,6 @@ const BookingsView = () => {
           <div style={{ minWidth: "max-content" }}>
             <Link
               className="btn btn-dark btn-sm"
-              target="_blank"
-              rel="noopener noreferrer"
               to={`/hotels/${hotelId}/bookings/${booking.id}`}
               onClick={(e) => e.stopPropagation()}>
               {t("booking.bookingsView.view")}
@@ -81,8 +79,6 @@ const BookingsView = () => {
             {!LOCKED_BOOKING_STATUSES.includes(info.row.original.statusId) && (
               <Link
                 className="btn btn-info btn-sm ms-1"
-                target="_blank"
-                rel="noopener noreferrer"
                 to={`/hotels/${hotelId}/bookings/${booking.id}/edit`}
                 onClick={(e) => e.stopPropagation()}>
                 {t("booking.bookingsView.edit")}

@@ -123,7 +123,7 @@ function BookingProvidersView() {
       setIsUploading(true);
       let response;
       if (values.id) {
-        response = await updateById(values, id);
+        response = await updateById(values, hotelId);
       } else {
         response = await add(values, hotelId);
       }
@@ -222,7 +222,7 @@ function BookingProvidersView() {
           didOpen: () => Swal.showLoading(),
         });
 
-        const response = await deleteById(id);
+        const response = await deleteById(id, hotelId);
         if (response.isSuccessful) {
           setBookingProviders((prev) => {
             const copyOfPrev = [...prev];
@@ -264,7 +264,7 @@ function BookingProvidersView() {
         setIsUploading(false);
       }
     },
-    [currentUser, getTranslatedErrorMessage, t]
+    [currentUser, getTranslatedErrorMessage, t, hotelId]
   );
 
   const columns = useMemo(

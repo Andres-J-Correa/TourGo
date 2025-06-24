@@ -63,7 +63,7 @@ namespace TourGo.Services.Finances
 
         public int Add(FinancePartnerAddRequest model, string userId, string hotelId)
         {
-            string proc = "finance_partners_insert_v3";
+            string proc = "finance_partners_insert_v4";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
@@ -85,26 +85,28 @@ namespace TourGo.Services.Finances
             return newId;
         }
 
-        public void Update(FinancePartnerUpdateRequest model, string userId)
+        public void Update(FinancePartnerUpdateRequest model, string userId, string hotelId)
         {
-            string proc = "finance_partners_update_v2";
+            string proc = "finance_partners_update_v3";
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_name", model.Name);
                 param.AddWithValue("p_financePartnerId", model.Id);
                 param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_hotelId", hotelId);
             });
         }
 
-        public void Delete(int id, string userId)
+        public void Delete(int id, string userId, string hotelId)
         {
-            string proc = "finance_partners_delete_v2";
+            string proc = "finance_partners_delete_v3";
 
             _dataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_modifiedBy", userId);
                 param.AddWithValue("p_financePartnerId", id);
+                param.AddWithValue("p_hotelId", hotelId);
             });
         }
 

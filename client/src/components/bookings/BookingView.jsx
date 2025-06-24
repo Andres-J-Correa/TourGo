@@ -376,8 +376,6 @@ function BookingView() {
             )}
             <Link
               to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
-              target="_blank"
-              rel="noopener noreferrer"
               className="btn btn-outline-dark float-end">
               {t("booking.view.goToInvoice")}
               <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />

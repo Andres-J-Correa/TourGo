@@ -75,8 +75,6 @@ function BookingViewOffCanvas({
                 {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
                   <Link
                     to={`/hotels/${hotelId}/bookings/${booking?.id}/edit`}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className=" ms-2 float-end btn btn-outline-dark">
                     {t("booking.view.edit")}
                     <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
@@ -84,8 +82,6 @@ function BookingViewOffCanvas({
                 )}
                 <Link
                   to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="btn btn-outline-dark float-end ms-2">
                   {t("booking.view.goToInvoice")}
                   <FontAwesomeIcon
@@ -95,8 +91,6 @@ function BookingViewOffCanvas({
                 </Link>
                 <Link
                   to={`/hotels/${hotelId}/bookings/${booking?.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="btn btn-outline-dark float-end">
                   {t("booking.viewOffCanvas.goToSummary")}
                   <FontAwesomeIcon icon={faClipboardList} className="ms-2" />

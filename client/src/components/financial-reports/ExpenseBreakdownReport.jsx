@@ -28,7 +28,7 @@ function ExpenseBreakdownReport({ hotelId }) {
       t("financialReports.expenseBreakdownReport.expenses"),
     ],
     ...data.map((item) => [
-      TRANSACTION_CATEGORIES_BY_ID[item.categoryId] || item.category,
+      t(TRANSACTION_CATEGORIES_BY_ID[item.categoryId]) || item.category,
       item.totalExpenses,
     ]),
   ];

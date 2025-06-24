@@ -14,7 +14,7 @@ using TourGo.Web.Models.Enums;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
-    [Route("api/rooms")]
+    [Route("api/hotel/{hotelId}/rooms")]
     [ApiController]
     public class RoomsController : BaseApiController
     {
@@ -32,7 +32,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             _errorLoggingService = errorLoggingService;
         }
 
-        [HttpPost("hotel/{hotelId}")]
+        [HttpPost]
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Create)]
         public ActionResult<ItemResponse<int>> Create(RoomAddRequest model, string hotelId)
         {
@@ -63,7 +63,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
-        [HttpGet("hotel/{hotelId}")]
+        [HttpGet]
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemsResponse<Room>> GetByHotel(string hotelId, [FromQuery] bool? isActive)
         {
@@ -98,14 +98,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPut("{id:int}")]
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> Update(RoomUpdateRequest model)
+        public ActionResult<SuccessResponse> Update(RoomUpdateRequest model, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _roomService.Update(model, userId);
+                _roomService.Update(model, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result= Ok200(response);
@@ -124,14 +124,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpDelete("{id:int}")]
         [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Delete)]
-        public ActionResult<SuccessResponse> Delete(int id)
+        public ActionResult<SuccessResponse> Delete(int id, string hotelId)
         {
             ObjectResult result = null;
 
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _roomService.Delete(id, userId);
+                _roomService.Delete(id, userId, hotelId);
 
                 SuccessResponse response = new SuccessResponse();
                 result = Ok200(response);

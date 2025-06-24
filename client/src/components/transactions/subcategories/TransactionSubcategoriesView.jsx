@@ -143,7 +143,7 @@ function TransactionSubcategoriesView() {
       setIsUploading(true);
       let response;
       if (values.id) {
-        response = await updateById(values, id);
+        response = await updateById(values, id, hotelId);
       } else {
         response = await add(values, hotelId);
       }
@@ -243,7 +243,7 @@ function TransactionSubcategoriesView() {
           didOpen: () => Swal.showLoading(),
         });
 
-        const response = await deleteById(id);
+        const response = await deleteById(id, hotelId);
         if (response.isSuccessful) {
           setTransactionSubcategories((prev) => {
             const copyOfPrev = [...prev];
@@ -281,7 +281,7 @@ function TransactionSubcategoriesView() {
         setIsUploading(false);
       }
     },
-    [currentUser, t]
+    [currentUser, t, hotelId]
   );
 
   const columns = useMemo(

@@ -301,8 +301,6 @@ const InvoiceView = () => {
                   {t("invoices.view.conceptAccommodation")}{" "}
                   <Link
                     to={`/hotels/${hotelId}/bookings/${booking.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="text-white text-decoration-none booking-card-header-print">
                     {t("invoices.view.bookingNumber", { id: booking?.id })}
                   </Link>
