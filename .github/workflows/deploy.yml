@@ -24,11 +24,12 @@ jobs:
             cd ~/TourGo || { echo "Directory ~/TourGo does not exist"; exit 1; }
 
             # Pull latest changes
-            git pull origin main || { echo "git pull failed"; exit 1; }
+            git fetch origin main || { echo "Failed to fetch origin/main"; exit 1; }
+            git reset --hard origin/main || { echo "Failed to reset to origin/main"; exit 1; }
 
-            # Inject secrets into .env.production
+            # Inject secrets into .env
             cd client
-            cat <<EOF > .env.production
+            cat <<EOF >> .env
             REACT_APP_RECAPTCHA_SITE_KEY=${{ secrets.CLIENT_GOOGLE_RECAPTCHA_SITE_KEY }}
             EOF
 

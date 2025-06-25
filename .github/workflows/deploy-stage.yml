@@ -24,11 +24,13 @@ jobs:
             cd ~/TourGo-Stage || { echo "Directory ~/TourGo-Stage does not exist"; exit 1; }
 
             # Pull latest changes
-            git pull origin stage || { echo "git pull failed"; exit 1; }
+            git checkout stage || { echo "git checkout stage failed"; exit 1; }
+            git fetch origin stage || { echo "Failed to fetch origin/stage"; exit 1; }
+            git reset --hard origin/stage || { echo "Failed to reset to origin/stage"; exit 1; }
 
             # Inject secrets into .env.staging
             cd client
-            cat <<EOF > .env.staging
+            cat <<EOF >> .env.staging
             REACT_APP_RECAPTCHA_SITE_KEY=${{ secrets.CLIENT_GOOGLE_RECAPTCHA_SITE_KEY }}
             EOF
 
