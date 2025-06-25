@@ -26,9 +26,9 @@ jobs:
             # Pull latest changes
             git pull origin main || { echo "git pull failed"; exit 1; }
 
-            # Inject secrets into .env
+            # Inject secrets into .env.production
             cd client
-            cat <<EOF > .env
+            cat <<EOF > .env.production
             REACT_APP_RECAPTCHA_SITE_KEY=${{ secrets.CLIENT_GOOGLE_RECAPTCHA_SITE_KEY }}
             EOF
 
