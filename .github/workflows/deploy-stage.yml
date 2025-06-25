@@ -27,11 +27,13 @@ jobs:
             git pull origin stage || { echo "git pull failed"; exit 1; }
 
             # Inject secrets into .env.staging
+            cd client
             cat <<EOF > .env.staging
             REACT_APP_RECAPTCHA_SITE_KEY=${{ secrets.CLIENT_GOOGLE_RECAPTCHA_SITE_KEY }}
             EOF
 
             # Inject secrets into appsettings.Staging.json
+            cd ../server/TourGo.Web.Api
             jq --arg json_token_secret "${{ secrets.SERVER_JSON_WEB_TOKEN_SECRET }}" \
                --arg mysql_conn_string "${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_STAGE }}" \
                --arg brevo_api_key "${{ secrets.SERVER_BREVO_API_KEY }}" \
@@ -49,7 +51,7 @@ jobs:
                appsettings.Staging.json > appsettings.Staging.tmp && mv appsettings.Staging.tmp appsettings.Staging.json
 
             # Client Deployment
-            cd client
+            cd ~/TourGo-Stage/client
             yarn install || { echo "yarn install failed"; exit 1; }
             yarn build:stage || { echo "yarn build:stage failed"; exit 1; }
             if [ -d "./build" ] && [ "$(ls -A ./build)" ]; then
