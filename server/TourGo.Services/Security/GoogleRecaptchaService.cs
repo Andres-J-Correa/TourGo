@@ -11,32 +11,29 @@ namespace TourGo.Services.Security
     public class GoogleRecaptchaService : IGoogleRecaptchaService
     {
         private readonly GoogleRecaptchaConfig _recaptchaConfig;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         public GoogleRecaptchaService(
-            IOptions<GoogleRecaptchaConfig> recaptchaConfig)
+            IOptions<GoogleRecaptchaConfig> recaptchaConfig,
+            IHttpClientFactory httpClientFactory)
         {
             _recaptchaConfig = recaptchaConfig.Value;
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(_recaptchaConfig.BaseUrl)
-            };
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<bool> VerifyTokenAsync(string token)
         {
-            var requestData = new
+            var requestData = new[]
             {
-                secret = _recaptchaConfig.SecretKey,
-                response = token
+                new KeyValuePair<string, string>("secret", _recaptchaConfig.SecretKey),
+                new KeyValuePair<string, string>("response", token)
             };
 
-            var response = await _httpClient.PostAsync("",
-                new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("secret", requestData.secret),
-                    new KeyValuePair<string, string>("response", requestData.response)
-                }));
+            var httpClient = _httpClientFactory.CreateClient("GoogleRecaptcha");
+            // BaseAddress is configured in Program.cs
+
+            var response = await httpClient.PostAsync("",
+                new FormUrlEncodedContent(requestData));
 
             if (!response.IsSuccessStatusCode)
                 return false;

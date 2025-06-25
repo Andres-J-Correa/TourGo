@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging.Console;
+using TourGo.Models.Domain.Config;
 
 namespace TourGo.Web.Api
 {
@@ -25,8 +26,6 @@ namespace TourGo.Web.Api
                 });
         }
 
-
-
         private static void ConfigureLogging(WebHostBuilderContext context, ILoggingBuilder logging)
         {
             logging.AddConfiguration(context.Configuration.GetSection("Logging"));
@@ -51,7 +50,5 @@ namespace TourGo.Web.Api
             IConfigurationBuilder envSettings = appSettings
                 .AddJsonFile(jsonFileName, optional: true, reloadOnChange: true);
         }
-
-
     }
 }

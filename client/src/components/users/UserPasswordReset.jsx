@@ -50,7 +50,10 @@ function UserPasswordReset() {
 
         const token = await executeRecaptcha("password_reset");
 
-        const response = await forgotPassword({ values, captchaToken: token });
+        const response = await forgotPassword({
+          ...values,
+          captchaToken: token,
+        });
         if (!Boolean(response?.isSuccessful)) {
           throw new Error(t("users.passwordReset.userNotFound"));
         }
