@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
+using TourGo.Models;
+using TourGo.Models.Domain;
+using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Staff;
+using TourGo.Models.Domain.Users;
 using TourGo.Models.Enums;
+using TourGo.Models.Requests.Staff;
 using TourGo.Services;
 using TourGo.Services.Interfaces;
+using TourGo.Services.Interfaces.Email;
 using TourGo.Services.Interfaces.Hotels;
+using TourGo.Services.Interfaces.Security;
+using TourGo.Web.Api.Extensions;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
-using TourGo.Web.Models.Responses;
-using TourGo.Web.Api.Extensions;
-using TourGo.Models;
-using TourGo.Models.Requests.Staff;
-using MySql.Data.MySqlClient;
 using TourGo.Web.Models.Enums;
-using TourGo.Models.Domain;
-using TourGo.Services.Interfaces.Email;
-using TourGo.Models.Domain.Users;
-using TourGo.Models.Domain.Hotels;
+using TourGo.Web.Models.Responses;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -29,19 +30,23 @@ namespace TourGo.Web.Api.Controllers.Hotels
         private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IHotelService _hotelService;
         private readonly IEmailService _emailService;
+        private readonly IGoogleRecaptchaService _googleRecaptchaService;
+
 
         public StaffController(ILogger<StaffController> logger, 
                             IStaffService staffService,
                             IErrorLoggingService errorLoggingService,
                             IWebAuthenticationService<string> webAuthService,
                             IHotelService hotelService,
-                            IEmailService emailService) : base(logger)
+                            IEmailService emailService,
+                            IGoogleRecaptchaService googleRecaptchaService) : base(logger)
         {
             _staffService = staffService;
             _errorLoggingService = errorLoggingService;
             _webAuthService = webAuthService;
             _hotelService = hotelService;
             _emailService = emailService;
+            _googleRecaptchaService = googleRecaptchaService;
         }
 
         [HttpGet("hotel/{hotelId}")]
@@ -209,10 +214,20 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPost("hotel/{hotelId}/invites")]
         [EntityAuth(EntityTypeEnum.HotelInvites, EntityActionTypeEnum.Create)]
-        public ActionResult<ItemResponse<int>> AddInvite(string hotelId, StaffInvitationRequest model)
+        public async Task<ActionResult<ItemResponse<int>>> AddInvite(string hotelId, StaffInvitationRequest model)
         {
             try
             {
+                if (!string.IsNullOrEmpty(model.CaptchaToken))
+                {
+                    bool isCaptchaValid = await _googleRecaptchaService.VerifyTokenAsync(model.CaptchaToken);
+
+                    if (!isCaptchaValid)
+                    {
+                        return StatusCode(400, new ErrorResponse(AuthenticationErrorCode.FailedCaptchaVerification));
+                    }
+                }
+
                 string userId = _webAuthService.GetCurrentUserId();
                 int inviteId = _staffService.AddInvite(model, hotelId, userId);
 
@@ -226,7 +241,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 if( hotel != null)
                 {
                     string roleName = EnumLocalizationHelper.GetLocalizedEnumDisplayName((Enums.Staff.StaffRoleEnum)model.RoleId);
-                    _emailService.HotelStaffInvitation(model.Email, hotel.Name, roleName);
+                    _ = _emailService.HotelStaffInvitation(model.Email, hotel.Name, roleName);
                 }
 
                 ItemResponse<int> response = new ItemResponse<int> { Item = inviteId };
@@ -236,9 +251,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
                 ErrorResponse error;
 
-                if (Enum.IsDefined(typeof(HotelManagementErrorCode), dbEx.Number))
+                if (Enum.IsDefined(typeof(HotelManagementErrorCode), dbEx.Number) || Enum.IsDefined(typeof(AuthenticationErrorCode), dbEx.Number))
                 {
-                    error = new ErrorResponse((HotelManagementErrorCode)dbEx.Number);
+                    error = new ErrorResponse(dbEx.Number);
                 }
                 else
                 {

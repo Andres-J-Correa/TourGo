@@ -43,6 +43,7 @@ namespace TourGo.Web.Api
             services.Configure<HotelsPublicIdConfig>(Configuration.GetSection("HotelsPublicIdConfig"));
             services.Configure<BookingsPublicIdConfig>(Configuration.GetSection("BookingsPublicIdConfig"));
             services.Configure<TransactionsPublicIdConfig>(Configuration.GetSection("TransactionsPublicIdConfig")); 
+            services.Configure<GoogleRecaptchaConfig>(Configuration.GetSection("GoogleRecaptchaConfig"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -37,6 +37,7 @@ namespace TourGo.Web.Api.Controllers.Users
         private readonly IEmailService _emailService;
         private readonly IErrorLoggingService _errorLoggingService;
         private readonly IMemoryCache _cache;
+        private readonly IGoogleRecaptchaService _googleRecaptchaService;
         private readonly EncryptionConfig _encryptionConfig;
         private readonly EmailConfig _emailConfig;
         private readonly UsersPublicIdConfig _usersPublicIdConfig;
@@ -51,7 +52,8 @@ namespace TourGo.Web.Api.Controllers.Users
             IErrorLoggingService errorLoggingService,
             IMemoryCache memoryCache,
             IOptions<EncryptionConfig> encryptionOptions,
-            IOptions<UsersPublicIdConfig> usersPublicIdOptions) : base(logger)
+            IOptions<UsersPublicIdConfig> usersPublicIdOptions,
+            IGoogleRecaptchaService googleRecaptchaService) : base(logger)
         {
             _userService = userService;
             _webAuthService = webAuthService;
@@ -63,6 +65,7 @@ namespace TourGo.Web.Api.Controllers.Users
             _encryptionConfig = encryptionOptions.Value;
             _cache = memoryCache;
             _usersPublicIdConfig = usersPublicIdOptions.Value;
+            _googleRecaptchaService = googleRecaptchaService;
 
         }
 
@@ -124,15 +127,26 @@ namespace TourGo.Web.Api.Controllers.Users
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult<ItemResponse<string>> Create(UserAddRequest model)
+        public async Task<ActionResult<ItemResponse<string>>> Create(UserAddRequest model)
         {
             try
             {
+                if (!string.IsNullOrEmpty(model.CaptchaToken))
+                {
+                    bool isCaptchaValid = await _googleRecaptchaService.VerifyTokenAsync(model.CaptchaToken);
+
+                    if (!isCaptchaValid)
+                    {
+                        return StatusCode(400, new ErrorResponse(AuthenticationErrorCode.FailedCaptchaVerification));
+                    }
+                }
+
                 string? publicId = null;
                 int attemptsMade = 0;
 
                 do
                 {
+
                     List<string> possiblePublicIds = PublicIdGeneratorService.GenerateSecureIds(_usersPublicIdConfig.NumberOfIdsToGenerate,
                                                                                                 _usersPublicIdConfig.Length,
                                                                                                 _usersPublicIdConfig.Characters);
@@ -228,6 +242,16 @@ namespace TourGo.Web.Api.Controllers.Users
 
             try
             {
+                if (!string.IsNullOrEmpty(model.CaptchaToken))
+                {
+                    bool isCaptchaValid = await _googleRecaptchaService.VerifyTokenAsync(model.CaptchaToken);
+
+                    if (!isCaptchaValid)
+                    {
+                        return StatusCode(400, new ErrorResponse(AuthenticationErrorCode.FailedCaptchaVerification));
+                    }
+                }
+
                 IUserAuthData user = _userService.Get(model.Email);
 
                 if (user != null)

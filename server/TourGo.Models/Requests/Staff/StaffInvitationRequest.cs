@@ -18,5 +18,7 @@ namespace TourGo.Models.Requests.Staff
         [Required]
         [ValidEnum(typeof(StaffRoleEnum))]
         public int RoleId { get; set; }
+
+        public string? CaptchaToken { get; set; }
     }
 }

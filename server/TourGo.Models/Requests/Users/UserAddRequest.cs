@@ -26,7 +26,6 @@ namespace TourGo.Models.Requests.Users
         [Required, ValidEnum(typeof(AuthProviderEnum))]
         public int AuthProvider { get; set; }
 
-        [ValidEnum(typeof(UserRoleEnum))]
-        public int Role { get; set; } = 2;
+        public string? CaptchaToken { get; set; }
     }
 }

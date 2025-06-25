@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
+
 import { BrowserRouter } from "react-router-dom";
 import { AppContextProvider } from "./contexts/GlobalAppContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
-import "./locales/i18n"; // Initialize i18n
+import i18n from "./locales/i18n";
 
 import App from "./App";
 import "./index.css";
@@ -24,9 +26,13 @@ root.render(
   <BrowserRouter>
     <React.StrictMode>
       <LanguageProvider>
-        <AppContextProvider>
-          <App />
-        </AppContextProvider>
+        <GoogleReCaptchaProvider
+          reCaptchaKey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+          language={i18n.language}>
+          <AppContextProvider>
+            <App />
+          </AppContextProvider>
+        </GoogleReCaptchaProvider>
       </LanguageProvider>
     </React.StrictMode>
   </BrowserRouter>

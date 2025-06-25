@@ -123,6 +123,7 @@
       "2003": "Incorrect email or password.",
       "2004": "Token not found",
       "2005": "You do not have sufficient permissions to perform this action",
+      "2006": "Are you human?",
       "3000": "User management error",
       "3001": "User already exists",
       "3002": "Email already exists",

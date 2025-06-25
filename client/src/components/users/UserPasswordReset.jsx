@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 import { Button, Container } from "reactstrap";
 import { Formik, Form } from "formik";
@@ -29,10 +30,15 @@ function UserPasswordReset() {
   const { t, getTranslatedErrorMessage } = useLanguage();
   const { user } = useAppContext();
   const navigate = useNavigate();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const handleForgotPasswordSubmit = useCallback(
     async (values) => {
       try {
+        if (!executeRecaptcha) {
+          return;
+        }
+
         Swal.fire({
           title: t("users.passwordReset.processingTitle"),
           text: t("users.passwordReset.processingText"),
@@ -42,7 +48,9 @@ function UserPasswordReset() {
           },
         });
 
-        const response = await forgotPassword(values);
+        const token = await executeRecaptcha("password_reset");
+
+        const response = await forgotPassword({ values, captchaToken: token });
         if (!Boolean(response?.isSuccessful)) {
           throw new Error(t("users.passwordReset.userNotFound"));
         }
@@ -69,7 +77,7 @@ function UserPasswordReset() {
         });
       }
     },
-    [getTranslatedErrorMessage, t]
+    [getTranslatedErrorMessage, t, executeRecaptcha]
   );
 
   const handlePasswordResetSubmit = useCallback(
