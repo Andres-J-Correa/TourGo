@@ -37,8 +37,17 @@ namespace TourGo.Web.StartUp
 
             services.AddSingleton<IConfiguration>(configuration);   // IConfiguration explicitly
 
-            string sqlConnString = configuration.GetConnectionString("Sql");
-            string mySqlConnString = configuration.GetConnectionString("MySql");
+            string? sqlConnString = configuration.GetConnectionString("Sql");
+            if (string.IsNullOrEmpty(sqlConnString))
+            {
+                throw new InvalidOperationException("The SQL connection string is not configured in the application settings.");
+            }
+
+            string? mySqlConnString = configuration.GetConnectionString("MySql");
+            if (string.IsNullOrEmpty(mySqlConnString))
+            {
+                throw new InvalidOperationException("The MySQL connection string is not configured in the application settings.");
+            }
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.2
 
             services.AddSingleton<IWebAuthenticationService<string>, WebAuthenticationService>();
