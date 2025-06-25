@@ -30,9 +30,7 @@ jobs:
 
             # Inject secrets into .env.staging
             cd client
-            cat <<EOF >> .env.staging
-            REACT_APP_RECAPTCHA_SITE_KEY=${{ secrets.CLIENT_GOOGLE_RECAPTCHA_SITE_KEY }}
-            EOF
+            echo "REACT_APP_RECAPTCHA_SITE_KEY=${{ secrets.CLIENT_GOOGLE_RECAPTCHA_SITE_KEY }}" >> .env.staging
 
             # Client Deployment
             yarn install || { echo "yarn install failed"; exit 1; }
