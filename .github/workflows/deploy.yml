@@ -33,7 +33,6 @@ jobs:
             EOF
 
             # Client Deployment
-            cd ~/TourGo-Stage/client
             yarn install || { echo "yarn install failed"; exit 1; }
             yarn build || { echo "yarn build failed"; exit 1; }
             if [ -d "./build" ] && [ "$(ls -A ./build)" ]; then

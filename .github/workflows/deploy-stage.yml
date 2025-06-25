@@ -33,7 +33,6 @@ jobs:
             EOF
 
             # Client Deployment
-            cd ~/TourGo-Stage/client
             yarn install || { echo "yarn install failed"; exit 1; }
             yarn build:stage || { echo "yarn build:stage failed"; exit 1; }
             if [ -d "./build" ] && [ "$(ls -A ./build)" ]; then
@@ -56,7 +55,7 @@ jobs:
 
             # Inject secrets into appsettings.Staging.json
             cd ~
-            cd /var/www/server
+            cd /var/www/server-stage
             jq --arg json_token_secret "${{ secrets.SERVER_JSON_WEB_TOKEN_SECRET }}" \
                --arg mysql_conn_string "${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_STAGE }}" \
                --arg brevo_api_key "${{ secrets.SERVER_BREVO_API_KEY }}" \
