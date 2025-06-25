@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection;
 using sib_api_v3_sdk.Api;
 using sib_api_v3_sdk.Client;
 using TourGo.Data;
 using TourGo.Data.Providers;
+using TourGo.Models.Domain.Config;
 using TourGo.Services;
 using TourGo.Services.Customers;
 using TourGo.Services.Email;
@@ -27,6 +29,7 @@ namespace TourGo.Web.StartUp
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+
             if (configuration is IConfigurationRoot)
             {
                 services.AddSingleton<IConfigurationRoot>(configuration as IConfigurationRoot);   // IConfigurationRoot
@@ -66,6 +69,16 @@ namespace TourGo.Web.StartUp
                 return new TransactionalEmailsApi();
             });
 
+            services.AddHttpClient("GoogleRecaptcha", (sp, client) =>
+            {
+                var baseUrl = configuration.GetSection("GoogleRecaptchaConfig:BaseUrl").Value;
+                if (string.IsNullOrEmpty(baseUrl))
+                {
+                    throw new InvalidOperationException("GoogleRecaptchaConfig:BaseUrl is not configured in the application settings.");
+                }
+                client.BaseAddress = new Uri(baseUrl);
+            });
+
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<ITemplateLoader, TemplateLoader>();
             services.AddSingleton<IUserTokenService, UserTokenService>();
@@ -87,6 +100,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IStaffService, StaffService>();
             services.AddSingleton<IFinancialReportService, FinancialReportService>();
             services.AddSingleton<IEncryptionService, EncryptionService>();
+            services.AddSingleton<IGoogleRecaptchaService, GoogleRecaptchaService>();
 
             services.AddScoped<IClaimsTransformation, ClaimsEnrichmentTransformation>();
 

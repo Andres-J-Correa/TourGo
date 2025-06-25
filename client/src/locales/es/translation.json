@@ -123,6 +123,7 @@
       "2003": "Correo electrónico o contraseña incorrectos.",
       "2004": "Token no encontrado",
       "2005": "No tienes permisos suficientes para realizar esta acción",
+      "2006": "Eres humano?",
       "3000": "Error de gestión de usuarios",
       "3001": "El usuario ya existe",
       "3002": "El correo ya existe",

@@ -11,5 +11,7 @@ namespace TourGo.Models.Requests.Users
     {
         [Required, EmailAddress, StringLength(100)]
         public string Email { get; set; }
+
+        public string ? CaptchaToken { get; set; }
     }
 }

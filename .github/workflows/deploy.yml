@@ -26,6 +26,28 @@ jobs:
             # Pull latest changes
             git pull origin main || { echo "git pull failed"; exit 1; }
 
+            # Inject secrets into .env
+            cat <<EOF > .env
+            REACT_APP_RECAPTCHA_SITE_KEY=${{ secrets.CLIENT_GOOGLE_RECAPTCHA_SITE_KEY }}
+            EOF
+
+            # Inject secrets into appsettings.Production.json
+            jq --arg json_token_secret "${{ secrets.SERVER_JSON_WEB_TOKEN_SECRET }}" \
+               --arg mysql_conn_string "${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_PROD }}" \
+               --arg brevo_api_key "${{ secrets.SERVER_BREVO_API_KEY }}" \
+               --arg awss3_access_key "${{ secrets.SERVER_AWS_S3_ACCESS_KEY }}" \
+               --arg awss3_secret_key "${{ secrets.SERVER_AWS_S3_SECRET_KEY }}" \
+               --arg user_pii_encrypt_key "${{ secrets.SERVER_USER_PII_ENCRYPTION_KEY }}" \
+               --arg google_recaptcha_v3_secret_key "${{ secrets.SERVER_GOOGLE_RECAPTCHA_SECRET_KEY }}" \
+               '.JsonWebTokenConfig.Secret = $json_token_secret |
+                .ConnectionStrings.MySql = $mysql_conn_string |
+                .BrevoConfig.ApiKey = $brevo_api_key |
+                .AWSS3Config.AccessKey = $awss3_access_key |
+                .AWSS3Config.SecretKey = $awss3_secret_key |
+                .EncryptionConfig.UserPIIKey = $user_pii_encrypt_key |
+                .GoogleRecaptchaConfig.SecretKey = $google_recaptcha_v3_secret_key' \
+               appsettings.Production.json > appsettings.Production.tmp && mv appsettings.Production.tmp appsettings.Production.json
+
             # Client Deployment
             cd client
             yarn install || { echo "yarn install failed"; exit 1; }

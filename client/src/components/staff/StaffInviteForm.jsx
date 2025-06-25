@@ -4,6 +4,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { Card, CardBody, CardTitle, Button, Row, Col } from "reactstrap";
 import Swal from "sweetalert2";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
@@ -23,6 +24,8 @@ const initialValues = {
 function StaffInviteForm() {
   const { getTranslatedErrorMessage, t, culture } = useLanguage();
   const { hotelId } = useParams();
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email(t("staff.inviteForm.emailInvalid"))
@@ -62,6 +65,10 @@ function StaffInviteForm() {
 
     if (!result.isConfirmed) return;
 
+    if (!executeRecaptcha) {
+      return;
+    }
+
     try {
       Swal.fire({
         title: t("staff.inviteForm.sendingTitle"),
@@ -70,7 +77,13 @@ function StaffInviteForm() {
         didOpen: () => Swal.showLoading(),
       });
 
-      const response = await inviteStaff(hotelId, values, culture);
+      const token = await executeRecaptcha("invite_staff");
+
+      const response = await inviteStaff(
+        hotelId,
+        { ...values, captchaToken: token },
+        culture
+      );
 
       Swal.close();
 
