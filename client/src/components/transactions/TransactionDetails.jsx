@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useMemo } from "react";
+import { useParams, Link } from "react-router-dom";
 import { Row, Col, Button } from "reactstrap";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
@@ -22,6 +22,7 @@ import {
 } from "services/transactionService";
 import { compressImage } from "utils/fileHelper";
 import { useLanguage } from "contexts/LanguageContext";
+import { formatCurrency } from "utils/currencyHelper";
 
 const TransactionDetails = ({
   txn,
@@ -245,8 +246,25 @@ const TransactionDetails = ({
     }
   };
 
+  const entityLink = useMemo(() => {
+    if (!txn.entityId) return " - ";
+
+    const isBooking = txn.entityId?.startsWith("BKN");
+    let path = `/hotels/${hotelId}`;
+    if (isBooking) {
+      path += `/bookings/${txn.entityId}`;
+    } else {
+      path = "#";
+    }
+    return (
+      <Link to={path} className="text-decoration-none">
+        {txn.entityId}
+      </Link>
+    );
+  }, [txn.entityId, hotelId]);
+
   return (
-    <>
+    <div className="text-dark">
       <LoadingOverlay isVisible={isLoading} />
       <Row>
         <Col xl={3} md={6} className="mb-2">
@@ -258,17 +276,36 @@ const TransactionDetails = ({
           <strong>{t("transactions.details.parentId")}</strong> <br />
           {txn.parentId || " - "}
         </Col>
-        <Col xl={3} md={12} className="mb-2">
+        <Col xl={3} md={6} className="mb-2">
           <strong>{t("transactions.details.reference")}</strong> <br />{" "}
           {txn.referenceNumber || t("transactions.details.noReference")}
+        </Col>
+        <Col xl={3} md={6} className="mb-2">
+          <strong>{t("transactions.details.entity")}</strong> <br />
+          {entityLink}
         </Col>
       </Row>
 
       <Row>
         <Col xl={3} md={6} className="mb-2">
+          <strong>{t("transactions.details.amount")}</strong> <br />
+          {formatCurrency(txn.amount, txn.currencyCode)}
+        </Col>
+        <Col xl={3} md={6} className="mb-2">
+          <strong>{t("transactions.details.transactionDate")}</strong> <br />
+          {dayjs(txn.transactionDate).format("DD/MM/YYYY")}
+        </Col>
+        <Col xl={3} md={6} className="mb-2">
+          <strong>{t("transactions.details.paymentMethod")}</strong> <br />
+          {txn.paymentMethod?.name}
+        </Col>
+        <Col xl={3} md={6} className="mb-2">
           <strong>{t("transactions.details.status")}</strong> <br />
           {status}
         </Col>
+      </Row>
+
+      <Row>
         <Col xl={3} md={6} className="mb-2">
           <strong>{t("transactions.details.subcategory")}</strong> <br />
           {txn.subcategory?.name || t("transactions.details.noSubcategory")}
@@ -278,13 +315,6 @@ const TransactionDetails = ({
           {category}
         </Col>
         <Col xl={3} md={6} className="mb-2">
-          <strong>{t("transactions.details.paymentMethod")}</strong> <br />
-          {txn.paymentMethod?.name}
-        </Col>
-      </Row>
-
-      <Row>
-        <Col xl={3} md={6} className="mb-2">
           <strong>{t("transactions.details.approvedBy")}</strong> <br />
           {txn.approvedBy?.firstName} {txn.approvedBy?.lastName || " - "}
         </Col>
@@ -292,6 +322,8 @@ const TransactionDetails = ({
           <strong>{t("transactions.details.financePartner")}</strong> <br />
           {txn.financePartner?.name || " - "}
         </Col>
+      </Row>
+      <Row>
         <Col xl={3} md={6} className="mb-2">
           <strong>{t("transactions.details.createdBy")}</strong> <br />
           {txn.createdBy?.firstName} {txn.createdBy?.lastName}
@@ -300,8 +332,6 @@ const TransactionDetails = ({
           <strong>{t("transactions.details.createdAt")}</strong> <br />
           {dayjs(txn.dateCreated).format("DD/MMM/YYYY - h:mm A")}
         </Col>
-      </Row>
-      <Row>
         <Col xl={3} md={6} className="mb-2">
           <strong>{t("transactions.details.modifiedBy")}</strong> <br />
           {txn.modifiedBy?.firstName} {txn.modifiedBy?.lastName}
@@ -436,7 +466,7 @@ const TransactionDetails = ({
         transaction={txn}
         hotelId={hotelId}
       />
-    </>
+    </div>
   );
 };
 
