@@ -1094,7 +1094,7 @@
       "document": "Documento:",
       "email": "Email:",
       "phone": "Teléfono:",
-      "invoiceDetails": "Detalles de la factura",
+      "invoiceDetails": "Detalles",
       "externalId": "Id Externa:",
       "issueDate": "Fecha de emisión:",
       "subtotal": "Subtotal",
@@ -1588,7 +1588,10 @@
       "save": "Guardar",
       "savingTitle": "Guardando...",
       "editDescriptionSuccess": "Descripción actualizada",
-      "editDescriptionError": "No se pudo actualizar la descripción"
+      "editDescriptionError": "No se pudo actualizar la descripción",
+      "entity": "Entidad Asociada:",
+      "transactionDate": "Fecha de Transacción:",
+      "amount": "Monto:"
     },
     "statusBadge": {
       "unknown": "Estado desconocido"
