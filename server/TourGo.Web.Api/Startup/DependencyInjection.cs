@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using sib_api_v3_sdk.Api;
 using sib_api_v3_sdk.Client;
@@ -29,6 +30,9 @@ namespace TourGo.Web.StartUp
     {
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+
+            services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
             if (configuration is IConfigurationRoot)
             {
