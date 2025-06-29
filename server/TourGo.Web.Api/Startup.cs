@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Localization;
+﻿using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Config.Emails;
@@ -27,6 +28,7 @@ namespace TourGo.Web.Api
             Authentication.ConfigureServices(services, Configuration);
             MVC.ConfigureServices(services);
             SPA.ConfigureServices(services);
+            services.AddInMemoryRateLimiting();
         }
 
         private void ConfigureAppSettings(IServiceCollection services)
@@ -55,6 +57,7 @@ namespace TourGo.Web.Api
                 SupportedUICultures = new[] { new CultureInfo("en"), new CultureInfo("es") }
             });
 
+            app.UseIpRateLimiting();
             app.UseMiddleware<ErrorLoggingMiddleware>();
             app.UseMiddleware<MaintenanceMiddleware>();
 
@@ -85,6 +88,7 @@ namespace TourGo.Web.Api
             MVC.Configure(app, env);
 
             SPA.Configure(app, env);
+
         }
     }
 }
