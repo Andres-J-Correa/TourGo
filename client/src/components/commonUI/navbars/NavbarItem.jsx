@@ -62,38 +62,75 @@ const renderSubItem = (subItem, subIndex) => {
 const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
   // Render dropdown menu if the nav item has a collapse property
   const renderDropdownMenu = () => (
-    <UncontrolledDropdown nav inNavbar className="mx-1">
-      <DropdownToggle
+    <>
+      <UncontrolledDropdown nav inNavbar className="mx-1 d-none d-md-block">
+        <DropdownToggle
+          nav
+          role="button"
+          className={classNames(
+            "ps-2 d-flex cursor-pointer align-items-center nav-link",
+            {
+              "text-uppercase": navItem.uppercase,
+              "text-capitalize": navItem.capitalize,
+            }
+          )}
+          title={navItem?.name?.length > 20 ? navItem.name : undefined}>
+          {navItem.icon && (
+            <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
+          )}
+          {navItem.name.length > 25
+            ? `${navItem.name.substring(0, 20)}...`
+            : navItem.name}
+          <FontAwesomeIcon
+            icon={faChevronDown}
+            size="xs"
+            className="down-arrow"
+          />
+        </DropdownToggle>
+        <DropdownMenu
+          flip
+          end={navItem.end}
+          className="navbar-dropdown-menu px-2">
+          <div className="hidden-box">{/* For hover effect */}</div>
+          {navItem.collapse.map(renderSubItem)}
+        </DropdownMenu>
+      </UncontrolledDropdown>
+      {/* Mobile Dropdown */}
+      <UncontrolledDropdown
         nav
-        role="button"
-        className={classNames(
-          "ps-2 d-flex cursor-pointer align-items-center nav-link",
-          {
-            "text-uppercase": navItem.uppercase,
-            "text-capitalize": navItem.capitalize,
-          }
-        )}
-        title={navItem?.name?.length > 20 ? navItem.name : undefined}>
-        {navItem.icon && (
-          <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
-        )}
-        {navItem.name.length > 25
-          ? `${navItem.name.substring(0, 20)}...`
-          : navItem.name}
-        <FontAwesomeIcon
-          icon={faChevronDown}
-          size="xs"
-          className="down-arrow"
-        />
-      </DropdownToggle>
-      <DropdownMenu
-        flip
-        end={navItem.end}
-        className="border-0 shadow px-3 border-radius-xl min-width-auto">
-        <div className="hidden-box">{/* For hover effect */}</div>
-        {navItem.collapse.map(renderSubItem)}
-      </DropdownMenu>
-    </UncontrolledDropdown>
+        inNavbar
+        className="mx-1 d-md-none position-relative">
+        <DropdownToggle
+          nav
+          role="button"
+          className={classNames(
+            "ps-2 d-flex cursor-pointer align-items-center nav-link",
+            {
+              "text-uppercase": navItem.uppercase,
+              "text-capitalize": navItem.capitalize,
+            }
+          )}
+          title={navItem?.name?.length > 20 ? navItem.name : undefined}>
+          {navItem.icon && (
+            <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
+          )}
+          {navItem.name.length > 25
+            ? `${navItem.name.substring(0, 20)}...`
+            : navItem.name}
+          <FontAwesomeIcon
+            icon={faChevronDown}
+            size="xs"
+            className="down-arrow"
+          />
+        </DropdownToggle>
+        <DropdownMenu
+          flip
+          end={navItem.end}
+          className="navbar-dropdown-menu px-2">
+          {navItem.collapse.map(renderSubItem)}
+        </DropdownMenu>
+      </UncontrolledDropdown>
+    </>
   );
 
   // Render a link if the nav item has a path property
@@ -103,7 +140,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
         end
         to={navItem.path}
         target={navItem.newTab ? "_blank" : undefined}
-        className={classNames("nav-action-item mx-1", {
+        className={classNames("nav-action-item mx-1 px-2", {
           "text-uppercase": navItem.uppercase,
           "text-capitalize": navItem.capitalize,
           "dropdown-item": isInnerItem,
@@ -123,7 +160,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
   // Render a dropdown item with an action if the nav item has an action property
   const renderActionItem = () => (
     <div
-      className={classNames("dropdown-item text-center px-1 nav-action-item", {
+      className={classNames("dropdown-item px-1 nav-action-item", {
         "text-uppercase": navItem?.uppercase,
         "text-capitalize": navItem?.capitalize,
         "dropdown-item": isInnerItem,

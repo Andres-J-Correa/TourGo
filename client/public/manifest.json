@@ -3,7 +3,7 @@
   "name": "TourGo",
   "description": "Administra tu hotel, gestiona reservas y ofrece una experiencia única a tus huéspedes con TourGo.",
   "scope": "/",
-  "orientation": "landscape",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "favicon.ico",
