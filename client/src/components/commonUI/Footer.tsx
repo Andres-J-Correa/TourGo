@@ -43,14 +43,14 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
         </Col>
         <Col>
           <Row className="d-flex align-items-center">
-            <Link to={`/hotels/${hotelId}/bookings/add`}>
+            <Link to={`/hotels/${hotelId}/bookings/new`}>
               <FontAwesomeIcon icon={faCalendarPlus} size="lg" />
             </Link>
           </Row>
         </Col>
         <Col>
           <Row className="d-flex align-items-center">
-            <Link to={`/hotels/${hotelId}/bookings/calendar`}>
+            <Link to={`/hotels/${hotelId}/calendar`}>
               <FontAwesomeIcon icon={faCalendarDays} />
             </Link>
           </Row>

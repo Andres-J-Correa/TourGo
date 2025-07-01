@@ -155,7 +155,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem, toggle }) => {
           "text-capitalize": navItem.capitalize,
           "dropdown-item": isInnerItem,
           "nav-link": !isInnerItem,
-          "d-none": navItem.desktopOnly,
+          "d-none d-md-block": navItem.desktopOnly,
         })}>
         <div>
           {" "}
@@ -175,7 +175,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem, toggle }) => {
         "text-uppercase": navItem?.uppercase,
         "text-capitalize": navItem?.capitalize,
         "dropdown-item": isInnerItem,
-        "d-none": navItem.desktopOnly,
+        "d-none d-md-block": navItem.desktopOnly,
       })}
       onClick={() => {
         navItem.action();
