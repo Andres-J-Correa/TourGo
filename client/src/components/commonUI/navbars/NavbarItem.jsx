@@ -13,54 +13,62 @@ import classNames from "classnames";
 import "./navbaritem.css";
 
 // Helper function to render inner items in a dropdown
-const renderInnerItem = (innerItem, innerIndex) => (
-  <NavbarItem
-    navItem={innerItem}
-    key={`inner-${innerIndex}-${innerItem.name}`}
-    isInnerItem={true}
-  />
-);
-
-// Helper function to render sub-items in a dropdown
-const renderSubItem = (subItem, subIndex) => {
-  const isHeader = subItem.collapse?.length > 0;
-
+const renderInnerItem = (toggle) => (innerItem, innerIndex) => {
   return (
-    <React.Fragment key={`sub-${subIndex}-${subItem.name}`}>
-      {subItem.path ? (
-        <Link
-          to={subItem.path}
-          className={classNames("dropdown-item", {
-            "text-uppercase": subItem.uppercase,
-            "text-capitalize": subItem.capitalize,
-            "item-long-text": subItem?.name?.length > 25,
-          })}>
-          {subItem.name}
-        </Link>
-      ) : (
-        <DropdownItem
-          header={isHeader}
-          className={classNames(
-            {
-              "font-weight-bolder": isHeader,
-              "text-uppercase": subItem.uppercase,
-              "text-capitalize": subItem.capitalize,
-              "item-long-text": subItem?.name?.length > 25,
-            },
-            "align-items-center px-1"
-          )}
-          onClick={subItem.action}>
-          {subItem.name}
-        </DropdownItem>
-      )}
-      {subItem.collapse && subItem.collapse.map(renderInnerItem)}
-    </React.Fragment>
+    <NavbarItem
+      navItem={innerItem}
+      key={`inner-${innerIndex}-${innerItem.name}`}
+      isInnerItem={true}
+      toggle={toggle}
+    />
   );
 };
 
 // Main NavbarItem component
-const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
+const NavbarItem = React.memo(({ navItem, isInnerItem, toggle }) => {
   // Render dropdown menu if the nav item has a collapse property
+
+  // Helper function to render sub-items in a dropdown
+  const renderSubItem = (subItem, subIndex) => {
+    const isHeader = subItem.collapse?.length > 0;
+    return (
+      <React.Fragment key={`sub-${subIndex}-${subItem.name}`}>
+        {subItem.path ? (
+          <Link
+            to={subItem.path}
+            className={classNames("dropdown-item", {
+              "text-uppercase": subItem.uppercase,
+              "text-capitalize": subItem.capitalize,
+              "item-long-text": subItem?.name?.length > 25,
+            })}>
+            {subItem.name}
+          </Link>
+        ) : (
+          <DropdownItem
+            header={isHeader}
+            className={classNames(
+              {
+                "font-weight-bolder": isHeader,
+                "text-uppercase": subItem.uppercase,
+                "text-capitalize": subItem.capitalize,
+                "item-long-text": subItem?.name?.length > 25,
+              },
+              "align-items-center px-1"
+            )}
+            onClick={() => {
+              if (subItem.action) {
+                subItem.action();
+                toggle && toggle();
+              }
+            }}>
+            {subItem.name}
+          </DropdownItem>
+        )}
+        {subItem.collapse && subItem.collapse.map(renderInnerItem(toggle))}
+      </React.Fragment>
+    );
+  };
+
   const renderDropdownMenu = () => (
     <>
       <UncontrolledDropdown nav inNavbar className="mx-1 d-none d-md-block">
@@ -169,7 +177,10 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
         "dropdown-item": isInnerItem,
         "d-none": navItem.desktopOnly,
       })}
-      onClick={navItem.action}
+      onClick={() => {
+        navItem.action();
+        toggle && toggle();
+      }}
       role="button">
       {navItem.name}
     </div>

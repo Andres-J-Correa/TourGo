@@ -12,12 +12,12 @@ const NavbarContainer = () => {
 
   const currentItems = useMemo(() => items, [items]);
 
-  const rightCustomComponents = useMemo(
-    () => [<UserAccountDropdown key="userAccountDropdown" />],
-    []
-  );
-
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
+
+  const rightCustomComponents = useMemo(
+    () => [<UserAccountDropdown toggle={toggle} key="userAccountDropdown" />],
+    [toggle]
+  );
 
   useEffect(() => {
     // Close the navbar when the route changes

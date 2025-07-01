@@ -6,7 +6,7 @@ import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 
 import NavbarItem from "components/commonUI/navbars/NavbarItem";
 
-const LanguageSelector = () => {
+const LanguageSelector = ({ toggle }) => {
   const { changeLanguage, language, t } = useLanguage();
 
   const menuItems = languages.map((lang) => {
@@ -31,7 +31,7 @@ const LanguageSelector = () => {
     ],
   };
 
-  return <NavbarItem navItem={languageItem} />;
+  return <NavbarItem navItem={languageItem} toggle={toggle} />;
 };
 
 export default LanguageSelector;

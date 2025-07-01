@@ -8,7 +8,7 @@ import { useAppContext } from "contexts/GlobalAppContext";
 
 import PropTypes from "prop-types";
 
-function UserAccountDropdown() {
+function UserAccountDropdown({ toggle }) {
   const { t } = useLanguage();
   const { user, toggleUserSignInModal } = useAppContext();
 
@@ -59,7 +59,7 @@ function UserAccountDropdown() {
         ],
   };
 
-  return <NavbarItem navItem={userdropdown} />;
+  return <NavbarItem navItem={userdropdown} toggle={toggle} />;
 }
 
 export default UserAccountDropdown;
