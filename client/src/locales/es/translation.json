@@ -661,6 +661,13 @@
       "title": "Verifica tu correo electrónico",
       "message": "Es necesario verificar tu cuenta para usar esta funcionalidad.",
       "button": "Ir a Verificar Correo"
+    },
+    "reCaptchaBrand": {
+      "text": "Este sitio está protegido por reCAPTCHA y la",
+      "privacyPolicy": "Política de Privacidad",
+      "termsOfService": "Términos de Servicio",
+      "and": "y",
+      "apply": "se aplican"
     }
   },
   "extraCharges": {

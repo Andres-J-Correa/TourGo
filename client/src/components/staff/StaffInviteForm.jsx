@@ -8,6 +8,8 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
+import ReCaptchaBrand from "../commonUI/ReCaptchaBrand";
+
 import { inviteStaff } from "services/staffService";
 import {
   HOTEL_ROLES,
@@ -157,6 +159,7 @@ function StaffInviteForm() {
             </Form>
           )}
         </Formik>
+        <ReCaptchaBrand />
       </CardBody>
     </Card>
   );

@@ -661,6 +661,13 @@
       "title": "Verify your email",
       "message": "You need to verify your account to use this feature.",
       "button": "Go to Verify Email"
+    },
+    "reCaptchaBrand": {
+      "text": "This site is protected by reCAPTCHA and the Google",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "apply": "apply"
     }
   },
   "extraCharges": {

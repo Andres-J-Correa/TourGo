@@ -25,7 +25,7 @@ import Footer from "components/commonUI/Footer";
 const App = () => {
   const [routes, setRoutes] = useState([]);
 
-  const { user, maintenanceMode } = useAppContext();
+  const { user, maintenanceMode, hotel } = useAppContext();
   const { t } = useLanguage();
 
   const mapRoute = (route, idx) => (
@@ -69,7 +69,7 @@ const App = () => {
             <Container className="my-4 main-container">
               <Routes>{routes}</Routes>
             </Container>
-            <Footer />
+            <Footer hotelId={hotel.current.id} />
           </Fragment>
         )}
       </Suspense>

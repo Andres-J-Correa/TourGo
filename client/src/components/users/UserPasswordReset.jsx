@@ -8,6 +8,7 @@ import CustomField from "components/commonUI/forms/CustomField";
 import AuthCard from "components/commonUI/forms/AuthCard";
 import DefaultHeader from "components/commonUI/headers/DefaultHeader";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
+import ReCaptchaBrand from "../commonUI/ReCaptchaBrand";
 
 import {
   useUserPasswordForgotSchema,
@@ -131,31 +132,34 @@ function UserPasswordReset() {
 
   const forgotPasswordForm = useMemo(
     () => (
-      <Formik
-        initialValues={{
-          email: "",
-        }}
-        validationSchema={userPasswordForgotSchema}
-        onSubmit={handleForgotPasswordSubmit}>
-        <Form>
-          <CustomField
-            name="email"
-            type="email"
-            className="form-control"
-            placeholder={t("client.passwordReset.email")}
-            autoComplete="email"
-          />
-          <ErrorAlert />
-          <div className="text-center">
-            <Button
-              type="submit"
-              size="lg"
-              className="bg-gradient-success w-100 mt-3 mb-0">
-              {t("client.passwordReset.button")}
-            </Button>
-          </div>
-        </Form>
-      </Formik>
+      <>
+        <Formik
+          initialValues={{
+            email: "",
+          }}
+          validationSchema={userPasswordForgotSchema}
+          onSubmit={handleForgotPasswordSubmit}>
+          <Form>
+            <CustomField
+              name="email"
+              type="email"
+              className="form-control"
+              placeholder={t("client.passwordReset.email")}
+              autoComplete="email"
+            />
+            <ErrorAlert />
+            <div className="text-center">
+              <Button
+                type="submit"
+                size="lg"
+                className="bg-gradient-success w-100 mt-3 mb-0">
+                {t("client.passwordReset.button")}
+              </Button>
+            </div>
+          </Form>
+        </Formik>
+        <ReCaptchaBrand />
+      </>
     ),
     [t, handleForgotPasswordSubmit, userPasswordForgotSchema]
   );

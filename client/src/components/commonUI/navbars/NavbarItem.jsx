@@ -99,7 +99,9 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
       <UncontrolledDropdown
         nav
         inNavbar
-        className="mx-1 d-md-none position-relative">
+        className={classNames("mx-1 d-md-none position-relative", {
+          "d-none": navItem.desktopOnly,
+        })}>
         <DropdownToggle
           nav
           role="button"
@@ -145,6 +147,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
           "text-capitalize": navItem.capitalize,
           "dropdown-item": isInnerItem,
           "nav-link": !isInnerItem,
+          "d-none": navItem.desktopOnly,
         })}>
         <div>
           {" "}
@@ -164,6 +167,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
         "text-uppercase": navItem?.uppercase,
         "text-capitalize": navItem?.capitalize,
         "dropdown-item": isInnerItem,
+        "d-none": navItem.desktopOnly,
       })}
       onClick={navItem.action}
       role="button">
