@@ -11,6 +11,7 @@ import CustomField from "components/commonUI/forms/CustomField";
 import AuthCard from "components/commonUI/forms/AuthCard";
 import withModal from "components/commonUI/forms/withModal";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
+import ReCaptchaBrand from "../commonUI/ReCaptchaBrand";
 
 import { useUserSignUpSchema } from "components/users/validationSchemas";
 import { useLanguage } from "contexts/LanguageContext";
@@ -165,6 +166,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
           </div>
         </Form>
       </Formik>
+      <ReCaptchaBrand />
     </AuthCard>
   );
 }

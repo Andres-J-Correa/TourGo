@@ -56,6 +56,7 @@ export const useNavbarItems = () => {
         icon: faClipboardList,
         position: "left",
         capitalize: true,
+        desktopOnly: true,
         collapse: [
           {
             name: t("commonUI.navbar.shortcuts"),
@@ -80,6 +81,7 @@ export const useNavbarItems = () => {
         position: "left",
         path: `/hotels/${hotel.current.id}/calendar`,
         capitalize: true,
+        desktopOnly: true,
       },
       {
         name: t("commonUI.navbar.transactions"),
@@ -87,6 +89,7 @@ export const useNavbarItems = () => {
         position: "left",
         path: `/hotels/${hotel.current.id}/transactions`,
         capitalize: true,
+        desktopOnly: true,
       },
       {
         name: t("commonUI.navbar.manageDetails"),

@@ -13,87 +13,134 @@ import classNames from "classnames";
 import "./navbaritem.css";
 
 // Helper function to render inner items in a dropdown
-const renderInnerItem = (innerItem, innerIndex) => (
-  <NavbarItem
-    navItem={innerItem}
-    key={`inner-${innerIndex}-${innerItem.name}`}
-    isInnerItem={true}
-  />
-);
-
-// Helper function to render sub-items in a dropdown
-const renderSubItem = (subItem, subIndex) => {
-  const isHeader = subItem.collapse?.length > 0;
-
+const renderInnerItem = (toggle) => (innerItem, innerIndex) => {
   return (
-    <React.Fragment key={`sub-${subIndex}-${subItem.name}`}>
-      {subItem.path ? (
-        <Link
-          to={subItem.path}
-          className={classNames("dropdown-item", {
-            "text-uppercase": subItem.uppercase,
-            "text-capitalize": subItem.capitalize,
-            "item-long-text": subItem?.name?.length > 25,
-          })}>
-          {subItem.name}
-        </Link>
-      ) : (
-        <DropdownItem
-          header={isHeader}
-          className={classNames(
-            {
-              "font-weight-bolder": isHeader,
-              "text-uppercase": subItem.uppercase,
-              "text-capitalize": subItem.capitalize,
-              "item-long-text": subItem?.name?.length > 25,
-            },
-            "align-items-center px-1"
-          )}
-          onClick={subItem.action}>
-          {subItem.name}
-        </DropdownItem>
-      )}
-      {subItem.collapse && subItem.collapse.map(renderInnerItem)}
-    </React.Fragment>
+    <NavbarItem
+      navItem={innerItem}
+      key={`inner-${innerIndex}-${innerItem.name}`}
+      isInnerItem={true}
+      toggle={toggle}
+    />
   );
 };
 
 // Main NavbarItem component
-const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
+const NavbarItem = React.memo(({ navItem, isInnerItem, toggle }) => {
   // Render dropdown menu if the nav item has a collapse property
+
+  // Helper function to render sub-items in a dropdown
+  const renderSubItem = (subItem, subIndex) => {
+    const isHeader = subItem.collapse?.length > 0;
+    return (
+      <React.Fragment key={`sub-${subIndex}-${subItem.name}`}>
+        {subItem.path ? (
+          <Link
+            to={subItem.path}
+            className={classNames("dropdown-item", {
+              "text-uppercase": subItem.uppercase,
+              "text-capitalize": subItem.capitalize,
+              "item-long-text": subItem?.name?.length > 25,
+            })}>
+            {subItem.name}
+          </Link>
+        ) : (
+          <DropdownItem
+            header={isHeader}
+            className={classNames(
+              {
+                "font-weight-bolder": isHeader,
+                "text-uppercase": subItem.uppercase,
+                "text-capitalize": subItem.capitalize,
+                "item-long-text": subItem?.name?.length > 25,
+              },
+              "align-items-center px-1"
+            )}
+            onClick={() => {
+              if (subItem.action) {
+                subItem.action();
+                toggle && toggle();
+              }
+            }}>
+            {subItem.name}
+          </DropdownItem>
+        )}
+        {subItem.collapse && subItem.collapse.map(renderInnerItem(toggle))}
+      </React.Fragment>
+    );
+  };
+
   const renderDropdownMenu = () => (
-    <UncontrolledDropdown nav inNavbar className="mx-1">
-      <DropdownToggle
+    <>
+      <UncontrolledDropdown nav inNavbar className="mx-1 d-none d-md-block">
+        <DropdownToggle
+          nav
+          role="button"
+          className={classNames(
+            "ps-2 d-flex cursor-pointer align-items-center nav-link",
+            {
+              "text-uppercase": navItem.uppercase,
+              "text-capitalize": navItem.capitalize,
+            }
+          )}
+          title={navItem?.name?.length > 20 ? navItem.name : undefined}>
+          {navItem.icon && (
+            <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
+          )}
+          {navItem.name.length > 25
+            ? `${navItem.name.substring(0, 20)}...`
+            : navItem.name}
+          <FontAwesomeIcon
+            icon={faChevronDown}
+            size="xs"
+            className="down-arrow"
+          />
+        </DropdownToggle>
+        <DropdownMenu
+          flip
+          end={navItem.end}
+          className="navbar-dropdown-menu px-2">
+          <div className="hidden-box">{/* For hover effect */}</div>
+          {navItem.collapse.map(renderSubItem)}
+        </DropdownMenu>
+      </UncontrolledDropdown>
+      {/* Mobile Dropdown */}
+      <UncontrolledDropdown
         nav
-        role="button"
-        className={classNames(
-          "ps-2 d-flex cursor-pointer align-items-center nav-link",
-          {
-            "text-uppercase": navItem.uppercase,
-            "text-capitalize": navItem.capitalize,
-          }
-        )}
-        title={navItem?.name?.length > 20 ? navItem.name : undefined}>
-        {navItem.icon && (
-          <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
-        )}
-        {navItem.name.length > 25
-          ? `${navItem.name.substring(0, 20)}...`
-          : navItem.name}
-        <FontAwesomeIcon
-          icon={faChevronDown}
-          size="xs"
-          className="down-arrow"
-        />
-      </DropdownToggle>
-      <DropdownMenu
-        flip
-        end={navItem.end}
-        className="border-0 shadow px-3 border-radius-xl min-width-auto">
-        <div className="hidden-box">{/* For hover effect */}</div>
-        {navItem.collapse.map(renderSubItem)}
-      </DropdownMenu>
-    </UncontrolledDropdown>
+        inNavbar
+        className={classNames("mx-1 d-md-none position-relative", {
+          "d-none": navItem.desktopOnly,
+        })}>
+        <DropdownToggle
+          nav
+          role="button"
+          className={classNames(
+            "ps-2 d-flex cursor-pointer align-items-center nav-link",
+            {
+              "text-uppercase": navItem.uppercase,
+              "text-capitalize": navItem.capitalize,
+            }
+          )}
+          title={navItem?.name?.length > 20 ? navItem.name : undefined}>
+          {navItem.icon && (
+            <FontAwesomeIcon icon={navItem.icon} className="me-2 icon" />
+          )}
+          {navItem.name.length > 25
+            ? `${navItem.name.substring(0, 20)}...`
+            : navItem.name}
+          <FontAwesomeIcon
+            icon={faChevronDown}
+            size="xs"
+            className="down-arrow"
+          />
+        </DropdownToggle>
+        <DropdownMenu
+          flip
+          end={navItem.end}
+          className="navbar-dropdown-menu px-2">
+          {navItem.collapse.map(renderSubItem)}
+        </DropdownMenu>
+      </UncontrolledDropdown>
+    </>
   );
 
   // Render a link if the nav item has a path property
@@ -103,11 +150,12 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
         end
         to={navItem.path}
         target={navItem.newTab ? "_blank" : undefined}
-        className={classNames("nav-action-item mx-1", {
+        className={classNames("nav-action-item mx-1 px-2", {
           "text-uppercase": navItem.uppercase,
           "text-capitalize": navItem.capitalize,
           "dropdown-item": isInnerItem,
           "nav-link": !isInnerItem,
+          "d-none": navItem.desktopOnly,
         })}>
         <div>
           {" "}
@@ -123,12 +171,16 @@ const NavbarItem = React.memo(({ navItem, isInnerItem }) => {
   // Render a dropdown item with an action if the nav item has an action property
   const renderActionItem = () => (
     <div
-      className={classNames("dropdown-item text-center px-1 nav-action-item", {
+      className={classNames("dropdown-item px-1 nav-action-item", {
         "text-uppercase": navItem?.uppercase,
         "text-capitalize": navItem?.capitalize,
         "dropdown-item": isInnerItem,
+        "d-none": navItem.desktopOnly,
       })}
-      onClick={navItem.action}
+      onClick={() => {
+        navItem.action();
+        toggle && toggle();
+      }}
       role="button">
       {navItem.name}
     </div>
