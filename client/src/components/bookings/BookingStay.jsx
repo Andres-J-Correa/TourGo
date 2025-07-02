@@ -67,14 +67,12 @@ const BookingStay = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
               : stay.rooms.map((room) => <li key={room.id}>{room.name}</li>)}
           </ul>
         </Col>
-        <Col>
-          {stay.notes && (
-            <>
-              <strong>{t("booking.stay.notes")}</strong>
-              <p className="mb-0">{stay.notes}</p>
-            </>
-          )}
-        </Col>
+        {stay.notes && (
+          <Col md={5}>
+            <strong>{t("booking.stay.notes")}</strong>
+            <p className="mb-0">{stay.notes}</p>
+          </Col>
+        )}
         <Col className="text-end align-content-end">
           <Button
             type="button"

@@ -49,7 +49,7 @@ function TransactionVersion({ txn }) {
           </span>
           <TransactionStatusBadge
             statusId={txn?.statusId}
-            className="float-end"
+            className="float-md-end mx-2"
           />
         </CardHeader>
 

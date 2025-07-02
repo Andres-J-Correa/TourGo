@@ -1,0 +1,16 @@
+.booking-offcanvas {
+  padding: 0.5rem;
+  width: 70% !important;
+}
+
+@media (max-width: 1200px) {
+  .booking-offcanvas {
+    width: 90% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .booking-offcanvas {
+    width: 100% !important;
+  }
+}

@@ -32,7 +32,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppContext } from "contexts/GlobalAppContext";
-import { useLanguage } from "contexts/LanguageContext"; // added
+import { useLanguage } from "contexts/LanguageContext";
 
 dayjs.extend(isSameOrAfter);
 
@@ -331,10 +331,13 @@ function BookingView() {
       />
       <h3 className="mb-4">{t("booking.view.title")}</h3>
       <ErrorBoundary>
-        <Row className="mb-3">
-          <Col className="px-3">
+        <Row className="mb-1">
+          <Col md={6} className="ps-3 gap-1">
             {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE && (
-              <Button color="outline-dark" onClick={handleCheckIn}>
+              <Button
+                color="outline-dark"
+                onClick={handleCheckIn}
+                className="mb-2 me-2">
                 {t("booking.arrival.markCheckIn")}
                 <FontAwesomeIcon icon={faPlaneArrival} className="ms-2" />
               </Button>
@@ -343,7 +346,7 @@ function BookingView() {
               dayjs(dayjs()).isAfter(booking?.arrivalDate) && (
                 <Button
                   color="outline-dark"
-                  className="ms-2"
+                  className="me-2 mb-2"
                   onClick={handleComplete}>
                   {t("booking.departure.markCompleted")}
                   <FontAwesomeIcon icon={faPlaneDeparture} className="ms-2" />
@@ -353,33 +356,37 @@ function BookingView() {
               dayjs(dayjs()).isSameOrAfter(booking?.arrivalDate) && (
                 <Button
                   color="outline-dark"
-                  className="ms-2"
+                  className="me-2 mb-2"
                   onClick={handleNoShow}>
                   {t("booking.view.markNoShow")}
                   <FontAwesomeIcon icon={faCalendarXmark} className="ms-2" />
                 </Button>
               )}
-            {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
-              <Button
-                color="outline-danger"
-                className="ms-2 float-end"
-                onClick={handleCancel}>
-                {t("booking.view.cancelBooking")}
-                <FontAwesomeIcon icon={faRectangleXmark} className="ms-2" />
-              </Button>
-            )}
-            {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
-              <Link to="edit" className=" ms-2 float-end btn btn-outline-dark">
-                {t("booking.view.edit")}
-                <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
+          </Col>
+          <Col md={6} className="gap-1 pe-1">
+            <div className="d-flex justify-content-md-end ps-1">
+              <Link
+                to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
+                className="me-2 btn btn-outline-dark  mb-2">
+                {t("booking.view.goToInvoice")}
+                <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />
               </Link>
-            )}
-            <Link
-              to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
-              className="btn btn-outline-dark float-end">
-              {t("booking.view.goToInvoice")}
-              <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />
-            </Link>
+              {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
+                <Link to="edit" className="me-2  mb-2 btn btn-outline-dark">
+                  {t("booking.view.edit")}
+                  <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
+                </Link>
+              )}
+              {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
+                <Button
+                  color="outline-danger"
+                  className="me-2  mb-2"
+                  onClick={handleCancel}>
+                  {t("booking.view.cancelBooking")}
+                  <FontAwesomeIcon icon={faRectangleXmark} className="ms-2" />
+                </Button>
+              )}
+            </div>
           </Col>
         </Row>
         <LoadingOverlay isVisible={isLoading} />
@@ -388,7 +395,7 @@ function BookingView() {
             <CardHeader tag="h4" className="text-bg-dark text-center">
               {t("booking.view.reservationNumber")} {booking?.id}
               <BookingStatusBadge
-                className="float-end"
+                className="float-md-end mx-2"
                 statusId={booking?.status?.id}
               />
             </CardHeader>

@@ -1078,6 +1078,9 @@ button:not(:disabled),
   .mt-md-n10 {
     margin-top: -10rem !important;
   }
+  .justify-content-end {
+    justify-content: flex-end !important;
+  }
 }
 @media (min-width: 992px) {
   .d-lg-block {
@@ -2286,4 +2289,13 @@ p {
 
 .display-inline {
   display: inline !important;
+}
+
+@media (max-width: 768px) {
+  .btn {
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-padding-x: 0.5rem;
+    --bs-btn-font-size: 0.875rem;
+    --bs-btn-border-radius: var(--bs-border-radius-sm);
+  }
 }

@@ -357,7 +357,7 @@ const TransactionDetails = ({
               size="sm"
               color="secondary"
               onClick={handleEditDescription}
-              className="float-start">
+              className="mx-1 mb-2">
               {t("transactions.details.editDescription")}
             </Button>
           )}
@@ -368,7 +368,7 @@ const TransactionDetails = ({
                 size="sm"
                 color="outline-danger"
                 onClick={() => onEditTransaction(txn)}
-                className="float-start">
+                className="mx-1 mb-2">
                 {t("transactions.details.editTransaction")}
               </Button>
             )}
@@ -377,7 +377,7 @@ const TransactionDetails = ({
               <Button
                 size="sm"
                 color={showUploader ? "warning" : "outline-dark"}
-                className="me-2"
+                className="mx-1 mb-2"
                 onClick={() => {
                   setFiles([]);
                   setShowUploader((prev) => !prev);
@@ -394,7 +394,7 @@ const TransactionDetails = ({
               size="sm"
               color="outline-success"
               onClick={handleViewDocument}
-              className="me-2">
+              className="mx-1 mb-2">
               {t("transactions.details.viewDocument")}
             </Button>
           )}
@@ -402,6 +402,7 @@ const TransactionDetails = ({
             <Button
               size="sm"
               color="outline-secondary"
+              className="mx-1 mb-2"
               onClick={handleToggleOffcanvas}>
               {t("transactions.details.viewHistory")}
             </Button>
@@ -411,7 +412,7 @@ const TransactionDetails = ({
               <Button
                 size="sm"
                 color="outline-danger"
-                className="float-end"
+                className="mx-1 mb-2"
                 onClick={handleReverseTransaction}>
                 {t("transactions.details.reverse")}
               </Button>

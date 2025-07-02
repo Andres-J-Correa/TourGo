@@ -80,14 +80,12 @@ const BookingDeparture = ({
                 ))}
           </ul>
         </Col>
-        <Col>
-          {departure.notes && (
-            <>
-              <strong>{t("booking.departure.notes")}</strong>
-              <p className="mb-0">{departure.notes}</p>
-            </>
-          )}
-        </Col>
+        {departure.notes && (
+          <Col md={5}>
+            <strong>{t("booking.departure.notes")}</strong>
+            <p className="mb-0">{departure.notes}</p>
+          </Col>
+        )}
         <Col className="text-end align-content-end">
           <Row>
             <Col xs={12} className="mb-2">

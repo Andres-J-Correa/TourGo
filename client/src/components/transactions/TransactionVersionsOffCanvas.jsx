@@ -8,6 +8,7 @@ import Alert from "components/commonUI/Alert";
 
 import { getTransactionVersions } from "services/transactionService";
 import { useLanguage } from "contexts/LanguageContext";
+import "./TransactionVersionsOffCanvas.css";
 
 function TransactionVersionsOffCanvas({
   transaction,
@@ -84,7 +85,7 @@ function TransactionVersionsOffCanvas({
       isOpen={offCanvasOpen}
       toggle={handleToggleOffcanvas}
       direction="end"
-      style={{ width: "50%", padding: "0.5rem" }}
+      className="transaction-versions-offcanvas"
       zIndex={5001}>
       <OffcanvasHeader toggle={handleToggleOffcanvas}>
         {t("transactions.versionsOffCanvas.title", { id: transaction.id })}
