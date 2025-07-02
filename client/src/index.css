@@ -1078,9 +1078,6 @@ button:not(:disabled),
   .mt-md-n10 {
     margin-top: -10rem !important;
   }
-  .justify-content-end {
-    justify-content: flex-end !important;
-  }
 }
 @media (min-width: 992px) {
   .d-lg-block {
