@@ -102,7 +102,7 @@ function BookingViewOffCanvas({
               <CardHeader tag="h4" className="text-bg-dark text-center">
                 {t("booking.view.reservationNumber")} {booking?.id}
                 <BookingStatusBadge
-                  className="float-md-end"
+                  className="float-md-end mx-2"
                   statusId={booking?.status?.id}
                 />
               </CardHeader>
