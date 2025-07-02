@@ -46,7 +46,7 @@ function DefaultNavbar({
           <NavbarItem
             navItem={element}
             key={`navbar-item-${i}-${element.name}`}
-            toggle={toggle}
+            toggle={isOpen ? toggle : undefined}
           />
         );
       } else {
@@ -54,7 +54,7 @@ function DefaultNavbar({
           <NavbarItem
             navItem={element}
             key={`navbar-item-${i}-${element.name}`}
-            toggle={toggle}
+            toggle={isOpen ? toggle : undefined}
           />
         );
       }
@@ -67,7 +67,14 @@ function DefaultNavbar({
       right: [...rightItems, ...rightCustomComps],
       left: [...leftCustomComps, ...leftItems],
     });
-  }, [navbarItems, user, leftCustomComponents, rightCustomComponents, toggle]);
+  }, [
+    navbarItems,
+    user,
+    leftCustomComponents,
+    rightCustomComponents,
+    toggle,
+    isOpen,
+  ]);
 
   return (
     <div className="navbar-container no-print">
@@ -91,7 +98,9 @@ function DefaultNavbar({
               {mappedItems.left}
             </div>
             <div className="right-items">
-              {showLanguageSelector && <LanguageSelector toggle={toggle} />}
+              {showLanguageSelector && (
+                <LanguageSelector toggle={isOpen ? toggle : undefined} />
+              )}
               {mappedItems.right}
             </div>
           </Nav>

@@ -15,8 +15,13 @@ const NavbarContainer = () => {
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
   const rightCustomComponents = useMemo(
-    () => [<UserAccountDropdown toggle={toggle} key="userAccountDropdown" />],
-    [toggle]
+    () => [
+      <UserAccountDropdown
+        toggle={isOpen ? toggle : undefined}
+        key="userAccountDropdown"
+      />,
+    ],
+    [toggle, isOpen]
   );
 
   useEffect(() => {
