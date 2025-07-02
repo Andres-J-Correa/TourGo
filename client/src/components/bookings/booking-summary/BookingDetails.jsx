@@ -43,15 +43,15 @@ const BookingDetails = ({ bookingData }) => {
               : "-"}
           </p>
         </Col>
-        <Col md="auto">
+        <Col xs={4} lg="auto">
           <strong>{t("booking.details.nights")}</strong>{" "}
           <p>{bookingData?.nights}</p>
         </Col>
-        <Col md="auto">
+        <Col xs={4} lg="auto">
           <strong>{t("booking.details.adults")}</strong>{" "}
           <p>{bookingData?.adultGuests}</p>
         </Col>
-        <Col md="auto">
+        <Col xs={4} lg="auto">
           <strong>{t("booking.details.children")}</strong>{" "}
           <p>{bookingData?.childGuests}</p>
         </Col>

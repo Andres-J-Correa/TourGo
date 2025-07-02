@@ -1,4 +1,3 @@
-import React from "react";
 import { Row, Col } from "reactstrap";
 import { formatPhoneNumber } from "utils/phoneHelper";
 import { useLanguage } from "contexts/LanguageContext";
@@ -10,7 +9,7 @@ const CustomerInfo = ({ customer }) => {
       <h5>{t("booking.customerInfo.title")}</h5>
       <hr className="mb-1 mt-0" />
       <Row>
-        <Col md={7}>
+        <Col md={12} lg={7}>
           <Row>
             <strong>{t("booking.customerInfo.name")}</strong>
             <p>
@@ -22,7 +21,7 @@ const CustomerInfo = ({ customer }) => {
             <p>{customer?.email}</p>
           </Row>
         </Col>
-        <Col md={5}>
+        <Col md={12} lg={5}>
           <Row>
             <strong>{t("booking.customerInfo.document")}</strong>
             <p>{customer?.documentNumber}</p>

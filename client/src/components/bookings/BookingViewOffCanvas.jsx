@@ -23,7 +23,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getBookingById } from "services/bookingService";
 import { LOCKED_BOOKING_STATUSES } from "components/bookings/constants";
-import { useLanguage } from "contexts/LanguageContext"; // added
+import { useLanguage } from "contexts/LanguageContext";
+import "./BookingViewOffCanvas.css";
 
 dayjs.extend(isSameOrAfter);
 
@@ -61,7 +62,7 @@ function BookingViewOffCanvas({
       isOpen={offCanvasOpen}
       toggle={handleToggleOffcanvas}
       direction="end"
-      style={{ width: "70%", padding: "0.5rem" }}
+      className="booking-offcanvas"
       zIndex={5001}>
       <OffcanvasHeader toggle={handleToggleOffcanvas}>
         {t("booking.viewOffCanvas.title")}
@@ -101,7 +102,7 @@ function BookingViewOffCanvas({
               <CardHeader tag="h4" className="text-bg-dark text-center">
                 {t("booking.view.reservationNumber")} {booking?.id}
                 <BookingStatusBadge
-                  className="float-end"
+                  className="float-md-end"
                   statusId={booking?.status?.id}
                 />
               </CardHeader>

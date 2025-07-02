@@ -214,7 +214,7 @@
     },
     "navigation": {
       "previous": "Previous",
-      "goToSummary": "Go to Summary",
+      "goToSummary": "Summary",
       "next": "Next"
     },
     "loadingOverlay": {
@@ -462,7 +462,7 @@
       "departingRooms": "Departing rooms:",
       "notes": "Notes:",
       "viewDetails": "View Details",
-      "markCompleted": "Mark Completed"
+      "markCompleted": "Mark Check-out"
     },
     "minimalCard": {
       "reservationNumber": "Reservation Number",
@@ -528,8 +528,8 @@
       "title": "Booking Details",
       "reservationNumber": "Reservation #",
       "edit": "Edit",
-      "goToInvoice": "Go to Invoice",
-      "cancelBooking": "Cancel Booking",
+      "goToInvoice": "Invoice",
+      "cancelBooking": "Cancel",
       "markNoShow": "Mark No Show",
       "checkInConfirmTitle": "Do you want to mark the booking as arrived?",
       "checkInConfirmText": "Ensure the customer has arrived",
@@ -556,7 +556,7 @@
     },
     "viewOffCanvas": {
       "title": "Booking Details",
-      "goToSummary": "Go to Summary"
+      "goToSummary": "Summary"
     }
   },
   "commonUI": {

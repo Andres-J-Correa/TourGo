@@ -45,7 +45,7 @@ function Transaction({
           {txn.paymentMethod?.name}
           <TransactionStatusBadge
             statusId={txn?.statusId}
-            className="float-end"
+            className="float-md-end mx-2"
           />
         </CardHeader>
 

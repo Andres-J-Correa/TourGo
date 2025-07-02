@@ -29,13 +29,11 @@ const Breadcrumb = ({ breadcrumbs, active }) => {
   return (
     <Row className="no-print">
       <Col xs="12">
-        <div className="page-title-box d-flex align-items-center justify-content-between">
-          <div className="ms-auto">
-            <ol className="breadcrumb m-0">
-              {mappedBreadcrumbs}
-              <li className="breadcrumb-item active">{active}</li>
-            </ol>
-          </div>
+        <div className="page-title-box d-flex align-items-center justify-content-end">
+          <ol className="breadcrumb m-0 justify-content-end">
+            {mappedBreadcrumbs}
+            <li className="breadcrumb-item active">{active}</li>
+          </ol>
         </div>
       </Col>
     </Row>
