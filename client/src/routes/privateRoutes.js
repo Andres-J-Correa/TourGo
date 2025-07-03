@@ -80,7 +80,7 @@ const bookings = [
     name: "bookingsView",
     path: "/hotels/:hotelId/bookings",
     component: lazy(() =>
-      import("components/bookings/bookings-view/BookingsView")
+      import("components/bookings/bookings-view/BookingsViewV2")
     ),
   },
   {

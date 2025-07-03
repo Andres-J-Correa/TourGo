@@ -14,6 +14,6 @@ namespace TourGo.Models.Domain.Users
 
         public IEnumerable<string> Roles { get; set; } = new List<string>();
         public bool IsVerified { get; set; }
-        public string? Phone { get; set; }
+        public string Phone { get; set; } = string.Empty;
     }
 }
