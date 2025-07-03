@@ -75,11 +75,10 @@ function BookingFilters({
 
   return (
     <>
-      {" "}
-      <Row className="mb-3 px-3">
-        <Col lg={12} xl={3}>
+      <Row>
+        <Col md={12} xl={3}>
           <Row className="text-dark">
-            <Col className="px-0" lg={8} xl={12}>
+            <Col lg={8} xl={12}>
               <DatePickers
                 startDate={paginationData.dates?.start}
                 endDate={paginationData.dates?.end}
@@ -90,7 +89,7 @@ function BookingFilters({
                 handleClearDates={handleClearDateFilters}
               />
             </Col>
-            <Col className="px-0 align-content-center" lg={4} xl={12}>
+            <Col className=" align-content-center mb-3" lg={4} xl={12}>
               {paginationData.dates?.start && paginationData.dates?.end && (
                 <div>
                   <button
@@ -116,7 +115,7 @@ function BookingFilters({
             </Col>
           </Row>
         </Col>
-        <Col lg={6} xl={4}>
+        <Col lg={6} xl={4} className="mb-3">
           <Form onSubmit={handleCustomerNameFilterSubmit}>
             <Label for="firstName" className="text-dark">
               {t("booking.filters.filterByCustomerName")}
@@ -161,7 +160,7 @@ function BookingFilters({
             </InputGroup>
           </Form>
         </Col>
-        <Col lg={6} xl="auto">
+        <Col lg={6} xl="auto" className="mb-3">
           <Form onSubmit={handleExternalBookingIdFilterSubmit}>
             <Label for="externalBookingId" className="text-dark">
               {t("booking.filters.filterByExternalId")}
@@ -193,8 +192,8 @@ function BookingFilters({
           </Form>
         </Col>
       </Row>
-      <Row className="px-3 mb-3">
-        <Col lg="auto" xl="auto">
+      <Row>
+        <Col lg="auto" xl="auto" className="mb-3">
           <Label for="statusId" className="text-dark">
             {t("booking.filters.filterByStatus")}
           </Label>
@@ -232,7 +231,7 @@ function BookingFilters({
             ))}
           </select>
         </Col>
-        <Col>
+        <Col className="mb-3">
           <div className="float-end">
             <Label for="pageSize" className="text-dark">
               {t("booking.filters.rowsPerPage")}

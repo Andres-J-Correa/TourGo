@@ -71,19 +71,19 @@ function BookingViewOffCanvas({
         <SimpleLoader isVisible={loading} />
         {booking !== null && !loading && (
           <>
-            <Row className="mb-3">
+            <Row>
               <Col className="px-3">
                 {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
                   <Link
                     to={`/hotels/${hotelId}/bookings/${booking?.id}/edit`}
-                    className=" ms-2 float-end btn btn-outline-dark">
+                    className=" ms-2 mb-2 float-end btn btn-outline-dark">
                     {t("booking.view.edit")}
                     <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
                   </Link>
                 )}
                 <Link
                   to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
-                  className="btn btn-outline-dark float-end ms-2">
+                  className="btn btn-outline-dark float-end ms-2  mb-2">
                   {t("booking.view.goToInvoice")}
                   <FontAwesomeIcon
                     icon={faFileInvoiceDollar}
@@ -92,7 +92,7 @@ function BookingViewOffCanvas({
                 </Link>
                 <Link
                   to={`/hotels/${hotelId}/bookings/${booking?.id}`}
-                  className="btn btn-outline-dark float-end">
+                  className="btn btn-outline-dark float-end  mb-2">
                   {t("booking.viewOffCanvas.goToSummary")}
                   <FontAwesomeIcon icon={faClipboardList} className="ms-2" />
                 </Link>

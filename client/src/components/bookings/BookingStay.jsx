@@ -59,7 +59,7 @@ const BookingStay = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
         </Col>
       </Row>
       <Row>
-        <Col md={5}>
+        <Col lg={4} md={6} xs={12}>
           <strong>{t("booking.stay.occupiedRooms")}</strong>
           <ul className="mb-0">
             {renderRooms
@@ -68,7 +68,7 @@ const BookingStay = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
           </ul>
         </Col>
         {stay.notes && (
-          <Col md={5}>
+          <Col lg={4} md={6} xs={12}>
             <strong>{t("booking.stay.notes")}</strong>
             <p className="mb-0">{stay.notes}</p>
           </Col>

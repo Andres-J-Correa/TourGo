@@ -70,7 +70,7 @@ const BookingDeparture = ({
         </Col>
       </Row>
       <Row>
-        <Col md={5}>
+        <Col lg={4} md={6} xs={12} className="mb-2">
           <strong>{t("booking.departure.departingRooms")}</strong>
           <ul className="mb-0">
             {renderRooms
@@ -81,12 +81,12 @@ const BookingDeparture = ({
           </ul>
         </Col>
         {departure.notes && (
-          <Col md={5}>
+          <Col lg={4} md={6} xs={12} className="mb-2">
             <strong>{t("booking.departure.notes")}</strong>
             <p className="mb-0">{departure.notes}</p>
           </Col>
         )}
-        <Col className="text-end align-content-end">
+        <Col className="text-end align-content-end mb-2">
           <Row>
             <Col xs={12} className="mb-2">
               <Button
