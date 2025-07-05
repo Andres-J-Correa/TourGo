@@ -1198,7 +1198,8 @@
       "pending": "Pending",
       "accepted": "Accepted",
       "rejected": "Rejected",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "expired": "Expired"
     },
     "card": {
       "role": "Role",

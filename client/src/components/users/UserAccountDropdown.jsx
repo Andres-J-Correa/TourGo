@@ -10,7 +10,7 @@ import PropTypes from "prop-types";
 
 function UserAccountDropdown({ toggle }) {
   const { t } = useLanguage();
-  const { user, toggleUserSignInModal } = useAppContext();
+  const { user } = useAppContext();
 
   const truncateString = (str) => {
     if (str.length > 10) {
@@ -54,7 +54,7 @@ function UserAccountDropdown({ toggle }) {
       : [
           {
             name: t("client.navbar.loginRegister"),
-            action: () => toggleUserSignInModal(),
+            path: "/",
           },
         ],
   };
