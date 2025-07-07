@@ -1,4 +1,4 @@
-import React from "react";
+import { useMemo } from "react";
 import { Card, CardBody, CardTitle, Button } from "reactstrap";
 import dayjs from "dayjs";
 import { HOTEL_ROLES_BY_ID } from "components/hotels/constants";
@@ -7,8 +7,16 @@ import { useLanguage } from "contexts/LanguageContext"; // added
 
 const HotelInviteCard = ({ invite, onAccept, onReject }) => {
   const { t } = useLanguage(); // added
-  const isPending = (invite.flags & INVITE_FLAGS_IDS.PENDING) !== 0;
-  const flags = useFlagBadges(invite.flags);
+  const isPending = useMemo(
+    () => (invite.flags & INVITE_FLAGS_IDS.PENDING) !== 0,
+    [invite.flags]
+  );
+  const isExpired = useMemo(
+    () => dayjs(invite.expiration).isBefore(dayjs()),
+    [invite.expiration]
+  );
+
+  const flags = useFlagBadges(invite.flags, isExpired);
   return (
     <Card className="mb-3 w-100 flex-fill">
       <div className="d-flex justify-content-end pt-1">{flags}</div>
@@ -33,15 +41,19 @@ const HotelInviteCard = ({ invite, onAccept, onReject }) => {
           <Button
             color="dark"
             size="sm"
-            onClick={() => (isPending ? onAccept(invite.id) : null)}
-            disabled={!isPending}>
+            onClick={() =>
+              isPending && !isExpired ? onAccept(invite.id) : null
+            }
+            disabled={!isPending || isExpired}>
             {t("hotels.inviteCard.accept")}
           </Button>
           <Button
             color="danger"
             size="sm"
-            onClick={() => (isPending ? onReject(invite.id) : null)}
-            disabled={!isPending}>
+            onClick={() =>
+              isPending && !isExpired ? onReject(invite.id) : null
+            }
+            disabled={!isPending || isExpired}>
             {t("hotels.inviteCard.reject")}
           </Button>
         </div>

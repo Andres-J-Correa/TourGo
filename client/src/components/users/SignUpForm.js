@@ -91,7 +91,7 @@ function SignUpForm({ onSignIn, loading, setLoading }) {
             {t("client.register.alreadyHaveAccount")}{" "}
             <span
               className="text-success text-gradient font-weight-bold"
-              onClick={loading ? null : onSignIn}
+              onClick={loading ? null : () => onSignIn()}
               role="button">
               {t("client.register.login")}
             </span>

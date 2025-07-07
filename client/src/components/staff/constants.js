@@ -9,15 +9,24 @@ export const INVITE_FLAGS_IDS = {
 };
 
 // Returns a function that uses the t function from useLanguage
-export const useFlagBadges = (flags) => {
+export const useFlagBadges = (flags, isExpired) => {
   const { t } = useLanguage();
   const result = [];
-  if (flags & INVITE_FLAGS_IDS.PENDING)
-    result.push(
-      <Badge color="success" key="active" className="me-1">
-        {t("staff.inviteFlags.pending")}
-      </Badge>
-    );
+  if (flags & INVITE_FLAGS_IDS.PENDING) {
+    if (isExpired) {
+      result.push(
+        <Badge color="secondary" key="expired" className="me-1">
+          {t("staff.inviteFlags.expired")}
+        </Badge>
+      );
+    } else {
+      result.push(
+        <Badge color="success" key="active" className="me-1">
+          {t("staff.inviteFlags.pending")}
+        </Badge>
+      );
+    }
+  }
   if (flags & INVITE_FLAGS_IDS.ACCEPTED)
     result.push(
       <Badge color="primary" key="accepted" className="me-1">

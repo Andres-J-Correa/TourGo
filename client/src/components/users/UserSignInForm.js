@@ -66,7 +66,7 @@ function UserSignInForm({
             {t("client.login.noAccount")}{" "}
             <span
               className="text-success text-gradient font-weight-bold"
-              onClick={loading ? null : onSignUp}
+              onClick={loading ? null : () => onSignUp()}
               role="button">
               {t("client.login.register")}
             </span>

@@ -79,7 +79,7 @@ function HotelInvites() {
       icon: "question",
       showCancelButton: true,
       confirmButtonText: t("hotels.invites.acceptConfirm"),
-      cancelButtonText: t("hotels.invites.cancel"),
+      cancelButtonText: t("common.cancel"),
     });
 
     if (!result.isConfirmed) {
@@ -133,7 +133,7 @@ function HotelInvites() {
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: t("hotels.invites.rejectConfirm"),
-      cancelButtonText: t("hotels.invites.cancel"),
+      cancelButtonText: t("common.cancel"),
     });
 
     if (!result.isConfirmed) {
