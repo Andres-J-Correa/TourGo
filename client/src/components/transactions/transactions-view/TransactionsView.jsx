@@ -47,6 +47,7 @@ import {
 import { flattenObject } from "utils/objectHelper";
 import dayjs from "dayjs";
 import { mkConfig, generateCsv, download } from "export-to-csv";
+import { getDateString } from "utils/dateHelper";
 
 import "./TransactionsView.css";
 
@@ -225,19 +226,7 @@ function TransactionsView() {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      dates: { ...prev.dates, [field]: date },
-    }));
-    table.setExpanded({});
-  };
-
-  const handleClearDateFilters = () => {
-    setPaginationData((prev) => ({
-      ...prev,
-      pageIndex: 0,
-      dates: {
-        start: "",
-        end: "",
-      },
+      dates: { ...prev.dates, [field]: getDateString(date) },
     }));
     table.setExpanded({});
   };
@@ -566,7 +555,6 @@ function TransactionsView() {
               paginationData={paginationData}
               loading={loading}
               handleDateChange={handleDateChange}
-              handleClearDateFilters={handleClearDateFilters}
               onPageSizeChange={onPageSizeChange}
               handleCategoryChange={handleCategoryChange}
               handleStatusChange={handleStatusChange}

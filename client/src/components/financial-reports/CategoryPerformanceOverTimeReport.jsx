@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { Chart } from "react-google-charts";
-import DatePickers from "components/commonUI/forms/DatePickers";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getCategoryPerformanceOverTime } from "services/financialReportService";
@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import { InputGroup, InputGroupText, Input, Row, Col } from "reactstrap";
 import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
 import { useLanguage } from "contexts/LanguageContext";
+import { getDateString } from "utils/dateHelper";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("year").format("YYYY-MM-DD"),
@@ -46,7 +47,7 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
   const handleDateChange = (type) => (date) => {
     setDates((prev) => ({
       ...prev,
-      [type]: date ? dayjs(date).format("YYYY-MM-DD") : "",
+      [type]: date ? getDateString(date) : "",
     }));
   };
 
@@ -111,12 +112,12 @@ function CategoryPerformanceOverTimeReport({ hotelId }) {
       </p>
       <Row className="mb-3">
         <Col xs={12}>
-          <DatePickers
+          <DatePickersV2
             startDate={dates.start}
             endDate={dates.end}
             handleStartChange={handleDateChange("start")}
             handleEndChange={handleDateChange("end")}
-            isDisabled={loading}
+            disabled={loading}
             allowSameDay={true}
             handleClearDates={handleClearDateFilter}
           />

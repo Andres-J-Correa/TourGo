@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Input, InputGroup, InputGroupText } from "reactstrap";
 import { Chart } from "react-google-charts";
-import DatePickers from "components/commonUI/forms/DatePickers";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getRoomOccupancyByDateRange } from "services/financialReportService";
@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
+import { getDateString } from "utils/dateHelper";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -29,14 +30,8 @@ function RoomOccupancyReport({ hotelId }) {
   const handleDateChange = (type) => (date) => {
     setDates((prev) => ({
       ...prev,
-      [type]: date ? dayjs(date).format("YYYY-MM-DD") : "",
+      [type]: getDateString(date),
     }));
-  };
-
-  const handleClearDateFilter = () => {
-    setDates({ start: "", end: "" });
-    setData(null);
-    setShowPrompt(true);
   };
 
   const handleRoomChange = (e) => {
@@ -116,14 +111,13 @@ function RoomOccupancyReport({ hotelId }) {
       <p>{t("financialReports.roomOccupancyReport.description")}</p>
       <Row>
         <Col xs={12}>
-          <DatePickers
+          <DatePickersV2
             startDate={dates.start}
             endDate={dates.end}
             handleStartChange={handleDateChange("start")}
             handleEndChange={handleDateChange("end")}
-            isDisabled={loading}
+            disabled={loading}
             allowSameDay={true}
-            handleClearDates={handleClearDateFilter}
           />
         </Col>
       </Row>
