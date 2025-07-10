@@ -23,11 +23,16 @@ const RoomCard = ({ room, bookingNights, extraCharges }) => {
 
         <ListGroup className="mt-2 flex-grow-1">
           {room?.segments?.map((seg, i) => (
-            <ListGroupItem key={i}>
-              <strong>{t("booking.roomCard.night")}</strong>{" "}
-              {dayjs(seg.date).format("DD/MM/YYYY")} -{" "}
-              <strong>{t("booking.roomCard.price")}</strong>{" "}
-              {formatCurrency(seg.price, "COP")}
+            <ListGroupItem key={i} className="line-item px-2">
+              <span className="line-label">
+                <strong>{t("booking.roomCard.night")}</strong>
+              </span>
+              {dayjs(seg.date).format("DD/MM/YYYY")}
+              <div className="line-fill" />
+              <span className="line-amount">
+                <strong>{t("booking.roomCard.price")}</strong>{" "}
+                {formatCurrency(seg.price, "COP")}
+              </span>
             </ListGroupItem>
           ))}
         </ListGroup>

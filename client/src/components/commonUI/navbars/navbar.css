@@ -57,6 +57,7 @@
   }
   .navbar .nav-action-item:hover {
     transform: scale(1.1);
+    background-color: transparent;
   }
 
   .navbar .left-items {

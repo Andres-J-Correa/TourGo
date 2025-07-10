@@ -9,7 +9,7 @@ namespace TourGo.Models.Domain.Finances
 {
     public class Transaction
     {
-		public string Id { get; set; }
+		public string Id { get; set; } = string.Empty;
         public string? ParentId { get; set; }
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; }

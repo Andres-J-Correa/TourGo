@@ -6,7 +6,7 @@ import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
 
 import { useAppContext } from "contexts/GlobalAppContext";
-import { getDate } from "utils/dateHelper";
+import { getDateString } from "utils/dateHelper";
 import { compressImage } from "utils/fileHelper";
 import {
   TRANSACTION_CATEGORIES,
@@ -272,7 +272,7 @@ function TransactionAddForm({
       {({ values, setFieldValue }) => {
         const handleDateChange = (e) => {
           const date = e.target.value;
-          setFieldValue("transactionDate", getDate(date));
+          setFieldValue("transactionDate", getDateString(date));
         };
 
         const handleSubcategoryChange = (e) => {

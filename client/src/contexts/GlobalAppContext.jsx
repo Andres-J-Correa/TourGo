@@ -14,6 +14,7 @@ import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import axiosClient from "services/axiosClient";
+import axiosClientV2 from "services/axiosClientV2";
 import { useLanguage } from "contexts/LanguageContext";
 
 const defaultUser = {
@@ -274,10 +275,25 @@ export const AppContextProvider = ({ children }) => {
       }
     );
 
+    // Set the axiosClientV2 interceptor
+    const interceptorV2 = axiosClientV2.interceptors.response.use(
+      (response) => {
+        if (maintenanceMode) setMaintenanceMode(false);
+        return response;
+      },
+      (error) => {
+        if (error.response?.status !== 503 || error.code !== "ERR_NETWORK") {
+          setMaintenanceMode(false);
+        }
+        return handleGlobalError(error);
+      }
+    );
+
     setIsResponseIntercepted(true);
 
     return () => {
       axiosClient.interceptors.response.eject(interceptor);
+      axiosClientV2.interceptors.response.eject(interceptorV2);
       setIsResponseIntercepted(false);
     };
   }, [handleGlobalError, maintenanceMode]);

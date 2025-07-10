@@ -23,14 +23,7 @@
     /* If your code runs in the DOM: */
     "lib": ["es2022", "dom", "dom.iterable"],
     "jsx": "react-jsx",
-    "baseUrl": "src",
-    "paths": {
-      "@/*": ["*"],
-      "@components/*": ["components/*"],
-      "@utils/*": ["utils/*"],
-      "@assets/*": ["assets/*"],
-      "@types/*": ["types/*"]
-    }
+    "baseUrl": "src"
   },
   "include": ["src"]
 }

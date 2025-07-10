@@ -11,7 +11,7 @@ namespace TourGo.Models.Domain.Bookings
     {
 		public DateOnly Date { get; set; }
 		public Room Room { get; set; } = new Room();
-        public string BookingId { get; set; }
+        public string BookingId { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }

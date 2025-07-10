@@ -92,25 +92,23 @@ const BookingArrival = ({
           </Col>
         </Row>
       )}
-      {arrival.notes && (
-        <Row>
-          <strong>{t("booking.arrival.notes")}</strong>
-          <p className="mb-0">{arrival.notes}</p>
-        </Row>
-      )}
       <Row>
-        <Col md={5}>
+        <Col lg={4} md={6} xs={12}>
           <strong>{t("booking.arrival.arrivingRooms")}</strong>{" "}
           <ul className="mb-0">{renderRooms(arrivingRooms)}</ul>
         </Col>
-        <Col md={5}>
-          <strong>{t("booking.arrival.otherRooms")}</strong>{" "}
-          <ul className="mb-0">
-            {filteredRooms.length > 0
-              ? renderRooms(filteredRooms)
-              : t("booking.arrival.none")}
-          </ul>
-        </Col>
+        {filteredRooms.length > 0 && (
+          <Col lg={4} md={6} xs={12}>
+            <strong>{t("booking.arrival.otherRooms")}</strong>{" "}
+            <ul className="mb-0">{renderRooms(filteredRooms)}</ul>
+          </Col>
+        )}
+        {arrival.notes && (
+          <Col lg={4} md={6} xs={12}>
+            <strong>{t("booking.arrival.notes")}</strong>
+            <p className="mb-0">{arrival.notes}</p>
+          </Col>
+        )}
         <Col className="text-end align-content-end">
           <Row>
             <Col xs={12} className="mb-2">

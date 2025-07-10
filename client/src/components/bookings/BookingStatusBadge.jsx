@@ -6,7 +6,7 @@ import {
 import classNames from "classnames";
 import { useLanguage } from "contexts/LanguageContext";
 
-function BookingStatusBadge({ statusId, className, ...props }) {
+function BookingStatusBadge({ statusId, className = "", ...props }) {
   const { t } = useLanguage();
 
   return (
