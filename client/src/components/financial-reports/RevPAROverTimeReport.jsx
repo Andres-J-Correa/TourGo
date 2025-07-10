@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { Chart } from "react-google-charts";
-import DatePickers from "components/commonUI/forms/DatePickers";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getRevPAROverTime } from "services/financialReportService";
 import { toast } from "react-toastify";
 import { Row, Col } from "reactstrap";
 import { useLanguage } from "contexts/LanguageContext";
+import { getDateString } from "utils/dateHelper";
 
 const getYearRange = () => ({
   start: dayjs().startOf("year").format("YYYY-MM-DD"),
@@ -43,14 +44,8 @@ function RevPAROverTimeReport({ hotelId }) {
   const handleDateChange = (type) => (date) => {
     setDates((prev) => ({
       ...prev,
-      [type]: date ? dayjs(date).format("YYYY-MM-DD") : "",
+      [type]: getDateString(date),
     }));
-  };
-
-  const handleClearDateFilter = () => {
-    setDates({ start: "", end: "" });
-    setData([]);
-    setShowPrompt(true);
   };
 
   useEffect(() => {
@@ -110,14 +105,13 @@ function RevPAROverTimeReport({ hotelId }) {
       <p>{t("financialReports.revPAROverTimeReport.description")}</p>
       <Row className="mb-3">
         <Col xs={12} md={8}>
-          <DatePickers
+          <DatePickersV2
             startDate={dates.start}
             endDate={dates.end}
             handleStartChange={handleDateChange("start")}
             handleEndChange={handleDateChange("end")}
-            isDisabled={loading}
+            disabled={loading}
             allowSameDay={true}
-            handleClearDates={handleClearDateFilter}
           />
         </Col>
         <Col xs={12} md={4} className="d-flex align-items-center">

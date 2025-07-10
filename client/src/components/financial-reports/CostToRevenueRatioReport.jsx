@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Input, InputGroup, InputGroupText } from "reactstrap";
 import { Chart } from "react-google-charts";
-import DatePickers from "components/commonUI/forms/DatePickers";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getCostToRevenueRatio } from "services/financialReportService";
@@ -39,12 +39,6 @@ function CostToRevenueRatioReport({ hotelId }) {
       ...prev,
       [type]: date ? dayjs(date).format("YYYY-MM-DD") : "",
     }));
-  };
-
-  const handleClearDateFilter = () => {
-    setDates({ start: "", end: "" });
-    setData(null);
-    setShowPrompt(true);
   };
 
   const handleRevenueChange = (e) => {
@@ -126,14 +120,13 @@ function CostToRevenueRatioReport({ hotelId }) {
       <p>{t("financialReports.costToRevenueRatioReport.description")}</p>
       <Row>
         <Col xs={12}>
-          <DatePickers
+          <DatePickersV2
             startDate={dates.start}
             endDate={dates.end}
             handleStartChange={handleDateChange("start")}
             handleEndChange={handleDateChange("end")}
-            isDisabled={loading}
+            disabled={loading}
             allowSameDay={true}
-            handleClearDates={handleClearDateFilter}
           />
         </Col>
       </Row>

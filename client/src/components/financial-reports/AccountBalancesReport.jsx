@@ -3,14 +3,14 @@ import { Chart } from "react-google-charts";
 import { toast } from "react-toastify";
 
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
-import DatePickers from "components/commonUI/forms/DatePickers";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Alert from "components/commonUI/Alert";
 
 import { getPaymentMethodsTotalsByHotelId } from "services/financialReportService";
 import { formatCurrency } from "utils/currencyHelper";
 import { Col, Row } from "reactstrap";
-import dayjs from "dayjs";
-import { useLanguage } from "contexts/LanguageContext"; // added
+import { useLanguage } from "contexts/LanguageContext";
+import { getDateString } from "utils/dateHelper";
 
 function AccountBalancesReport({ hotelId }) {
   const [data, setData] = useState([]);
@@ -24,7 +24,7 @@ function AccountBalancesReport({ hotelId }) {
   const handleDateChange = (type) => (date) => {
     setDates((prev) => ({
       ...prev,
-      [type]: date ? dayjs(date).format("YYYY-MM-DD") : "",
+      [type]: getDateString(date),
     }));
   };
 
@@ -71,12 +71,12 @@ function AccountBalancesReport({ hotelId }) {
       <p>{t("financialReports.accountBalancesReport.description")}</p>
       <Row>
         <Col xs={12}>
-          <DatePickers
+          <DatePickersV2
             startDate={dates.start}
             endDate={dates.end}
             handleStartChange={handleDateChange("start")}
             handleEndChange={handleDateChange("end")}
-            isDisabled={loading}
+            disabled={loading}
             allowSameDay={true}
             handleClearDates={handleClearDateFilter}
           />

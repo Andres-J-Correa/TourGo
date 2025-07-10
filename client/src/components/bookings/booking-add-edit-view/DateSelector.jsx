@@ -1,7 +1,7 @@
-import React from "react";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import DatePickers from "components/commonUI/forms/DatePickers";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
+import { getDateString } from "utils/dateHelper";
 import Alert from "components/commonUI/Alert";
 import Swal from "sweetalert2";
 import { useLanguage } from "contexts/LanguageContext";
@@ -43,7 +43,7 @@ function DateSelector({
         return newState;
       });
     }
-    onDateChange("start")(value);
+    onDateChange("start")(getDateString(value));
   };
 
   const handleEndChange = async (value) => {
@@ -57,7 +57,7 @@ function DateSelector({
         return newState;
       });
     }
-    onDateChange("end")(value);
+    onDateChange("end")(getDateString(value));
   };
 
   return (
@@ -69,14 +69,14 @@ function DateSelector({
           message={t("booking.dateSelector.pastDateWarning")}
         />
       )}
-      <DatePickers
+      <DatePickersV2
         startDate={dates.start}
         endDate={dates.end}
         startDateName={t("booking.dateSelector.startDate")}
         endDateName={t("booking.dateSelector.endDate")}
         handleStartChange={handleStartChange}
         handleEndChange={handleEndChange}
-        isDisabled={isDisabled}
+        disabled={isDisabled}
       />
     </>
   );

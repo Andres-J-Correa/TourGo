@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 
-import DatePickers from "components/commonUI/forms/DatePickers";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 
 import { Row, Col, Label, Input, InputGroup, Button, Form } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,7 +23,6 @@ function TransactionsTableFilters({
   paginationData,
   loading,
   handleDateChange,
-  handleClearDateFilters,
   handleCategoryChange,
   handleStatusChange,
   handleSubcategoryChange,
@@ -273,14 +272,13 @@ function TransactionsTableFilters({
     <div>
       <Row>
         <Col lg={12} xl={3}>
-          <DatePickers
+          <DatePickersV2
             startDate={paginationData.dates?.start}
             endDate={paginationData.dates?.end}
             handleStartChange={handleDateChange("start")}
             handleEndChange={handleDateChange("end")}
-            isDisabled={loading}
+            disabled={loading}
             allowSameDay={true}
-            handleClearDates={handleClearDateFilters}
           />
         </Col>
         <Col lg="auto" xl="auto" className="mb-3">

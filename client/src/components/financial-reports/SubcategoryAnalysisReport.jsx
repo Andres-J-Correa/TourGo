@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
-import DatePickers from "components/commonUI/forms/DatePickers";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getSubcategoryAnalysis } from "services/financialReportService";
@@ -14,6 +14,7 @@ import TransactionCategoriesExplanationIcon from "components/transactions/Transa
 import dayjs from "dayjs";
 import { formatCurrency } from "utils/currencyHelper";
 import { useLanguage } from "contexts/LanguageContext";
+import { getDateString } from "utils/dateHelper";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("year").format("YYYY-MM-DD"),
@@ -53,14 +54,8 @@ function SubcategoryAnalysisReport({ hotelId }) {
   const handleDateChange = (type) => (date) => {
     setDates((prev) => ({
       ...prev,
-      [type]: date ? dayjs(date).format("YYYY-MM-DD") : "",
+      [type]: getDateString(date),
     }));
-  };
-
-  const handleClearDateFilter = () => {
-    setDates({ start: "", end: "" });
-    setData([]);
-    setShowPrompt(true);
   };
 
   const handleCategoryChange = (e) => {
@@ -111,14 +106,13 @@ function SubcategoryAnalysisReport({ hotelId }) {
       <p>{t("financialReports.subcategoryAnalysisReport.description")}</p>
       <Row className="mb-3">
         <Col xs={12}>
-          <DatePickers
+          <DatePickersV2
             startDate={dates.start}
             endDate={dates.end}
             handleStartChange={handleDateChange("start")}
             handleEndChange={handleDateChange("end")}
-            isDisabled={loading}
+            disabled={loading}
             allowSameDay={true}
-            handleClearDates={handleClearDateFilter}
           />
         </Col>
         <Col xs={6}>

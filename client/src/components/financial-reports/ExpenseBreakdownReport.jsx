@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { Chart } from "react-google-charts";
-import DatePickers from "components/commonUI/forms/DatePickers";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
 import { getExpenseBreakdown } from "services/financialReportService";
 import { TRANSACTION_CATEGORIES_BY_ID } from "components/transactions/constants";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
+import { getDateString } from "utils/dateHelper";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -36,14 +37,8 @@ function ExpenseBreakdownReport({ hotelId }) {
   const handleDateChange = (type) => (date) => {
     setDates((prev) => ({
       ...prev,
-      [type]: date ? dayjs(date).format("YYYY-MM-DD") : "",
+      [type]: getDateString(date),
     }));
-  };
-
-  const handleClearDateFilter = () => {
-    setDates({ start: "", end: "" });
-    setData([]);
-    setShowPrompt(true);
   };
 
   useEffect(() => {
@@ -76,14 +71,13 @@ function ExpenseBreakdownReport({ hotelId }) {
       <h4>{t("financialReports.expenseBreakdownReport.title")}</h4>
       <p>{t("financialReports.expenseBreakdownReport.description")}</p>
       <div className="mb-3">
-        <DatePickers
+        <DatePickersV2
           startDate={dates.start}
           endDate={dates.end}
           handleStartChange={handleDateChange("start")}
           handleEndChange={handleDateChange("end")}
-          isDisabled={loading}
+          disabled={loading}
           allowSameDay={true}
-          handleClearDates={handleClearDateFilter}
         />
       </div>
       <SimpleLoader isVisible={loading} />
