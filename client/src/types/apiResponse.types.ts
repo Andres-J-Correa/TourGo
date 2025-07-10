@@ -2,21 +2,26 @@ export interface BaseResponse {
   isSuccessful: boolean;
   transactionId?: string;
 }
+interface SuccessfulResponse extends BaseResponse {
+  isSuccessful: true;
+}
 
-export interface ItemResponse<T> extends BaseResponse {
+export interface ItemResponse<T> extends SuccessfulResponse {
   item: T;
 }
 
-export interface ItemsResponse<T> extends BaseResponse {
+export interface ItemsResponse<T> extends SuccessfulResponse {
   items: T[];
 }
 
 export interface ErrorResponse extends BaseResponse {
   errors: string[];
   code: number;
+  error: unknown;
+  isSuccessful: false;
 }
 
-export interface PagedResponse<T> extends BaseResponse {
+export interface PagedResponse<T> extends SuccessfulResponse {
   item: {
     pagedItems: T[];
     totalCount: number;

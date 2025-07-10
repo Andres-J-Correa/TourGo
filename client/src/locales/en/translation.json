@@ -399,7 +399,26 @@
       "filterByStatus": "Filter by status:",
       "removeFilter": "Remove Filter",
       "select": "Select",
-      "rowsPerPage": "Rows per page:"
+      "rowsPerPage": "Bookings per page:",
+      "filterByBookingId": "Filter by booking ID:",
+      "bookingIdPlaceholder": "BKN-XXXXXXXX",
+      "sortBy": "Sort by:",
+      "sortOptions": {
+        "id": "ID",
+        "arrivalDate": "Arrival Date",
+        "departureDate": "Departure Date",
+        "total": "Total",
+        "balanceDue": "Balance Due",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "externalBookingId": "External Booking ID",
+        "statusId": "Status"
+      },
+      "sortDirection": "Sort Direction:",
+      "ascending": "Ascending",
+      "descending": "Descending",
+      "selectSortOption": "No Sort Option",
+      "selectSortDirection": "No Sort Direction"
     },
     "bookingsTable": {
       "loading": "Loading...",
@@ -465,16 +484,22 @@
       "markCompleted": "Mark Check-out"
     },
     "minimalCard": {
-      "reservationNumber": "Reservation Number",
+      "reservationNumber": "Reservation Number:",
       "viewDetails": "View details",
-      "name": "Name",
+      "name": "Name:",
       "externalId": "External ID:",
       "arrival": "Arrival:",
       "departure": "Departure:",
       "total": "Total:",
       "balanceDue": "Balance due:",
       "loading": "Loading information...",
-      "notFound": "Booking not found"
+      "notFound": "Booking not found",
+      "edit": "Edit Booking",
+      "auditable": "See auditable information",
+      "auditButton": "Audit",
+      "editButton": "Edit",
+      "viewButton": "View",
+      "status": "Status"
     },
     "providers": {
       "title": "Booking Providers",

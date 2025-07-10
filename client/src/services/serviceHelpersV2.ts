@@ -1,21 +1,34 @@
-/**
- * Will unpack the response body from reponse object
- * @param {*} response
- *
- */
+import axios from "axios";
 
-const onGlobalSuccess = <T extends { data?: unknown }>(
-  response: T
-): T["data"] | T => {
-  /// Should not use if you need access to anything other than the data
-  return response.data ?? response;
-};
+import type { ErrorResponse } from "types/apiResponse.types";
 
-const onGlobalError = <T>(err: T): Promise<T> => {
-  return Promise.reject(err);
-};
+import { ERROR_CODES } from "constants/errorCodes";
 
 const API_HOST_PREFIX = process.env.REACT_APP_API_HOST_PREFIX;
+
+const isErrorResponse = (data: unknown): data is ErrorResponse => {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    "errors" in data &&
+    "code" in data &&
+    "isSuccessful" in data &&
+    "transactionId" in data
+  );
+};
+
+export const handleGlobalError = (error: unknown): ErrorResponse => {
+  if (axios.isAxiosError(error) && isErrorResponse(error.response?.data)) {
+    return { ...error.response.data, isSuccessful: false };
+  } else {
+    return {
+      isSuccessful: false,
+      errors: ["An unexpected error occurred."],
+      code: ERROR_CODES.UNKNOWN_ERROR,
+      error: error,
+    };
+  }
+};
 
 type ReplaceEmptyWithNull<T> = T extends ""
   ? null // replace empty string
@@ -54,9 +67,4 @@ function replaceEmptyStringsWithNull<T>(data: T): ReplaceEmptyWithNull<T> {
   return result;
 }
 
-export {
-  onGlobalError,
-  onGlobalSuccess,
-  API_HOST_PREFIX,
-  replaceEmptyStringsWithNull,
-};
+export { API_HOST_PREFIX, replaceEmptyStringsWithNull };

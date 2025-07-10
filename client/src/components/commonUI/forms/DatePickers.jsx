@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import DatePicker from "react-datepicker";
 import dayjs from "dayjs";
-import { getDate } from "utils/dateHelper";
+import { getDateString } from "utils/dateHelper";
 import { faRectangleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "react-datepicker/dist/react-datepicker.css";
@@ -22,7 +22,6 @@ const DatePickers = ({
   allowSameDay = false,
 }) => {
   const { t } = useLanguage(); // added
-
   // Use translation keys if not provided
   const startLabel = startDateName || t("commonUI.datePickers.startDate");
   const endLabel = endDateName || t("commonUI.datePickers.endDate");
@@ -43,7 +42,7 @@ const DatePickers = ({
     if (isSameDate) return;
 
     if (date) {
-      handleStartChange(getDate(date));
+      handleStartChange(getDateString(date));
     }
   };
 
@@ -54,7 +53,7 @@ const DatePickers = ({
 
     if (isSameDate) return;
     if (date) {
-      handleEndChange(getDate(date));
+      handleEndChange(getDateString(date));
     }
   };
 
@@ -77,7 +76,7 @@ const DatePickers = ({
           selected={startDate}
           onChange={onStartDateChange}
           dateFormat="dd-MM-yyyy"
-          maxDate={getDate(maxDate)}
+          maxDate={getDateString(maxDate)}
           disabled={isDisabled}
           className="form-control"
           placeholderText={startLabel}
@@ -99,7 +98,7 @@ const DatePickers = ({
           onChange={onEndDateChange}
           dateFormat="dd-MM-yyyy"
           minDate={endDateMinDate}
-          maxDate={getDate(maxDate)}
+          maxDate={getDateString(maxDate)}
           disabled={!startDate || isDisabled}
           className="form-control"
           placeholderText={endLabel}

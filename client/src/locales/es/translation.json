@@ -394,12 +394,31 @@
       "lastName": "Apellido",
       "filter": "Filtrar",
       "clear": "Limpiar",
-      "filterByExternalId": "Filtrar por ID de reserva externa:",
+      "filterByExternalId": "Filtrar por ID externa de reserva:",
       "externalIdPlaceholder": "ID de reserva externa",
       "filterByStatus": "Filtrar por estado:",
       "removeFilter": "Quitar Filtro",
       "select": "Seleccionar",
-      "rowsPerPage": "Filas por página:"
+      "rowsPerPage": "Reservas por página:",
+      "filterByBookingId": "Filtrar por ID de reserva:",
+      "bookingIdPlaceholder": "BKN-XXXXXXXX",
+      "sortBy": "Ordenar por:",
+      "sortOptions": {
+        "id": "ID",
+        "arrivalDate": "Fecha de llegada",
+        "departureDate": "Fecha de salida",
+        "total": "Total",
+        "balanceDue": "Saldo pendiente",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "externalBookingId": "ID externa de reserva",
+        "statusId": "Estado"
+      },
+      "sortDirection": "Orden:",
+      "ascending": "Ascendente",
+      "descending": "Descendente",
+      "selectSortOption": "Sin Orden",
+      "selectSortDirection": "Sin Dirección"
     },
     "bookingsTable": {
       "loading": "Cargando...",
@@ -465,16 +484,22 @@
       "markCompleted": "Marcar Check-out"
     },
     "minimalCard": {
-      "reservationNumber": "Reserva Número",
+      "reservationNumber": "Reserva Número:",
       "viewDetails": "Ver detalles",
-      "name": "Nombre",
+      "name": "Nombre:",
       "externalId": "ID Externa:",
       "arrival": "Llegada:",
       "departure": "Salida:",
       "total": "Total:",
-      "balanceDue": "Debe:",
+      "balanceDue": "Saldo Pendiente",
       "loading": "Cargando información...",
-      "notFound": "No se encontró la reserva"
+      "notFound": "No se encontró la reserva",
+      "edit": "Editar Reserva",
+      "auditable": "Ver Información Auditable",
+      "auditButton": "Auditar",
+      "editButton": "Editar",
+      "viewButton": "Ver",
+      "status": "Estado"
     },
     "providers": {
       "title": "Proveedores de Reservas",

@@ -1,25 +1,26 @@
-import type { Booking, BookingMinimal } from "@/types/entities/booking.types";
+import type { AxiosRequestConfig } from "axios";
+import type { Booking, BookingMinimal } from "types/entities/booking.types";
 import type {
-  ItemResponse,
   ErrorResponse,
+  ItemResponse,
   PagedResponse,
-} from "@/types/apiResponse.types";
+} from "types/apiResponse.types";
 
 import {
-  onGlobalError,
-  onGlobalSuccess,
   API_HOST_PREFIX,
+  handleGlobalError,
   //   replaceEmptyStringsWithNull,
 } from "./serviceHelpersV2";
-import axiosClient from "services/axiosClient";
+import axiosClientV2 from "services/axiosClientV2";
+import { BOOKING_VIEW_SORT_OPTIONS } from "components/bookings/bookings-view/constants";
 
 const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/bookings`;
 
 export const getBookingById = async (
   bookingId: string,
   hotelId: string
-): Promise<Partial<ItemResponse<Booking>>> => {
-  const config = {
+): Promise<ItemResponse<Booking> | Promise<ErrorResponse>> => {
+  const config: AxiosRequestConfig = {
     headers: {
       "Content-Type": "application/json",
     },
@@ -27,50 +28,73 @@ export const getBookingById = async (
     url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}`,
   };
   try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data as ItemResponse<Booking>;
+    const response = await axiosClientV2<ItemResponse<Booking>>(config);
+    return response.data;
   } catch (error: unknown) {
-    return onGlobalError(error as ErrorResponse);
+    return handleGlobalError(error);
   }
 };
 
+export type GetPagedMinimalBookingsByDateRangeParams = {
+  hotelId: string;
+  pageIndex: number;
+  pageSize: number;
+  startDate?: string;
+  endDate?: string;
+  isArrivalDate?: boolean;
+  sortColumn?: keyof typeof BOOKING_VIEW_SORT_OPTIONS;
+  sortDirection: "ASC" | "DESC";
+  firstName?: string;
+  lastName?: string;
+  externalBookingId?: string;
+  statusId?: string;
+  bookingId?: string;
+};
+
+// Update the function to use the new type
 export const getPagedMinimalBookingsByDateRange = async (
-  hotelId: string,
-  pageIndex: number,
-  pageSize: number,
-  startDate?: string | null,
-  endDate?: string | null,
-  isArrivalDate?: boolean | null,
-  sortColumn?: string | null,
-  sortDirection?: string | null,
-  firstName?: string | null,
-  lastName?: string | null,
-  externalBookingId?: string | null,
-  statusId?: number | null
-): Promise<Partial<PagedResponse<BookingMinimal>>> => {
+  params: GetPagedMinimalBookingsByDateRangeParams
+): Promise<PagedResponse<BookingMinimal> | Promise<ErrorResponse>> => {
+  const {
+    hotelId,
+    pageIndex,
+    pageSize,
+    startDate,
+    endDate,
+    isArrivalDate,
+    sortColumn,
+    sortDirection,
+    firstName,
+    lastName,
+    externalBookingId,
+    statusId,
+    bookingId,
+  } = params;
   const queryParams = new URLSearchParams({
     pageIndex: pageIndex.toString(),
     pageSize: pageSize.toString(),
   });
-  if (sortColumn) queryParams.append("sortColumn", sortColumn);
-  if (sortDirection) queryParams.append("sortDirection", sortDirection);
+  if (sortColumn) {
+    queryParams.append("sortColumn", sortColumn);
+    queryParams.append("sortDirection", sortDirection);
+  }
   if (startDate) queryParams.append("startDate", startDate);
   if (endDate) queryParams.append("endDate", endDate);
-  if (isArrivalDate && startDate && endDate)
+  if (isArrivalDate)
     queryParams.append("isArrivalDate", isArrivalDate.toString());
   if (firstName) queryParams.append("firstName", firstName);
   if (lastName) queryParams.append("lastName", lastName);
   if (externalBookingId)
     queryParams.append("externalBookingId", externalBookingId);
-  if (statusId) queryParams.append("statusId", statusId.toString());
+  if (statusId) queryParams.append("statusId", statusId);
+  if (bookingId) queryParams.append("bookingId", bookingId);
 
   const url = `${apiV2.replace(
     /{hotelId}/,
     hotelId
   )}/date-range?${queryParams.toString()}`;
 
-  const config = {
+  const config: AxiosRequestConfig = {
     headers: {
       "Content-Type": "application/json",
     },
@@ -78,10 +102,10 @@ export const getPagedMinimalBookingsByDateRange = async (
     url: url,
   };
   try {
-    const response = await axiosClient(config);
-    onGlobalSuccess(response);
-    return response.data as PagedResponse<BookingMinimal>;
-  } catch (error) {
-    return onGlobalError(error as ErrorResponse);
+    const response = await axiosClientV2<PagedResponse<BookingMinimal>>(config);
+
+    return response.data;
+  } catch (error: unknown) {
+    return handleGlobalError(error);
   }
 };

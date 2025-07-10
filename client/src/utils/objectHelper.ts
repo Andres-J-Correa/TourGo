@@ -1,6 +1,10 @@
-export const flattenObject = (obj, prefix = "", result = {}) => {
+export const flattenObject = (
+  obj: Record<string, any>,
+  prefix: string = "",
+  result: Record<string, any> = {}
+): Record<string, any> => {
   for (const [key, value] of Object.entries(obj)) {
-    const newKey = prefix ? `${prefix}-${key}` : key;
+    const newKey: string = prefix ? `${prefix}-${key}` : key;
 
     if (
       value &&
