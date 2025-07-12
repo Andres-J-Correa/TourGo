@@ -7,11 +7,33 @@ import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
 import { useLanguage } from "contexts/LanguageContext"; // added
+import Swal from "sweetalert2";
+import { isValidPhoneNumber } from "libphonenumber-js";
+import { formatPhoneNumber } from "utils/phoneHelper";
+
+const getWhatsappLink = (phone) => {
+  const cleaned = phone.replace(/\D/g, "");
+  return `https://api.whatsapp.com/send?phone=${cleaned}`;
+};
 
 const BookingStay = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
   const [offCanvasOpen, setOffCanvasOpen] = useState(false);
   const { t } = useLanguage(); // added
   const toggleOffCanvas = () => setOffCanvasOpen((prev) => !prev);
+
+  const handlePhoneClick = () => {
+    const phone = stay.customer?.phone;
+    if (!isValidPhoneNumber(phone)) {
+      Swal.fire({
+        icon: "error",
+        title: t("booking.invalidPhoneSwalTitle"),
+        text: t("booking.invalidPhoneSwalText"),
+      });
+      return;
+    }
+    const whatsappLink = getWhatsappLink(phone);
+    window.open(whatsappLink, "_blank");
+  };
 
   return (
     <div
@@ -35,7 +57,15 @@ const BookingStay = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
           {stay.customer?.firstName} {stay.customer?.lastName}
           <br />
           <strong>{t("booking.stay.phone")}</strong>{" "}
-          {stay.customer?.phone || "N/A"}
+          {!!stay.customer?.phone ? (
+            <span
+              className="link-primary cursor-pointer"
+              onClick={handlePhoneClick}>
+              {formatPhoneNumber(stay.customer.phone)}
+            </span>
+          ) : (
+            "N/A"
+          )}
           <br />
           <strong>{t("booking.stay.document")}</strong>{" "}
           {stay.customer?.documentNumber || "N/A"}

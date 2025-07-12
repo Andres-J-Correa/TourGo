@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Row, Col, Button } from "reactstrap";
 import classnames from "classnames";
 import dayjs from "dayjs";
@@ -7,6 +7,8 @@ import {
   faPlaneArrival,
   faClipboardList,
 } from "@fortawesome/free-solid-svg-icons";
+import { isValidPhoneNumber } from "libphonenumber-js";
+import Swal from "sweetalert2";
 
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
@@ -14,6 +16,13 @@ import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
 import { BOOKING_STATUS_IDS } from "components/bookings/constants";
 import { formatCurrency } from "utils/currencyHelper";
 import { useLanguage } from "contexts/LanguageContext";
+import { formatPhoneNumber } from "utils/phoneHelper";
+
+const getWhatsappLink = (phone) => {
+  const cleaned = phone.replace(/\D/g, "");
+
+  return `https://api.whatsapp.com/send?phone=${cleaned}`;
+};
 
 const BookingArrival = ({
   arrival,
@@ -33,6 +42,20 @@ const BookingArrival = ({
     otherRooms?.length > 0
       ? otherRooms.filter((r) => !arrivingRoomIds.has(r.id))
       : [];
+
+  const handlePhoneClick = () => {
+    const phone = arrival.customer?.phone;
+    if (!isValidPhoneNumber(phone)) {
+      Swal.fire({
+        icon: "error",
+        title: t("booking.invalidPhoneSwalTitle"),
+        text: t("booking.invalidPhoneSwalText"),
+      });
+      return;
+    }
+    const whatsappLink = getWhatsappLink(phone);
+    window.open(whatsappLink, "_blank");
+  };
 
   return (
     <div
@@ -56,7 +79,15 @@ const BookingArrival = ({
           {arrival.customer?.firstName} {arrival.customer?.lastName}
           <br />
           <strong>{t("booking.arrival.phone")}</strong>{" "}
-          {arrival.customer?.phone || "N/A"}
+          {!!arrival.customer?.phone ? (
+            <span
+              className="link-primary cursor-pointer"
+              onClick={handlePhoneClick}>
+              {formatPhoneNumber(arrival.customer.phone)}
+            </span>
+          ) : (
+            "N/A"
+          )}
           <br />
           <strong>{t("booking.arrival.document")}</strong>{" "}
           {arrival.customer?.documentNumber || "N/A"}

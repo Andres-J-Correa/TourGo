@@ -140,6 +140,8 @@
     }
   },
   "booking": {
+    "invalidPhoneSwalTitle": "Invalid phone number",
+    "invalidPhoneSwalText": "Please check the phone number.",
     "status": {
       "active": "Active",
       "cancelled": "Cancelled",
