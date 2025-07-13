@@ -17,13 +17,14 @@ import BookingCard from "components/bookings/bookings-view/BookingCard";
 import Breadcrumb from "components/commonUI/Breadcrumb";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import BookingFiltersV2 from "./BookingFiltersV2";
+import Pagination from "components/commonUI/Pagination";
 
 //services & utils
 import { useLanguage } from "contexts/LanguageContext";
 import { getPagedMinimalBookingsByDateRange } from "services/bookingServiceV2";
 import { getDateString } from "utils/dateHelper";
 import { BOOKING_STATUS_BY_ID } from "components/bookings/constants";
-import { Button } from "reactstrap";
+import { Button, Col, Row } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileCsv } from "@fortawesome/free-solid-svg-icons";
 
@@ -223,6 +224,11 @@ function BookingsViewV2(): JSX.Element {
       pageIndex: 0,
     }));
 
+  const gotoPage = (pageIndex: number) => {
+    if (pageIndex < 0 || pageIndex >= data.totalPages) return;
+    setPaginationData((prev) => ({ ...prev, pageIndex }));
+  };
+
   useEffect(() => {
     if (!hotelId) return;
 
@@ -312,6 +318,18 @@ function BookingsViewV2(): JSX.Element {
           </span>
         </div>
 
+        <Row>
+          <Col>
+            <Pagination
+              pageIndex={paginationData.pageIndex}
+              totalPages={data.totalPages}
+              hasPreviousPage={data.hasPreviousPage}
+              hasNextPage={data.hasNextPage}
+              onPageChange={gotoPage}
+            />
+          </Col>
+        </Row>
+
         <div className="w-100">
           {hotelId && data.items.length > 0 ? (
             data.items.map((booking) => (
@@ -325,6 +343,17 @@ function BookingsViewV2(): JSX.Element {
             <p>No bookings found for the selected date range.</p>
           )}
         </div>
+        <Row>
+          <Col>
+            <Pagination
+              pageIndex={paginationData.pageIndex}
+              totalPages={data.totalPages}
+              hasPreviousPage={data.hasPreviousPage}
+              hasNextPage={data.hasNextPage}
+              onPageChange={gotoPage}
+            />
+          </Col>
+        </Row>
       </ErrorBoundary>
     </>
   );
