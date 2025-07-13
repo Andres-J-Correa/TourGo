@@ -65,7 +65,7 @@ const PaginationComponent = ({
   }, [pageIndex]);
 
   return (
-    <div className="d-flex align-items-center gap-2 float-sm-end mb-3">
+    <div className="d-flex align-items-center gap-2 float-end mb-3">
       <Pagination
         aria-label="Page navigation"
         className="pagination pagination-rounded mb-0">

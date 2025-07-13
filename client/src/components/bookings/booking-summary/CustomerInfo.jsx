@@ -1,28 +1,10 @@
 import { Row, Col } from "reactstrap";
-import { formatPhoneNumber } from "utils/phoneHelper";
+import PhoneWspLink from "components/commonUI/PhoneWspLink";
 import { useLanguage } from "contexts/LanguageContext";
-import Swal from "sweetalert2";
-import { isValidPhoneNumber } from "libphonenumber-js";
-const getWhatsappLink = (phone) => {
-  const cleaned = phone.replace(/\D/g, "");
-  return `https://api.whatsapp.com/send?phone=${cleaned}`;
-};
 
 const CustomerInfo = ({ customer }) => {
   const { t } = useLanguage();
-  const handlePhoneClick = () => {
-    const phone = customer?.phone;
-    if (!isValidPhoneNumber(phone)) {
-      Swal.fire({
-        icon: "error",
-        title: t("booking.invalidPhoneSwalTitle"),
-        text: t("booking.invalidPhoneSwalText"),
-      });
-      return;
-    }
-    const whatsappLink = getWhatsappLink(phone);
-    window.open(whatsappLink, "_blank");
-  };
+
   return (
     <>
       <h5>{t("booking.customerInfo.title")}</h5>
@@ -47,17 +29,9 @@ const CustomerInfo = ({ customer }) => {
           </Row>
           <Row>
             <strong>{t("booking.customerInfo.phone")}</strong>
-            {!!customer?.phone ? (
-              <p>
-                <span
-                  className="link-primary cursor-pointer"
-                  onClick={handlePhoneClick}>
-                  {formatPhoneNumber(customer.phone)}
-                </span>
-              </p>
-            ) : (
-              <p>N/A</p>
-            )}
+            <p>
+              <PhoneWspLink phone={customer?.phone} />
+            </p>
           </Row>
         </Col>
       </Row>
