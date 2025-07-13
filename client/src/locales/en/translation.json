@@ -140,8 +140,6 @@
     }
   },
   "booking": {
-    "invalidPhoneSwalTitle": "Invalid phone number",
-    "invalidPhoneSwalText": "Please check the phone number.",
     "status": {
       "active": "Active",
       "cancelled": "Cancelled",
@@ -695,6 +693,10 @@
       "termsOfService": "Terms of Service",
       "and": "and",
       "apply": "apply"
+    },
+    "phoneWspLink": {
+      "invalidPhoneSwalTitle": "Invalid phone number",
+      "invalidPhoneSwalText": "Please check the phone number."
     }
   },
   "extraCharges": {

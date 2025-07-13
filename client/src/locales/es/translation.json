@@ -140,8 +140,6 @@
     }
   },
   "booking": {
-    "invalidPhoneSwalTitle": "Número de teléfono inválido",
-    "invalidPhoneSwalText": "Por favor, revisa el número de teléfono.",
     "status": {
       "active": "Activa",
       "cancelled": "Cancelada",
@@ -695,6 +693,10 @@
       "termsOfService": "Términos de Servicio",
       "and": "y",
       "apply": "se aplican"
+    },
+    "phoneWspLink": {
+      "invalidPhoneSwalTitle": "Número de teléfono inválido",
+      "invalidPhoneSwalText": "Por favor, revisa el número de teléfono."
     }
   },
   "extraCharges": {

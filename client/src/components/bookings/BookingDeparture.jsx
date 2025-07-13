@@ -10,15 +10,8 @@ import {
 import classnames from "classnames";
 import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
 import dayjs from "dayjs";
-import { useLanguage } from "contexts/LanguageContext"; // added
-import Swal from "sweetalert2";
-import { isValidPhoneNumber } from "libphonenumber-js";
-import { formatPhoneNumber } from "utils/phoneHelper";
-
-const getWhatsappLink = (phone) => {
-  const cleaned = phone.replace(/\D/g, "");
-  return `https://api.whatsapp.com/send?phone=${cleaned}`;
-};
+import { useLanguage } from "contexts/LanguageContext";
+import PhoneWspLink from "components/commonUI/PhoneWspLink";
 
 const BookingDeparture = ({
   departure,
@@ -28,22 +21,8 @@ const BookingDeparture = ({
   renderRooms,
 }) => {
   const [offCanvasOpen, setOffCanvasOpen] = useState(false);
-  const { t } = useLanguage(); // added
+  const { t } = useLanguage();
   const toggleOffCanvas = () => setOffCanvasOpen((prev) => !prev);
-
-  const handlePhoneClick = () => {
-    const phone = departure.customer?.phone;
-    if (!isValidPhoneNumber(phone)) {
-      Swal.fire({
-        icon: "error",
-        title: t("booking.invalidPhoneSwalTitle"),
-        text: t("booking.invalidPhoneSwalText"),
-      });
-      return;
-    }
-    const whatsappLink = getWhatsappLink(phone);
-    window.open(whatsappLink, "_blank");
-  };
 
   return (
     <div
@@ -68,15 +47,7 @@ const BookingDeparture = ({
           {departure.customer?.firstName} {departure.customer?.lastName}
           <br />
           <strong>{t("booking.departure.phone")}</strong>{" "}
-          {!!departure.customer?.phone ? (
-            <span
-              className="link-primary cursor-pointer"
-              onClick={handlePhoneClick}>
-              {formatPhoneNumber(departure.customer.phone)}
-            </span>
-          ) : (
-            "N/A"
-          )}
+          <PhoneWspLink phone={departure.customer?.phone} />
           <br />
           <strong>{t("booking.departure.document")}</strong>{" "}
           {departure.customer?.documentNumber || "N/A"}
