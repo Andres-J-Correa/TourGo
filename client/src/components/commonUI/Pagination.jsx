@@ -16,7 +16,7 @@ const PaginationComponent = ({
   hasPreviousPage,
   hasNextPage,
   onPageChange,
-  maxPageNumbersToShow = 4,
+  maxPageNumbersToShow = 3,
 }) => {
   const [inputValue, setInputValue] = useState(pageIndex + 1);
 
@@ -41,7 +41,7 @@ const PaginationComponent = ({
   const getPageNumbers = () => {
     const pages = [];
     let startPage = Math.max(0, pageIndex - 1);
-    let endPage = Math.min(totalPages - 1, pageIndex + 2);
+    let endPage = Math.min(totalPages - 1, pageIndex + 1);
 
     if (endPage - startPage + 1 < maxPageNumbersToShow) {
       startPage = Math.max(0, endPage - maxPageNumbersToShow + 1);
@@ -73,34 +73,26 @@ const PaginationComponent = ({
           <PaginationLink first onClick={() => onPageChange(0)} />
         </PaginationItem>
 
-        <PaginationItem disabled={!hasPreviousPage}>
-          <PaginationLink
-            previous
-            onClick={() => onPageChange(pageIndex - 1)}
-          />
-        </PaginationItem>
-
         {getPageNumbers()}
-
-        <PaginationItem disabled={!hasNextPage}>
-          <PaginationLink next onClick={() => onPageChange(pageIndex + 1)} />
-        </PaginationItem>
 
         <PaginationItem disabled={pageIndex === totalPages - 1}>
           <PaginationLink last onClick={() => onPageChange(totalPages - 1)} />
         </PaginationItem>
       </Pagination>
 
-      <InputGroup style={{ width: "100px" }}>
-        <InputGroupText>{t("commonUI.pagination.goTo")}</InputGroupText>
+      <InputGroup style={{ width: "max-content" }}>
         <Input
           type="number"
+          style={{ width: "4rem" }}
           min="1"
           max={totalPages}
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleInputSubmit}
         />
+        <InputGroupText>
+          {t("commonUI.pagination.of")} {totalPages}
+        </InputGroupText>
       </InputGroup>
     </div>
   );

@@ -680,7 +680,7 @@
       "careers": "Careers"
     },
     "pagination": {
-      "goTo": "Go to"
+      "of": "of"
     },
     "verifyAccountFallback": {
       "title": "Verify your email",

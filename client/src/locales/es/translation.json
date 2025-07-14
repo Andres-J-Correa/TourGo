@@ -680,7 +680,7 @@
       "careers": "Trabaja con nosotros"
     },
     "pagination": {
-      "goTo": "Ir a"
+      "of": "de"
     },
     "verifyAccountFallback": {
       "title": "Verifica tu correo electrónico",
