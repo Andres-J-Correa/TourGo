@@ -446,7 +446,8 @@
       "errors": {
         "loadRooms": "Error al cargar habitaciones",
         "loadBookings": "Error al cargar reservas"
-      }
+      },
+      "invalidDateRange": "Rango de fechas inválido. Asegúrese de que la fecha de inicio sea anterior a la fecha de fin."
     },
     "arrival": {
       "reservationNumber": "Reserva #:",

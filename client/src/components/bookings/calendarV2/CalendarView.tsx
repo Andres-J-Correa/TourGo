@@ -4,13 +4,14 @@ import type { Room } from "types/entities/room.types";
 import type { RoomBooking } from "types/entities/booking.types";
 
 //libs
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
 //components
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Breadcrumbs from "components/commonUI/Breadcrumbs";
+import Alert from "components/commonUI/Alert";
 
 //services & utils
 import { useLanguage } from "contexts/LanguageContext";
@@ -69,7 +70,25 @@ const roomBookings: Partial<RoomBooking>[] = [
 ];
 
 function CalendarView(): JSX.Element {
-  const [dates, setDates] = useState<Date | null>(null);
+  const [dates, setDates] = useState<{ start: Date | null; end: Date | null }>({
+    start: dayjs().startOf("month").toDate(),
+    end: dayjs().endOf("month").toDate(),
+  });
+
+  const handleDateChange = (field: "start" | "end") => (date: Date | null) => {
+    setDates((prev) => ({
+      ...prev,
+      [field]: date,
+    }));
+  };
+
+  const isDateRangeValid: boolean = useMemo(() => {
+    return (
+      dayjs(dates.start).isValid() &&
+      dayjs(dates.end).isValid() &&
+      dayjs(dates.start).isBefore(dayjs(dates.end))
+    );
+  }, [dates.start, dates.end]);
 
   const { hotelId } = useParams<{ hotelId: string }>();
   const { t } = useLanguage();
@@ -86,7 +105,17 @@ function CalendarView(): JSX.Element {
         breadcrumbs={breadcrumbs}
         active={t("booking.calendar.title")}
       />
-      <h1>{t("booking.calendar.title")}</h1>
+      <h3>{t("booking.calendar.title")}</h3>
+      <DatePickersV2
+        startDate={dates.start}
+        endDate={dates.end}
+        handleEndChange={handleDateChange("end")}
+        handleStartChange={handleDateChange("start")}
+        allowSameDay={true}
+      />
+      {!isDateRangeValid && (
+        <Alert type="danger">{t("booking.calendar.invalidDateRange")}</Alert>
+      )}
     </div>
   );
 }

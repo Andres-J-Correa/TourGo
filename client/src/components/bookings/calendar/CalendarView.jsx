@@ -320,7 +320,7 @@ function CalendarView() {
   }, [dates, rowVirtualizer]);
 
   return (
-    <div className="mx-n5">
+    <div>
       <LoadingOverlay
         isVisible={isLoadingRooms || isLoadingBookings}
         message={

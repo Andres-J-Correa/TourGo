@@ -38,6 +38,15 @@ h6 {
   --contrast-color: #ffffff;
 }
 
+@media (min-width: 1200px) {
+  .main-container {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    padding-right: calc(var(--bs-gutter-x) * 2) !important;
+    padding-left: calc(var(--bs-gutter-x) * 2) !important;
+  }
+}
+
 @media print {
   .main-container {
     max-width: 100% !important;

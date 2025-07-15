@@ -66,7 +66,7 @@ const App = () => {
         ) : (
           <Fragment>
             <NavbarContainer />
-            <Container className="my-4 px-5 main-container" fluid>
+            <Container className="my-4 main-container" fluid>
               <Routes>{routes}</Routes>
             </Container>
             <Footer hotelId={hotel.current.id} />
