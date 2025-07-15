@@ -1,0 +1,30 @@
+.sticky-room {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 2;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  z-index: 1;
+}
+
+.calendar-table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 600px) {
+  th,
+  td {
+    min-width: 80px !important;
+    font-size: 0.85em !important;
+    padding: 0.5em !important;
+  }
+  .fw-bold {
+    font-size: 1em;
+  }
+}

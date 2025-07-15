@@ -27,6 +27,13 @@ const hotelRoutes = [
     component: lazy(() => import("components/bookings/calendar/CalendarView")),
   },
   {
+    name: "calendarv2",
+    path: "/hotels/:hotelId/calendarV2",
+    component: lazy(() =>
+      import("components/bookings/calendarV2/CalendarView")
+    ),
+  },
+  {
     name: "customer",
     path: "/hotels/:hotelId/customers",
     component: lazy(() =>
