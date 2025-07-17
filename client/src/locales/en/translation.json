@@ -446,7 +446,11 @@
       "errors": {
         "loadRooms": "Error loading rooms",
         "loadBookings": "Error loading bookings"
-      }
+      },
+      "invalidDateRange": "Invalid date range. Ensure the start date is before the end date.",
+      "available": "Available",
+      "reservation": "Booking",
+      "price": "Price"
     },
     "arrival": {
       "reservationNumber": "Reservation #:",

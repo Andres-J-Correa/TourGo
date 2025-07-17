@@ -4,8 +4,8 @@ import type { Room } from "./room.types";
 import type { ExtraCharge } from "./extraCharge.types";
 
 export interface RoomBooking {
-  date: Date;
-  room: Partial<Room>;
+  date: string;
+  room: Pick<Room, "id" | "name">;
   bookingId: string;
   price: number;
   firstName?: string | null;

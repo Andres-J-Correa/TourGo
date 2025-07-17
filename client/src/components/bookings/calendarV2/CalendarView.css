@@ -1,0 +1,48 @@
+.table-calendar {
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.booking-data-cell {
+  white-space: nowrap;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.data-cell {
+  min-width: 120px;
+  max-width: 120px;
+}
+
+.first-column {
+  min-width: 80px;
+  max-width: 80px;
+}
+
+.room-header {
+  position: sticky;
+  left: 0;
+}
+
+.dates-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+@media (max-width: 600px) {
+  th,
+  td {
+    font-size: 0.85em !important;
+    padding: 0.5em !important;
+  }
+  .fw-bold {
+    font-size: 1em;
+  }
+
+  .data-cell {
+    min-width: 100px !important;
+    max-width: 100px !important;
+  }
+}

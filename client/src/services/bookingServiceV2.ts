@@ -1,8 +1,13 @@
 import type { AxiosRequestConfig } from "axios";
-import type { Booking, BookingMinimal } from "types/entities/booking.types";
 import type {
-  ErrorResponse,
+  Booking,
+  BookingMinimal,
+  RoomBooking,
+} from "types/entities/booking.types";
+import type {
+  ApiResponse,
   ItemResponse,
+  ItemsResponse,
   PagedResponse,
 } from "types/apiResponse.types";
 
@@ -19,7 +24,7 @@ const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/bookings`;
 export const getBookingById = async (
   bookingId: string,
   hotelId: string
-): Promise<ItemResponse<Booking> | Promise<ErrorResponse>> => {
+): Promise<ApiResponse<ItemResponse<Booking>>> => {
   const config: AxiosRequestConfig = {
     headers: {
       "Content-Type": "application/json",
@@ -54,7 +59,7 @@ export type GetPagedMinimalBookingsByDateRangeParams = {
 // Update the function to use the new type
 export const getPagedMinimalBookingsByDateRange = async (
   params: GetPagedMinimalBookingsByDateRangeParams
-): Promise<PagedResponse<BookingMinimal> | Promise<ErrorResponse>> => {
+): Promise<ApiResponse<PagedResponse<BookingMinimal>>> => {
   const {
     hotelId,
     pageIndex,
@@ -104,6 +109,29 @@ export const getPagedMinimalBookingsByDateRange = async (
   try {
     const response = await axiosClientV2<PagedResponse<BookingMinimal>>(config);
 
+    return response.data;
+  } catch (error: unknown) {
+    return handleGlobalError(error);
+  }
+};
+
+export const getRoomBookingsByDateRange = async (
+  hotelId: string,
+  startDate: string,
+  endDate: string
+): Promise<ApiResponse<ItemsResponse<RoomBooking>>> => {
+  const config: AxiosRequestConfig = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(
+      /{hotelId}/,
+      hotelId
+    )}/room-bookings?startDate=${startDate}&endDate=${endDate}`,
+  };
+  try {
+    const response = await axiosClientV2<ItemsResponse<RoomBooking>>(config);
     return response.data;
   } catch (error: unknown) {
     return handleGlobalError(error);

@@ -54,10 +54,11 @@ function DatePickersV2({
     <div className="d-flex align-items-center mb-3">
       <Row>
         <Col>
-          <label htmlFor="start-date" className="form-label w-100">
+          <label htmlFor="start-date" className="form-label w-100 text-dark">
             {startLabel}
           </label>
           <DatePicker
+            id="start-date"
             selected={dateStart}
             className="form-control"
             onChange={handleStartChange}
@@ -78,10 +79,11 @@ function DatePickersV2({
           />
         </Col>
         <Col>
-          <label htmlFor="end-date" className="form-label w-100">
+          <label htmlFor="end-date" className="form-label w-100 text-dark">
             {endLabel}
           </label>
           <DatePicker
+            id="end-date"
             selected={dateEnd}
             className="form-control"
             onChange={handleEndChange}

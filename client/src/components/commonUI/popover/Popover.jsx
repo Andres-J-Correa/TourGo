@@ -11,13 +11,19 @@ import {
   useInteractions,
   FloatingPortal,
   FloatingFocusManager,
+  useHover,
+  safePolygon,
 } from "@floating-ui/react";
 import "./Popover.css";
 
-const Popover = ({ children, content, placement = "bottom" }) => {
+const Popover = ({
+  children,
+  content,
+  placement = "bottom",
+  action = "click",
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Floating UI setup
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
@@ -26,18 +32,27 @@ const Popover = ({ children, content, placement = "bottom" }) => {
     whileElementsMounted: autoUpdate,
   });
 
-  // Interaction hooks
-  const click = useClick(context);
+  const click = useClick(context, {
+    enabled: action === "click",
+  });
+
+  const hover = useHover(context, {
+    enabled: action === "hover",
+    restMs: 100,
+    mouseOnly: true,
+    handleClose: safePolygon({ buffer: 4 }), // buffer prevents flicker
+  });
+
   const dismiss = useDismiss(context);
   const role = useRole(context);
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
     click,
+    hover,
     dismiss,
     role,
   ]);
 
-  // Clone the child to attach ref and props
   const trigger = cloneElement(children, {
     ref: refs.setReference,
     ...getReferenceProps(),
@@ -51,10 +66,7 @@ const Popover = ({ children, content, placement = "bottom" }) => {
           <FloatingFocusManager context={context}>
             <div
               ref={refs.setFloating}
-              style={{
-                ...floatingStyles,
-                zIndex: 2000, // Ensure high z-index
-              }}
+              style={{ ...floatingStyles, zIndex: 2000 }}
               {...getFloatingProps()}
               className="popover-content">
               {content}
