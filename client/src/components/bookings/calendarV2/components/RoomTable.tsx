@@ -76,8 +76,8 @@ function RoomTable({
 
   return (
     <Fragment>
-      <h6 className="room-header">{room.name}</h6>
-      <table className="table table-bordered">
+      <h6 className="room-header mb-1">{room.name}</h6>
+      <table className="table table-striped table-sm mb-2">
         <tbody>
           <tr>
             <td className="first-column text-center align-content-center bg-dark text-white fw-bold">

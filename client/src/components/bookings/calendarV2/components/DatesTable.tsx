@@ -43,7 +43,7 @@ function DatesTable({ datesArray }: { datesArray: Dayjs[] }): JSX.Element {
   }
 
   return (
-    <table className="table table-bordered dates-header">
+    <table className="table table-bordered dates-header table-sm mb-2">
       <thead>
         <tr>
           <th rowSpan={2} className="bg-dark first-column"></th>
