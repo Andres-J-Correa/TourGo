@@ -1,0 +1,22 @@
+//types
+import type { JSX } from "react";
+import type { Dayjs } from "dayjs";
+
+function MonthYearHeader({
+  date,
+  colSpan,
+}: {
+  date: Dayjs;
+  colSpan: number;
+}): JSX.Element {
+  return (
+    <th
+      style={{ minWidth: 140, maxWidth: 140 }}
+      className="text-start align-content-center bg-dark text-white fw-bold"
+      colSpan={colSpan}>
+      <div className="text-capitalize">{date.format("MMM YYYY")}</div>
+    </th>
+  );
+}
+
+export default MonthYearHeader;

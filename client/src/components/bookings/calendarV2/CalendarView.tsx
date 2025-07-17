@@ -2,6 +2,7 @@
 import type { JSX } from "react";
 import type { Room } from "types/entities/room.types";
 import type { RoomBooking } from "types/entities/booking.types";
+import type { Dayjs } from "dayjs";
 
 //libs
 import { useMemo, useState } from "react";
@@ -12,9 +13,13 @@ import dayjs from "dayjs";
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Breadcrumbs from "components/commonUI/Breadcrumbs";
 import Alert from "components/commonUI/Alert";
+import RoomTable from "./components/RoomTable";
+import DatesTable from "./components/DatesTable";
 
 //services & utils
 import { useLanguage } from "contexts/LanguageContext";
+import { getByHotelId as getRoomsByHotelId } from "services/roomServiceV2";
+import { getRoomBookingsByDateRange } from "services/bookingServiceV2";
 
 //styles
 import "./CalendarView.css";
@@ -44,7 +49,7 @@ const rooms: Partial<Room>[] = [
 
 const roomBookings: Partial<RoomBooking>[] = [
   {
-    date: dayjs("2025-07-01").toDate(),
+    date: "2025-07-01",
     room: { id: 1, name: "Deluxe Room Edited v2" },
     bookingId: "BKN-KCQFOTQZ",
     price: 150000.0,
@@ -52,7 +57,7 @@ const roomBookings: Partial<RoomBooking>[] = [
     lastName: "Doe",
   },
   {
-    date: dayjs("2025-07-02").toDate(),
+    date: "2025-07-02",
     room: { id: 1, name: "Deluxe Room Edited v2" },
     bookingId: "BKN-KCQFOTQZ",
     price: 150000.0,
@@ -60,11 +65,27 @@ const roomBookings: Partial<RoomBooking>[] = [
     lastName: "Doe",
   },
   {
-    date: dayjs("2025-07-01").toDate(),
+    date: "2025-07-03",
+    room: { id: 1, name: "Deluxe Room Edited v2" },
+    bookingId: "BKN-KCQFOTQZ",
+    price: 150000.0,
+    firstName: "John",
+    lastName: "Doe",
+  },
+  {
+    date: "2025-07-05",
     room: { id: 3, name: "Cuarto Doble Economico 1" },
     bookingId: "BKN-KUL8OXCV",
     price: 80000.0,
-    firstName: "Andres",
+    firstName: "ANDRES CARNE DE RES",
+    lastName: "Correa",
+  },
+  {
+    date: "2025-07-06",
+    room: { id: 3, name: "Cuarto Doble Economico 1" },
+    bookingId: "BKN-KUL8OXCV",
+    price: 80000.0,
+    firstName: "ANDRES CARNE DE RES",
     lastName: "Correa",
   },
 ];
@@ -74,6 +95,50 @@ function CalendarView(): JSX.Element {
     start: dayjs().startOf("month").toDate(),
     end: dayjs().endOf("month").toDate(),
   });
+
+  const datesArray: Dayjs[] = useMemo(() => {
+    const start = dayjs(dates.start);
+    const end = dayjs(dates.end);
+    const days: Dayjs[] = [];
+
+    for (
+      let date = start;
+      date.isBefore(end) || date.isSame(end, "day");
+      date = date.add(1, "day")
+    ) {
+      days.push(date);
+    }
+
+    return days;
+  }, [dates.start, dates.end]);
+
+  const datesWithBookingsByRoom: Record<
+    string,
+    Record<string, Partial<RoomBooking>>
+  > = useMemo(() => {
+    const result: Record<string, Record<string, Partial<RoomBooking>>> = {};
+
+    roomBookings.forEach((booking) => {
+      if (booking.room?.id && booking.date) {
+        //check if the date exists in the result
+        if (!result[booking.date]) {
+          //if not, create it and initialize with the room id and booking
+          result[booking.date] = {
+            [booking.room.id]: booking,
+          };
+          return;
+        }
+
+        //if the date exists, check if the room id exists
+        if (!result[booking.date]![booking.room.id]) {
+          //if not, create it and initialize with the booking
+          result[booking.date]![booking.room.id] = booking;
+        }
+      }
+    });
+
+    return result;
+  }, []);
 
   const handleDateChange = (field: "start" | "end") => (date: Date | null) => {
     setDates((prev) => ({
@@ -93,11 +158,14 @@ function CalendarView(): JSX.Element {
   const { hotelId } = useParams<{ hotelId: string }>();
   const { t } = useLanguage();
 
-  const breadcrumbs: { label: string; path?: string }[] = [
-    { label: t("booking.breadcrumb.home"), path: "/" },
-    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
-    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs: { label: string; path?: string }[] = useMemo(
+    () => [
+      { label: t("booking.breadcrumb.home"), path: "/" },
+      { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
+      { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
+    ],
+    [hotelId, t]
+  );
 
   return (
     <div>
@@ -116,6 +184,18 @@ function CalendarView(): JSX.Element {
       {!isDateRangeValid && (
         <Alert type="danger">{t("booking.calendar.invalidDateRange")}</Alert>
       )}
+      <div className="table-responsive table-calendar fs-7">
+        <DatesTable datesArray={datesArray} />
+
+        {rooms.map((room, index) => (
+          <RoomTable
+            key={`room-${index}`}
+            room={room}
+            datesArray={datesArray}
+            datesWithBookingsByRoom={datesWithBookingsByRoom}
+          />
+        ))}
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import type { Room } from "./room.types";
 import type { ExtraCharge } from "./extraCharge.types";
 
 export interface RoomBooking {
-  date: Date;
+  date: string;
   room: Partial<Room>;
   bookingId: string;
   price: number;

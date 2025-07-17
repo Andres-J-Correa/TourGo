@@ -1,30 +1,32 @@
-.sticky-room {
-  position: sticky;
-  left: 0;
-  background: #fff;
-  z-index: 2;
+.table-calendar {
+  height: calc(100vh - 200px);
+  overflow-y: auto;
 }
 
-.sticky-header {
-  position: sticky;
-  top: 0;
-  background: #f8f9fa;
-  z-index: 1;
-}
-
-.calendar-table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.booking-data-cell {
+  white-space: nowrap;
+  text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 600px) {
   th,
   td {
-    min-width: 80px !important;
     font-size: 0.85em !important;
     padding: 0.5em !important;
   }
   .fw-bold {
     font-size: 1em;
+  }
+
+  th.date-header {
+    min-width: 120px !important;
+    max-width: 120px !important;
+  }
+
+  td.data-cell {
+    min-width: 120px !important;
+    max-width: 120px !important;
   }
 }

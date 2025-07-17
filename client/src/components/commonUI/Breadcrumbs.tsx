@@ -3,7 +3,7 @@ import type { JSX } from "react";
 import type { BreadcrumbsProps } from "./Breadcrumbs.types";
 
 //libs
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Row, Col } from "reactstrap";
 
@@ -48,4 +48,4 @@ const Breadcrumbs = ({
   );
 };
 
-export default Breadcrumbs;
+export default React.memo(Breadcrumbs);
