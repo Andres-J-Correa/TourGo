@@ -6,9 +6,7 @@ import { formatCurrency } from "utils/currencyHelper";
 
 function PriceCell({ price }: { price: number | undefined }): JSX.Element {
   return (
-    <td
-      className="data-cell text-center align-content-center"
-      style={{ minWidth: 140, maxWidth: 140 }}>
+    <td className="data-cell text-center align-content-center">
       {formatCurrency(price, "COP")}
     </td>
   );

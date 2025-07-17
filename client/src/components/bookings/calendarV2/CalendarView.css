@@ -10,6 +10,27 @@
   text-overflow: ellipsis;
 }
 
+.data-cell {
+  min-width: 120px;
+  max-width: 120px;
+}
+
+.first-column {
+  min-width: 80px;
+  max-width: 80px;
+}
+
+.room-header {
+  position: sticky;
+  left: 0;
+}
+
+.dates-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
 @media (max-width: 600px) {
   th,
   td {
@@ -20,13 +41,8 @@
     font-size: 1em;
   }
 
-  th.date-header {
-    min-width: 120px !important;
-    max-width: 120px !important;
-  }
-
-  td.data-cell {
-    min-width: 120px !important;
-    max-width: 120px !important;
+  .data-cell {
+    min-width: 100px !important;
+    max-width: 100px !important;
   }
 }

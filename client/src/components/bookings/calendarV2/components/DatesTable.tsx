@@ -43,15 +43,10 @@ function DatesTable({ datesArray }: { datesArray: Dayjs[] }): JSX.Element {
   }
 
   return (
-    <table
-      className="table table-bordered"
-      style={{ position: "sticky", top: 0, zIndex: 2 }}>
+    <table className="table table-bordered dates-header">
       <thead>
         <tr>
-          <th
-            style={{ minWidth: 80, maxWidth: 80 }}
-            rowSpan={2}
-            className="bg-dark"></th>
+          <th rowSpan={2} className="bg-dark first-column"></th>
           {monthAndYearComponents}
         </tr>
         <tr>{daysComponents}</tr>

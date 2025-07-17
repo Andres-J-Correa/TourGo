@@ -4,9 +4,7 @@ import type { Dayjs } from "dayjs";
 
 function DayHeader({ date }: { date: Dayjs }): JSX.Element {
   return (
-    <th
-      style={{ minWidth: 140, maxWidth: 140 }}
-      className="date-header text-center align-content-center bg-dark text-white fw-bold">
+    <th className="data-cell text-center align-content-center bg-dark text-white fw-bold">
       <div className="text-capitalize">{date.format("DD ddd")}</div>
     </th>
   );

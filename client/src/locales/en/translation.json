@@ -448,7 +448,9 @@
         "loadBookings": "Error loading bookings"
       },
       "invalidDateRange": "Invalid date range. Ensure the start date is before the end date.",
-      "details": "Details"
+      "available": "Available",
+      "reservation": "Booking",
+      "price": "Price"
     },
     "arrival": {
       "reservationNumber": "Reservation #:",

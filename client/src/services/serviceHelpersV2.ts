@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import type { ErrorResponse } from "types/apiResponse.types";
 
@@ -25,7 +25,7 @@ export const handleGlobalError = (error: unknown): ErrorResponse => {
       isSuccessful: false,
       errors: ["An unexpected error occurred."],
       code: ERROR_CODES.UNKNOWN_ERROR,
-      error: error,
+      error: error as AxiosError,
     };
   }
 };

@@ -448,7 +448,9 @@
         "loadBookings": "Error al cargar reservas"
       },
       "invalidDateRange": "Rango de fechas inválido. Asegúrese de que la fecha de inicio sea anterior a la fecha de fin.",
-      "details": "Detalles"
+      "available": "Disponible",
+      "reservation": "Reserva",
+      "price": "Precio"
     },
     "arrival": {
       "reservationNumber": "Reserva #:",

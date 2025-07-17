@@ -11,15 +11,22 @@ import { Fragment } from "react";
 import PriceCell from "./PriceCell";
 import BookingCell from "./BookingCell";
 
+//services & utils
+import { useLanguage } from "contexts/LanguageContext";
+
 function RoomTable({
   room,
   datesArray,
   datesWithBookingsByRoom,
+  hotelId,
 }: {
-  room: Partial<Room>;
+  room: Room;
   datesArray: Dayjs[];
-  datesWithBookingsByRoom: Record<string, Record<string, Partial<RoomBooking>>>;
+  datesWithBookingsByRoom: Record<string, Record<string, RoomBooking>>;
+  hotelId?: string;
 }): JSX.Element {
+  const { t } = useLanguage();
+
   const bookings: JSX.Element[] = [];
   const prices: JSX.Element[] = [];
 
@@ -29,7 +36,7 @@ function RoomTable({
   for (let i = 0; i < datesArray.length; i++) {
     const date: string | undefined = datesArray[i]?.format("YYYY-MM-DD");
 
-    const roomBooking: Partial<RoomBooking> | undefined = date
+    const roomBooking: RoomBooking | undefined = date
       ? datesWithBookingsByRoom[date]?.[room.id]
       : undefined;
 
@@ -55,6 +62,7 @@ function RoomTable({
           key={`booking-${room.id}-${date}`}
           roomBooking={roomBooking}
           colSpan={colSpan}
+          hotelId={hotelId}
         />
       );
     } else {
@@ -68,22 +76,18 @@ function RoomTable({
 
   return (
     <Fragment>
-      <h6 style={{ position: "sticky", left: 0 }}>{room.name}</h6>
+      <h6 className="room-header">{room.name}</h6>
       <table className="table table-bordered">
         <tbody>
           <tr>
-            <td
-              className="text-center align-content-center bg-dark text-white fw-bold"
-              style={{ minWidth: 80, maxWidth: 80 }}>
-              Reserva
+            <td className="first-column text-center align-content-center bg-dark text-white fw-bold">
+              {t("booking.calendar.reservation")}
             </td>
             {bookings}
           </tr>
           <tr>
-            <td
-              className="text-center align-content-center bg-dark text-white fw-bold"
-              style={{ minWidth: 80, maxWidth: 80 }}>
-              Precio
+            <td className="first-column text-center align-content-center bg-dark text-white fw-bold">
+              {t("booking.calendar.price")}
             </td>
             {prices}
           </tr>

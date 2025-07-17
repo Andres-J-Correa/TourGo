@@ -10,7 +10,7 @@ const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/rooms`;
 export const getByHotelId = async (
   hotelId: string,
   isActive?: boolean
-): Promise<ItemsResponse<Room[]> | ErrorResponse> => {
+): Promise<ItemsResponse<Room> | ErrorResponse> => {
   const queryParams = new URLSearchParams();
   if (isActive) {
     queryParams.append("isActive", isActive.toString());
@@ -24,7 +24,7 @@ export const getByHotelId = async (
     url: `${apiV2.replace(/{hotelId}/, hotelId)}?${queryParams.toString()}`,
   };
   try {
-    const response = await axiosClientV2<ItemsResponse<Room[]>>(config);
+    const response = await axiosClientV2<ItemsResponse<Room>>(config);
     return response.data;
   } catch (error: unknown) {
     return handleGlobalError(error);

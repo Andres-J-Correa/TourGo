@@ -1,3 +1,5 @@
+import type { AxiosError } from "axios";
+
 export interface BaseResponse {
   isSuccessful: boolean;
   transactionId?: string;
@@ -17,7 +19,7 @@ export interface ItemsResponse<T> extends SuccessfulResponse {
 export interface ErrorResponse extends BaseResponse {
   errors: string[];
   code: number;
-  error: unknown;
+  error: AxiosError;
   isSuccessful: false;
 }
 
