@@ -2,7 +2,7 @@ import type { AxiosError } from "axios";
 
 export interface BaseResponse {
   isSuccessful: boolean;
-  transactionId?: string;
+  transactionId: string;
 }
 interface SuccessfulResponse extends BaseResponse {
   isSuccessful: true;

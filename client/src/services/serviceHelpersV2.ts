@@ -24,6 +24,7 @@ export const handleGlobalError = (error: unknown): ErrorResponse => {
 
   const baseErrorResponse: Omit<ErrorResponse, "error"> = {
     isSuccessful: false,
+    transactionId: "",
     errors: ["An unexpected error occurred."],
     code: ERROR_CODES.UNKNOWN_ERROR,
   };

@@ -58,6 +58,7 @@ function DatePickersV2({
             {startLabel}
           </label>
           <DatePicker
+            id="start-date"
             selected={dateStart}
             className="form-control"
             onChange={handleStartChange}
@@ -82,6 +83,7 @@ function DatePickersV2({
             {endLabel}
           </label>
           <DatePicker
+            id="end-date"
             selected={dateEnd}
             className="form-control"
             onChange={handleEndChange}
