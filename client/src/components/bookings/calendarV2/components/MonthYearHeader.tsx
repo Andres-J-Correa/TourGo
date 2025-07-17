@@ -11,7 +11,7 @@ function MonthYearHeader({
 }): JSX.Element {
   return (
     <th
-      className="data-cell text-start align-content-center bg-dark text-white fw-bold"
+      className="data-cell text-start align-content-center bg-light text-dark fw-bold"
       colSpan={colSpan}>
       <div className="text-capitalize">{date.format("MMM YYYY")}</div>
     </th>

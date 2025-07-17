@@ -46,7 +46,7 @@ function DatesTable({ datesArray }: { datesArray: Dayjs[] }): JSX.Element {
     <table className="table table-bordered dates-header table-sm mb-2">
       <thead>
         <tr>
-          <th rowSpan={2} className="bg-dark first-column"></th>
+          <th rowSpan={2} className="bg-light first-column"></th>
           {monthAndYearComponents}
         </tr>
         <tr>{daysComponents}</tr>
