@@ -1,6 +1,6 @@
 // components/staff/InviteCard.jsx
 
-import React from "react";
+import { useMemo } from "react";
 import { Card, CardBody, CardTitle, Row, Col } from "reactstrap";
 import dayjs from "dayjs";
 import { HOTEL_ROLES_BY_ID } from "components/hotels/constants";
@@ -11,10 +11,17 @@ import { useLanguage } from "contexts/LanguageContext";
 
 const StaffInviteCard = ({ invite, handleDeleteClick }) => {
   const { t } = useLanguage();
-  const flags = useFlagBadges(invite.flags);
+
+  const isExpired = useMemo(
+    () => dayjs(invite.expiration).isBefore(dayjs()),
+    [invite.expiration]
+  );
+
+  const flags = useFlagBadges(invite.flags, isExpired);
+
   return (
     <Card className="w-100">
-      {(invite.flags & INVITE_FLAGS_IDS.PENDING) !== 0 && (
+      {!isExpired && (invite.flags & INVITE_FLAGS_IDS.PENDING) !== 0 && (
         <span
           className="position-absolute cursor-pointer top-right-icon"
           title={t("staff.inviteCard.cancelInvite")}

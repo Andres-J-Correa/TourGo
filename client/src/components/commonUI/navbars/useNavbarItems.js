@@ -1,11 +1,11 @@
 import {
   faHotel,
   faCalendarCheck,
-  faClipboardList,
   faBed,
   faUsers,
   faCashRegister,
   faCogs,
+  faCalendarDays,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
@@ -53,7 +53,7 @@ export const useNavbarItems = () => {
     currentHotelItems = [
       {
         name: t("commonUI.navbar.bookings"),
-        icon: faClipboardList,
+        icon: faCalendarCheck,
         position: "left",
         capitalize: true,
         desktopOnly: true,
@@ -77,7 +77,7 @@ export const useNavbarItems = () => {
       },
       {
         name: t("commonUI.navbar.calendar"),
-        icon: faCalendarCheck,
+        icon: faCalendarDays,
         position: "left",
         path: `/hotels/${hotel.current.id}/calendar`,
         capitalize: true,

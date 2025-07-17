@@ -5,7 +5,7 @@ import { useLanguage } from "contexts/LanguageContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHome,
-  faAddressBook,
+  faCalendarCheck,
   faCalendarPlus,
   faCalendarDays,
   faCashRegister,
@@ -37,7 +37,7 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
         <Col>
           <Row className="d-flex align-items-center">
             <Link to={`/hotels/${hotelId}/bookings`}>
-              <FontAwesomeIcon icon={faAddressBook} />
+              <FontAwesomeIcon icon={faCalendarCheck} />
             </Link>
           </Row>
         </Col>

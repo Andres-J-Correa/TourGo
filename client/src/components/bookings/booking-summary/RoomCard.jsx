@@ -25,13 +25,11 @@ const RoomCard = ({ room, bookingNights, extraCharges }) => {
           {room?.segments?.map((seg, i) => (
             <ListGroupItem key={i} className="line-item px-2">
               <span className="line-label">
-                <strong>{t("booking.roomCard.night")}</strong>
+                <strong>{dayjs(seg.date).format("DD/MM/YYYY")}</strong>
               </span>
-              {dayjs(seg.date).format("DD/MM/YYYY")}
               <div className="line-fill" />
               <span className="line-amount">
-                <strong>{t("booking.roomCard.price")}</strong>{" "}
-                {formatCurrency(seg.price, "COP")}
+                <strong>{formatCurrency(seg.price, "COP")}</strong>{" "}
               </span>
             </ListGroupItem>
           ))}

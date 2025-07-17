@@ -38,7 +38,7 @@ const BookingGeneralCharges = ({ bookingData }) => {
     }
 
     return (
-      <Col key={`charge-${index}`} md={4}>
+      <Col key={`charge-${index}`}>
         <div className="line-item">
           <span className="line-label fw-bold">{charge.name}</span>
           <div className="line-fill" />

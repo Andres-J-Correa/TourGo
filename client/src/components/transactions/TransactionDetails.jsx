@@ -257,7 +257,7 @@ const TransactionDetails = ({
       path = "#";
     }
     return (
-      <Link to={path} className="text-decoration-none">
+      <Link to={path} className="text-decoration-none link-primary">
         {txn.entityId}
       </Link>
     );
