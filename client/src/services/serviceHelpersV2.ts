@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosHeaders } from "axios";
+import axios, { AxiosError } from "axios";
 
 import type { ErrorResponse } from "types/apiResponse.types";
 
@@ -20,34 +20,30 @@ const isErrorResponse = (data: unknown): data is ErrorResponse => {
 export const handleGlobalError = (error: unknown): ErrorResponse => {
   if (axios.isAxiosError(error) && isErrorResponse(error.response?.data)) {
     return error.response.data;
-  } else if (axios.isAxiosError(error)) {
-    return {
-      isSuccessful: false,
-      errors: ["An unexpected error occurred."],
-      code: ERROR_CODES.UNKNOWN_ERROR,
-      error,
-    };
-  } else {
-    const axiosError = new AxiosError();
-    axiosError.response = {
-      status: 500,
-      statusText: "Internal Server Error",
-      data: null,
-      config: {
-        headers: new AxiosHeaders({
-          "Content-Type": "application/json",
-        }),
-      },
-      headers: new AxiosHeaders(),
-    };
+  }
 
+  const baseErrorResponse: Omit<ErrorResponse, "error"> = {
+    isSuccessful: false,
+    errors: ["An unexpected error occurred."],
+    code: ERROR_CODES.UNKNOWN_ERROR,
+  };
+
+  if (axios.isAxiosError(error)) {
+    // Case 2: It's an Axios error but does not have a valid ErrorResponse
     return {
-      isSuccessful: false,
-      errors: ["An unexpected error occurred."],
-      code: ERROR_CODES.UNKNOWN_ERROR,
-      error: axiosError,
+      ...baseErrorResponse,
+      error, // keep the real Axios error
     };
   }
+
+  // Case 3: Not an Axios error, preserve original error as much as possible
+  const wrappedError =
+    error instanceof Error ? error : new Error(String(error));
+
+  return {
+    ...baseErrorResponse,
+    error: wrappedError as unknown as AxiosError, // Cast for type safety, but keep real error
+  };
 };
 
 type ReplaceEmptyWithNull<T> = T extends ""
