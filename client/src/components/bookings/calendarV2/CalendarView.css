@@ -1,6 +1,7 @@
 .table-calendar {
   height: calc(100vh - 200px);
   overflow-y: auto;
+  will-change: scroll-position;
 }
 
 .booking-data-cell {

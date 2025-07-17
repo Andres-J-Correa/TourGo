@@ -63,13 +63,13 @@ function BookingCell({
         }>
         <button
           onClick={handleBookingClick}
-          className="btn btn-info w-100 fw-bold text-white p-2 rounded text-center booking-data-cell d-none d-md-block">
+          className="btn btn-success w-100 py-1 px-2 fw-bold rounded text-center booking-data-cell d-none d-md-block">
           {roomBooking.firstName} {roomBooking.lastName}
         </button>
       </Popover>
       <button
         onClick={handleBookingClick}
-        className="btn btn-info w-100 fw-bold text-white p-2 rounded text-center booking-data-cell d-md-none">
+        className="btn btn-success w-100 py-1 px-2 fw-bold rounded text-center booking-data-cell d-md-none">
         {roomBooking.firstName} {roomBooking.lastName}
       </button>
       <BookingViewOffCanvas
