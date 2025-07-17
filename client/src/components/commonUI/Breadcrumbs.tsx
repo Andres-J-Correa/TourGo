@@ -3,7 +3,7 @@ import type { JSX } from "react";
 import type { BreadcrumbsProps } from "./Breadcrumbs.types";
 
 //libs
-import React, { useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Row, Col } from "reactstrap";
 
@@ -11,9 +11,7 @@ const Breadcrumbs = ({
   breadcrumbs,
   active,
 }: BreadcrumbsProps): JSX.Element => {
-  const [mappedBreadcrumbs, setMappedBreadcrumbs] = useState<JSX.Element[]>([]);
-
-  useEffect(() => {
+  const mappedBreadcrumbs = useMemo(() => {
     if (breadcrumbs.length > 0) {
       const mapped: JSX.Element[] = [];
 
@@ -30,7 +28,7 @@ const Breadcrumbs = ({
           );
         }
       });
-      setMappedBreadcrumbs(mapped);
+      return mapped;
     }
   }, [breadcrumbs]);
 

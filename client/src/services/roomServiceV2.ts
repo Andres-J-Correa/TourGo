@@ -1,5 +1,5 @@
 import type { AxiosRequestConfig } from "axios";
-import type { ErrorResponse, ItemsResponse } from "types/apiResponse.types";
+import type { ApiResponse, ItemsResponse } from "types/apiResponse.types";
 import type { Room } from "types/entities/room.types";
 
 import { API_HOST_PREFIX, handleGlobalError } from "./serviceHelpersV2";
@@ -10,7 +10,7 @@ const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/rooms`;
 export const getByHotelId = async (
   hotelId: string,
   isActive?: boolean
-): Promise<ItemsResponse<Room> | ErrorResponse> => {
+): Promise<ApiResponse<ItemsResponse<Room>>> => {
   const queryParams = new URLSearchParams();
   if (isActive) {
     queryParams.append("isActive", isActive.toString());

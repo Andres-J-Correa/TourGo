@@ -1,4 +1,10 @@
-import React, { createContext, useState, useContext, useCallback } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useCallback,
+  useEffect,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { setStringInLocalStorage } from "utils/localStorageHelper";
 import { setDefaultLocale } from "react-datepicker";
@@ -23,9 +29,6 @@ export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(i18n.language || "es");
   const [culture, setCulture] = useState(getCultureFromLanguage(language));
 
-  setDefaultLocale(language);
-  dayjs.locale(language);
-
   const getTranslatedErrorMessage = useCallback(
     (error) => {
       if (Boolean(error?.response?.data?.code)) {
@@ -48,6 +51,11 @@ export const LanguageProvider = ({ children }) => {
     const newCulture = getCultureFromLanguage(lng);
     setCulture(newCulture);
   };
+
+  useEffect(() => {
+    setDefaultLocale(language);
+    dayjs.locale(language);
+  }, [language]);
 
   return (
     <LanguageContext.Provider

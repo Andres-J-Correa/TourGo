@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosHeaders } from "axios";
 
 import type { ErrorResponse } from "types/apiResponse.types";
 
@@ -19,13 +19,33 @@ const isErrorResponse = (data: unknown): data is ErrorResponse => {
 
 export const handleGlobalError = (error: unknown): ErrorResponse => {
   if (axios.isAxiosError(error) && isErrorResponse(error.response?.data)) {
-    return { ...error.response.data, isSuccessful: false };
-  } else {
+    return error.response.data;
+  } else if (axios.isAxiosError(error)) {
     return {
       isSuccessful: false,
       errors: ["An unexpected error occurred."],
       code: ERROR_CODES.UNKNOWN_ERROR,
-      error: error as AxiosError,
+      error,
+    };
+  } else {
+    const axiosError = new AxiosError();
+    axiosError.response = {
+      status: 500,
+      statusText: "Internal Server Error",
+      data: null,
+      config: {
+        headers: new AxiosHeaders({
+          "Content-Type": "application/json",
+        }),
+      },
+      headers: new AxiosHeaders(),
+    };
+
+    return {
+      isSuccessful: false,
+      errors: ["An unexpected error occurred."],
+      code: ERROR_CODES.UNKNOWN_ERROR,
+      error: axiosError,
     };
   }
 };

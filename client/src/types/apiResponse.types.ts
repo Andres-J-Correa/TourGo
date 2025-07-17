@@ -34,3 +34,7 @@ export interface PagedResponse<T> extends SuccessfulResponse {
     hasPreviousPage: boolean;
   };
 }
+
+export type ApiResponse<T> = T extends SuccessfulResponse
+  ? T | ErrorResponse
+  : never;

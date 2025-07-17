@@ -5,7 +5,7 @@ import type {
   RoomBooking,
 } from "types/entities/booking.types";
 import type {
-  ErrorResponse,
+  ApiResponse,
   ItemResponse,
   ItemsResponse,
   PagedResponse,
@@ -24,7 +24,7 @@ const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/bookings`;
 export const getBookingById = async (
   bookingId: string,
   hotelId: string
-): Promise<ItemResponse<Booking> | ErrorResponse> => {
+): Promise<ApiResponse<ItemResponse<Booking>>> => {
   const config: AxiosRequestConfig = {
     headers: {
       "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export type GetPagedMinimalBookingsByDateRangeParams = {
 // Update the function to use the new type
 export const getPagedMinimalBookingsByDateRange = async (
   params: GetPagedMinimalBookingsByDateRangeParams
-): Promise<PagedResponse<BookingMinimal> | ErrorResponse> => {
+): Promise<ApiResponse<PagedResponse<BookingMinimal>>> => {
   const {
     hotelId,
     pageIndex,
@@ -119,7 +119,7 @@ export const getRoomBookingsByDateRange = async (
   hotelId: string,
   startDate: string,
   endDate: string
-): Promise<ItemsResponse<RoomBooking> | ErrorResponse> => {
+): Promise<ApiResponse<ItemsResponse<RoomBooking>>> => {
   const config: AxiosRequestConfig = {
     headers: {
       "Content-Type": "application/json",
