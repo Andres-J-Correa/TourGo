@@ -437,7 +437,8 @@
       "to": "to",
       "of": "of",
       "reservations": "reservations",
-      "page": "Page"
+      "page": "Page",
+      "noBookings": "No bookings found for the selected filters."
     },
     "calendar": {
       "title": "Calendar",

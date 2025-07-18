@@ -437,7 +437,8 @@
       "to": "a",
       "of": "de",
       "reservations": "reservas",
-      "page": "Página"
+      "page": "Página",
+      "noBookings": "No se encontraron reservas para los filtros seleccionados."
     },
     "calendar": {
       "title": "Calendario",

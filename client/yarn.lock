@@ -8780,6 +8780,11 @@ react-lazy-load-image-component@^1.6.2:
     lodash.debounce "^4.0.8"
     lodash.throttle "^4.1.1"
 
+react-number-format@^5.4.4:
+  version "5.4.4"
+  resolved "https://registry.yarnpkg.com/react-number-format/-/react-number-format-5.4.4.tgz#d31f0e260609431500c8d3f81bbd3ae1fb7cacad"
+  integrity sha512-wOmoNZoOpvMminhifQYiYSTCLUDOiUbBunrMrMjA+dV52sY+vck1S4UhR6PkgnoCquvvMSeJjErXZ4qSaWCliA==
+
 react-pdf@^9.2.1:
   version "9.2.1"
   resolved "https://registry.yarnpkg.com/react-pdf/-/react-pdf-9.2.1.tgz#35294da1232d310243ffe5e54f39281e6c98d8d4"

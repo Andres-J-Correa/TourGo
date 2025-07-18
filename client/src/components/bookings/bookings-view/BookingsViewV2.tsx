@@ -340,7 +340,9 @@ function BookingsViewV2(): JSX.Element {
               />
             ))
           ) : (
-            <p>No bookings found for the selected date range.</p>
+            <p className="fw-bold text-center">
+              {t("booking.bookingsView.noBookings")}
+            </p>
           )}
         </div>
         <Row>

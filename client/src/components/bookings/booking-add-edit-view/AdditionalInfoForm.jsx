@@ -4,6 +4,7 @@ import { Row, Col } from "reactstrap";
 import { faPlusSquare, faMinusSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
+import { useNumericFormat } from "react-number-format";
 
 import CustomField from "components/commonUI/forms/CustomField";
 import DateTimePicker from "components/commonUI/forms/DateTimePicker";
@@ -19,6 +20,11 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
   const { setFieldValue, values } = useFormikContext();
   const { t } = useLanguage();
 
+  const { format, removeFormatting } = useNumericFormat({
+    thousandSeparator: ".",
+    decimalSeparator: ",",
+  });
+
   const handleInputChange = (e, fieldName) => {
     const value = e.target.value;
     setFieldValue(fieldName, value); // Update Formik state
@@ -26,6 +32,13 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
       ...values,
       [fieldName]: value,
     });
+  };
+
+  const handleComissionChange = (e) => {
+    const rawValue = e.target.value;
+    // Remove formatting for internal numeric value
+    const numericValue = removeFormatting(rawValue);
+    setFieldValue("externalCommission", numericValue); // Update Formik state
   };
 
   const handleEtaChange = (date) => {
@@ -80,13 +93,13 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
           />
         </Col>
       </Row>
-      <h5 className="mt-4 mb-3">
+      <h5
+        className="mt-4 mb-3 cursor-pointer d-flex"
+        onClick={() => setShowOptionalFields(!showOptionalFields)}>
         {t("booking.additionalInfo.optionalInfo")}
         <FontAwesomeIcon
           icon={showOptionalFields ? faMinusSquare : faPlusSquare}
-          className="ms-2"
-          style={{ cursor: "pointer" }}
-          onClick={() => setShowOptionalFields(!showOptionalFields)}
+          className="ms-2 my-auto"
         />
       </h5>
       {showOptionalFields && (
@@ -138,12 +151,12 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
             <Col md="4">
               <CustomField
                 name="externalCommission"
-                type="number"
+                type="text"
                 placeholder={t("booking.additionalInfo.externalCommission")}
-                step="0.01"
+                value={format(String(values.externalCommission) || "")}
                 isRequired={Boolean(values.bookingProviderId)}
                 disabled={submitting || !Boolean(values.bookingProviderId)}
-                onChange={(e) => handleInputChange(e, "externalCommission")}
+                onChange={handleComissionChange}
               />
             </Col>
           </Row>
