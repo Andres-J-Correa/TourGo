@@ -8,6 +8,7 @@ import type { Dayjs } from "dayjs";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
 //components
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
@@ -21,18 +22,31 @@ import ErrorBoundary from "components/commonUI/ErrorBoundary";
 //services & utils
 import { useLanguage } from "contexts/LanguageContext";
 import { useCalendarTableData } from "./hooks/useCalendarTableData";
+import { getDateString } from "utils/dateHelper";
 
 //styles
 import "./CalendarView.css";
 
+dayjs.extend(isSameOrBefore);
+
 function CalendarView(): JSX.Element {
   const [dates, setDates] = useState<{ start: Date | null; end: Date | null }>({
-    start: dayjs().startOf("month").toDate(),
-    end: dayjs().endOf("month").toDate(),
+    start: dayjs().toDate(),
+    end: dayjs().add(1, "month").toDate(),
   });
 
   const { hotelId } = useParams<{ hotelId: string }>();
   const { t } = useLanguage();
+
+  const isDateRangeValid: boolean = useMemo(() => {
+    return (
+      dayjs(dates.start).isValid() &&
+      dayjs(dates.end).isValid() &&
+      dayjs(getDateString(dates.start)).isSameOrBefore(
+        dayjs(getDateString(dates.end))
+      )
+    );
+  }, [dates.start, dates.end]);
 
   const {
     rooms,
@@ -44,7 +58,11 @@ function CalendarView(): JSX.Element {
     roomBookings: RoomBooking[];
     loadingRooms: boolean;
     loadingBookings: boolean;
-  } = useCalendarTableData(dates.start, dates.end, hotelId);
+  } = useCalendarTableData(
+    isDateRangeValid ? dates.start : null,
+    isDateRangeValid ? dates.end : null,
+    hotelId
+  );
 
   const breadcrumbs: { label: string; path?: string }[] = useMemo(
     () => [
@@ -105,14 +123,6 @@ function CalendarView(): JSX.Element {
       [field]: date,
     }));
   };
-
-  const isDateRangeValid: boolean = useMemo(() => {
-    return (
-      dayjs(dates.start).isValid() &&
-      dayjs(dates.end).isValid() &&
-      dayjs(dates.start).isBefore(dayjs(dates.end))
-    );
-  }, [dates.start, dates.end]);
 
   return (
     <div>

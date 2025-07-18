@@ -44,7 +44,7 @@ function BookingCell({
   if (!roomBooking) {
     return (
       <td
-        className="data-cell text-start text-muted px-4 table-success align-content-center"
+        className="data-cell text-start text-muted ps-3 table-success align-content-center"
         colSpan={colSpan}>
         {t("booking.calendar.available")}
       </td>
