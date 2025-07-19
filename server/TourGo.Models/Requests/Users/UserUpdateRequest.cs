@@ -12,7 +12,7 @@ namespace TourGo.Models.Requests.Users
         [Required, StringLength(50, MinimumLength = 2)]
         public string LastName { get; set; }
 
-        [Phone, StringLength(20, MinimumLength = 4)]
+        [Phone]
         public string? Phone { get; set; }
     }
 }

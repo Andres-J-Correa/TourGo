@@ -12,7 +12,8 @@ namespace TourGo.Models.Requests.Hotels
         [Required, StringLength(100)]
         public string Name { get; set; }
 
-        [Required, StringLength(20)]
+        [Required]
+        [Phone]
         public string Phone { get; set; }
 
         [Required, StringLength(200)]

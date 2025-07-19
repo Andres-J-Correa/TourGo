@@ -9,7 +9,8 @@ namespace TourGo.Models.Requests.Users
 {
     public  class PhoneValidateRequest
     {
-        [Required, StringLength(20)]
+        [Required]
+        [Phone]
         public string Phone { get; set; }
     }
 }

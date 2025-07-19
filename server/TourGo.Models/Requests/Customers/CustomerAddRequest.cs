@@ -19,8 +19,7 @@ namespace TourGo.Models.Requests.Customers
         public string LastName { get; set; }
 
         [Required]
-        [RegularExpression(@"^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$",
-        ErrorMessage = "Invalid phone number format")]
+        [Phone]
         public string Phone { get; set; }
 
         [Required]
