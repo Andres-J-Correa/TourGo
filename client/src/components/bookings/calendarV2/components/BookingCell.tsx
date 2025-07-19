@@ -4,6 +4,8 @@ import type { JSX } from "react";
 
 //libs
 import { useCallback, useState } from "react";
+import { Spinner } from "reactstrap";
+import classNames from "classnames";
 
 //components
 import BookingMinimalCard from "components/bookings/BookingMinimalCard";
@@ -19,15 +21,18 @@ function BookingCell({
   hotelId,
   isFirst = false,
   isAvailable = true,
+  onClick,
 }: {
   roomBooking?: RoomBooking;
   colSpan?: number;
   hotelId?: string;
   isFirst?: boolean;
   isAvailable?: boolean;
+  onClick?: () => Promise<void>;
 }): JSX.Element {
   const [showBookingOffCanvas, setShowBookingOffCanvas] =
     useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { t } = useLanguage();
 
@@ -45,28 +50,47 @@ function BookingCell({
     [roomBooking]
   );
 
+  const handleClick = useCallback(
+    async (e: React.MouseEvent): Promise<void> => {
+      e.stopPropagation();
+
+      if (onClick && !isLoading) {
+        setIsLoading(true);
+        await onClick();
+        setIsLoading(false);
+      }
+    },
+    [onClick, isLoading]
+  );
+
   if (!roomBooking) {
-    if (isAvailable) {
-      return (
-        <td
-          className={`${
-            isFirst ? "border-end-0" : "border-start-0 border-end-0"
-          } data-cell text-start text-muted ps-3 table-success align-content-center`}
-          colSpan={colSpan}>
-          {isFirst ? t("booking.calendar.available") : ""}
-        </td>
-      );
-    } else {
-      return (
-        <td
-          className={`${
-            isFirst ? "border-end-0" : "border-start-0 border-end-0"
-          } data-cell text-start text-muted ps-3 table-danger align-content-center`}
-          colSpan={colSpan}>
-          {isFirst ? t("booking.calendar.closed") : ""}
-        </td>
-      );
-    }
+    return (
+      <td
+        onClick={handleClick}
+        className={classNames("data-cell text-muted cursor-pointer", {
+          "table-success": isAvailable,
+          "table-danger": !isAvailable,
+          "border-end-0": isFirst,
+          "border-start-0 border-end-0": !isFirst,
+          "ps-3 text-start": !isLoading,
+        })}
+        colSpan={colSpan}>
+        {isLoading ? (
+          <Spinner
+            className="data-cell-spinner d-flex mx-auto my-auto"
+            size="sm"
+          />
+        ) : isFirst ? (
+          isAvailable ? (
+            t("booking.calendar.available")
+          ) : (
+            t("booking.calendar.closed")
+          )
+        ) : (
+          ""
+        )}
+      </td>
+    );
   }
 
   return (

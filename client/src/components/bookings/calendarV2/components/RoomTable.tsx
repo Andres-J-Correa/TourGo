@@ -20,12 +20,18 @@ function RoomTable({
   datesArray,
   datesWithBookingsByRoom,
   datesWithAvailabilityByRoom,
+  handleBookingCellClick,
   hotelId,
 }: {
   room: Room;
   datesArray: Dayjs[];
   datesWithBookingsByRoom: Record<string, Record<string, RoomBooking>>;
   datesWithAvailabilityByRoom: Record<string, Record<string, RoomAvailability>>;
+  handleBookingCellClick: (
+    date: string,
+    roomId: number,
+    isOpen: boolean
+  ) => Promise<void>;
   hotelId?: string;
 }): JSX.Element {
   const { t } = useLanguage();
@@ -91,12 +97,17 @@ function RoomTable({
         const isAvailable: boolean | undefined =
           datesWithAvailabilityByRoom[date]?.[room.id]?.isOpen ?? true;
 
+        const handleClick = async (): Promise<void> => {
+          return await handleBookingCellClick(date, room.id, isAvailable);
+        };
+
         if (!previousDate) {
           bookings.push(
             <BookingCell
               key={`booking-${room.id}-${date}`}
               isFirst={true}
               isAvailable={isAvailable}
+              onClick={handleClick}
             />
           );
         } else {
@@ -120,6 +131,7 @@ function RoomTable({
               key={`booking-${room.id}-${date}`}
               isFirst={isFirst}
               isAvailable={isAvailable}
+              onClick={handleClick}
             />
           );
         }
@@ -135,6 +147,7 @@ function RoomTable({
     datesWithAvailabilityByRoom,
     room.id,
     hotelId,
+    handleBookingCellClick,
   ]);
 
   if (!room.id) return <Fragment />;
