@@ -953,7 +953,8 @@
       "bookingProviders": "Proveedores de Reservas",
       "financePartners": "Socios financieros",
       "staffInvites": "Invitaciones de Personal",
-      "financialReports": "Reportes financieros"
+      "financialReports": "Reportes financieros",
+      "roomAvailability": "Disponibilidad de Habitaciones"
     },
     "validation": {
       "nameRequired": "El nombre es obligatorio",

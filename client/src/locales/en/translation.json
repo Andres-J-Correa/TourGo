@@ -953,7 +953,8 @@
       "bookingProviders": "Booking Providers",
       "financePartners": "Finance Partners",
       "staffInvites": "Staff Invitations",
-      "financialReports": "Financial Reports"
+      "financialReports": "Financial Reports",
+      "roomAvailability": "Room Availability"
     },
     "validation": {
       "nameRequired": "Name is required",
