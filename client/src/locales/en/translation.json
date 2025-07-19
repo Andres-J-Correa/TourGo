@@ -446,12 +446,15 @@
       "loadingBookings": "Loading Bookings",
       "errors": {
         "loadRooms": "Error loading rooms",
-        "loadBookings": "Error loading bookings"
+        "loadBookings": "Error loading bookings",
+        "loadAvailability": "Error loading room availability",
+        "upsertAvailability": "Error updating room availability"
       },
       "invalidDateRange": "Invalid date range. Ensure the start date is before the end date.",
       "available": "Available",
       "reservation": "Booking",
-      "price": "Price"
+      "price": "Price",
+      "closed": "Closed"
     },
     "arrival": {
       "reservationNumber": "Reservation #:",
@@ -951,7 +954,8 @@
       "bookingProviders": "Booking Providers",
       "financePartners": "Finance Partners",
       "staffInvites": "Staff Invitations",
-      "financialReports": "Financial Reports"
+      "financialReports": "Financial Reports",
+      "roomAvailability": "Room Availability"
     },
     "validation": {
       "nameRequired": "Name is required",

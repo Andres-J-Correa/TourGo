@@ -29,6 +29,7 @@ const RoomBookingTable = ({
   setSelectedRoomBookings,
   selectedRoomBookings,
   bookingId,
+  roomAvailability,
 }) => {
   const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -45,6 +46,32 @@ const RoomBookingTable = ({
     return { start, end };
   }, [startDate, endDate]);
 
+  const roomAvailabilityByDateAndRoom = useMemo(() => {
+    const roomAvailabilityByDate = {};
+
+    roomAvailability.forEach((availability) => {
+      if (availability.roomId && availability.date) {
+        //check if the date exists in the roomAvailabilityByDate
+        if (!roomAvailabilityByDate[availability.date]) {
+          //if not, create it and initialize with the room id and availability
+          roomAvailabilityByDate[availability.date] = {
+            [availability.roomId]: availability,
+          };
+          return;
+        }
+
+        //if the date exists, check if the room id exists
+        if (!roomAvailabilityByDate[availability.date][availability.roomId]) {
+          //if not, create it and initialize with the availability
+          roomAvailabilityByDate[availability.date][availability.roomId] =
+            availability;
+        }
+      }
+    });
+
+    return roomAvailabilityByDate;
+  }, [roomAvailability]);
+
   // 🔍 Booking lookup
   const getBooking = (date, roomId) =>
     roomBookings?.find(
@@ -60,6 +87,11 @@ const RoomBookingTable = ({
 
     const isPreBooked = getBooking(date, room.id);
     if (isPreBooked) return;
+
+    const isClosed =
+      !roomAvailabilityByDateAndRoom[date]?.[room.id]?.isOpen ?? true;
+
+    if (isClosed) return;
 
     const alreadySelected = selectedRoomBookings.find(
       (c) => c.date === date && c.roomId === room.id
@@ -199,7 +231,9 @@ const RoomBookingTable = ({
       const isAlreadySelected = selectedRoomBookings.some(
         (s) => s.date === date && s.roomId === room.id
       );
-      return !isAlreadyBooked && !isAlreadySelected;
+      const isOpen =
+        roomAvailabilityByDateAndRoom?.[date]?.[room.id]?.isOpen ?? true;
+      return !isAlreadyBooked && !isAlreadySelected && isOpen;
     });
 
     // Build a list of those date+roomId pairs
@@ -379,6 +413,7 @@ const RoomBookingTable = ({
                 selectedRoomBookings={selectedRoomBookings}
                 onCellClick={handleCellClick}
                 disabled={true}
+                roomAvailabilityByDateAndRoom={roomAvailabilityByDateAndRoom}
               />
               {dates.map((date) => (
                 <BookingRow
@@ -389,6 +424,7 @@ const RoomBookingTable = ({
                   currentSelection={currentSelection}
                   selectedRoomBookings={selectedRoomBookings}
                   onCellClick={handleCellClick}
+                  roomAvailabilityByDateAndRoom={roomAvailabilityByDateAndRoom}
                 />
               ))}
               <BookingRow
@@ -399,6 +435,7 @@ const RoomBookingTable = ({
                 selectedRoomBookings={selectedRoomBookings}
                 onCellClick={handleCellClick}
                 disabled={true}
+                roomAvailabilityByDateAndRoom={roomAvailabilityByDateAndRoom}
               />
             </tbody>
           </Table>

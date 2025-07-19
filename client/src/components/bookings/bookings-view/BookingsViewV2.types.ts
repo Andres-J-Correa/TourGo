@@ -1,5 +1,7 @@
-import type { BookingMinimal } from "types/entities/booking.types";
-import type { GetPagedMinimalBookingsByDateRangeParams } from "services/bookingServiceV2";
+import type {
+  BookingMinimal,
+  GetPagedMinimalBookingsByDateRangeParams,
+} from "types/entities/booking.types";
 
 export interface BookingData {
   items: BookingMinimal[];

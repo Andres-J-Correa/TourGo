@@ -38,7 +38,7 @@ const Popover = ({
 
   const hover = useHover(context, {
     enabled: action === "hover",
-    restMs: 100,
+    restMs: 300,
     mouseOnly: true,
     handleClose: safePolygon({ buffer: 4 }), // buffer prevents flicker
   });

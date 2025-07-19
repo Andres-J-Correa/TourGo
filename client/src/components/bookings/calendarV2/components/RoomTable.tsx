@@ -1,11 +1,12 @@
 //types
 import type { RoomBooking } from "types/entities/booking.types";
 import type { Room } from "types/entities/room.types";
+import type { RoomAvailability } from "types/entities/roomAvailability.types";
 import type { Dayjs } from "dayjs";
 import type { JSX } from "react";
 
 //libs
-import { Fragment } from "react";
+import { Fragment, useMemo } from "react";
 
 //components
 import PriceCell from "./PriceCell";
@@ -18,83 +19,157 @@ function RoomTable({
   room,
   datesArray,
   datesWithBookingsByRoom,
+  datesWithAvailabilityByRoom,
+  handleBookingCellClick,
   hotelId,
 }: {
   room: Room;
   datesArray: Dayjs[];
   datesWithBookingsByRoom: Record<string, Record<string, RoomBooking>>;
+  datesWithAvailabilityByRoom: Record<string, Record<string, RoomAvailability>>;
+  handleBookingCellClick: (
+    date: string,
+    roomId: number,
+    isOpen: boolean
+  ) => Promise<void>;
   hotelId?: string;
 }): JSX.Element {
   const { t } = useLanguage();
 
-  const bookings: JSX.Element[] = [];
-  const prices: JSX.Element[] = [];
+  const components = useMemo((): {
+    bookings: JSX.Element[];
+    prices: JSX.Element[];
+  } => {
+    const bookings: JSX.Element[] = [];
+    const prices: JSX.Element[] = [];
+
+    let colSpan: number = 1;
+    for (let i = 0; i < datesArray.length; i++) {
+      const date: string | undefined = datesArray[i]?.format("YYYY-MM-DD");
+
+      if (!date) continue;
+
+      const roomBooking: RoomBooking | undefined =
+        datesWithBookingsByRoom[date]?.[room.id];
+
+      prices.push(
+        <PriceCell
+          key={`price-${room.id}-${date}`}
+          price={roomBooking?.price}
+        />
+      );
+
+      if (roomBooking) {
+        const nextDate: string | undefined =
+          datesArray[i + 1]?.format("YYYY-MM-DD");
+
+        if (!nextDate) {
+          bookings.push(
+            <BookingCell
+              key={`booking-${room.id}-${date}`}
+              roomBooking={roomBooking}
+              colSpan={colSpan}
+              hotelId={hotelId}
+            />
+          );
+        } else {
+          const nextRoomBooking: RoomBooking | undefined =
+            datesWithBookingsByRoom[nextDate]?.[room.id];
+
+          if (nextRoomBooking?.bookingId === roomBooking.bookingId) {
+            colSpan++;
+            continue;
+          }
+
+          bookings.push(
+            <BookingCell
+              key={`booking-${room.id}-${date}`}
+              roomBooking={roomBooking}
+              colSpan={colSpan}
+              hotelId={hotelId}
+            />
+          );
+        }
+      } else {
+        const previousDate: string | undefined =
+          datesArray[i - 1]?.format("YYYY-MM-DD");
+
+        const isAvailable: boolean =
+          datesWithAvailabilityByRoom[date]?.[room.id]?.isOpen ?? true;
+
+        const handleClick = async (): Promise<void> => {
+          return await handleBookingCellClick(date, room.id, isAvailable);
+        };
+
+        if (!previousDate) {
+          bookings.push(
+            <BookingCell
+              key={`booking-${room.id}-${date}`}
+              isFirst={true}
+              isAvailable={isAvailable}
+              onClick={handleClick}
+            />
+          );
+        } else {
+          let isFirst: boolean = false;
+
+          const previousRoomBooking: RoomBooking | undefined =
+            datesWithBookingsByRoom[previousDate]?.[room.id];
+
+          const isPreviousAvailable: boolean =
+            datesWithAvailabilityByRoom[previousDate]?.[room.id]?.isOpen ??
+            true;
+
+          if (isAvailable) {
+            isFirst = !!previousRoomBooking || i === 0 || !isPreviousAvailable;
+          } else {
+            isFirst = !!previousRoomBooking || i === 0 || !!isPreviousAvailable;
+          }
+
+          bookings.push(
+            <BookingCell
+              key={`booking-${room.id}-${date}`}
+              isFirst={isFirst}
+              isAvailable={isAvailable}
+              onClick={handleClick}
+            />
+          );
+        }
+      }
+
+      colSpan = 1;
+    }
+
+    return { bookings, prices };
+  }, [
+    datesArray,
+    datesWithBookingsByRoom,
+    datesWithAvailabilityByRoom,
+    room.id,
+    hotelId,
+    handleBookingCellClick,
+  ]);
 
   if (!room.id) return <Fragment />;
 
-  let colSpan: number = 1;
-  for (let i = 0; i < datesArray.length; i++) {
-    const date: string | undefined = datesArray[i]?.format("YYYY-MM-DD");
-
-    const roomBooking: RoomBooking | undefined = date
-      ? datesWithBookingsByRoom[date]?.[room.id]
-      : undefined;
-
-    prices.push(
-      <PriceCell key={`price-${room.id}-${date}`} price={roomBooking?.price} />
-    );
-
-    const nextDate: string | undefined =
-      datesArray[i + 1]?.format("YYYY-MM-DD");
-
-    const nextRoomBooking: Partial<RoomBooking> | undefined = nextDate
-      ? datesWithBookingsByRoom[nextDate]?.[room.id]
-      : undefined;
-
-    if (roomBooking) {
-      if (nextRoomBooking?.bookingId === roomBooking.bookingId) {
-        colSpan++;
-        continue;
-      }
-
-      bookings.push(
-        <BookingCell
-          key={`booking-${room.id}-${date}`}
-          roomBooking={roomBooking}
-          colSpan={colSpan}
-          hotelId={hotelId}
-        />
-      );
-    } else {
-      if (!nextRoomBooking?.bookingId && i + 1 < datesArray.length) {
-        colSpan++;
-        continue;
-      }
-
-      bookings.push(
-        <BookingCell key={`booking-${room.id}-${date}`} colSpan={colSpan} />
-      );
-    }
-
-    colSpan = 1;
-  }
-
   return (
     <Fragment>
-      <h6 className="room-header mb-1">{room.name}</h6>
+      <h6 className="room-header mb-1 text-decoration-underline">
+        {room.name}
+      </h6>
       <table className="table table-bordered table-sm mb-2">
         <tbody>
           <tr>
             <td className="first-column text-center align-content-center bg-light text-dark fw-bold">
               {t("booking.calendar.reservation")}
             </td>
-            {bookings}
+            {components.bookings}
           </tr>
           <tr>
             <td className="first-column text-center align-content-center bg-light text-dark fw-bold">
               {t("booking.calendar.price")}
             </td>
-            {prices}
+            {components.prices}
           </tr>
         </tbody>
       </table>

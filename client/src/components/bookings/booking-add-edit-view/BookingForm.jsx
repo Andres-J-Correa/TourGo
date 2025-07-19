@@ -89,6 +89,8 @@ function BookingForm({
     isLoadingBookings,
     isLoadingHotelData,
     isHotelDataInitialFetch,
+    isLoadingRoomAvailability,
+    roomAvailability,
   } = useBookingFormData(hotelId, dates);
 
   const navigate = useNavigate();
@@ -101,7 +103,11 @@ function BookingForm({
     personalizedCharges
   );
 
-  const isLoading = isLoadingBookings || isLoadingHotelData || isSubmitting;
+  const isLoading =
+    isLoadingBookings ||
+    isLoadingHotelData ||
+    isSubmitting ||
+    isLoadingRoomAvailability;
 
   const isSameDate = (date1, date2) => {
     const isValidDates = dayjs(date1).isValid() && dayjs(date1).isValid();
@@ -468,7 +474,12 @@ function BookingForm({
         <DateSelector
           dates={dates}
           onDateChange={handleDateChange}
-          isDisabled={submitting || isLoadingBookings || isSubmitting}
+          isDisabled={
+            submitting ||
+            isLoadingBookings ||
+            isSubmitting ||
+            isLoadingRoomAvailability
+          }
           selectedRoomBookings={selectedRoomBookings}
           setSelectedRoomBookings={setSelectedRoomBookings}
         />
@@ -485,6 +496,7 @@ function BookingForm({
           setSelectedRoomBookings={setSelectedRoomBookings}
           selectedRoomBookings={selectedRoomBookings}
           bookingId={bookingId}
+          roomAvailability={roomAvailability}
         />
 
         <h5 className="mt-4 mb-3">

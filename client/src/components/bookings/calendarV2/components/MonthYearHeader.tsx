@@ -13,7 +13,11 @@ function MonthYearHeader({
     <th
       className="data-cell text-start align-content-center bg-light text-dark fw-bold"
       colSpan={colSpan}>
-      <div className="text-capitalize">{date.format("MMM YYYY")}</div>
+      <div>
+        <span className="date-header-text text-capitalize">
+          {date.format("MMM YYYY")}
+        </span>
+      </div>
     </th>
   );
 }

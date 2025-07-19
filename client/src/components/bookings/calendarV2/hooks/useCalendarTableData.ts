@@ -1,6 +1,7 @@
 //types
 import type { RoomBooking } from "types/entities/booking.types";
 import type { Room } from "types/entities/room.types";
+import type { RoomAvailability } from "types/entities/roomAvailability.types";
 
 //libs
 import { useState, useEffect } from "react";
@@ -10,6 +11,7 @@ import { toast } from "react-toastify";
 //services & utils
 import { getByHotelId as getRoomsByHotelId } from "services/roomServiceV2";
 import { getRoomBookingsByDateRange } from "services/bookingServiceV2";
+import { getRoomAvailabilityByDateRange } from "services/roomAvailabilityService";
 import { useLanguage } from "contexts/LanguageContext";
 
 export const useCalendarTableData = (
@@ -21,11 +23,18 @@ export const useCalendarTableData = (
   roomBookings: RoomBooking[];
   loadingRooms: boolean;
   loadingBookings: boolean;
+  loadingAvailability: boolean;
+  roomAvailability: RoomAvailability[];
 } => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomBookings, setRoomBookings] = useState<RoomBooking[]>([]);
+  const [roomAvailability, setRoomAvailability] = useState<RoomAvailability[]>(
+    []
+  );
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
   const [loadingBookings, setLoadingBookings] = useState<boolean>(false);
+  const [loadingAvailability, setLoadingAvailability] =
+    useState<boolean>(false);
 
   const { t } = useLanguage();
 
@@ -53,10 +62,11 @@ export const useCalendarTableData = (
   useEffect(() => {
     if (!hotelId || !startDate || !endDate) return;
 
+    const start = dayjs(startDate).format("YYYY-MM-DD");
+    const end = dayjs(endDate).format("YYYY-MM-DD");
+
     const fetchRoomBookings = async () => {
       setLoadingBookings(true);
-      const start = dayjs(startDate).format("YYYY-MM-DD");
-      const end = dayjs(endDate).format("YYYY-MM-DD");
 
       const response = await getRoomBookingsByDateRange(hotelId, start, end);
 
@@ -71,8 +81,35 @@ export const useCalendarTableData = (
       setLoadingBookings(false);
     };
 
+    const fetchRoomAvailability = async () => {
+      setLoadingAvailability(true);
+      const response = await getRoomAvailabilityByDateRange(
+        hotelId,
+        start,
+        end
+      );
+
+      if (response.isSuccessful) {
+        setRoomAvailability(response.items);
+      } else {
+        if (response.error?.response?.status !== 404) {
+          toast.error(t("booking.calendar.errors.loadAvailability"));
+        }
+        setRoomAvailability([]);
+      }
+      setLoadingAvailability(false);
+    };
+
     fetchRoomBookings();
+    fetchRoomAvailability();
   }, [hotelId, startDate, endDate, t]);
 
-  return { rooms, roomBookings, loadingRooms, loadingBookings };
+  return {
+    rooms,
+    roomBookings,
+    loadingRooms,
+    loadingBookings,
+    loadingAvailability,
+    roomAvailability,
+  };
 };

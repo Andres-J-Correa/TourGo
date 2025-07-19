@@ -2,13 +2,18 @@
 import type { JSX } from "react";
 import type { Room } from "types/entities/room.types";
 import type { RoomBooking } from "types/entities/booking.types";
+import type {
+  RoomAvailability,
+  RoomAvailabilityRequest,
+} from "types/entities/roomAvailability.types";
 import type { Dayjs } from "dayjs";
 
 //libs
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { toast } from "react-toastify";
 
 //components
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
@@ -23,6 +28,7 @@ import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import { useLanguage } from "contexts/LanguageContext";
 import { useCalendarTableData } from "./hooks/useCalendarTableData";
 import { getDateString } from "utils/dateHelper";
+import { upsertRoomAvailability } from "services/roomAvailabilityService";
 
 //styles
 import "./CalendarView.css";
@@ -35,8 +41,20 @@ function CalendarView(): JSX.Element {
     end: dayjs().add(1, "month").toDate(),
   });
 
-  const { hotelId } = useParams<{ hotelId: string }>();
+  const [roomAvailabilityByDateAndRoom, setRoomAvailabilityByDateAndRoom] =
+    useState<Record<string, Record<string, RoomAvailability>>>({});
+
   const { t } = useLanguage();
+  const { hotelId } = useParams<{ hotelId: string }>();
+
+  const breadcrumbs: { label: string; path?: string }[] = useMemo(
+    () => [
+      { label: t("booking.breadcrumb.home"), path: "/" },
+      { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
+      { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
+    ],
+    [hotelId, t]
+  );
 
   const isDateRangeValid: boolean = useMemo(() => {
     return (
@@ -53,43 +71,22 @@ function CalendarView(): JSX.Element {
     roomBookings,
     loadingRooms,
     loadingBookings,
+    loadingAvailability,
+    roomAvailability,
   }: {
     rooms: Room[];
     roomBookings: RoomBooking[];
     loadingRooms: boolean;
     loadingBookings: boolean;
+    loadingAvailability: boolean;
+    roomAvailability: RoomAvailability[];
   } = useCalendarTableData(
     isDateRangeValid ? dates.start : null,
     isDateRangeValid ? dates.end : null,
     hotelId
   );
 
-  const breadcrumbs: { label: string; path?: string }[] = useMemo(
-    () => [
-      { label: t("booking.breadcrumb.home"), path: "/" },
-      { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
-      { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
-    ],
-    [hotelId, t]
-  );
-
-  const datesArray: Dayjs[] = useMemo(() => {
-    const start = dayjs(dates.start);
-    const end = dayjs(dates.end);
-    const days: Dayjs[] = [];
-
-    for (
-      let date = start;
-      date.isBefore(end) || date.isSame(end, "day");
-      date = date.add(1, "day")
-    ) {
-      days.push(date);
-    }
-
-    return days;
-  }, [dates.start, dates.end]);
-
-  const datesWithBookingsByRoom: Record<
+  const roomBookingsByDateAndRoom: Record<
     string,
     Record<string, RoomBooking>
   > = useMemo(() => {
@@ -117,12 +114,104 @@ function CalendarView(): JSX.Element {
     return result;
   }, [roomBookings]);
 
-  const handleDateChange = (field: "start" | "end") => (date: Date | null) => {
-    setDates((prev) => ({
-      ...prev,
-      [field]: date,
-    }));
+  const datesArray: Dayjs[] = useMemo(() => {
+    const start = dayjs(dates.start);
+    const end = dayjs(dates.end);
+    const days: Dayjs[] = [];
+
+    for (
+      let date = start;
+      date.isBefore(end) || date.isSame(end, "day");
+      date = date.add(1, "day")
+    ) {
+      days.push(date);
+    }
+
+    return days;
+  }, [dates.start, dates.end]);
+
+  const mapRoomAvailabilityByDateAndRoom = (
+    roomAvailability: RoomAvailability[]
+  ): Record<string, Record<string, RoomAvailability>> => {
+    const roomAvailabilityByDate: Record<
+      string,
+      Record<string, RoomAvailability>
+    > = {};
+
+    roomAvailability.forEach((availability) => {
+      if (availability.roomId && availability.date) {
+        //check if the date exists in the roomAvailabilityByDate
+        if (!roomAvailabilityByDate[availability.date]) {
+          //if not, create it and initialize with the room id and availability
+          roomAvailabilityByDate[availability.date] = {
+            [availability.roomId]: availability,
+          };
+          return;
+        }
+
+        //if the date exists, check if the room id exists
+        if (!roomAvailabilityByDate[availability.date]![availability.roomId]) {
+          //if not, create it and initialize with the availability
+          roomAvailabilityByDate[availability.date]![availability.roomId] =
+            availability;
+        }
+      }
+    });
+
+    return roomAvailabilityByDate;
   };
+
+  const handleDateChange =
+    (field: "start" | "end") =>
+    (date: Date | null): void => {
+      setDates((prev) => ({
+        ...prev,
+        [field]: date,
+      }));
+    };
+
+  const handleUpsertRoomAvailability = useCallback(
+    async (
+      hotelId: string,
+      availability: RoomAvailabilityRequest
+    ): Promise<void> => {
+      const response = await upsertRoomAvailability(hotelId, availability);
+      if (response.isSuccessful) {
+        setRoomAvailabilityByDateAndRoom((prev) => {
+          const copy = { ...prev };
+          for (const roomAvailability of availability.requests) {
+            copy[roomAvailability.date] = {
+              [roomAvailability.roomId]: {
+                ...roomAvailability,
+                isOpen: availability.isOpen,
+              },
+            };
+          }
+          return copy;
+        });
+      } else {
+        toast.error(t("booking.calendar.errors.upsertAvailability"));
+      }
+    },
+    [t]
+  );
+
+  const handleBookingCellClick = useCallback(
+    async (date: string, roomId: number, isOpen: boolean): Promise<void> => {
+      if (!hotelId) return;
+      await handleUpsertRoomAvailability(hotelId, {
+        requests: [{ roomId, date }],
+        isOpen: !isOpen,
+      });
+    },
+    [hotelId, handleUpsertRoomAvailability]
+  );
+
+  useEffect(() => {
+    setRoomAvailabilityByDateAndRoom(
+      mapRoomAvailabilityByDateAndRoom(roomAvailability)
+    );
+  }, [roomAvailability]);
 
   return (
     <div>
@@ -132,7 +221,9 @@ function CalendarView(): JSX.Element {
       />
       <h3>{t("booking.calendar.title")}</h3>
       <ErrorBoundary>
-        <LoadingOverlay isVisible={loadingRooms || loadingBookings} />
+        <LoadingOverlay
+          isVisible={loadingRooms || loadingBookings || loadingAvailability}
+        />
         <DatePickersV2
           startDate={dates.start}
           endDate={dates.end}
@@ -151,8 +242,10 @@ function CalendarView(): JSX.Element {
                 key={`room-${index}`}
                 room={room}
                 datesArray={datesArray}
-                datesWithBookingsByRoom={datesWithBookingsByRoom}
+                datesWithBookingsByRoom={roomBookingsByDateAndRoom}
+                datesWithAvailabilityByRoom={roomAvailabilityByDateAndRoom}
                 hotelId={hotelId}
+                handleBookingCellClick={handleBookingCellClick}
               />
             ))}
           </div>

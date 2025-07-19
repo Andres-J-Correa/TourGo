@@ -16,6 +16,7 @@ const BookingCell = ({
   selected,
   onCellClick,
   disabled,
+  isOpen,
 }) => {
   const { hotelId } = useParams();
   const { t } = useLanguage();
@@ -39,6 +40,8 @@ const BookingCell = ({
       return `${formatCurrency(selected.price, "COP")}`;
     } else if (currentSelected?.roomId) {
       return t("booking.table.selected");
+    } else if (!isOpen) {
+      return <span>{t("booking.calendar.closed")}</span>;
     } else if (disabled) {
       return (
         <span className="text-white fw-medium">{t("booking.table.free")}</span>
@@ -57,9 +60,9 @@ const BookingCell = ({
       key={room.id}
       className={classNames("text-center booking-table-cell-container", {
         "booked-cell": booking,
-        "bg-secondary text-white": booking || disabled,
-        "cursor-not-allowed": disabled && !booking,
-        "cursor-pointer": !booking,
+        "bg-secondary text-white": booking || disabled || !isOpen,
+        "cursor-not-allowed": !isOpen || (disabled && !booking),
+        "cursor-pointer": !booking && isOpen,
         "bg-success-subtle text-success-emphasis": selected,
         "bg-success text-white": currentSelected,
       })}

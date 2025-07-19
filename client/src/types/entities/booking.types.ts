@@ -3,6 +3,8 @@ import type { Lookup } from "../common.types";
 import type { Room } from "./room.types";
 import type { ExtraCharge } from "./extraCharge.types";
 
+import { BOOKING_VIEW_SORT_OPTIONS } from "components/bookings/bookings-view/constants";
+
 export interface RoomBooking {
   date: string;
   room: Pick<Room, "id" | "name">;
@@ -40,3 +42,21 @@ export interface BookingMinimal extends AuditableEntity {
   lastName: string;
   statusId: number;
 }
+
+// #region Requests
+export interface GetPagedMinimalBookingsByDateRangeParams {
+  hotelId: string;
+  pageIndex: number;
+  pageSize: number;
+  startDate?: string;
+  endDate?: string;
+  isArrivalDate?: boolean;
+  sortColumn?: keyof typeof BOOKING_VIEW_SORT_OPTIONS;
+  sortDirection: "ASC" | "DESC";
+  firstName?: string;
+  lastName?: string;
+  externalBookingId?: string;
+  statusId?: string;
+  bookingId?: string;
+}
+// #endregion

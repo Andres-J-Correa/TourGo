@@ -4,6 +4,7 @@ import { getRoomBookingsByDateRange } from "services/bookingService";
 import { getBookingProvidersMinimalByHotelId } from "services/bookingProviderService";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { getByHotelId as getChargesByHotelId } from "services/extraChargeService";
+import { getRoomAvailabilityByDateRange } from "services/roomAvailabilityService";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { useLanguage } from "contexts/LanguageContext";
@@ -12,7 +13,10 @@ export default function useBookingFormData(hotelId, dates) {
   const [rooms, setRooms] = useState([]);
   const [charges, setCharges] = useState([]);
   const [roomBookings, setRoomBookings] = useState([]);
+  const [roomAvailability, setRoomAvailability] = useState([]);
   const [isLoadingBookings, setIsLoadingBookings] = useState(false);
+  const [isLoadingRoomAvailability, setIsLoadingRoomAvailability] =
+    useState(false);
   const [isLoadingHotelData, setIsLoadingHotelData] = useState(false);
   const [bookingProviderOptions, setBookingProviderOptions] = useState([]);
   const [isHotelDataInitialFetch, setIsHotelDataInitialFetch] = useState(true);
@@ -28,6 +32,24 @@ export default function useBookingFormData(hotelId, dates) {
       if (err?.response?.status !== 404) {
         toast.error(t("booking.errors.loadBookings"));
       }
+    },
+    [t]
+  );
+
+  const onGetRoomAvailabilitySuccess = (res) => {
+    if (res.items?.length > 0) {
+      setRoomAvailability(res.items);
+    } else {
+      setRoomAvailability([]);
+    }
+  };
+
+  const onGetRoomAvailabilityError = useCallback(
+    ({ error }) => {
+      if (error?.response?.status !== 404) {
+        toast.error(t("booking.errors.loadAvailability"));
+      }
+      setRoomAvailability([]);
     },
     [t]
   );
@@ -85,6 +107,8 @@ export default function useBookingFormData(hotelId, dates) {
     if (!isValidDateRange) return;
 
     setIsLoadingBookings(true);
+    setIsLoadingRoomAvailability(true);
+
     getRoomBookingsByDateRange(
       hotelId,
       dayjs(dates.start).subtract(1, "day").format("YYYY-MM-DD"),
@@ -93,7 +117,16 @@ export default function useBookingFormData(hotelId, dates) {
       .then(onGetRoomBookingsSuccess)
       .catch(onGetRoomBookingsError)
       .finally(() => setIsLoadingBookings(false));
-  }, [hotelId, dates, onGetRoomBookingsError]);
+
+    getRoomAvailabilityByDateRange(
+      hotelId,
+      dayjs(dates.start).subtract(1, "day").format("YYYY-MM-DD"),
+      dayjs(dates.end).format("YYYY-MM-DD")
+    )
+      .then(onGetRoomAvailabilitySuccess)
+      .catch(onGetRoomAvailabilityError)
+      .finally(() => setIsLoadingRoomAvailability(false));
+  }, [hotelId, dates, onGetRoomBookingsError, onGetRoomAvailabilityError]);
 
   return {
     rooms,
@@ -103,5 +136,7 @@ export default function useBookingFormData(hotelId, dates) {
     isLoadingHotelData,
     isLoadingBookings,
     isHotelDataInitialFetch,
+    isLoadingRoomAvailability,
+    roomAvailability,
   };
 }

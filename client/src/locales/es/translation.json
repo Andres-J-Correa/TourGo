@@ -446,12 +446,15 @@
       "loadingBookings": "Cargando Reservas",
       "errors": {
         "loadRooms": "Error al cargar habitaciones",
-        "loadBookings": "Error al cargar reservas"
+        "loadBookings": "Error al cargar reservas",
+        "loadAvailability": "Error al cargar disponibilidad de habitaciones",
+        "upsertAvailability": "Error al actualizar disponibilidad de habitaciones"
       },
       "invalidDateRange": "Rango de fechas inválido. Asegúrese de que la fecha de inicio sea anterior a la fecha de fin.",
       "available": "Disponible",
       "reservation": "Reserva",
-      "price": "Precio"
+      "price": "Precio",
+      "closed": "Cerrado"
     },
     "arrival": {
       "reservationNumber": "Reserva #:",
@@ -951,7 +954,8 @@
       "bookingProviders": "Proveedores de Reservas",
       "financePartners": "Socios financieros",
       "staffInvites": "Invitaciones de Personal",
-      "financialReports": "Reportes financieros"
+      "financialReports": "Reportes financieros",
+      "roomAvailability": "Disponibilidad de Habitaciones"
     },
     "validation": {
       "nameRequired": "El nombre es obligatorio",

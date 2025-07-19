@@ -11,6 +11,7 @@ const BookingRow = ({
   selectedRoomBookings = [],
   onCellClick,
   disabled,
+  roomAvailabilityByDateAndRoom,
 }) => (
   <tr key={date}>
     <td
@@ -30,6 +31,9 @@ const BookingRow = ({
           c.date === date && (c.roomId === room.id || c.room?.id === room.id)
       );
 
+      const isOpen =
+        roomAvailabilityByDateAndRoom?.[date]?.[room.id]?.isOpen ?? true;
+
       return (
         <BookingCell
           key={room.id}
@@ -40,6 +44,7 @@ const BookingRow = ({
           selected={selected}
           onCellClick={onCellClick}
           disabled={disabled}
+          isOpen={isOpen}
         />
       );
     })}
