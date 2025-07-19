@@ -181,6 +181,7 @@ function CalendarView(): JSX.Element {
           const copy = { ...prev };
           for (const roomAvailability of availability.requests) {
             copy[roomAvailability.date] = {
+              ...copy[roomAvailability.date],
               [roomAvailability.roomId]: {
                 ...roomAvailability,
                 isOpen: availability.isOpen,
