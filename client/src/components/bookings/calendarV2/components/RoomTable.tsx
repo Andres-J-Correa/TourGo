@@ -94,7 +94,7 @@ function RoomTable({
         const previousDate: string | undefined =
           datesArray[i - 1]?.format("YYYY-MM-DD");
 
-        const isAvailable: boolean | undefined =
+        const isAvailable: boolean =
           datesWithAvailabilityByRoom[date]?.[room.id]?.isOpen ?? true;
 
         const handleClick = async (): Promise<void> => {
