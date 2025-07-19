@@ -19,7 +19,7 @@ const isErrorResponse = (data: unknown): data is ErrorResponse => {
 
 export const handleGlobalError = (error: unknown): ErrorResponse => {
   if (axios.isAxiosError(error) && isErrorResponse(error.response?.data)) {
-    return error.response.data;
+    return { ...error.response.data, error: error };
   }
 
   const baseErrorResponse: Omit<ErrorResponse, "error"> = {

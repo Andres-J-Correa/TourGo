@@ -92,6 +92,7 @@ export const useCalendarTableData = (
       if (response.isSuccessful) {
         setRoomAvailability(response.items);
       } else {
+        debugger;
         if (response.error?.response?.status !== 404) {
           toast.error(t("booking.calendar.errors.loadAvailability"));
         }
