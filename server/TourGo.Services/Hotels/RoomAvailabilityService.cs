@@ -31,7 +31,7 @@ namespace TourGo.Services.Hotels
                 (MySqlParameterCollection param) =>
                 {
                     param.AddWithValue("p_hotelId", hotelId);
-                    param.AddWithValue("p_isOpen", request.IsOpen);
+                    param.AddWithValue("p_isOpen", request.IsOpen ? 1 : 0);
                     param.AddWithValue("p_jsonData", JsonConvert.SerializeObject(request.Requests));
                     param.AddWithValue("p_userId", userId);
                 });
@@ -47,8 +47,8 @@ namespace TourGo.Services.Hotels
                 (MySqlParameterCollection param) =>
                 {
                     param.AddWithValue("p_hotelId", hotelId);
-                    param.AddWithValue("p_startDate", startDate);
-                    param.AddWithValue("p_endDate", endDate);
+                    param.AddWithValue("p_startDate", startDate.ToString("yyyy-MM-dd"));
+                    param.AddWithValue("p_endDate", endDate.ToString("yyyy-MM-dd"));
                 },
                 (IDataReader reader, short set) =>
                 {

@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Enums;
 using TourGo.Models.Requests.Hotels;
 using TourGo.Services;
 using TourGo.Services.Interfaces;
 using TourGo.Services.Interfaces.Hotels;
 using TourGo.Web.Api.Extensions;
 using TourGo.Web.Controllers;
+using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 
 namespace TourGo.Web.Api.Controllers.Hotels
@@ -31,6 +33,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         }
 
         [HttpPost]
+        [EntityAuth(EntityTypeEnum.RoomAvailability, EntityActionTypeEnum.Create)]
         public ActionResult<SuccessResponse> Upsert(string hotelId, RoomAvailabilityUpsertRequest request)
         {
             ObjectResult result;
@@ -55,6 +58,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         }
         [HttpGet("date-range")]
+        [EntityAuth(EntityTypeEnum.RoomAvailability, EntityActionTypeEnum.Read)]
         public ActionResult<ItemsResponse<RoomAvailability>> GetAll(string hotelId, [FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
         {
             
