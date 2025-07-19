@@ -447,7 +447,8 @@
       "errors": {
         "loadRooms": "Error loading rooms",
         "loadBookings": "Error loading bookings",
-        "loadAvailability": "Error loading room availability"
+        "loadAvailability": "Error loading room availability",
+        "upsertAvailability": "Error updating room availability"
       },
       "invalidDateRange": "Invalid date range. Ensure the start date is before the end date.",
       "available": "Available",

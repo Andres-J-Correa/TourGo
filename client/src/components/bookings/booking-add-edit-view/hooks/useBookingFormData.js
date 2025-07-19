@@ -47,7 +47,7 @@ export default function useBookingFormData(hotelId, dates) {
   const onGetRoomAvailabilityError = useCallback(
     ({ error }) => {
       if (error?.response?.status !== 404) {
-        toast.error(t("booking.errors.loadRoomAvailability"));
+        toast.error(t("booking.errors.loadAvailability"));
       }
       setRoomAvailability([]);
     },

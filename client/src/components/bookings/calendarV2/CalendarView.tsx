@@ -170,28 +170,31 @@ function CalendarView(): JSX.Element {
       }));
     };
 
-  const handleUpsertRoomAvailability = async (
-    hotelId: string,
-    availability: RoomAvailabilityRequest
-  ): Promise<void> => {
-    const response = await upsertRoomAvailability(hotelId, availability);
-    if (response.isSuccessful) {
-      setRoomAvailabilityByDateAndRoom((prev) => {
-        const copy = { ...prev };
-        for (const roomAvailability of availability.requests) {
-          copy[roomAvailability.date] = {
-            [roomAvailability.roomId]: {
-              ...roomAvailability,
-              isOpen: availability.isOpen,
-            },
-          };
-        }
-        return copy;
-      });
-    } else {
-      toast.error("Error al actualizar la disponibilidad de la habitación");
-    }
-  };
+  const handleUpsertRoomAvailability = useCallback(
+    async (
+      hotelId: string,
+      availability: RoomAvailabilityRequest
+    ): Promise<void> => {
+      const response = await upsertRoomAvailability(hotelId, availability);
+      if (response.isSuccessful) {
+        setRoomAvailabilityByDateAndRoom((prev) => {
+          const copy = { ...prev };
+          for (const roomAvailability of availability.requests) {
+            copy[roomAvailability.date] = {
+              [roomAvailability.roomId]: {
+                ...roomAvailability,
+                isOpen: availability.isOpen,
+              },
+            };
+          }
+          return copy;
+        });
+      } else {
+        toast.error(t("booking.calendar.errors.upsertAvailability"));
+      }
+    },
+    [t]
+  );
 
   const handleBookingCellClick = useCallback(
     async (date: string, roomId: number, isOpen: boolean): Promise<void> => {
@@ -201,7 +204,7 @@ function CalendarView(): JSX.Element {
         isOpen: !isOpen,
       });
     },
-    [hotelId]
+    [hotelId, handleUpsertRoomAvailability]
   );
 
   useEffect(() => {

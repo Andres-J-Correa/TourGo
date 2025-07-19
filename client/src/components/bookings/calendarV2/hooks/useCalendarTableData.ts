@@ -93,7 +93,7 @@ export const useCalendarTableData = (
         setRoomAvailability(response.items);
       } else {
         if (response.error?.response?.status !== 404) {
-          toast.error(t("booking.calendar.errors.loadRoomAvailability"));
+          toast.error(t("booking.calendar.errors.loadAvailability"));
         }
         setRoomAvailability([]);
       }
