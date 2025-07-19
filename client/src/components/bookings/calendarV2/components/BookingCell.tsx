@@ -17,10 +17,12 @@ function BookingCell({
   roomBooking,
   colSpan = 1,
   hotelId,
+  isFirstAvailable = false,
 }: {
   roomBooking?: RoomBooking;
   colSpan?: number;
   hotelId?: string;
+  isFirstAvailable?: boolean;
 }): JSX.Element {
   const [showBookingOffCanvas, setShowBookingOffCanvas] =
     useState<boolean>(false);
@@ -44,9 +46,11 @@ function BookingCell({
   if (!roomBooking) {
     return (
       <td
-        className="data-cell text-start text-muted ps-3 table-success align-content-center"
+        className={`${
+          isFirstAvailable ? "border-end-0" : "border-start-0 border-end-0"
+        } data-cell text-start text-muted ps-3 table-success align-content-center`}
         colSpan={colSpan}>
-        {t("booking.calendar.available")}
+        {isFirstAvailable ? t("booking.calendar.available") : ""}
       </td>
     );
   }

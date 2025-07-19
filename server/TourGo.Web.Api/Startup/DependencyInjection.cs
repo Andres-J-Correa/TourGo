@@ -114,6 +114,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IFinancialReportService, FinancialReportService>();
             services.AddSingleton<IEncryptionService, EncryptionService>();
             services.AddSingleton<IGoogleRecaptchaService, GoogleRecaptchaService>();
+            services.AddSingleton<IRoomAvailabilityService, RoomAvailabilityService>();
 
             services.AddScoped<IClaimsTransformation, ClaimsEnrichmentTransformation>();
 

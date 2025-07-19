@@ -32,6 +32,12 @@
   z-index: 2;
 }
 
+.date-header-text {
+  position: sticky;
+  left: 0;
+  padding-left: 0.5rem;
+}
+
 @media (max-width: 600px) {
   th,
   td {

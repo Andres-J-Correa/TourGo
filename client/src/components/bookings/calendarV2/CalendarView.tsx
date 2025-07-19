@@ -117,12 +117,14 @@ function CalendarView(): JSX.Element {
     return result;
   }, [roomBookings]);
 
-  const handleDateChange = (field: "start" | "end") => (date: Date | null) => {
-    setDates((prev) => ({
-      ...prev,
-      [field]: date,
-    }));
-  };
+  const handleDateChange =
+    (field: "start" | "end") =>
+    (date: Date | null): void => {
+      setDates((prev) => ({
+        ...prev,
+        [field]: date,
+      }));
+    };
 
   return (
     <div>

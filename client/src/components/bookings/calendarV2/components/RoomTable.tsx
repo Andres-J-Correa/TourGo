@@ -44,14 +44,14 @@ function RoomTable({
       <PriceCell key={`price-${room.id}-${date}`} price={roomBooking?.price} />
     );
 
-    const nextDate: string | undefined =
-      datesArray[i + 1]?.format("YYYY-MM-DD");
-
-    const nextRoomBooking: Partial<RoomBooking> | undefined = nextDate
-      ? datesWithBookingsByRoom[nextDate]?.[room.id]
-      : undefined;
-
     if (roomBooking) {
+      const nextDate: string | undefined =
+        datesArray[i + 1]?.format("YYYY-MM-DD");
+
+      const nextRoomBooking: Partial<RoomBooking> | undefined = nextDate
+        ? datesWithBookingsByRoom[nextDate]?.[room.id]
+        : undefined;
+
       if (nextRoomBooking?.bookingId === roomBooking.bookingId) {
         colSpan++;
         continue;
@@ -66,13 +66,18 @@ function RoomTable({
         />
       );
     } else {
-      if (!nextRoomBooking?.bookingId && i + 1 < datesArray.length) {
-        colSpan++;
-        continue;
-      }
+      const previousDate: string | undefined =
+        datesArray[i - 1]?.format("YYYY-MM-DD");
+
+      const previousRoomBooking: Partial<RoomBooking> | undefined = previousDate
+        ? datesWithBookingsByRoom[previousDate]?.[room.id]
+        : undefined;
 
       bookings.push(
-        <BookingCell key={`booking-${room.id}-${date}`} colSpan={colSpan} />
+        <BookingCell
+          key={`booking-${room.id}-${date}`}
+          isFirstAvailable={!!previousRoomBooking || i === 0}
+        />
       );
     }
 
@@ -81,7 +86,9 @@ function RoomTable({
 
   return (
     <Fragment>
-      <h6 className="room-header mb-1">{room.name}</h6>
+      <h6 className="room-header mb-1 text-decoration-underline">
+        {room.name}
+      </h6>
       <table className="table table-bordered table-sm mb-2">
         <tbody>
           <tr>
