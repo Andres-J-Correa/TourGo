@@ -4,7 +4,7 @@ export interface BaseResponse {
   isSuccessful: boolean;
   transactionId: string;
 }
-interface SuccessfulResponse extends BaseResponse {
+export interface SuccessfulResponse extends BaseResponse {
   isSuccessful: true;
 }
 

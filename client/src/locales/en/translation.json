@@ -446,12 +446,14 @@
       "loadingBookings": "Loading Bookings",
       "errors": {
         "loadRooms": "Error loading rooms",
-        "loadBookings": "Error loading bookings"
+        "loadBookings": "Error loading bookings",
+        "loadAvailability": "Error loading room availability"
       },
       "invalidDateRange": "Invalid date range. Ensure the start date is before the end date.",
       "available": "Available",
       "reservation": "Booking",
-      "price": "Price"
+      "price": "Price",
+      "closed": "Closed"
     },
     "arrival": {
       "reservationNumber": "Reservation #:",

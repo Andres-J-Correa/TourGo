@@ -2,6 +2,7 @@
 import type { JSX } from "react";
 import type { Room } from "types/entities/room.types";
 import type { RoomBooking } from "types/entities/booking.types";
+import type { RoomAvailability } from "types/entities/roomAvailability.types";
 import type { Dayjs } from "dayjs";
 
 //libs
@@ -53,11 +54,15 @@ function CalendarView(): JSX.Element {
     roomBookings,
     loadingRooms,
     loadingBookings,
+    loadingAvailability,
+    roomAvailability,
   }: {
     rooms: Room[];
     roomBookings: RoomBooking[];
     loadingRooms: boolean;
     loadingBookings: boolean;
+    loadingAvailability: boolean;
+    roomAvailability: RoomAvailability[];
   } = useCalendarTableData(
     isDateRangeValid ? dates.start : null,
     isDateRangeValid ? dates.end : null,
@@ -89,7 +94,7 @@ function CalendarView(): JSX.Element {
     return days;
   }, [dates.start, dates.end]);
 
-  const datesWithBookingsByRoom: Record<
+  const roomBookingsByDateAndRoom: Record<
     string,
     Record<string, RoomBooking>
   > = useMemo(() => {
@@ -117,6 +122,38 @@ function CalendarView(): JSX.Element {
     return result;
   }, [roomBookings]);
 
+  const roomAvailabilityByDateAndRoom: Record<
+    string,
+    Record<string, RoomAvailability>
+  > = useMemo(() => {
+    const roomAvailabilityByDate: Record<
+      string,
+      Record<string, RoomAvailability>
+    > = {};
+
+    roomAvailability.forEach((availability) => {
+      if (availability.roomId && availability.date) {
+        //check if the date exists in the roomAvailabilityByDate
+        if (!roomAvailabilityByDate[availability.date]) {
+          //if not, create it and initialize with the room id and availability
+          roomAvailabilityByDate[availability.date] = {
+            [availability.roomId]: availability,
+          };
+          return;
+        }
+
+        //if the date exists, check if the room id exists
+        if (!roomAvailabilityByDate[availability.date]![availability.roomId]) {
+          //if not, create it and initialize with the availability
+          roomAvailabilityByDate[availability.date]![availability.roomId] =
+            availability;
+        }
+      }
+    });
+
+    return roomAvailabilityByDate;
+  }, [roomAvailability]);
+
   const handleDateChange =
     (field: "start" | "end") =>
     (date: Date | null): void => {
@@ -134,7 +171,9 @@ function CalendarView(): JSX.Element {
       />
       <h3>{t("booking.calendar.title")}</h3>
       <ErrorBoundary>
-        <LoadingOverlay isVisible={loadingRooms || loadingBookings} />
+        <LoadingOverlay
+          isVisible={loadingRooms || loadingBookings || loadingAvailability}
+        />
         <DatePickersV2
           startDate={dates.start}
           endDate={dates.end}
@@ -153,7 +192,8 @@ function CalendarView(): JSX.Element {
                 key={`room-${index}`}
                 room={room}
                 datesArray={datesArray}
-                datesWithBookingsByRoom={datesWithBookingsByRoom}
+                datesWithBookingsByRoom={roomBookingsByDateAndRoom}
+                datesWithAvailabilityByRoom={roomAvailabilityByDateAndRoom}
                 hotelId={hotelId}
               />
             ))}

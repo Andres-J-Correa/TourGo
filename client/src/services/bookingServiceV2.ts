@@ -3,6 +3,7 @@ import type {
   Booking,
   BookingMinimal,
   RoomBooking,
+  GetPagedMinimalBookingsByDateRangeParams,
 } from "types/entities/booking.types";
 import type {
   ApiResponse,
@@ -17,7 +18,6 @@ import {
   //   replaceEmptyStringsWithNull,
 } from "./serviceHelpersV2";
 import axiosClientV2 from "services/axiosClientV2";
-import { BOOKING_VIEW_SORT_OPTIONS } from "components/bookings/bookings-view/constants";
 
 const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/bookings`;
 
@@ -38,22 +38,6 @@ export const getBookingById = async (
   } catch (error: unknown) {
     return handleGlobalError(error);
   }
-};
-
-export type GetPagedMinimalBookingsByDateRangeParams = {
-  hotelId: string;
-  pageIndex: number;
-  pageSize: number;
-  startDate?: string;
-  endDate?: string;
-  isArrivalDate?: boolean;
-  sortColumn?: keyof typeof BOOKING_VIEW_SORT_OPTIONS;
-  sortDirection: "ASC" | "DESC";
-  firstName?: string;
-  lastName?: string;
-  externalBookingId?: string;
-  statusId?: string;
-  bookingId?: string;
 };
 
 // Update the function to use the new type
