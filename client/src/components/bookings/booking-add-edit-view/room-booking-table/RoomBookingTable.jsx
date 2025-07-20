@@ -88,10 +88,10 @@ const RoomBookingTable = ({
     const isPreBooked = getBooking(date, room.id);
     if (isPreBooked) return;
 
-    const isClosed =
-      !roomAvailabilityByDateAndRoom[date]?.[room.id]?.isOpen ?? true;
+    const isOpen =
+      roomAvailabilityByDateAndRoom[date]?.[room.id]?.isOpen ?? true;
 
-    if (isClosed) return;
+    if (!isOpen) return;
 
     const alreadySelected = selectedRoomBookings.find(
       (c) => c.date === date && c.roomId === room.id
