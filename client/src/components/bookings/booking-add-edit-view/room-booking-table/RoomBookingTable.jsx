@@ -20,6 +20,7 @@ import BookingRow from "./BookingRow";
 import RoomHeader from "./RoomHeader";
 import "./RoomBookingTable.css"; // Custom styles for the table
 import { useLanguage } from "contexts/LanguageContext"; // add import
+import { useNumericFormat } from "react-number-format";
 
 const RoomBookingTable = ({
   startDate,
@@ -71,6 +72,17 @@ const RoomBookingTable = ({
 
     return roomAvailabilityByDate;
   }, [roomAvailability]);
+
+  const { format, removeFormatting } = useNumericFormat({
+    thousandSeparator: ".",
+    decimalSeparator: ",",
+  });
+
+  const handlePriceChange = (e) => {
+    const rawValue = e.target.value;
+    const numericValue = removeFormatting(rawValue);
+    setPrice(numericValue);
+  };
 
   // 🔍 Booking lookup
   const getBooking = (date, roomId) =>
@@ -455,12 +467,10 @@ const RoomBookingTable = ({
                 handlePriceSubmit();
               }}>
               <Input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                type="text"
+                value={format(price)}
+                onChange={handlePriceChange}
                 placeholder={t("booking.table.pricePlaceholder")}
-                min="0"
-                step="0.01"
                 autoFocus={true}
               />
               <div className="d-flex justify-content-end mt-3">

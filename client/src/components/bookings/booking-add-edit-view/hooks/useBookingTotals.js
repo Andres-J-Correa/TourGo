@@ -11,7 +11,7 @@ export default function useBookingTotals(
     const subtotal =
       selectedRoomBookings.length > 0
         ? selectedRoomBookings?.reduce((acc, booking) => {
-            return acc + (booking?.price || 0);
+            return acc + Number(booking?.price || 0);
           }, 0)
         : 0;
 
@@ -20,19 +20,23 @@ export default function useBookingTotals(
         ? selectedCharges?.reduce((acc, charge) => {
             switch (charge.type.id) {
               case EXTRA_CHARGE_TYPE_IDS.PERCENTAGE:
-                return acc + subtotal * charge.amount;
+                return acc + subtotal * Number(charge.amount);
               case EXTRA_CHARGE_TYPE_IDS.DAILY:
-                return acc + charge.amount * selectedRoomBookings.length;
+                return (
+                  acc + Number(charge.amount) * selectedRoomBookings.length
+                );
               case EXTRA_CHARGE_TYPE_IDS.PER_ROOM: {
                 const selectedRooms = new Set(
                   selectedRoomBookings.map((booking) => booking.roomId)
                 );
-                return acc + charge.amount * selectedRooms.size;
+                return acc + Number(charge.amount) * selectedRooms.size;
               }
               case EXTRA_CHARGE_TYPE_IDS.GENERAL:
-                return acc + charge.amount;
+                return acc + Number(charge.amount);
               case EXTRA_CHARGE_TYPE_IDS.PER_PERSON: {
-                return acc + charge.amount * (formData?.adultGuests || 0);
+                return (
+                  acc + Number(charge.amount) * (formData?.adultGuests || 0)
+                );
               }
               default:
                 return acc;
@@ -42,7 +46,7 @@ export default function useBookingTotals(
 
     if (personalizedCharges?.length > 0) {
       chargesTotal += personalizedCharges.reduce((acc, charge) => {
-        return acc + charge.amount;
+        return acc + Number(charge.amount);
       }, 0);
     }
 

@@ -23,6 +23,7 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 import { isEqual } from "lodash";
+import { useNumericFormat } from "react-number-format";
 
 function TransactionUpdateForm({
   transaction,
@@ -39,6 +40,11 @@ function TransactionUpdateForm({
   const { t, getTranslatedErrorMessage } = useLanguage();
   const transactionUpdateValidationSchema =
     useTransactionUpdateValidationSchema();
+
+  const { format } = useNumericFormat({
+    thousandSeparator: ".",
+    decimalSeparator: ",",
+  });
 
   const initialValues = {
     amount: transaction?.amount || 0,
@@ -244,12 +250,12 @@ function TransactionUpdateForm({
               <Col md={4}>
                 <CustomField
                   name="amount"
-                  type="number"
+                  type="text"
                   className="form-control"
                   placeholder={t("transactions.table.amount")}
-                  step="0.01"
                   isRequired={true}
                   disabled={true}
+                  value={format(String(values.amount))}
                 />
               </Col>
               <Col md={4}>

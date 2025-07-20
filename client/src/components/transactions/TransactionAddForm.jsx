@@ -20,6 +20,7 @@ import { ERROR_CODES } from "constants/errorCodes";
 
 import { Formik, Form } from "formik";
 import { Button, Col, InputGroup, InputGroupText, Row } from "reactstrap";
+import { useNumericFormat } from "react-number-format";
 
 import classNames from "classnames";
 import dayjs from "dayjs";
@@ -42,6 +43,11 @@ function TransactionAddForm({
   const transactionAddValidationSchema = useTransactionAddValidationSchema();
 
   const [files, setFiles] = useState([]);
+
+  const { format, removeFormatting } = useNumericFormat({
+    thousandSeparator: ".",
+    decimalSeparator: ",",
+  });
 
   const handleCancelClick = () => {
     setShowForm(false);
@@ -299,6 +305,12 @@ function TransactionAddForm({
           setFieldValue("subcategoryId", "");
         };
 
+        const handleAmountChange = (e) => {
+          const rawValue = e.target.value;
+          const numericValue = removeFormatting(rawValue);
+          setFieldValue("amount", numericValue);
+        };
+
         return (
           <Form
             className={classNames("mt-4 p-3 border rounded shadow-lg", {
@@ -320,11 +332,12 @@ function TransactionAddForm({
               <Col md={4}>
                 <CustomField
                   name="amount"
-                  type="number"
+                  type="text"
                   className="form-control"
                   placeholder={t("transactions.table.amount")}
-                  step="0.01"
                   isRequired={true}
+                  onChange={handleAmountChange}
+                  value={format(values.amount)}
                 />
               </Col>
               <Col md={4}>

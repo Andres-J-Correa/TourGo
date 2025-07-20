@@ -18,6 +18,7 @@ import {
 } from "reactstrap";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
+import { useNumericFormat } from "react-number-format";
 
 // Internal Services/Utilities
 import {
@@ -59,6 +60,17 @@ const ExtraChargesView = () => {
 
   const { getTranslatedErrorMessage, t } = useLanguage(); // changed
   const validationSchema = useAddValidationSchema();
+
+  const { format, removeFormatting } = useNumericFormat({
+    thousandSeparator: ".",
+    decimalSeparator: ",",
+  });
+
+  const handleAmountChange = (setFieldValue) => (e) => {
+    const rawValue = e.target.value;
+    const numericValue = removeFormatting(rawValue);
+    setFieldValue("amount", numericValue);
+  };
 
   const breadcrumbs = [
     { label: t("booking.breadcrumb.home"), path: "/" },
@@ -394,7 +406,7 @@ const ExtraChargesView = () => {
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
                 enableReinitialize>
-                {({ values }) => (
+                {({ values, setFieldValue }) => (
                   <Form>
                     <ErrorAlert />
                     <Row>
@@ -414,10 +426,12 @@ const ExtraChargesView = () => {
                           )}
                           <CustomField
                             name="amount"
-                            type="number"
+                            type="text"
                             className="form-control"
                             placeholder={t("extraCharges.amountPlaceholder")}
                             isRequired={true}
+                            onChange={handleAmountChange(setFieldValue)}
+                            value={format(String(values.amount))}
                           />
                           {values.typeId && Number(values.typeId) === 1 && (
                             <InputGroupText className="mb-3">%</InputGroupText>
