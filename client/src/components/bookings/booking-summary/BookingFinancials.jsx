@@ -15,9 +15,9 @@ const BookingFinancials = ({ bookingData, isInvoiceView }) => {
   } = bookingData || {};
   const totalPaid =
     transactions?.length > 0
-      ? transactions?.reduce((sum, txn) => sum + txn.amount, 0)
+      ? transactions?.reduce((sum, txn) => sum + Number(txn.amount), 0)
       : 0;
-  const balance = total - totalPaid;
+  const balance = Number(total) - Number(totalPaid);
 
   return (
     <>
