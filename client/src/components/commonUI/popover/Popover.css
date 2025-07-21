@@ -6,3 +6,9 @@
   max-width: 500px;
   min-width: 400px;
 }
+
+@media (max-width: 576px) {
+  .popover-content {
+    min-width: 100%;
+  }
+}
