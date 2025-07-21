@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
 import CustomField from "components/commonUI/forms/CustomField";
-import Dropzone from "components/commonUI/forms/Dropzone";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import TransactionCategoriesExplanationIcon from "components/transactions/TransactionCategoriesExplanationIcon";
+import FilePondDropzone from "components/commonUI/forms/FilePondDropzone";
 
 import { useAppContext } from "contexts/GlobalAppContext";
 import { getDateString } from "utils/dateHelper";
@@ -147,10 +147,14 @@ function TransactionAddForm({
 
   const handleFileUpload = async (transaction, file) => {
     try {
-      const compressedFile = await compressImage(file, 35 * 1024); // 35 KB
+      let fileToUpload = file;
+
+      if (file.type.startsWith("image/")) {
+        fileToUpload = await compressImage(file, 35 * 1024); // 35 KB
+      }
 
       const response = await updateDocumentUrl(
-        compressedFile,
+        fileToUpload,
         transaction.id,
         transaction.amount,
         hotelId
@@ -461,19 +465,24 @@ function TransactionAddForm({
                 {t("transactions.addForm.maxSize")}
               </span>
             </h6>
-            <Dropzone
-              onDropAccepted={(files) => {
-                setFiles(files);
-              }}
-              multiple={false}
-              accept={{
-                "image/*": [".png", ".jpeg", ".jpg", "webp"],
-              }}
-              disabled={submitting}
-              setFiles={setFiles}
-              files={files}
-              maxSize={1000 * 1024} // 1 MB
-            />
+            <Row className="justify-content-center">
+              <Col lg={6}>
+                <FilePondDropzone
+                  files={files}
+                  setFiles={(acceptedFiles) => setFiles(acceptedFiles)}
+                  acceptedFileTypes={[
+                    "image/png",
+                    "image/jpeg",
+                    "image/webp",
+                    "image/jpg",
+                    "application/pdf",
+                  ]}
+                  disabled={submitting}
+                  allowMultiple={false}
+                  maxFileSize={1000 * 1024} // 1 MB
+                />
+              </Col>
+            </Row>
           </Form>
         );
       }}

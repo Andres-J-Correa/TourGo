@@ -4,10 +4,10 @@ import { Row, Col, Button } from "reactstrap";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 
-import Dropzone from "components/commonUI/forms/Dropzone";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import SupportDocumentModal from "components/transactions/SupportDocumentModal";
 import TransactionVersionsOffCanvas from "components/transactions/TransactionVersionsOffCanvas";
+import FilePondDropzone from "components/commonUI/forms/FilePondDropzone";
 
 import {
   TRANSACTION_CATEGORIES_BY_ID,
@@ -90,7 +90,7 @@ const TransactionDetails = ({
 
     if (!result.isConfirmed || files.length === 0) return;
 
-    const file = files[0];
+    let file = files[0];
 
     try {
       setSubmitting(true);
@@ -101,10 +101,13 @@ const TransactionDetails = ({
         didOpen: () => Swal.showLoading(),
       });
 
-      const compressedFile = await compressImage(file, 35 * 1024); // 35 KB
+      //check file type if image compress it
+      if (file.type.startsWith("image/")) {
+        file = await compressImage(file, 35 * 1024); // 35 KB
+      }
 
       const uploadResponse = await updateDocumentUrl(
-        compressedFile,
+        file,
         txn.id,
         txn.amount,
         hotelId
@@ -425,34 +428,43 @@ const TransactionDetails = ({
           <Col>
             <h6 className="text-center mt-3 mb-1">
               {t("transactions.details.attachDocument")}
-              <span className="text-muted"> (.png, .jpg, .jpeg, .webp)</span>
+              <span className="text-muted">
+                {" "}
+                (.png, .jpg, .jpeg, .webp, .pdf)
+              </span>
               <br />
               <span className="text-muted">
                 {t("transactions.details.maxSize")}
               </span>
             </h6>
-            <Dropzone
-              onDropAccepted={(acceptedFiles) => setFiles(acceptedFiles)}
-              multiple={false}
-              accept={{
-                "image/*": [".png", ".jpeg", ".jpg", "webp"],
-              }}
-              disabled={submitting}
-              setFiles={setFiles}
-              files={files}
-              maxSize={1000 * 1024} // 1 MB
-            />
-            {
-              <div className="text-center mt-2">
-                <Button
-                  size="sm"
-                  color="success"
-                  onClick={handleFileSubmit}
-                  disabled={submitting || files.length === 0}>
-                  {t("transactions.details.uploadDocument")}
-                </Button>
-              </div>
-            }
+            <Row className="justify-content-center">
+              <Col lg={6}>
+                <FilePondDropzone
+                  files={files}
+                  setFiles={(acceptedFiles) => setFiles(acceptedFiles)}
+                  acceptedFileTypes={[
+                    "image/png",
+                    "image/jpeg",
+                    "image/webp",
+                    "image/jpg",
+                    "application/pdf",
+                  ]}
+                  disabled={submitting}
+                  allowMultiple={false}
+                  maxFileSize={1000 * 1024} // 1 MB
+                />
+              </Col>
+            </Row>
+
+            <div className="text-center mt-2">
+              <Button
+                size="sm"
+                color="success"
+                onClick={handleFileSubmit}
+                disabled={submitting || files.length === 0}>
+                {t("transactions.details.uploadDocument")}
+              </Button>
+            </div>
           </Col>
         </Row>
       )}

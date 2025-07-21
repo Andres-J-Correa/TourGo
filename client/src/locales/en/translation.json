@@ -625,6 +625,13 @@
       "invalidType": "File type not accepted",
       "noPreview": "No preview"
     },
+    "filePondDropzone": {
+      "labelIdle": "<div class='filepond-custom-label'>Drag and drop your files here or <span class='filepond--label-action'>Browse</span></div>",
+      "labelMaxFileSizeExceeded": "File is too large",
+      "labelMaxFileSize": "Maximum file size is {filesize}",
+      "labelFileTypeNotAllowed": "File type not accepted",
+      "fileValidateTypeLabelExpectedTypes": "Expected types: {allButLastType} or {lastType}"
+    },
     "richEditorToolbar": {
       "textColor": "Text color",
       "bold": "Bold",
