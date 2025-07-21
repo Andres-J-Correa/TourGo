@@ -27,7 +27,7 @@ const LandingPage = () => {
   };
 
   const renderSignInForm = () => (
-    <Col xs="12" sm="8" md="6" lg="4">
+    <Col xs="12" sm="6" md="5" lg="5" xl="4" xxl="3">
       <UserSignInForm
         loading={loading}
         setLoading={setLoading}
@@ -37,7 +37,7 @@ const LandingPage = () => {
   );
 
   const renderSignUpForm = () => (
-    <Col xs="12" sm="8" md="6" lg="4">
+    <Col xs="12" sm="6" md="6" lg="5" xl="4" xxl="4">
       <SignUpForm
         loading={loading}
         setLoading={setLoading}

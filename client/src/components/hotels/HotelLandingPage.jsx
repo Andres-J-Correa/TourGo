@@ -516,13 +516,12 @@ const HotelLandingPage = () => {
 
                       <Col md={6}>
                         <strong>{t("hotels.landing.arriving")}</strong>
-                        <ul>
-                          {data.arrivingRooms?.length === 0 ? (
-                            <li className="text-muted">
-                              {t("hotels.landing.none")}
-                            </li>
-                          ) : (
-                            data.arrivingRooms.map((item) => (
+
+                        {data.arrivingRooms?.length === 0 ? (
+                          <p>{t("hotels.landing.none")}</p>
+                        ) : (
+                          <ol>
+                            {data.arrivingRooms.map((item) => (
                               <li
                                 key={`arriving-${item.room.id}-${item.bookingId}`}>
                                 <strong>{item.room.name}</strong> —{" "}
@@ -537,19 +536,18 @@ const HotelLandingPage = () => {
                                   })}
                                 </Link>
                               </li>
-                            ))
-                          )}
-                        </ul>
+                            ))}
+                          </ol>
+                        )}
                       </Col>
                       <Col md={6}>
                         <strong>{t("hotels.landing.departing")}</strong>
-                        <ul>
-                          {data.departingRooms?.length === 0 ? (
-                            <li className="text-muted">
-                              {t("hotels.landing.none")}
-                            </li>
-                          ) : (
-                            data.departingRooms.map((item) => (
+
+                        {data.departingRooms?.length === 0 ? (
+                          <p>{t("hotels.landing.none")}</p>
+                        ) : (
+                          <ol>
+                            {data.departingRooms.map((item) => (
                               <li
                                 key={`departing-${item.room.id}-${item.bookingId}`}>
                                 <strong>{item.room.name}</strong> —{" "}
@@ -564,9 +562,9 @@ const HotelLandingPage = () => {
                                   })}
                                 </Link>
                               </li>
-                            ))
-                          )}
-                        </ul>
+                            ))}
+                          </ol>
+                        )}
                       </Col>
                     </Row>
                   </TabPane>
