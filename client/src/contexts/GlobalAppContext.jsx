@@ -61,7 +61,7 @@ export const AppContextProvider = ({ children }) => {
   const [hotel, setHotel] = useState({ ...defaultHotel });
   const [hotelIdParam, setHotelIdParam] = useState(null);
   const [isLoadingHotel, setIsLoadingHotel] = useState(false);
-  const [isLoadingUser, setIsLoadingUser] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [modals, setModals] = useState({ ...defaultModals });
   const [isAuthError, setIsAuthError] = useState(false);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
@@ -203,7 +203,6 @@ export const AppContextProvider = ({ children }) => {
       !currentUser.hasFetched &&
       isResponseIntercepted
     ) {
-      setIsLoadingUser(true);
       getCurrentUser()
         .then((data) => {
           const { item } = data;
