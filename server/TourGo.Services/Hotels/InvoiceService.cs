@@ -1,18 +1,19 @@
 ﻿using MySql.Data.MySqlClient;
+using Scriban;
 using System;
 using System.Collections.Generic;
-using TourGo.Data;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TourGo.Data;
 using TourGo.Data.Providers;
+using TourGo.Models.Domain.Bookings;
+using TourGo.Models.Domain.Hotels;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Requests.Invoices;
-using TourGo.Services.Interfaces.Hotels;
-using System.Data;
-using TourGo.Models.Domain.Bookings;
 using TourGo.Services.Customers;
-using TourGo.Models.Domain.Hotels;
+using TourGo.Services.Interfaces.Hotels;
 
 namespace TourGo.Services.Hotels
 {
@@ -122,6 +123,23 @@ namespace TourGo.Services.Hotels
             });
 
             return invoiceWithEntities;
+        }
+
+        public async Task <string> RenderInvoiceHtmlAsync()
+        {
+            string templatePath = Path.Combine("Templates", "invoice-template.html");
+
+            return templatePath; 
+
+            string templateText = await File.ReadAllTextAsync(templatePath);
+
+            var template = Template.Parse(templateText);
+            if (template.HasErrors)
+            {
+                throw new InvalidOperationException("Scriban template error: " + string.Join(", ", template.Messages));
+            }
+
+            return template.Render();
         }
 
         private static Invoice MapInvoice(IDataReader reader, ref int index)
