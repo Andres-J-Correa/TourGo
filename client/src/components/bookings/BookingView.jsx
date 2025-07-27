@@ -28,11 +28,11 @@ import {
   faPlaneDeparture,
   faCalendarXmark,
   faPenToSquare,
-  faFileInvoiceDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
+import DownloadInvoicePdfButton from "components/invoices/DownloadInvoicePdfButton";
 
 dayjs.extend(isSameOrAfter);
 
@@ -365,12 +365,11 @@ function BookingView() {
           </Col>
           <Col md={6} className="gap-1 pe-1">
             <div className="d-flex justify-content-md-end ps-1">
-              <Link
-                to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
-                className="me-2 btn btn-outline-dark  mb-2">
-                {t("booking.view.goToInvoice")}
-                <FontAwesomeIcon icon={faFileInvoiceDollar} className="ms-2" />
-              </Link>
+              <DownloadInvoicePdfButton
+                className="me-2 btn btn-outline-dark  mb-2"
+                invoiceId={booking?.invoiceId}
+                hotelId={hotelId}
+              />
               {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
                 <Link to="edit" className="me-2  mb-2 btn btn-outline-dark">
                   {t("booking.view.edit")}

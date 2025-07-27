@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        h2 {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Invoice #{{ invoice.id }}</h1>
+    <p><strong>Customer:</strong> {{ invoice.customer_name }}</p>
+    <p><strong>Date:</strong> {{ invoice.date }}</p>
+
+    {{ for service in invoice.services }}
+    <h2>Service: {{ service.name }}</h2>
+    <p>{{ service.notes }}</p>
+    <table>
+        <thead>
+            <tr><th>Description</th><th>Cost</th></tr>
+        </thead>
+        <tbody>
+            {{ for item in service.items }}
+            <tr>
+                <td>{{ item.description }}</td>
+                <td>{{ item.cost | string.format 'C' }}</td>
+            </tr>
+            {{ end }}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td><strong>Subtotal</strong></td>
+                <td><strong>{{ service.total | string.format 'C' }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+    {{ end }}
+
+    <h3>Total: {{ invoice.total | string.format 'C' }}</h3>
+</body>
+</html>

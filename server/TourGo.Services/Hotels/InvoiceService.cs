@@ -1,18 +1,20 @@
 ﻿using MySql.Data.MySqlClient;
+using Scriban;
 using System;
 using System.Collections.Generic;
-using TourGo.Data;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TourGo.Data;
 using TourGo.Data.Providers;
-using TourGo.Models.Domain.Invoices;
-using TourGo.Models.Requests.Invoices;
-using TourGo.Services.Interfaces.Hotels;
-using System.Data;
 using TourGo.Models.Domain.Bookings;
-using TourGo.Services.Customers;
 using TourGo.Models.Domain.Hotels;
+using TourGo.Models.Domain.Invoices;
+using TourGo.Models.Enums;
+using TourGo.Models.Requests.Invoices;
+using TourGo.Services.Customers;
+using TourGo.Services.Interfaces.Hotels;
 
 namespace TourGo.Services.Hotels
 {
@@ -122,6 +124,103 @@ namespace TourGo.Services.Hotels
             });
 
             return invoiceWithEntities;
+        }
+
+        public InvoicePdfModel? GetInvoicePdfModel(string invoiceId, string hotelId)
+        {
+            string proc = "invoices_select_for_pdf";
+            InvoicePdfModel? pdfModel = null;
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_invoiceId", invoiceId);
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (IDataReader reader, short set) =>
+            {
+                int index = 0;
+                if (set == 0)
+                {
+                    pdfModel = new InvoicePdfModel();
+                    pdfModel.InvoiceNumber = reader.GetSafeString(index++);
+                    pdfModel.Subtotal = reader.GetSafeDecimal(index++);
+                    pdfModel.Paid = reader.GetSafeDecimal(index++);
+                    pdfModel.Charges = reader.GetSafeDecimal(index++);
+                    pdfModel.Total = reader.GetSafeDecimal(index++);
+                    pdfModel.Balance = reader.GetSafeDecimal(index++);
+                    pdfModel.HotelName = reader.GetSafeString(index++);
+                    pdfModel.HotelPhone = reader.GetSafeString(index++);
+                    pdfModel.HotelEmail = reader.GetSafeString(index++);
+                    pdfModel.HotelAddress = reader.GetSafeString(index++);
+                    pdfModel.HotelTaxId = reader.GetSafeString(index++);
+                    pdfModel.CustomerFirstName = reader.GetSafeString(index++);
+                    pdfModel.CustomerLastName = reader.GetSafeString(index++);
+                    pdfModel.CustomerPhone = reader.GetSafeString(index++);
+                    pdfModel.CustomerEmail = reader.GetSafeString(index++);
+                    pdfModel.CustomerDocumentNumber = reader.GetSafeString(index++);
+                    pdfModel.InvoiceTerms = reader.GetSafeString(index++);
+                }
+                if (set == 1 && pdfModel != null)
+                {
+                    BookingPdfModel booking = new BookingPdfModel();
+                    booking.Id = reader.GetSafeString(index++);
+                    booking.ArrivalDate = reader.GetSafeDateTime(index++).ToString("dd/MM/yyyy");
+                    booking.DepartureDate = reader.GetSafeDateTime(index++).ToString("dd/MM/yyyy");
+                    booking.AdultGuests = reader.GetSafeInt32(index++);
+                    booking.ChildGuests = reader.GetSafeInt32(index++);
+                    booking.Total = reader.GetSafeDecimal(index++);
+                    booking.Subtotal = reader.GetSafeDecimal(index++);
+                    booking.Charges = reader.GetSafeDecimal(index++);
+                    booking.RawRoomBookings  = reader.DeserializeObjectSafely<List<RoomBooking>>(index++, () => null) ?? [];
+                    booking.ExtraCharges = reader.DeserializeObjectSafely<List<ExtraCharge>>(index++, () => null) ?? [];
+                    booking.GeneralCharges = reader.DeserializeObjectSafely<List<ExtraCharge>>(index++, () => null) ?? [];
+
+                    pdfModel.Bookings.Add(booking);
+                }
+            });
+
+            if(pdfModel == null)
+            {
+                return null;
+            }
+
+            pdfModel.Bookings.ForEach(booking =>
+            {
+                List<ExtraCharge> roomBasedCharges = [];
+
+                booking.ExtraCharges.ForEach(charge =>
+                {
+                    if (charge.Type.Id == (int)ExtraChargeTypeEnum.PerPerson || charge.Type.Id == (int)ExtraChargeTypeEnum.General)
+                    {
+                        booking.GeneralCharges.Add(charge);
+                    }
+                    else
+                    {
+                        roomBasedCharges.Add(charge);
+                    }
+                });
+
+                booking.GeneralCharges = [.. booking.GeneralCharges.Select(charge =>
+                                                {
+                                                    decimal amount = 0;
+                                                    switch ((ExtraChargeTypeEnum)charge.Type.Id)
+                                                    {
+                                                        case ExtraChargeTypeEnum.PerPerson:
+                                                            amount = booking.AdultGuests * charge.Amount;
+                                                            break;
+                                                        default:
+                                                            amount = charge.Amount;
+                                                            break;
+                                                    }
+                                                    return new ExtraCharge
+                                                    {
+                                                        Name = charge.Name,
+                                                        Amount = amount,
+                                                    };
+                                                })];
+
+                booking.RoomBookings = RoomBookingGrouper.GroupRoomBookings(booking.RawRoomBookings, roomBasedCharges);
+            });
+
+            return pdfModel;
         }
 
         private static Invoice MapInvoice(IDataReader reader, ref int index)
