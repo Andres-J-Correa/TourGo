@@ -22,7 +22,8 @@
       "home": "Inicio",
       "hotels": "Hoteles",
       "hotel": "Hotel"
-    }
+    },
+    "downloading": "Descargando"
   },
   "yup": {
     "required": "{{label}} es obligatorio",

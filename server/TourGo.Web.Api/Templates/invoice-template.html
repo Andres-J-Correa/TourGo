@@ -1,57 +1,571 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotel Receipt Template</title>
     <style>
-        body {
-            font-family: Arial;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        body {
+            font-family: "Arial", sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .receipt-container {
+            margin: 0 auto;
+        }
+
+        /* Hotel Header Styles */
+        .hotel-header {
+            text-align: center;
+        }
+
+        .hotel-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hotel-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #555;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .info-icon {
+            width: 18px;
+            height: 18px;
+            color: #3498db;
+            flex-shrink: 0;
+            fill: currentColor;
+            margin-right: 4px
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, #3498db, #2c3e50, #3498db);
+            margin: 20px 0;
+        }
+
+        /* Info Row Styles */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 40px;
+        }
+
+        .customer-info {
+            flex: 1;
+        }
+
+        .customer-details p {
+            font-size: 14px;
+        }
+
+        .receipt-info {
+            text-align: right;
+            width: 50%;
+        }
+
+        .receipt-header {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .receipt-date {
+            font-size: 16px;
+            color: #555;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        /* Services Table Styles */
+        .services-section {
             margin-bottom: 20px;
         }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
         }
 
-        h2 {
-            margin-top: 30px;
+            .services-table th {
+                background: #3498db;
+                color: white;
+                padding: 12px 8px;
+                text-align: left;
+                font-weight: bold;
+                border: 1px solid #2980b9;
+            }
+
+                .services-table th:last-child,
+                .services-table td:last-child {
+                    text-align: right;
+                }
+
+            .services-table td {
+                padding: 12px 8px;
+                border: 1px solid #ddd;
+                background: #fff;
+            }
+
+            .services-table tbody tr:nth-child(even) {
+                background: #f8f9fa;
+            }
+
+            .services-table tbody tr:hover {
+                background: #e3f2fd;
+            }
+
+        .total-row {
+            background: #2c3e50 !important;
+            color: white !important;
+        }
+
+            .total-row td {
+                background: #2c3e50 !important;
+                color: white !important;
+                font-weight: bold;
+                font-size: 16px;
+                border-color: #34495e !important;
+            }
+
+        /* Terms and Conditions */
+        .terms-section {
+            margin-top: 20px;
+        }
+
+        .terms-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+
+        .fw-bold {
+            font-weight: 700 !important;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem !important;
+        }
+
+        /* Unified line-item styles */
+        .line-item {
+            align-items: center;
+            display: flex;
+            font-size: 1rem;
+            overflow: auto;
+            padding: 2px 0;
+        }
+
+        .line-label {
+            font-weight: 500;
+            margin-right: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .line-fill {
+            border-bottom: 1px dotted #999;
+            flex-grow: 1;
+            height: 1px;
+            margin: 0 0.5rem;
+        }
+
+        .line-amount {
+            margin-left: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .totals-container {
+            margin-top: 10px;
+        }
+
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .card-body {
+            flex: 1 1 auto;
+            padding: 16px 24px;
+        }
+
+        .card-header {
+            padding-left: 16px;
+            padding-right: 16px;
+            text-align: center;
+            font-size: large !important;
+            font-weight: 600;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .booking-details {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        hr {
+            border: 1px solid;
+            color: inherit;
+            margin: 1rem 0;
+            opacity: 0.25;
+            border-top: none;
+            height: 1px;
+            display: block;
+            margin-block-start: 0.5em;
+            margin-block-end: 0.5em;
+            margin-inline-start: auto;
+            margin-inline-end: auto;
+            unicode-bidi: isolate;
+            overflow: hidden;
+            border-style: inset;
+            border-width: 1px;
+        }
+
+        .text-dark {
+            color: #2c3e50;
+        }
+
+        .text-small,
+        .text-small * {
+            font-size: small;
+        }
+
+        .room-container {
+            background-color: #ebeef2;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .room-nights {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding: 5px 16px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .service-card {
+            background-color: #f8f9fa;
+        }
+
+        .room-totals {
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+
+        /* Column base style */
+        .col {
+            padding: 15px;
+            flex-grow: 1;
+            flex: 0 0 50%;
+            max-width: 50%;
         }
     </style>
 </head>
+
 <body>
-    <h1>Invoice #{{ invoice.id }}</h1>
-    <p><strong>Customer:</strong> {{ invoice.customer_name }}</p>
-    <p><strong>Date:</strong> {{ invoice.date }}</p>
+    <div class="receipt-container">
+        <!-- Hotel Header -->
+        <div class="hotel-header">
+            <h1 class="hotel-name">{{hotel_name}}</h1>
 
-    {{ for service in invoice.services }}
-    <h2>Service: {{ service.name }}</h2>
-    <p>{{ service.notes }}</p>
-    <table>
-        <thead>
-            <tr><th>Description</th><th>Cost</th></tr>
-        </thead>
-        <tbody>
-            {{ for item in service.items }}
-            <tr>
-                <td>{{ item.description }}</td>
-                <td>{{ item.cost | string.format 'C' }}</td>
-            </tr>
+            <div class="hotel-info">
+                <div class="info-item">
+                    <svg class="info-icon"
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="currentColor"
+                         class="size-6">
+                        <path fill-rule="evenodd"
+                              d="M4.5 3.75a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V6.75a3 3 0 0 0-3-3h-15Zm4.125 3a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Zm-3.873 8.703a4.126 4.126 0 0 1 7.746 0 .75.75 0 0 1-.351.92 7.47 7.47 0 0 1-3.522.877 7.47 7.47 0 0 1-3.522-.877.75.75 0 0 1-.351-.92ZM15 8.25a.75.75 0 0 0 0 1.5h3.75a.75.75 0 0 0 0-1.5H15ZM14.25 12a.75.75 0 0 1 .75-.75h3.75a.75.75 0 0 1 0 1.5H15a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5h3.75a.75.75 0 0 0 0-1.5H15Z"
+                              clip-rule="evenodd" />
+                    </svg>
+
+                    <span>{{hotel_tax_id}}</span>
+                </div>
+
+                <div class="info-item">
+                    <svg class="info-icon"
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="currentColor"
+                         class="size-6">
+                        <path fill-rule="evenodd"
+                              d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                              clip-rule="evenodd" />
+                    </svg>
+
+                    <span>{{hotel_address}}</span>
+                </div>
+
+                <div class="info-item">
+                    <svg class="info-icon"
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="currentColor"
+                         class="size-6">
+                        <path fill-rule="evenodd"
+                              d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 0 0 6.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z"
+                              clip-rule="evenodd" />
+                    </svg>
+
+                    <span>{{hotel_phone}}</span>
+                </div>
+
+                <div class="info-item">
+                    <svg class="info-icon"
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="currentColor"
+                         class="size-6">
+                        <path fill-rule="evenodd"
+                              d="M17.834 6.166a8.25 8.25 0 1 0 0 11.668.75.75 0 0 1 1.06 1.06c-3.807 3.808-9.98 3.808-13.788 0-3.808-3.807-3.808-9.98 0-13.788 3.807-3.808 9.98-3.808 13.788 0A9.722 9.722 0 0 1 21.75 12c0 .975-.296 1.887-.809 2.571-.514.685-1.28 1.179-2.191 1.179-.904 0-1.666-.487-2.18-1.164a5.25 5.25 0 1 1-.82-6.26V8.25a.75.75 0 0 1 1.5 0V12c0 .682.208 1.27.509 1.671.3.401.659.579.991.579.332 0 .69-.178.991-.579.3-.4.509-.99.509-1.671a8.222 8.222 0 0 0-2.416-5.834ZM15.75 12a3.75 3.75 0 1 0-7.5 0 3.75 3.75 0 0 0 7.5 0Z"
+                              clip-rule="evenodd" />
+                    </svg>
+
+                    <span>{{hotel_email}}</span>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Customer Info and Receipt Info -->
+        <div class="info-row">
+            <div class="customer-info">
+                <h3 class="section-title">Información del Cliente</h3>
+                <div class="customer-details">
+                    <p><strong>ID:</strong> {{customer_document_number}}</p>
+                    <p><strong>Nombre:</strong> {{customer_first_name}} {{customer_last_name}}</p>
+                    <p><strong>Teléfono:</strong> {{customer_phone}}</p>
+                    <p><strong>Email:</strong> {{customer_email}}</p>
+                </div>
+            </div>
+
+            <div class="receipt-info">
+                <h2 class="receipt-header">Cuenta de Cobro # {{invoice_number}}</h2>
+                <p class="receipt-date">Fecha: {{invoice_date}}</p>
+            </div>
+        </div>
+
+        <!--Services Table -->
+        <div class="services-section">
+            <h3 class="section-title">Servicios</h3>
+            {{for booking in bookings}}
+            <div class="card text-small service-card">
+                <h5 class="card-header">
+                    Concepto: Reserva # {{booking.id}}
+                </h5>
+                <div class="card-body">
+                    <div class="booking-details">
+                        <div>
+                            <strong class="text-dark">Fecha de llegada:</strong>
+                            <p>{{booking.arrival_date}}</p>
+                        </div>
+                        <div>
+                            <strong class="text-dark">Fecha de Salida:</strong>
+                            <p>{{booking.departure_date}}</p>
+                        </div>
+                        <div>
+                            <strong class="text-dark">Número de Huespedes:</strong>
+                            <p>Adultos: {{booking.adult_guests}} - Niños: {{booking.child_guests}}</p>
+                        </div>
+                    </div>
+                    <hr />
+                    <div>
+                        <h5 class="text-dark">Habitaciones</h5>
+                        <div class="row">
+                            {{for room in booking.room_bookings}}
+                            <div class="col">
+                                <div class="room-container text-dark">
+                                    <div class="room-card-line">
+                                        <h5 class="text-center">{{room.room_name}}</h5>
+                                        <p class="text-center">{{room.room_description}}</p>
+                                    </div>
+
+                                    <div class="room-nights">
+                                        {{for segment in room.segments}}
+                                        <div class="line-item">
+                                            <span class="line-label"><strong>{{segment.display_date}}</strong></span>
+                                            <div class="line-fill"></div>
+                                            <span class="line-amount">
+                                                <strong>{{segment.price | math.format "N" }}</strong>
+                                            </span>
+                                        </div>
+                                        {{ end }}
+                                    </div>
+
+                                    <div class="room-totals">
+                                        <div class="line-item">
+                                            <span class="line-label fw-bold">Subtotal</span>
+                                            <div class="line-fill"></div>
+                                            <span class="line-amount fw-bold">{{room.subtotal | math.format "N" }}</span>
+                                        </div>
+                                        {{for charge in room.room_charges}}
+                                        <div class="line-item">
+                                            <span class="line-label fw-bold">{{charge.name}}</span>
+                                            <div class="line-fill"></div>
+                                            <span class="line-amount fw-bold">{{charge.amount | math.format "N" }}</span>
+                                        </div>
+                                        {{ end }}
+                                        <hr />
+                                        <div class="line-item line-total">
+                                            <span class="line-label fw-bold">Total</span>
+                                            <div class="line-fill"></div>
+                                            <span class="line-amount fw-bold">{{room.total | math.format "N" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
+
+                    </div>
+                    <hr />
+                    {{if booking.general_charges.size > 0}}
+                    <div class="booking-totals">
+                        <h5 class="text-dark">Cargos Generales</h5>
+                        {{for charge in booking.general_charges}}
+                        <div class="line-item">
+                            <span class="line-label fw-bold">{{charge.name}}</span>
+                            <div class="line-fill"></div>
+                            <span class="line-amount fw-bold">{{charge.amount | math.format "N" }}</span>
+                        </div>
+                        {{end}}
+                    </div>
+                    <hr />
+                    {{ else }}
+                    {{ end }}
+
+                    <div class="booking-totals">
+                        <h5 class="text-dark">Totales de la reserva</h5>
+                        <div class="line-item">
+                            <span class="line-label fw-bold">Subtotal</span>
+                            <div class="line-fill"></div>
+                            <span class="line-amount fw-bold">{{booking.subtotal | math.format "N" }}</span>
+                        </div>
+
+                        <div class="line-item">
+                            <span class="line-label fw-bold">Cargos</span>
+                            <div class="line-fill"></div>
+                            <span class="line-amount fw-bold">{{booking.charges | math.format "N" }}</span>
+                        </div>
+
+                        <div class="line-item">
+                            <span class="line-label fw-bold">Total</span>
+                            <div class="line-fill"></div>
+                            <span class="line-amount fw-bold">{{booking.total | math.format "N" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {{ end }}
-        </tbody>
-        <tfoot>
-            <tr>
-                <td><strong>Subtotal</strong></td>
-                <td><strong>{{ service.total | string.format 'C' }}</strong></td>
-            </tr>
-        </tfoot>
-    </table>
-    {{ end }}
+        </div>
 
-    <h3>Total: {{ invoice.total | string.format 'C' }}</h3>
+        <!--Totals-->
+        <div class="services-section">
+            <h3 class="section-title">Totales</h3>
+            <div class="totals-container">
+                <div class="mb-2">
+                    <div class="line-item">
+                        <span class="line-label fw-bold">Subtotal</span>
+                        <div class="line-fill"></div>
+                        <span class="line-amount">{{subtotal | math.format "N" }}</span>
+                    </div>
+
+                    <div class="line-item">
+                        <span class="line-label fw-bold">Cargos</span>
+                        <div class="line-fill"></div>
+                        <span class="line-amount">{{charges | math.format "N" }}</span>
+                    </div>
+
+                    <div class="line-item">
+                        <span class="line-label fw-bold">Total</span>
+                        <div class="line-fill"></div>
+                        <span class="line-amount">{{total | math.format "N" }}</span>
+                    </div>
+
+                    <div class="line-item">
+                        <span class="line-label fw-bold">Total Pagado</span>
+                        <div class="line-fill"></div>
+                        <span class="line-amount">{{paid | math.format "N" }}</span>
+                    </div>
+
+                    <div class="line-item">
+                        <span class="line-label fw-bold">Saldo</span>
+                        <div class="line-fill"></div>
+                        <span class="line-amount">{{balance | math.format "N" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Third Row: Terms and Conditions -->
+        <div class="terms-section">
+            <h3 class="section-title">Terminos y Condiciones</h3>
+            <div class="terms-content">{{invoice_terms}}</div>
+        </div>
+    </div>
 </body>
 </html>

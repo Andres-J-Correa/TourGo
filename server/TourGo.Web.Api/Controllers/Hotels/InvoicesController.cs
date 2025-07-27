@@ -10,6 +10,7 @@ using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 using TourGo.Web.Api.Extensions;
 using TourGo.Services.Interfaces;
+using SelectPdf;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -21,15 +22,21 @@ namespace TourGo.Web.Api.Controllers.Hotels
         private readonly IInvoiceService _invoiceService;
         private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IErrorLoggingService _errorLoggingService;
+        private readonly ITemplateService _templateService;
+        private readonly ISelectPdfService _selectPdfService;
 
         public InvoicesController(ILogger<InvoicesController> logger,
             IInvoiceService invoiceService,
             IWebAuthenticationService<string> webAuthenticationService,
-            IErrorLoggingService errorLoggingService) : base(logger)
+            IErrorLoggingService errorLoggingService,
+            ITemplateService templateService,
+            ISelectPdfService selectPdfService) : base(logger)
         {
             _invoiceService = invoiceService;
             _webAuthService = webAuthenticationService;
             _errorLoggingService = errorLoggingService;
+            _templateService = templateService;
+            _selectPdfService = selectPdfService;
         }
 
         [HttpGet("{id}/entities")]
@@ -61,6 +68,35 @@ namespace TourGo.Web.Api.Controllers.Hotels
             }
 
             return result;
+        }
+
+        [HttpGet("{id}/pdf")]
+        [EntityAuth(EntityTypeEnum.Invoices, EntityActionTypeEnum.Read)]
+        public async Task<ActionResult> GetPdf(string id, string hotelId)
+        {
+            try
+            {
+                InvoicePdfModel? invoicePdfModel = _invoiceService.GetInvoicePdfModel(id, hotelId);
+
+                if(invoicePdfModel == null)
+                {
+                    ErrorResponse response = new ErrorResponse("Invoice not found.");
+                    return NotFound404(response);
+                }
+
+                string htmlContent = await _templateService.RenderTemplate("invoice-template", invoicePdfModel);
+
+                PdfDocument pdf = _selectPdfService.GetPdfFromHtml(htmlContent);
+
+                byte[] pdfBytes = pdf.Save();
+                return File(pdfBytes, "application/pdf", $"Invoice_{id}.pdf");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                return StatusCode(500, response);
+            }
         }
 
     }
