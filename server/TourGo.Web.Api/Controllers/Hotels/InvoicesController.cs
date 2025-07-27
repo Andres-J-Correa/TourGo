@@ -89,6 +89,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 PdfDocument pdf = _selectPdfService.GetPdfFromHtml(htmlContent);
 
                 byte[] pdfBytes = pdf.Save();
+                pdf.Close();
                 return File(pdfBytes, "application/pdf", $"Invoice_{id}.pdf");
             }
             catch (Exception ex)
