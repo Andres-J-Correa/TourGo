@@ -188,7 +188,7 @@ namespace TourGo.Services.Hotels
 
                 booking.ExtraCharges.ForEach(charge =>
                 {
-                    if (charge.Type.Id == (int)ExtraChargeTypeEnum.PerPerson | charge.Type.Id == (int)ExtraChargeTypeEnum.General)
+                    if (charge.Type.Id == (int)ExtraChargeTypeEnum.PerPerson || charge.Type.Id == (int)ExtraChargeTypeEnum.General)
                     {
                         booking.GeneralCharges.Add(charge);
                     }

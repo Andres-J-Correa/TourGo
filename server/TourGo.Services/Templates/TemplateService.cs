@@ -44,7 +44,7 @@ namespace TourGo.Services.Templates
             }
             catch (Exception)
             {
-                    throw new DirectoryNotFoundException($"Template {templateName} not found.");
+                    throw new FileNotFoundException($"Template {templateName} not found.");
             }
         }
     }
