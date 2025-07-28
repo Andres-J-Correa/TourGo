@@ -41,7 +41,7 @@ function DownloadInvoicePdfButton({
         </>
       ) : (
         <>
-          {t("booking.view.goToInvoice")}
+          {t("booking.view.invoice")}
           <FontAwesomeIcon icon={faFilePdf} className="ms-2" />
         </>
       )}

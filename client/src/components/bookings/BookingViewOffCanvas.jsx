@@ -18,6 +18,7 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import {
   faPenToSquare,
   faClipboardList,
+  faFileInvoiceDollar,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getBookingById } from "services/bookingService";
@@ -81,6 +82,15 @@ function BookingViewOffCanvas({
                     <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
                   </Link>
                 )}
+                <Link
+                  to={`/hotels/${hotelId}/invoices/${booking?.invoiceId}`}
+                  className="btn btn-outline-dark float-end ms-2  mb-2">
+                  {t("booking.view.goToInvoice")}
+                  <FontAwesomeIcon
+                    icon={faFileInvoiceDollar}
+                    className="ms-2"
+                  />
+                </Link>
                 <DownloadInvoicePdfButton
                   invoiceId={booking?.invoiceId}
                   hotelId={hotelId}
