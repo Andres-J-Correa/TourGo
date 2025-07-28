@@ -87,7 +87,12 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 string htmlContent = await _templateService.RenderTemplate("invoice-template", invoicePdfModel);
 
-                await new BrowserFetcher().DownloadAsync();
+
+                var browserFetcher = new BrowserFetcher
+                {
+                    CacheDir = "/tmp"
+                };
+                await browserFetcher.DownloadAsync(BrowserTag.Stable);
                 using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true, Args = [ "--no-sandbox" ] });
                 using var page = await browser.NewPageAsync();
                 await page.SetContentAsync(htmlContent);
