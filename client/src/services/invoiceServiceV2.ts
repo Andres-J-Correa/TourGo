@@ -21,13 +21,28 @@ export const downloadInvoicePdf = async (
   };
 
   try {
-    const response = await axiosClientV2<Blob>(config);
+    const response = await axiosClientV2<Blob>({
+      ...config,
+      // Ensure you get headers
+      responseType: "blob",
+    });
 
     const blob = new Blob([response.data], { type: "application/pdf" });
     const downloadUrl = window.URL.createObjectURL(blob);
+
+    // Extract filename from Content-Disposition header
+    let filename = "invoice.pdf";
+    const disposition = response.headers?.["content-disposition"];
+    if (disposition) {
+      const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+      if (match && match[1]) {
+        filename = match[1].replace(/['"]/g, "");
+      }
+    }
+
     const link = document.createElement("a");
     link.href = downloadUrl;
-    link.setAttribute("download", `invoice_${invoiceId}.pdf`);
+    link.download = filename; // Set the filename
     document.body.appendChild(link);
     link.click();
     link.remove();

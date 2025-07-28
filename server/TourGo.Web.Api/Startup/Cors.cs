@@ -18,7 +18,9 @@ namespace TourGo.Web.StartUp
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowCredentials();
+                        .AllowCredentials()
+                        .WithExposedHeaders("Content-Disposition"); 
+                    ;
                 });
             });
 

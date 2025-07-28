@@ -117,7 +117,6 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IGoogleRecaptchaService, GoogleRecaptchaService>();
             services.AddSingleton<IRoomAvailabilityService, RoomAvailabilityService>();
             services.AddSingleton<ITemplateService, TemplateService>();
-            services.AddSingleton<ISelectPdfService, SelectPdfService>();
 
             services.AddScoped<IClaimsTransformation, ClaimsEnrichmentTransformation>();
 
