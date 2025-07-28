@@ -92,8 +92,18 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 {
                     CacheDir = "/var/www/Chrome"
                 };
-                await browserFetcher.DownloadAsync(BrowserTag.Stable);
-                using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true ,Args = [ "--no-sandbox" ] });
+
+                await browserFetcher.DownloadAsync("138.0.7204.168");
+
+                string executablePath = browserFetcher.GetExecutablePath("138.0.7204.168");
+
+                var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+                {
+                    ExecutablePath = executablePath,
+                    Headless = true,
+                    Args = ["--no-sandbox"]
+                });
+
                 using var page = await browser.NewPageAsync();
                 await page.SetContentAsync(htmlContent);
 
