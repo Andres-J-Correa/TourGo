@@ -90,7 +90,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 var browserFetcher = new BrowserFetcher
                 {
-                    CacheDir = "/var/www/server-stage"
+                    CacheDir = "/var/www/Chrome"
                 };
                 await browserFetcher.DownloadAsync(BrowserTag.Stable);
                 using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true ,Args = [ "--no-sandbox" ] });
