@@ -1,12 +1,6 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Threading;
+﻿using Microsoft.AspNetCore.Mvc;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Enums;
-using TourGo.Models.Requests.Invoices;
 using TourGo.Services;
 using TourGo.Services.Interfaces;
 using TourGo.Services.Interfaces.Hotels;
@@ -105,8 +99,14 @@ namespace TourGo.Web.Api.Controllers.Hotels
                     }
                 };
 
-                // Run conversion in a separate task with timeout
-                var conversionTask = Task.Run(() => converter.Convert(doc));
+                // Run conversion in a separate task with timeout using LongRunning option
+                var conversionTask = Task.Factory.StartNew(
+                    () => converter.Convert(doc),
+                    CancellationToken.None,
+                    TaskCreationOptions.LongRunning,
+                    TaskScheduler.Default
+                );
+
                 if (await Task.WhenAny(conversionTask, Task.Delay(TimeSpan.FromSeconds(15))) == conversionTask)
                 {
                     byte[] pdfStream = conversionTask.Result;

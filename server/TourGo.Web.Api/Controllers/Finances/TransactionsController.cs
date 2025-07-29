@@ -380,7 +380,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                     return BadRequest(new ErrorResponse($"Invalid sort direction: {sortDirection}"));
                 }
 
-                if(startDate != null && startDate < DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)))
+                if (startDate != null && startDate < DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)))
                 {
                     return BadRequest(new ErrorResponse("Start date cannot be more than 7 days in the past."));
                 }
@@ -390,7 +390,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                     startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
                 }
 
-                if(endDate == null)
+                if (endDate == null)
                 {
                     endDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 }
