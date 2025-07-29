@@ -109,7 +109,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 if (await Task.WhenAny(conversionTask, Task.Delay(TimeSpan.FromSeconds(15))) == conversionTask)
                 {
-                    byte[] pdfStream = conversionTask.Result;
+                    byte[] pdfStream = await conversionTask;
                     return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
                 }
                 else
