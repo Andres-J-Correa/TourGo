@@ -24,6 +24,7 @@ import {
 } from "components/transactions/constants";
 import useHotelFormData from "components/transactions/hooks/useHotelFormData";
 import { useLanguage } from "contexts/LanguageContext";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 
 import { Button, Col, Label, Row, Spinner } from "reactstrap";
 import classNames from "classnames";
@@ -91,6 +92,10 @@ function TransactionsView() {
     () => (isUserAdmin ? getPagedTransactions : getFixedPagination),
     [isUserAdmin]
   );
+
+  const minDate = useMemo(() => {
+    return dayjs().subtract(7, "day").toDate();
+  }, []);
 
   const columnOrderTranslated = [
     { id: "id", label: t("transactions.table.id") },
@@ -227,6 +232,18 @@ function TransactionsView() {
       ...prev,
       pageIndex: 0,
       dates: { ...prev.dates, [field]: getDateString(date) },
+    }));
+    table.setExpanded({});
+  };
+
+  const handleFixedStartDateChange = (date) => {
+    if (dayjs(date).isBefore(dayjs(getDateString(minDate)))) {
+      return;
+    }
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      dates: { ...prev.dates, start: getDateString(date) },
     }));
     table.setExpanded({});
   };
@@ -529,7 +546,7 @@ function TransactionsView() {
       <h3>{t("transactions.view.title")}</h3>
       <ErrorBoundary>
         <div>
-          {isUserAdmin && (
+          {isUserAdmin ? (
             <div
               className="text-dark cursor-pointer fw-bold fs-4 mb-2 ms-auto"
               style={{ maxWidth: "max-content" }}
@@ -542,6 +559,20 @@ function TransactionsView() {
                 />
               </span>
             </div>
+          ) : (
+            <Row>
+              <Col lg={12} xl={3}>
+                <DatePickersV2
+                  startDate={paginationData.dates?.start}
+                  endDate={paginationData.dates?.end}
+                  handleStartChange={handleFixedStartDateChange}
+                  handleEndChange={handleDateChange("end")}
+                  disabled={loading}
+                  allowSameDay={true}
+                  minDate={minDate}
+                />
+              </Col>
+            </Row>
           )}
           <div
             className={classNames(

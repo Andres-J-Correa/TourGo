@@ -586,7 +586,8 @@
       "pleaseWait": "Please wait.",
       "confirmYes": "Yes, confirm",
       "errors": {
-        "loadBooking": "Error loading booking"
+        "loadBooking": "Error loading booking",
+        "downloadInvoice": "Error downloading invoice"
       }
     },
     "viewOffCanvas": {

@@ -586,7 +586,8 @@
       "pleaseWait": "Por favor, espere.",
       "confirmYes": "Sí, confirmar",
       "errors": {
-        "loadBooking": "Error al cargar reserva"
+        "loadBooking": "Error al cargar reserva",
+        "downloadInvoice": "Error al descargar factura"
       }
     },
     "viewOffCanvas": {

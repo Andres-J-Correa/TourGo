@@ -1,10 +1,6 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Enums;
-using TourGo.Models.Requests.Invoices;
 using TourGo.Services;
 using TourGo.Services.Interfaces;
 using TourGo.Services.Interfaces.Hotels;
@@ -94,7 +90,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                         Orientation = Orientation.Portrait,
                         PaperSize = PaperKind.A4,
                     },
-                                    Objects = {
+                    Objects = {
                         new ObjectSettings() {
                             PagesCount = true,
                             HtmlContent = htmlContent,
@@ -103,9 +99,28 @@ namespace TourGo.Web.Api.Controllers.Hotels
                     }
                 };
 
-                byte[] pdfStream = converter.Convert(doc);
+                //TODO The conversionTask is not cancelled when the timeout occurs,
+                //which means the PDF conversion continues running in the background.
+                //Consider passing a CancellationToken to the converter.Convert() method to properly cancel the operation.
+                //Consider moving the conversion logic to another service and kill it if the timeout occurs.
+                var conversionTask = Task.Factory.StartNew(
+                    () => converter.Convert(doc),
+                    CancellationToken.None,
+                    TaskCreationOptions.LongRunning,
+                    TaskScheduler.Default
+                );
 
-                return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
+                if (await Task.WhenAny(conversionTask, Task.Delay(TimeSpan.FromSeconds(15))) == conversionTask)
+                {
+                    byte[] pdfStream = await conversionTask;
+                    return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
+                }
+                else
+                {
+                    Logger.LogErrorWithDb(new TimeoutException("PDF generation timed out."), _errorLoggingService, HttpContext);
+                    ErrorResponse response = new ErrorResponse("PDF generation timed out.");
+                    return StatusCode(500, response);
+                }
             }
             catch (Exception ex)
             {

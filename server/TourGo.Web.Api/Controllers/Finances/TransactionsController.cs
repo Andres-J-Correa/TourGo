@@ -362,7 +362,9 @@ namespace TourGo.Web.Api.Controllers.Finances
             [FromQuery] int pageIndex,
             [FromQuery] int pageSize,
             [FromQuery] string? sortColumn,
-            [FromQuery] string? sortDirection)
+            [FromQuery] string? sortDirection,
+            [FromQuery] DateOnly? startDate,
+            [FromQuery] DateOnly? endDate)
         {
             ObjectResult result = null;
 
@@ -378,8 +380,20 @@ namespace TourGo.Web.Api.Controllers.Finances
                     return BadRequest(new ErrorResponse($"Invalid sort direction: {sortDirection}"));
                 }
 
-                DateOnly starDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
-                DateOnly endDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                if (startDate != null && startDate < DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)))
+                {
+                    return BadRequest(new ErrorResponse("Start date cannot be more than 7 days in the past."));
+                }
+
+                if (startDate == null)
+                {
+                    startDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7));
+                }
+
+                if (endDate == null)
+                {
+                    endDate = DateOnly.FromDateTime(DateTime.UtcNow);
+                }
 
                 Paged<Transaction>? transactions = _transactionService.GetPaginated(
                     hotelId,
@@ -387,7 +401,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                     pageSize,
                     sortColumn,
                     sortDirection,
-                    starDate,
+                    startDate,
                     endDate,
                     null,
                     null,
