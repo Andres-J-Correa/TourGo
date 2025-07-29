@@ -562,7 +562,7 @@
       "title": "Booking Details",
       "reservationNumber": "Reservation #",
       "edit": "Edit",
-      "invoice": "Invoice",
+      "invoice": "Download Invoice",
       "goToInvoice": "Go to Invoice",
       "cancelBooking": "Cancel",
       "markNoShow": "Mark No Show",

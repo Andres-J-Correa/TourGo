@@ -23,6 +23,8 @@ using TourGo.Services.Templates;
 using TourGo.Services.Users;
 using TourGo.Web.Api.StartUp.DependencyInjection;
 using TourGo.Web.Core.Services;
+using WkHtmlToPdfDotNet;
+using WkHtmlToPdfDotNet.Contracts;
 
 
 namespace TourGo.Web.StartUp
@@ -34,6 +36,7 @@ namespace TourGo.Web.StartUp
 
             services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
             services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
             if (configuration is IConfigurationRoot)
             {

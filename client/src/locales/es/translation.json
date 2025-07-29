@@ -562,7 +562,7 @@
       "title": "Detalles de Reserva",
       "reservationNumber": "Reserva #",
       "edit": "Editar",
-      "invoice": "Factura",
+      "invoice": "Descargar Factura",
       "goToInvoice": "Ir a Factura",
       "cancelBooking": "Cancelar",
       "markNoShow": "Marcar No Show",

@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PuppeteerSharp;
-using PuppeteerSharp.Media;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Invoices;
@@ -14,6 +12,7 @@ using TourGo.Web.Api.Extensions;
 using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
+using WkHtmlToPdfDotNet;
 
 
 namespace TourGo.Web.Api.Controllers.Hotels
@@ -87,40 +86,25 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 string htmlContent = await _templateService.RenderTemplate("invoice-template", invoicePdfModel);
 
+                var converter = new SynchronizedConverter(new PdfTools());
 
-                var browserFetcher = new BrowserFetcher
+                var doc = new HtmlToPdfDocument()
                 {
-                    CacheDir = "/var/www/Chrome"
-                };
-
-                await browserFetcher.DownloadAsync("138.0.7204.168");
-
-                string executablePath = browserFetcher.GetExecutablePath("138.0.7204.168");
-
-                var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-                {
-                    ExecutablePath = executablePath,
-                    Headless = true,
-                    Args = ["--no-sandbox"]
-                });
-
-                using var page = await browser.NewPageAsync();
-                await page.SetContentAsync(htmlContent);
-
-                var pdfOptions = new PdfOptions
-                {
-                    Format = PaperFormat.A4,
-                    MarginOptions = new MarginOptions
-                    {
-                        Top = "10px",
-                        Right = "10px",
-                        Bottom = "10px",
-                        Left = "10px"
+                    GlobalSettings = {
+                        Orientation = Orientation.Portrait,
+                        PaperSize = PaperKind.A4,
+                    },
+                                    Objects = {
+                        new ObjectSettings() {
+                            PagesCount = true,
+                            HtmlContent = htmlContent,
+                            WebSettings = { DefaultEncoding = "utf-8" },
+                        }
                     }
                 };
 
-                var pdfStream = await page.PdfStreamAsync(pdfOptions);
-                await page.CloseAsync();
+                byte[] pdfStream = converter.Convert(doc);
+
                 return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
             }
             catch (Exception ex)
