@@ -99,7 +99,10 @@ namespace TourGo.Web.Api.Controllers.Hotels
                     }
                 };
 
-                // Run conversion in a separate task with timeout using LongRunning option
+                //TODO The conversionTask is not cancelled when the timeout occurs,
+                //which means the PDF conversion continues running in the background.
+                //Consider passing a CancellationToken to the converter.Convert() method to properly cancel the operation.
+                //Consider moving the conversion logic to another service and kill it if the timeout occurs.
                 var conversionTask = Task.Factory.StartNew(
                     () => converter.Convert(doc),
                     CancellationToken.None,
