@@ -9,6 +9,7 @@ using TourGo.Web.Controllers;
 using TourGo.Web.Core.Filters;
 using TourGo.Web.Models.Responses;
 using WkHtmlToPdfDotNet;
+using WkHtmlToPdfDotNet.Contracts;
 
 
 namespace TourGo.Web.Api.Controllers.Hotels
@@ -22,17 +23,20 @@ namespace TourGo.Web.Api.Controllers.Hotels
         private readonly IWebAuthenticationService<string> _webAuthService;
         private readonly IErrorLoggingService _errorLoggingService;
         private readonly ITemplateService _templateService;
+        private readonly IConverter _converter;
 
         public InvoicesController(ILogger<InvoicesController> logger,
             IInvoiceService invoiceService,
             IWebAuthenticationService<string> webAuthenticationService,
             IErrorLoggingService errorLoggingService,
-            ITemplateService templateService) : base(logger)
+            ITemplateService templateService,
+            IConverter converter) : base(logger)
         {
             _invoiceService = invoiceService;
             _webAuthService = webAuthenticationService;
             _errorLoggingService = errorLoggingService;
             _templateService = templateService;
+            _converter = converter;
         }
 
         [HttpGet("{id}/entities")]
@@ -73,7 +77,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
 
-                throw new NotImplementedException();
                 InvoicePdfModel? invoicePdfModel = _invoiceService.GetInvoicePdfModel(id, hotelId);
 
                 if (invoicePdfModel == null)
@@ -83,8 +86,6 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 }
 
                 string htmlContent = await _templateService.RenderTemplate("invoice-template", invoicePdfModel);
-
-                var converter = new SynchronizedConverter(new PdfTools());
 
                 var doc = new HtmlToPdfDocument()
                 {
@@ -100,29 +101,8 @@ namespace TourGo.Web.Api.Controllers.Hotels
                         }
                     }
                 };
-
-                //TODO The conversionTask is not cancelled when the timeout occurs,
-                //which means the PDF conversion continues running in the background.
-                //Consider passing a CancellationToken to the converter.Convert() method to properly cancel the operation.
-                //Consider moving the conversion logic to another service and kill it if the timeout occurs.
-                var conversionTask = Task.Factory.StartNew(
-                    () => converter.Convert(doc),
-                    CancellationToken.None,
-                    TaskCreationOptions.LongRunning,
-                    TaskScheduler.Default
-                );
-
-                if (await Task.WhenAny(conversionTask, Task.Delay(TimeSpan.FromSeconds(15))) == conversionTask)
-                {
-                    byte[] pdfStream = await conversionTask;
+                    byte[] pdfStream = _converter.Convert(doc);
                     return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
-                }
-                else
-                {
-                    Logger.LogErrorWithDb(new TimeoutException("PDF generation timed out."), _errorLoggingService, HttpContext);
-                    ErrorResponse response = new ErrorResponse("PDF generation timed out.");
-                    return StatusCode(500, response);
-                }
             }
             catch (Exception ex)
             {
