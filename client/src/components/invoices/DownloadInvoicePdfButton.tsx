@@ -7,6 +7,7 @@ import { useLanguage } from "contexts/LanguageContext";
 import { Spinner } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilePdf } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 
 function DownloadInvoicePdfButton({
   invoiceId,
@@ -26,8 +27,13 @@ function DownloadInvoicePdfButton({
   ): Promise<void> => {
     e.preventDefault();
     setIsDownloading(true);
-    await downloadInvoicePdf(invoiceId, hotelId);
-    setIsDownloading(false);
+    try {
+      await downloadInvoicePdf(invoiceId, hotelId);
+    } catch {
+      toast.error(t("booking.view.errors.downloadInvoice"));
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (

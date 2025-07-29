@@ -193,7 +193,9 @@ export const getFixedPagination = async (
   pageIndex,
   pageSize,
   sortColumn,
-  sortDirection
+  sortDirection,
+  startDate,
+  endDate
 ) => {
   const queryParams = new URLSearchParams({
     pageIndex,
@@ -202,6 +204,8 @@ export const getFixedPagination = async (
 
   if (sortColumn) queryParams.append("sortColumn", sortColumn);
   if (sortDirection) queryParams.append("sortDirection", sortDirection);
+  if (startDate) queryParams.append("startDate", startDate);
+  if (endDate) queryParams.append("endDate", endDate);
 
   const url = `${apiV2.replace(
     /{hotelId}/,
