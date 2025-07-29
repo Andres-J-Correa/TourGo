@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using System.Threading;
 using TourGo.Models.Domain.Invoices;
 using TourGo.Models.Enums;
 using TourGo.Models.Requests.Invoices;
@@ -94,7 +96,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
                         Orientation = Orientation.Portrait,
                         PaperSize = PaperKind.A4,
                     },
-                                    Objects = {
+                    Objects = {
                         new ObjectSettings() {
                             PagesCount = true,
                             HtmlContent = htmlContent,
@@ -103,9 +105,19 @@ namespace TourGo.Web.Api.Controllers.Hotels
                     }
                 };
 
-                byte[] pdfStream = converter.Convert(doc);
-
-                return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
+                // Run conversion in a separate task with timeout
+                var conversionTask = Task.Run(() => converter.Convert(doc));
+                if (await Task.WhenAny(conversionTask, Task.Delay(TimeSpan.FromSeconds(15))) == conversionTask)
+                {
+                    byte[] pdfStream = conversionTask.Result;
+                    return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
+                }
+                else
+                {
+                    Logger.LogErrorWithDb(new TimeoutException("PDF generation timed out."), _errorLoggingService, HttpContext);
+                    ErrorResponse response = new ErrorResponse("PDF generation timed out.");
+                    return StatusCode(500, response);
+                }
             }
             catch (Exception ex)
             {

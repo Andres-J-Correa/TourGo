@@ -23,6 +23,7 @@ interface DatePickersV2Props {
   startDateLabel?: string;
   endDateLabel?: string;
   allowSameDay?: boolean;
+  minDate?: string | Date;
 }
 
 function DatePickersV2({
@@ -35,6 +36,7 @@ function DatePickersV2({
   startDateLabel,
   endDateLabel,
   allowSameDay = false,
+  minDate,
 }: DatePickersV2Props): JSX.Element {
   const { t } = useLanguage();
 
@@ -45,6 +47,7 @@ function DatePickersV2({
   const dateStart: Date | null = getDate(startDate);
   const dateEnd: Date | null = getDate(endDate);
   const dateMax: Date | null = getDate(maxDate);
+  const dateMin: Date | null = getDate(minDate);
   const endDateMinDate: Date | null = allowSameDay
     ? dateStart
     : dateStart
@@ -76,6 +79,7 @@ function DatePickersV2({
             scrollableYearDropdown
             showMonthDropdown
             isClearable={dateStart !== null && !disabled}
+            minDate={dateMin || undefined}
           />
         </Col>
         <Col>
