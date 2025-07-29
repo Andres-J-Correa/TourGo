@@ -76,6 +76,8 @@ namespace TourGo.Web.Api.Controllers.Hotels
         {
             try
             {
+
+                throw new NotImplementedException();
                 InvoicePdfModel? invoicePdfModel = _invoiceService.GetInvoicePdfModel(id, hotelId);
 
                 if (invoicePdfModel == null)
