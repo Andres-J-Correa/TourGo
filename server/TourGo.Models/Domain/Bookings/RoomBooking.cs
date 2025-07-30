@@ -15,5 +15,6 @@ namespace TourGo.Models.Domain.Bookings
         public decimal Price { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-	}
+        public bool? IsRoomChange { get; set; }
+    }
 }

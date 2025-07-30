@@ -515,7 +515,12 @@ const HotelLandingPage = () => {
                       </Col>
 
                       <Col md={6}>
-                        <strong>{t("hotels.landing.arriving")}</strong>
+                        <strong>
+                          {t("hotels.landing.arriving")}
+                          {data.arrivingRooms?.length > 0
+                            ? ` (${data.arrivingRooms.length})`
+                            : ""}
+                        </strong>
 
                         {data.arrivingRooms?.length === 0 ? (
                           <p>{t("hotels.landing.none")}</p>
@@ -524,6 +529,11 @@ const HotelLandingPage = () => {
                             {data.arrivingRooms.map((item) => (
                               <li
                                 key={`arriving-${item.room.id}-${item.bookingId}`}>
+                                {item.isRoomChange && (
+                                  <strong className="text-info">
+                                    [{t("hotels.landing.roomChange")}]
+                                  </strong>
+                                )}{" "}
                                 <strong>{item.room.name}</strong> —{" "}
                                 {item.firstName} {item.lastName}{" "}
                                 <Link
@@ -541,7 +551,12 @@ const HotelLandingPage = () => {
                         )}
                       </Col>
                       <Col md={6}>
-                        <strong>{t("hotels.landing.departing")}</strong>
+                        <strong>
+                          {t("hotels.landing.departing")}
+                          {data.departingRooms?.length > 0
+                            ? ` (${data.departingRooms.length})`
+                            : ""}
+                        </strong>
 
                         {data.departingRooms?.length === 0 ? (
                           <p>{t("hotels.landing.none")}</p>
@@ -550,6 +565,11 @@ const HotelLandingPage = () => {
                             {data.departingRooms.map((item) => (
                               <li
                                 key={`departing-${item.room.id}-${item.bookingId}`}>
+                                {item.isRoomChange && (
+                                  <strong className="text-info">
+                                    [{t("hotels.landing.roomChange")}]
+                                  </strong>
+                                )}{" "}
                                 <strong>{item.room.name}</strong> —{" "}
                                 {item.firstName} {item.lastName}{" "}
                                 <Link

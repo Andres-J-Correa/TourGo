@@ -324,7 +324,7 @@ namespace TourGo.Services.Hotels
 
         public List<RoomBooking>? GetDepartingRoomBookings(DateOnly departureDate, string hotelId)
         {
-            string proc = "room_bookings_select_departing_by_date_v3";
+            string proc = "room_bookings_select_departing_by_date_v4";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -340,6 +340,7 @@ namespace TourGo.Services.Hotels
                 roomBooking.FirstName = reader.GetSafeString(index++);
                 roomBooking.LastName = reader.GetSafeString(index++);
                 roomBooking.BookingId = reader.GetSafeString(index++);
+                roomBooking.IsRoomChange = reader.GetSafeBool(index++);
 
                 list ??= new List<RoomBooking>();
                 list.Add(roomBooking);
@@ -349,7 +350,7 @@ namespace TourGo.Services.Hotels
 
         public List<RoomBooking>? GetArrivingRoomBookings(DateOnly arrivalDate, string hotelId)
         {
-            string proc = "room_bookings_select_arriving_by_date_v3";
+            string proc = "room_bookings_select_arriving_by_date_v4";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -365,6 +366,7 @@ namespace TourGo.Services.Hotels
                 roomBooking.FirstName = reader.GetSafeString(index++);
                 roomBooking.LastName = reader.GetSafeString(index++);
                 roomBooking.BookingId = reader.GetSafeString(index++);
+                roomBooking.IsRoomChange = reader.GetSafeBool(index++);
 
                 list ??= new List<RoomBooking>();
                 list.Add(roomBooking);
