@@ -1102,7 +1102,8 @@
       "completeTitle": "Do you want to mark the booking as completed?",
       "completeText": "You will no longer be able to edit the booking",
       "completeSuccess": "Booking marked as completed",
-      "completeError": "Error marking as completed"
+      "completeError": "Error marking as completed",
+      "roomChange": "Room Change"
     },
     "settings": {
       "title": "Settings",
