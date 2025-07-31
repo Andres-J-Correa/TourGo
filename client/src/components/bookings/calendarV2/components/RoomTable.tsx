@@ -6,14 +6,17 @@ import type { Dayjs } from "dayjs";
 import type { JSX } from "react";
 
 //libs
-import { Fragment, useMemo } from "react";
+import { Fragment, useCallback, useMemo, useState, useEffect } from "react";
 
 //components
 import PriceCell from "./PriceCell";
 import BookingCell from "./BookingCell";
+import CleaningCell from "./CleaningCell";
 
 //services & utils
 import { useLanguage } from "contexts/LanguageContext";
+import { toggleRoomBookingShouldClean } from "services/bookingServiceV2";
+import { toast } from "react-toastify";
 
 function RoomTable({
   room,
@@ -22,6 +25,7 @@ function RoomTable({
   datesWithAvailabilityByRoom,
   handleBookingCellClick,
   hotelId,
+  isCleaningMode,
 }: {
   room: Room;
   datesArray: Dayjs[];
@@ -33,122 +37,179 @@ function RoomTable({
     isOpen: boolean
   ) => Promise<void>;
   hotelId?: string;
+  isCleaningMode: boolean;
 }): JSX.Element {
   const { t } = useLanguage();
+
+  const [
+    datesDictionaryWithBookingsByRoom,
+    setDatesDictionaryWithBookingsByRoom,
+  ] = useState<Record<string, Record<string, RoomBooking>>>({});
+
+  const handleToggleShouldClean = useCallback(
+    async (roomBooking: RoomBooking) => {
+      if (!hotelId) return;
+
+      const response = await toggleRoomBookingShouldClean(roomBooking, hotelId);
+
+      if (response.isSuccessful) {
+        const { date, room } = roomBooking;
+        setDatesDictionaryWithBookingsByRoom((prev) => ({
+          ...prev,
+          [date]: {
+            ...prev[date],
+            [room.id]: {
+              ...roomBooking,
+              shouldClean: !roomBooking.shouldClean,
+            },
+          },
+        }));
+      } else {
+        toast.error(t("booking.calendar.errors.toggleShouldClean"));
+      }
+    },
+    [hotelId, t]
+  );
 
   const components = useMemo((): {
     bookings: JSX.Element[];
     prices: JSX.Element[];
+    cleaningCells: JSX.Element[];
   } => {
     const bookings: JSX.Element[] = [];
     const prices: JSX.Element[] = [];
+    const cleaningCells: JSX.Element[] = [];
 
-    let colSpan: number = 1;
+    let colSpan = 1;
+
+    const getDate = (i: number): string | undefined =>
+      datesArray[i]?.format("YYYY-MM-DD");
+
+    const getRoomBooking = (date?: string): RoomBooking | undefined =>
+      date ? datesDictionaryWithBookingsByRoom[date]?.[room.id] : undefined;
+
+    const getAvailability = (date?: string): boolean =>
+      date
+        ? datesWithAvailabilityByRoom[date]?.[room.id]?.isOpen ?? true
+        : true;
+
+    const createPriceCell = (
+      date: string,
+      price?: number,
+      hasCleaning?: boolean
+    ) => (
+      <PriceCell
+        key={`price-${room.id}-${date}`}
+        price={price}
+        hasCleaning={hasCleaning}
+      />
+    );
+
+    const createCleaningCell = (
+      date: string,
+      roomBooking?: RoomBooking,
+      showBookingName?: boolean
+    ) => (
+      <CleaningCell
+        key={`cleaning-${room.id}-${date}`}
+        roomBooking={roomBooking}
+        isCleaningMode={isCleaningMode}
+        handleToggleShouldClean={handleToggleShouldClean}
+        showBookingName={showBookingName}
+      />
+    );
+
+    const createBookingCell = (
+      date: string,
+      options: Partial<{
+        roomBooking: RoomBooking;
+        colSpan: number;
+        isFirst: boolean;
+        isAvailable: boolean;
+        onClick: () => Promise<void>;
+      }>
+    ): JSX.Element => (
+      <BookingCell
+        key={`booking-${room.id}-${date}`}
+        {...options}
+        hotelId={hotelId}
+        isHidden={isCleaningMode}
+      />
+    );
+
     for (let i = 0; i < datesArray.length; i++) {
-      const date: string | undefined = datesArray[i]?.format("YYYY-MM-DD");
-
+      const date = getDate(i);
       if (!date) continue;
 
-      const roomBooking: RoomBooking | undefined =
-        datesWithBookingsByRoom[date]?.[room.id];
-
+      const roomBooking = getRoomBooking(date);
       prices.push(
-        <PriceCell
-          key={`price-${room.id}-${date}`}
-          price={roomBooking?.price}
-        />
+        createPriceCell(date, roomBooking?.price, roomBooking?.shouldClean)
       );
 
+      const previousDate = getDate(i - 1);
+      const previousRoomBooking = getRoomBooking(previousDate);
+
       if (roomBooking) {
-        const nextDate: string | undefined =
-          datesArray[i + 1]?.format("YYYY-MM-DD");
+        const nextRoomBooking = getRoomBooking(getDate(i + 1));
 
-        if (!nextDate) {
-          bookings.push(
-            <BookingCell
-              key={`booking-${room.id}-${date}`}
-              roomBooking={roomBooking}
-              colSpan={colSpan}
-              hotelId={hotelId}
-            />
-          );
-        } else {
-          const nextRoomBooking: RoomBooking | undefined =
-            datesWithBookingsByRoom[nextDate]?.[room.id];
+        const isSameAsPrevious =
+          previousRoomBooking?.bookingId === roomBooking.bookingId;
 
-          if (nextRoomBooking?.bookingId === roomBooking.bookingId) {
-            colSpan++;
-            continue;
-          }
+        cleaningCells.push(
+          createCleaningCell(date, roomBooking, !isSameAsPrevious)
+        );
 
-          bookings.push(
-            <BookingCell
-              key={`booking-${room.id}-${date}`}
-              roomBooking={roomBooking}
-              colSpan={colSpan}
-              hotelId={hotelId}
-            />
-          );
+        if (nextRoomBooking?.bookingId === roomBooking.bookingId) {
+          colSpan++;
+          continue;
         }
+
+        bookings.push(
+          createBookingCell(date, {
+            roomBooking,
+            colSpan,
+          })
+        );
       } else {
-        const previousDate: string | undefined =
-          datesArray[i - 1]?.format("YYYY-MM-DD");
+        const isAvailable = getAvailability(date);
+        const isPreviousAvailable = getAvailability(previousDate);
 
-        const isAvailable: boolean =
-          datesWithAvailabilityByRoom[date]?.[room.id]?.isOpen ?? true;
+        const isFirst =
+          !!previousRoomBooking ||
+          i === 0 ||
+          (isAvailable ? !isPreviousAvailable : isPreviousAvailable);
 
-        const handleClick = async (): Promise<void> => {
+        const handleClick = async () => {
           return await handleBookingCellClick(date, room.id, isAvailable);
         };
-
-        if (!previousDate) {
-          bookings.push(
-            <BookingCell
-              key={`booking-${room.id}-${date}`}
-              isFirst={true}
-              isAvailable={isAvailable}
-              onClick={handleClick}
-            />
-          );
-        } else {
-          let isFirst: boolean = false;
-
-          const previousRoomBooking: RoomBooking | undefined =
-            datesWithBookingsByRoom[previousDate]?.[room.id];
-
-          const isPreviousAvailable: boolean =
-            datesWithAvailabilityByRoom[previousDate]?.[room.id]?.isOpen ??
-            true;
-
-          if (isAvailable) {
-            isFirst = !!previousRoomBooking || i === 0 || !isPreviousAvailable;
-          } else {
-            isFirst = !!previousRoomBooking || i === 0 || !!isPreviousAvailable;
-          }
-
-          bookings.push(
-            <BookingCell
-              key={`booking-${room.id}-${date}`}
-              isFirst={isFirst}
-              isAvailable={isAvailable}
-              onClick={handleClick}
-            />
-          );
-        }
+        cleaningCells.push(createCleaningCell(date));
+        bookings.push(
+          createBookingCell(date, {
+            isFirst,
+            isAvailable,
+            onClick: handleClick,
+          })
+        );
       }
 
       colSpan = 1;
     }
 
-    return { bookings, prices };
+    return { bookings, prices, cleaningCells };
   }, [
     datesArray,
-    datesWithBookingsByRoom,
+    datesDictionaryWithBookingsByRoom,
     datesWithAvailabilityByRoom,
     room.id,
     hotelId,
     handleBookingCellClick,
+    isCleaningMode,
+    handleToggleShouldClean,
   ]);
+
+  useEffect(() => {
+    setDatesDictionaryWithBookingsByRoom(datesWithBookingsByRoom);
+  }, [datesWithBookingsByRoom]);
 
   if (!room.id) return <Fragment />;
 
@@ -164,6 +225,7 @@ function RoomTable({
               {t("booking.calendar.reservation")}
             </td>
             {components.bookings}
+            {isCleaningMode && components.cleaningCells}
           </tr>
           <tr>
             <td className="first-column text-center align-content-center bg-light text-dark fw-bold">

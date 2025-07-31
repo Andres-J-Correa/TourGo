@@ -10,6 +10,7 @@ import type {
   ItemResponse,
   ItemsResponse,
   PagedResponse,
+  SuccessfulResponse,
 } from "types/apiResponse.types";
 
 import {
@@ -116,6 +117,32 @@ export const getRoomBookingsByDateRange = async (
   };
   try {
     const response = await axiosClientV2<ItemsResponse<RoomBooking>>(config);
+    return response.data;
+  } catch (error: unknown) {
+    return handleGlobalError(error);
+  }
+};
+
+export const toggleRoomBookingShouldClean = async (
+  roomBooking: Pick<RoomBooking, "bookingId" | "date" | "room">,
+  hotelId: string
+): Promise<ApiResponse<SuccessfulResponse>> => {
+  const config: AxiosRequestConfig = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(
+      /{hotelId}/,
+      hotelId
+    )}/room-booking/toggle-should-clean`,
+    data: {
+      ...roomBooking,
+      roomId: roomBooking.room.id,
+    },
+  };
+  try {
+    const response = await axiosClientV2<SuccessfulResponse>(config);
     return response.data;
   } catch (error: unknown) {
     return handleGlobalError(error);

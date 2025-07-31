@@ -7,13 +7,20 @@ import classNames from "classnames";
 //services & utils
 import { formatCurrency } from "utils/currencyHelper";
 
-function PriceCell({ price }: { price: number | undefined }): JSX.Element {
+function PriceCell({
+  price,
+  hasCleaning,
+}: {
+  price?: number;
+  hasCleaning?: boolean;
+}): JSX.Element {
   return (
     <td
       className={classNames(
         "data-cell text-center align-content-center text-muted",
         {
           "table-danger": price && price > 0,
+          "border-top-danger": hasCleaning,
         }
       )}>
       {formatCurrency(price, "COP")}

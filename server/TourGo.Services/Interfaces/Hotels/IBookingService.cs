@@ -28,5 +28,6 @@ namespace TourGo.Services.Interfaces
         List<RoomBooking>? GetDepartingRoomBookings(DateOnly departureDate, string hotelId);
         List<RoomBooking>? GetArrivingRoomBookings(DateOnly arrivalDate, string hotelId);
         List<string>? GetAvailablePublicIds(List<string> possibleIds);
+        void ToggleRoomBookingShouldClean(ToggleRoomBookingShouldCleanRequest model, string hotelId);
     }
 }

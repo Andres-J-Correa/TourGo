@@ -22,6 +22,7 @@ function BookingCell({
   isFirst = false,
   isAvailable = true,
   onClick,
+  isHidden = false,
 }: {
   roomBooking?: RoomBooking;
   colSpan?: number;
@@ -29,6 +30,7 @@ function BookingCell({
   isFirst?: boolean;
   isAvailable?: boolean;
   onClick?: () => Promise<void>;
+  isHidden?: boolean;
 }): JSX.Element {
   const [showBookingOffCanvas, setShowBookingOffCanvas] =
     useState<boolean>(false);
@@ -73,11 +75,13 @@ function BookingCell({
           "border-end-0": isFirst,
           "border-start-0 border-end-0": !isFirst,
           "ps-3 text-start": !isLoading,
+          "d-none": isHidden,
+          "cursor-not-allowed": isLoading,
         })}
         colSpan={colSpan}>
         {isLoading ? (
           <Spinner
-            className="data-cell-spinner d-flex mx-auto my-auto"
+            className="data-cell-spinner d-flex mx-auto my-auto text-muted"
             size="sm"
           />
         ) : isFirst ? (
@@ -95,7 +99,9 @@ function BookingCell({
 
   return (
     <td
-      className="data-cell align-content-center table-danger"
+      className={classNames("data-cell align-content-center table-danger", {
+        "d-none": isHidden,
+      })}
       colSpan={colSpan}>
       <Popover
         action="hover"
