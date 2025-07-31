@@ -607,7 +607,8 @@ const HotelLandingPage = () => {
                         ) : (
                           <ol>
                             {data.forCleaningRooms.map((item) => (
-                              <li key={`for-cleaning-${item.id}`}>
+                              <li
+                                key={`for-cleaning-${item.room.id}-${item.bookingId}`}>
                                 <strong>{item.room.name}</strong> —{" "}
                                 <Link
                                   className="link-primary"
