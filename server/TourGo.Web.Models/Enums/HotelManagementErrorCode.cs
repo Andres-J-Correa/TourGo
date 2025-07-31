@@ -13,5 +13,6 @@ namespace TourGo.Web.Models.Enums
         Conflicts = BaseErrorCode.HotelManagementError + 3,
         NoRecordsFound = BaseErrorCode.HotelManagementError + 4,
         InsufficientPermissions = BaseErrorCode.HotelManagementError + 5,
+        ExternalBookingIdExists = BaseErrorCode.HotelManagementError + 6,
     }
 }
