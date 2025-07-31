@@ -43,6 +43,7 @@ import useBookingTotals from "./hooks/useBookingTotals";
 import ChargeTypesExplanationIcon from "components/extra-charges/ChargeTypesExplanationIcon";
 import PersonalizedCharges from "./PersonalizedCharges";
 import { useLanguage } from "contexts/LanguageContext"; // add import
+import { ERROR_CODES } from "constants/errorCodes";
 
 const emptyFormData = {
   customerId: "",
@@ -548,7 +549,7 @@ export default withFormik({
       : { ...bookingDefaultInitialValues },
   validationSchema: (props) => props.bookingSchema,
   enableReinitialize: true,
-  handleSubmit: async (values, { props, setSubmitting }) => {
+  handleSubmit: async (values, { props, setSubmitting, setFieldError }) => {
     const {
       hotelId,
       customer,
@@ -638,6 +639,16 @@ export default withFormik({
         throw new Error(t("booking.errors.saveBooking"));
       }
     } catch (err) {
+      if (
+        Number(err?.response?.data?.code) ===
+        ERROR_CODES.EXTERNAL_BOOKING_ID_CONFLICT
+      ) {
+        setFieldError(
+          "externalId",
+          t(`errors.custom.${ERROR_CODES.EXTERNAL_BOOKING_ID_CONFLICT}`)
+        );
+      }
+
       const errorMessage = getTranslatedErrorMessage(err);
 
       Swal.close();

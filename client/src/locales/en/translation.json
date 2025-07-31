@@ -135,6 +135,7 @@
       "4003": "A record of this type already exists",
       "4004": "No records found",
       "4005": "You do not have sufficient permissions to perform this action",
+      "4006": "External booking ID conflict",
       "5000": "Transaction management error",
       "5001": "The request is invalid",
       "5002": "A transaction with this reference number already exists"
