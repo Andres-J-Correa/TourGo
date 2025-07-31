@@ -14,6 +14,8 @@ import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { toast } from "react-toastify";
+import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 //components
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
@@ -248,11 +250,15 @@ function CalendarView(): JSX.Element {
           <Col className="align-content-center">
             <Button
               color={`${isCleaningMode ? "success" : "dark"}`}
-              className="float-end"
+              className="float-end animation-rotate"
               onClick={handleCleaningModeToggle}>
               {isCleaningMode
                 ? t("booking.calendar.cleaningMode")
                 : t("booking.calendar.bookingMode")}
+              <FontAwesomeIcon
+                icon={faArrowsRotate}
+                className="ms-2 icon-rotate"
+              />
             </Button>
           </Col>
         </Row>
