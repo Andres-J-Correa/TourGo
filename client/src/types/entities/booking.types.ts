@@ -12,6 +12,8 @@ export interface RoomBooking {
   price: number;
   firstName?: string | null;
   lastName?: string | null;
+  shouldClean?: boolean;
+  isRoomChange?: boolean;
 }
 
 export interface Booking extends EntityBase {

@@ -449,13 +449,16 @@
         "loadRooms": "Error loading rooms",
         "loadBookings": "Error loading bookings",
         "loadAvailability": "Error loading room availability",
-        "upsertAvailability": "Error updating room availability"
+        "upsertAvailability": "Error updating room availability",
+        "toggleShouldClean": "Error updating room cleaning status"
       },
       "invalidDateRange": "Invalid date range. Ensure the start date is before the end date.",
       "available": "Available",
       "reservation": "Booking",
       "price": "Price",
-      "closed": "Closed"
+      "closed": "Closed",
+      "bookingMode": "Bookings Mode",
+      "cleaningMode": "Cleaning Mode"
     },
     "arrival": {
       "reservationNumber": "Reservation #:",

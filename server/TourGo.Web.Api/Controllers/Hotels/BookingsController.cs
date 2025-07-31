@@ -258,6 +258,25 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
+        [HttpPatch("room-booking/toggle-should-clean")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> ToggleRoomBookingShouldClean(ToogleRoomBookingShouldCleanRequest model, string hotelId)
+        {
+            ObjectResult result;
+            try
+            {
+                _bookingService.ToggleRoomBookingShouldClean(model, hotelId);
+                result = Ok200(new SuccessResponse());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
+
 
         [HttpGet("{id}")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]

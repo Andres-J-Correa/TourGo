@@ -250,7 +250,7 @@ namespace TourGo.Services.Hotels
 
         public List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, string hotelId)
         {
-            string proc = "room_bookings_select_by_date_range_v3";
+            string proc = "room_bookings_select_by_date_range_v4";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -263,6 +263,7 @@ namespace TourGo.Services.Hotels
                 int index = 0;
                 list ??= new List<RoomBooking>();
                 RoomBooking roomBooking = MapRoomBooking(reader, ref index);
+                roomBooking.ShouldClean = reader.GetSafeBool(index++);
                 list.Add(roomBooking);
             });
 
@@ -412,6 +413,18 @@ namespace TourGo.Services.Hotels
             });
 
             return availableIds;
+        }
+
+        public void ToggleRoomBookingShouldClean(ToogleRoomBookingShouldCleanRequest model, string hotelId)
+        {
+            string proc = "room_bookings_toggle_should_clean";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_bookingId", model.BookingId);
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_roomId", model.RoomId);
+                param.AddWithValue("p_date", model.Date.ToString("yyyy-MM-dd"));
+            });
         }
 
         public bool IsValidSortDirection(string? direction)

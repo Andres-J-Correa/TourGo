@@ -16,5 +16,6 @@ namespace TourGo.Models.Domain.Bookings
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public bool? IsRoomChange { get; set; }
+        public bool? ShouldClean { get; set; }
     }
 }

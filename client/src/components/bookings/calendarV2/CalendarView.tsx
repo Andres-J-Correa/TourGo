@@ -32,6 +32,7 @@ import { upsertRoomAvailability } from "services/roomAvailabilityService";
 
 //styles
 import "./CalendarView.css";
+import { Button, Col, Row } from "reactstrap";
 
 dayjs.extend(isSameOrBefore);
 
@@ -43,6 +44,8 @@ function CalendarView(): JSX.Element {
 
   const [roomAvailabilityByDateAndRoom, setRoomAvailabilityByDateAndRoom] =
     useState<Record<string, Record<string, RoomAvailability>>>({});
+
+  const [isCleaningMode, setIsCleaningMode] = useState<boolean>(false);
 
   const { t } = useLanguage();
   const { hotelId } = useParams<{ hotelId: string }>();
@@ -208,6 +211,13 @@ function CalendarView(): JSX.Element {
     [hotelId, handleUpsertRoomAvailability]
   );
 
+  const handleCleaningModeToggle = (
+    e: React.MouseEvent<HTMLButtonElement>
+  ): void => {
+    e.preventDefault();
+    setIsCleaningMode((prev) => !prev);
+  };
+
   useEffect(() => {
     setRoomAvailabilityByDateAndRoom(
       mapRoomAvailabilityByDateAndRoom(roomAvailability)
@@ -225,13 +235,27 @@ function CalendarView(): JSX.Element {
         <LoadingOverlay
           isVisible={loadingRooms || loadingBookings || loadingAvailability}
         />
-        <DatePickersV2
-          startDate={dates.start}
-          endDate={dates.end}
-          handleEndChange={handleDateChange("end")}
-          handleStartChange={handleDateChange("start")}
-          allowSameDay={true}
-        />
+        <Row className="mb-3">
+          <Col lg={4} md={6} sm={12}>
+            <DatePickersV2
+              startDate={dates.start}
+              endDate={dates.end}
+              handleEndChange={handleDateChange("end")}
+              handleStartChange={handleDateChange("start")}
+              allowSameDay={true}
+            />
+          </Col>
+          <Col className="align-content-center">
+            <Button
+              color={`${isCleaningMode ? "success" : "dark"}`}
+              className="float-end"
+              onClick={handleCleaningModeToggle}>
+              {isCleaningMode
+                ? t("booking.calendar.cleaningMode")
+                : t("booking.calendar.bookingMode")}
+            </Button>
+          </Col>
+        </Row>
         {!isDateRangeValid ? (
           <Alert type="danger">{t("booking.calendar.invalidDateRange")}</Alert>
         ) : (
@@ -247,6 +271,7 @@ function CalendarView(): JSX.Element {
                 datesWithAvailabilityByRoom={roomAvailabilityByDateAndRoom}
                 hotelId={hotelId}
                 handleBookingCellClick={handleBookingCellClick}
+                isCleaningMode={isCleaningMode}
               />
             ))}
           </div>
