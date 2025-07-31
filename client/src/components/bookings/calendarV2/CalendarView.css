@@ -46,9 +46,12 @@
 .cleaning-cell-booking-name {
   position: absolute;
   top: -0.7rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  overflow-x: hidden;
   text-wrap: nowrap;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 1;
 }
 
 @media (max-width: 600px) {
