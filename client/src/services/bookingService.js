@@ -287,6 +287,26 @@ export const getDepartingRooms = async (hotelId, date) => {
   }
 };
 
+export const getForCleaningRooms = async (hotelId, date) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${apiV2.replace(
+      /{hotelId}/,
+      hotelId
+    )}/for-cleaning/rooms?date=${date}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
 export const update = async (payload, hotelId) => {
   const config = {
     headers: {

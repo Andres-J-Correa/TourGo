@@ -1107,7 +1107,8 @@
       "completeText": "Ya no podrá editar la reserva",
       "completeSuccess": "Reserva marcada como completada",
       "completeError": "Error al marcar como completada",
-      "roomChange": "Cambio de Hab."
+      "roomChange": "Cambio de Hab.",
+      "forCleaning": "Limpieza"
     },
     "settings": {
       "title": "Configuración",
