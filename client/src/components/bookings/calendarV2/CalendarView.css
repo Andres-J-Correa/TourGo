@@ -52,6 +52,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   z-index: 1;
+  max-width: inherit;
 }
 
 @media (max-width: 600px) {
