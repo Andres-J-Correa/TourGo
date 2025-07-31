@@ -7,7 +7,7 @@ using TourGo.Models.Interfaces;
 
 namespace TourGo.Models.Requests.Bookings
 {
-    public class ToogleRoomBookingShouldCleanRequest
+    public class ToggleRoomBookingShouldCleanRequest
     {
         public string BookingId { get; set; } = string.Empty;
         public int RoomId { get; set; }

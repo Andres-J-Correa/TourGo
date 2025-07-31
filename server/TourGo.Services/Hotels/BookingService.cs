@@ -415,7 +415,7 @@ namespace TourGo.Services.Hotels
             return availableIds;
         }
 
-        public void ToggleRoomBookingShouldClean(ToogleRoomBookingShouldCleanRequest model, string hotelId)
+        public void ToggleRoomBookingShouldClean(ToggleRoomBookingShouldCleanRequest model, string hotelId)
         {
             string proc = "room_bookings_toggle_should_clean";
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>

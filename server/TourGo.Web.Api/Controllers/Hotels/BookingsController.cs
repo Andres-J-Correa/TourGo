@@ -260,7 +260,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPatch("room-booking/toggle-should-clean")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> ToggleRoomBookingShouldClean(ToogleRoomBookingShouldCleanRequest model, string hotelId)
+        public ActionResult<SuccessResponse> ToggleRoomBookingShouldClean(ToggleRoomBookingShouldCleanRequest model, string hotelId)
         {
             ObjectResult result;
             try
