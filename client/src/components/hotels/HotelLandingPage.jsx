@@ -39,6 +39,7 @@ import {
   getStays,
   updateStatusToCheckedIn,
   updateStatusToCompleted,
+  getForCleaningRooms,
 } from "services/bookingService";
 import { leaveHotel } from "services/staffService";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
@@ -58,6 +59,7 @@ const HotelLandingPage = () => {
     arrivingRooms: [],
     departingRooms: [],
     stays: [],
+    forCleaningRooms: [],
   });
   const [date, setDate] = useState(dateOptions.today);
   const [loadingArrivalsDepartures, setLoadingArrivalsDepartures] =
@@ -286,6 +288,7 @@ const HotelLandingPage = () => {
       getArrivingRooms(hotelId, date),
       getDepartingRooms(hotelId, date),
       getStays(hotelId, date),
+      getForCleaningRooms(hotelId, date),
     ])
       .then(
         ([
@@ -294,6 +297,7 @@ const HotelLandingPage = () => {
           arrivingRoomsResult,
           departingRoomsResult,
           staysResult,
+          forCleaningRoomsResult,
         ]) => {
           const errors = [];
           let arrivals = [];
@@ -301,6 +305,7 @@ const HotelLandingPage = () => {
           let arrivingRooms = [];
           let departingRooms = [];
           let stays = [];
+          let forCleaningRooms = [];
 
           if (arrivalsResult.status === "fulfilled") {
             arrivals = arrivalsResult.value?.items || [];
@@ -332,12 +337,19 @@ const HotelLandingPage = () => {
             errors.push("Error al cargar estancias de hoy");
           }
 
+          if (forCleaningRoomsResult.status === "fulfilled") {
+            forCleaningRooms = forCleaningRoomsResult.value?.items || [];
+          } else if (forCleaningRoomsResult.reason?.response?.status !== 404) {
+            errors.push("Error al cargar habitaciones en limpieza");
+          }
+
           setData({
             arrivals,
             departures,
             arrivingRooms,
             departingRooms,
             stays,
+            forCleaningRooms,
           });
 
           if (errors.length > 0) {
@@ -514,7 +526,7 @@ const HotelLandingPage = () => {
                         </ul>
                       </Col>
 
-                      <Col md={6}>
+                      <Col md={12} lg={6} xl={4}>
                         <strong>
                           {t("hotels.landing.arriving")}
                           {data.arrivingRooms?.length > 0
@@ -535,22 +547,20 @@ const HotelLandingPage = () => {
                                   </strong>
                                 )}{" "}
                                 <strong>{item.room.name}</strong> —{" "}
-                                {item.firstName} {item.lastName}{" "}
                                 <Link
+                                  className="link-primary"
                                   to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
                                   title={t(
                                     "hotels.landing.viewBookingDetails"
                                   )}>
-                                  {t("hotels.landing.bookingNumber", {
-                                    bookingId: item.bookingId,
-                                  })}
+                                  {item.firstName} {item.lastName}
                                 </Link>
                               </li>
                             ))}
                           </ol>
                         )}
                       </Col>
-                      <Col md={6}>
+                      <Col md={12} lg={6} xl={4}>
                         <strong>
                           {t("hotels.landing.departing")}
                           {data.departingRooms?.length > 0
@@ -571,15 +581,42 @@ const HotelLandingPage = () => {
                                   </strong>
                                 )}{" "}
                                 <strong>{item.room.name}</strong> —{" "}
-                                {item.firstName} {item.lastName}{" "}
                                 <Link
+                                  className="link-primary"
                                   to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
                                   title={t(
                                     "hotels.landing.viewBookingDetails"
                                   )}>
-                                  {t("hotels.landing.bookingNumber", {
-                                    bookingId: item.bookingId,
-                                  })}
+                                  {item.firstName} {item.lastName}
+                                </Link>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
+                      </Col>
+                      <Col md={12} lg={6} xl={4}>
+                        <strong>
+                          {t("hotels.landing.forCleaning")}
+                          {data.forCleaningRooms?.length > 0
+                            ? ` (${data.forCleaningRooms.length})`
+                            : ""}
+                        </strong>
+
+                        {data.forCleaningRooms?.length === 0 ? (
+                          <p>{t("hotels.landing.none")}</p>
+                        ) : (
+                          <ol>
+                            {data.forCleaningRooms.map((item) => (
+                              <li
+                                key={`for-cleaning-${item.room.id}-${item.bookingId}`}>
+                                <strong>{item.room.name}</strong> —{" "}
+                                <Link
+                                  className="link-primary"
+                                  to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
+                                  title={t(
+                                    "hotels.landing.viewBookingDetails"
+                                  )}>
+                                  {item.firstName} {item.lastName}
                                 </Link>
                               </li>
                             ))}

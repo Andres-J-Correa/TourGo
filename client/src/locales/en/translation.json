@@ -1107,7 +1107,8 @@
       "completeText": "You will no longer be able to edit the booking",
       "completeSuccess": "Booking marked as completed",
       "completeError": "Error marking as completed",
-      "roomChange": "Room Change"
+      "roomChange": "Room Change",
+      "forCleaning": "Cleaning"
     },
     "settings": {
       "title": "Settings",

@@ -570,5 +570,33 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return result;
         }
+
+        [HttpGet("for-cleaning/rooms")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemsResponse<RoomBooking>> GetForCleaningRoomBookings(string hotelId, [FromQuery] DateOnly date)
+        {
+            ObjectResult result;
+            try
+            {
+                List<RoomBooking>? shouldCleanRooms = _bookingService.GetForCleaningRoomBookings(date, hotelId);
+                if (shouldCleanRooms == null)
+                {
+                    result = NotFound404(new ErrorResponse("No room bookings that need cleaning found for this date"));
+                }
+                else
+                {
+                    ItemsResponse<RoomBooking> response = new ItemsResponse<RoomBooking>() { Items = shouldCleanRooms };
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+            return result;
+        }
+
     }
 }

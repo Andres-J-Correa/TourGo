@@ -427,6 +427,29 @@ namespace TourGo.Services.Hotels
             });
         }
 
+        public List<RoomBooking>? GetForCleaningRoomBookings(DateOnly date, string hotelId)
+        {
+            string proc = "room_bookings_select_for_cleaning";
+            List<RoomBooking>? list = null;
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_date", date.ToString("yyyy-MM-dd"));
+                param.AddWithValue("p_hotelId", hotelId);
+            }, (reader, set) =>
+            {
+                int index = 0;
+                RoomBooking roomBooking = new RoomBooking();
+                roomBooking.Room.Id = reader.GetSafeInt32(index++);
+                roomBooking.Room.Name = reader.GetSafeString(index++);
+                roomBooking.FirstName = reader.GetSafeString(index++);
+                roomBooking.LastName = reader.GetSafeString(index++);
+                roomBooking.BookingId = reader.GetSafeString(index++);
+                list ??= new List<RoomBooking>();
+                list.Add(roomBooking);
+            });
+            return list;
+        }
+
         public bool IsValidSortDirection(string? direction)
         {
             return string.Equals(direction, "ASC", StringComparison.OrdinalIgnoreCase)
