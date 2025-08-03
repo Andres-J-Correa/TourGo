@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import classNames from "classnames";
-import { mkConfig, generateCsv, download } from "export-to-csv";
+import { utils, writeFile } from "xlsx";
 
 //components
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
@@ -26,7 +26,7 @@ import { getDateString } from "utils/dateHelper";
 import { BOOKING_STATUS_BY_ID } from "components/bookings/constants";
 import { Button, Col, Row } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileCsv } from "@fortawesome/free-solid-svg-icons";
+import { faFileExcel } from "@fortawesome/free-solid-svg-icons";
 
 const defaultData: BookingData = {
   items: [],
@@ -78,13 +78,6 @@ function BookingsViewV2(): JSX.Element {
     { id: "status", label: t("booking.minimalCard.status") },
   ];
 
-  const csvConfig = mkConfig({
-    fieldSeparator: ";",
-    filename: t("booking.bookingsView.title").toLowerCase(),
-    decimalSeparator: ".",
-    useKeysAsHeaders: true,
-  });
-
   const exportExcel = () => {
     if (!hotelId || data.items.length === 0) return;
     const copyOfItems = data.items.map(
@@ -121,8 +114,16 @@ function BookingsViewV2(): JSX.Element {
         return acc;
       }, {} as Record<string, string | number>)
     );
-    const csv = generateCsv(csvConfig)(dataToExport);
-    download(csvConfig)(csv);
+    const worksheet = utils.json_to_sheet(dataToExport);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(
+      workbook,
+      worksheet,
+      t("booking.bookingsView.title")
+    );
+    writeFile(workbook, `${t("booking.bookingsView.title")}.xlsx`, {
+      compression: true,
+    });
   };
 
   const handleFilterByBookingId = (value: string): void => {
@@ -298,8 +299,8 @@ function BookingsViewV2(): JSX.Element {
             color="success"
             onClick={() => exportExcel()}
             disabled={loading || data.items.length === 0}>
-            <FontAwesomeIcon icon={faFileCsv} className="me-2" />
-            {t("transactions.view.exportCsv")}
+            <FontAwesomeIcon icon={faFileExcel} className="me-2" />
+            {t("transactions.view.exportExcel")}
           </Button>
         </div>
         <div className="w-100 d-flex align-items-center">

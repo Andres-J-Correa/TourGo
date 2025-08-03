@@ -1562,7 +1562,7 @@
       "title": "Transactions",
       "filters": "Filters",
       "addTransaction": "Add Transaction",
-      "exportCsv": "Export to CSV",
+      "exportExcel": "Export to Excel",
       "showing": "Showing",
       "to": "to",
       "of": "of",

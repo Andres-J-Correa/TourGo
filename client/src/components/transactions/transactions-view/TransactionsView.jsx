@@ -43,12 +43,12 @@ import {
   faSort,
   faSquarePlus,
   faSquareMinus,
-  faFileCsv,
+  faFileExcel,
 } from "@fortawesome/free-solid-svg-icons";
 import { flattenObject } from "utils/objectHelper";
 import dayjs from "dayjs";
-import { mkConfig, generateCsv, download } from "export-to-csv";
 import { getDateString } from "utils/dateHelper";
+import { utils, writeFile } from "xlsx";
 
 import "./TransactionsView.css";
 
@@ -103,7 +103,7 @@ function TransactionsView() {
     { id: "amount", label: t("transactions.table.amount") },
     { id: "currencyCode", label: t("transactions.table.currencyCode") },
     { id: "category", label: t("transactions.table.category") },
-    { id: "subcategory", label: t("transactions.table.subcategory") },
+    { id: "subcategory-name", label: t("transactions.table.subcategory") },
     { id: "paymentMethod-name", label: t("transactions.table.paymentMethod") },
     { id: "description", label: t("transactions.table.description") },
     { id: "referenceNumber", label: t("transactions.table.referenceNumber") },
@@ -116,13 +116,6 @@ function TransactionsView() {
     { id: "parentId", label: t("transactions.table.parentId") },
     { id: "hasDocumentUrl", label: t("transactions.table.hasDocumentUrl") },
   ];
-
-  const csvConfig = mkConfig({
-    fieldSeparator: ";",
-    filename: t("transactions.view.title").toLowerCase(),
-    decimalSeparator: ".",
-    useKeysAsHeaders: true,
-  });
 
   const [paginationData, setPaginationData] = useState({
     pageIndex: 0,
@@ -209,15 +202,18 @@ function TransactionsView() {
 
       return copy;
     });
-
     rowData = rowData.map((row) =>
       columnOrderTranslated.reduce((acc, obj) => {
         acc[obj.label] = row[obj.id] ?? "";
         return acc;
       }, {})
     );
-    const csv = generateCsv(csvConfig)(rowData);
-    download(csvConfig)(csv);
+    const worksheet = utils.json_to_sheet(rowData);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, t("transactions.view.title"));
+    writeFile(workbook, `${t("transactions.view.title")}.xlsx`, {
+      compression: true,
+    });
   };
 
   const onPageSizeChange = (e) =>
@@ -659,8 +655,8 @@ function TransactionsView() {
               className="float-end"
               onClick={() => exportExcel(table.getRowModel().rows)}
               disabled={loading || table.getRowModel().rows.length === 0}>
-              <FontAwesomeIcon icon={faFileCsv} className="me-2" />
-              {t("transactions.view.exportCsv")}
+              <FontAwesomeIcon icon={faFileExcel} className="me-2" />
+              {t("transactions.view.exportExcel")}
             </Button>
           </div>
         </Row>
