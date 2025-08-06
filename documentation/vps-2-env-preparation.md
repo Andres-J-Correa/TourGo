@@ -109,7 +109,33 @@ sudo apt-get install -y dotnet-sdk-8.0=8.0.114-0ubuntu1~24.04.1
 dotnet --list-sdks
 ```
 
-## Step 4: Install Nginx
+## Step 4: Install MariaDB
+
+### 1. Install MariaDB Server
+
+```bash
+sudo apt install -y mariadb-server
+```
+
+### 2. Secure the Installation
+
+```bash
+sudo mysql_secure_installation
+```
+
+### 3. Verify MariaDB is Running
+
+```bash
+sudo systemctl status mariadb
+```
+
+### 4. Check MariaDB Version
+
+```bash
+mysql -V
+```
+
+## Step 5: Install Nginx
 
 ### 1. Install and Start Nginx
 
