@@ -8,7 +8,6 @@ import {
   InputGroupText,
 } from "reactstrap";
 import PropTypes from "prop-types";
-import { useLanguage } from "contexts/LanguageContext"; // added
 
 const PaginationComponent = ({
   pageIndex,
@@ -19,8 +18,6 @@ const PaginationComponent = ({
   maxPageNumbersToShow = 3,
 }) => {
   const [inputValue, setInputValue] = useState(pageIndex + 1);
-
-  const { t } = useLanguage(); // added
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -41,7 +38,13 @@ const PaginationComponent = ({
   const getPageNumbers = () => {
     const pages = [];
     let startPage = Math.max(0, pageIndex - 1);
-    let endPage = Math.min(totalPages - 1, pageIndex + 1);
+    let endPage = hasPreviousPage
+      ? Math.min(
+          totalPages - 1,
+          pageIndex + 2,
+          pageIndex + Math.floor(maxPageNumbersToShow / 2)
+        )
+      : Math.min(totalPages - 1, pageIndex + maxPageNumbersToShow - 1);
 
     if (endPage - startPage + 1 < maxPageNumbersToShow) {
       startPage = Math.max(0, endPage - maxPageNumbersToShow + 1);
@@ -65,7 +68,9 @@ const PaginationComponent = ({
   }, [pageIndex]);
 
   return (
-    <div className="d-flex align-items-center gap-2 float-end mb-3">
+    <div
+      className="d-flex align-items-center gap-2 mb-3 float-end"
+      style={{ overflowX: "auto" }}>
       <Pagination
         aria-label="Page navigation"
         className="pagination pagination-rounded mb-0">
@@ -80,19 +85,17 @@ const PaginationComponent = ({
         </PaginationItem>
       </Pagination>
 
-      <InputGroup style={{ width: "max-content" }}>
+      <InputGroup style={{ minWidth: "fit-content" }}>
         <Input
           type="number"
-          style={{ width: "4rem" }}
+          style={{ maxWidth: "4rem" }}
           min="1"
           max={totalPages}
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleInputSubmit}
         />
-        <InputGroupText>
-          {t("commonUI.pagination.of")} {totalPages}
-        </InputGroupText>
+        <InputGroupText>/ {totalPages}</InputGroupText>
       </InputGroup>
     </div>
   );

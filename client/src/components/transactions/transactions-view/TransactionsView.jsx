@@ -660,7 +660,7 @@ function TransactionsView() {
             </Button>
           </div>
         </Row>
-        <div className="table-responsive">
+        <div className="table-responsive mt-3">
           <span
             className={classNames("float-end", {
               invisible: data.items.length === 0 || loading,
@@ -805,13 +805,18 @@ function TransactionsView() {
             {t("transactions.view.of")} {data.totalPages}
           </p>
         </div>
-        <Pagination
-          pageIndex={paginationData.pageIndex}
-          totalPages={data.totalPages}
-          hasPreviousPage={data.hasPreviousPage}
-          hasNextPage={data.hasNextPage}
-          onPageChange={gotoPage}
-        />
+        <Row>
+          <Col>
+            <Pagination
+              pageIndex={paginationData.pageIndex}
+              totalPages={data.totalPages}
+              hasPreviousPage={data.hasPreviousPage}
+              hasNextPage={data.hasNextPage}
+              onPageChange={gotoPage}
+            />
+          </Col>
+        </Row>
+
         <div className="mt-5">
           <TransactionAddForm
             hotelId={hotelId}

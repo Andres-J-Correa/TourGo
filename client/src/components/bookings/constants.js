@@ -31,7 +31,6 @@ export const BOOKING_STATUS_IDS = {
 export const LOCKED_BOOKING_STATUSES = [
   BOOKING_STATUS_IDS.CANCELLED,
   BOOKING_STATUS_IDS.NO_SHOW,
-  BOOKING_STATUS_IDS.COMPLETED,
 ];
 
 // Export a function to get columns with translations
