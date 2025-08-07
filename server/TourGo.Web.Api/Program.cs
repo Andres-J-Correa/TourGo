@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging.Console;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
 using TourGo.Models.Domain.Config;
 
 namespace TourGo.Web.Api
@@ -28,11 +30,17 @@ namespace TourGo.Web.Api
 
         private static void ConfigureLogging(WebHostBuilderContext context, ILoggingBuilder logging)
         {
+            logging.ClearProviders();
             logging.AddConfiguration(context.Configuration.GetSection("Logging"));
 
-            logging.AddSimpleConsole(options => {
+            logging.AddOpenTelemetry(options =>
+            {
                 options.IncludeScopes = true;
-                options.ColorBehavior = LoggerColorBehavior.Disabled;
+                options.ParseStateValues = true;
+                options.IncludeFormattedMessage = true;
+                options.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TourGo.Web.Api"));
+                options.AddConsoleExporter();
+                //options.AddOtlpExporter();
             });
 
             logging.AddDebug();

@@ -1,5 +1,8 @@
 ﻿using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Localization;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using System.Globalization;
 using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Config.Emails;
@@ -22,6 +25,18 @@ namespace TourGo.Web.Api
         {
             services.AddLocalization(options => options.ResourcesPath = "Resources");
             services.AddMemoryCache();
+            services.AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddService("TourGo.Web.Api"))
+            .WithTracing(tracing => 
+                tracing.AddAspNetCoreInstrumentation()
+                    .AddConsoleExporter()
+                    //.AddOtlpExporter()
+                    )
+            .WithMetrics(metrics => 
+                metrics.AddAspNetCoreInstrumentation()
+                    //.AddOtlpExporter()
+                    .AddConsoleExporter());
+
             ConfigureAppSettings(services);
             DependencyInjection.ConfigureServices(services, Configuration);
             Cors.ConfigureServices(services);
