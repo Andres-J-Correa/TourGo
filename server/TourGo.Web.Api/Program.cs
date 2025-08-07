@@ -32,7 +32,8 @@ namespace TourGo.Web.Api
 
             logging.AddSimpleConsole(options => {
                 options.IncludeScopes = true;
-                options.ColorBehavior = LoggerColorBehavior.Disabled;
+                options.ColorBehavior = LoggerColorBehavior.Enabled;
+                options.TimestampFormat = "[HH:mm:ss] ";
             });
 
             logging.AddDebug();
