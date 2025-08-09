@@ -10,5 +10,6 @@ namespace TourGo.Web.Models.Enums
     {
         BadRequest = BaseErrorCode.TransactionManagementError + 1,
         ReferenceNumberConflict = BaseErrorCode.TransactionManagementError + 2,
+        AlreadyReversed = BaseErrorCode.TransactionManagementError + 3,
     }
 }

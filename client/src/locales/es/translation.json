@@ -138,7 +138,8 @@
       "4006": "Ya existe una reserva con este ID externo",
       "5000": "Error de gestión de transacciones",
       "5001": "La solicitud no es válida",
-      "5002": "Ya existe una transacción con este número de referencia"
+      "5002": "Ya existe una transacción con este número de referencia",
+      "5003": "La transacción ya ha sido revertida"
     }
   },
   "booking": {

@@ -71,7 +71,7 @@ namespace TourGo.Services.Finances
 
         public int Reverse(string txnId, string userId, string publicId)
         {
-            string proc = "transactions_reverse_v4";
+            string proc = "transactions_reverse_v5";
             int newId = 0;
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>

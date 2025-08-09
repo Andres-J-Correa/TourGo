@@ -29,6 +29,7 @@ export const ERROR_CODES = {
   // Transaction Management-specific error codes
   TRANSACTION_BAD_REQUEST: 5001,
   TRANSACTION_REFERENCE_NUMBER_CONFLICT: 5002,
+  TRANSACTION_ALREADY_REVERSED: 5003,
 
   // Add other specific error codes here
 };

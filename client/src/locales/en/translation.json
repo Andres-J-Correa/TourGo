@@ -138,7 +138,8 @@
       "4006": "External booking ID conflict",
       "5000": "Transaction management error",
       "5001": "The request is invalid",
-      "5002": "A transaction with this reference number already exists"
+      "5002": "A transaction with this reference number already exists",
+      "5003": "The transaction has already been reversed"
     }
   },
   "booking": {
