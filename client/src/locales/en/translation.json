@@ -23,7 +23,8 @@
       "hotels": "Hoteles",
       "hotel": "Hotel"
     },
-    "downloading": "Downloading"
+    "downloading": "Downloading",
+    "recaptchaError": "reCAPTCHA error, please notify the site administrator"
   },
   "yup": {
     "required": "{{label}} is required",

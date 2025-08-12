@@ -68,6 +68,12 @@ function StaffInviteForm() {
     if (!result.isConfirmed) return;
 
     if (!executeRecaptcha) {
+      Swal.fire({
+        title: t("common.error"),
+        text: t("common.recaptchaError"),
+        icon: "error",
+        confirmButtonText: t("common.ok"),
+      });
       return;
     }
 

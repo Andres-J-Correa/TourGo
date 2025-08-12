@@ -31,9 +31,6 @@ jobs:
 
             # Inject secrets into .env
             cd client
-            echo "REACT_APP_RECAPTCHA_SITE_KEY=${{ secrets.CLIENT_GOOGLE_RECAPTCHA_SITE_KEY }}" >> .env
-
-
 
             # Client Deployment
             yarn install || { echo "yarn install failed"; exit 1; }

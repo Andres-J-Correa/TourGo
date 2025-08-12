@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, Fragment } from "react";
+import React, { useState, useEffect, Suspense, Fragment, useMemo } from "react";
 
 import { HelmetProvider } from "react-helmet-async";
 import { Container } from "reactstrap";
@@ -10,7 +10,7 @@ import RouteWrapper from "contexts/RouteWrapper";
 
 import { useAppContext } from "./contexts/GlobalAppContext";
 
-import { Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { FaroRoutes } from "@grafana/faro-react";
 
 import { publicFlattenedRoutes, privateFlattenedRoutes } from "./routes";
@@ -40,6 +40,11 @@ const App = () => {
     />
   );
 
+  const RoutesComp = useMemo(
+    () => (process.env.REACT_APP_ENV === "development" ? Routes : FaroRoutes),
+    []
+  );
+
   useEffect(() => {
     const publicRoutes = publicFlattenedRoutes.map(mapRoute);
     const privateRoutes = privateFlattenedRoutes.map(mapRoute);
@@ -64,7 +69,7 @@ const App = () => {
           <Fragment>
             <NavbarContainer />
             <Container className="my-4 main-container" fluid>
-              <FaroRoutes>{routes}</FaroRoutes>
+              <RoutesComp>{routes}</RoutesComp>
             </Container>
             <Footer hotelId={hotel.current.id} />
           </Fragment>

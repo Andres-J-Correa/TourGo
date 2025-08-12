@@ -36,33 +36,37 @@ require("dayjs/locale/es"); // Import Spanish locale
 dayjs.locale("es");
 registerLocale("es", es);
 
-initializeFaro({
-  url: "https://faro-collector-prod-us-east-2.grafana.net/collect/b7ceccb90a4d2a84d177f764ab670090",
-  app: {
-    name: "TourGo_Prod",
-    version: "1.0.0",
-    environment: "production",
-  },
+const env = process.env.REACT_APP_ENV;
 
-  instrumentations: [
-    // Mandatory, omits default instrumentations otherwise.
-    ...getWebInstrumentations(),
+if (env !== "development") {
+  initializeFaro({
+    url: "https://faro-collector-prod-us-east-2.grafana.net/collect/b7ceccb90a4d2a84d177f764ab670090",
+    app: {
+      name: "TourGo_Prod",
+      version: "0.1.0",
+      environment: env,
+    },
 
-    // Tracing package to get end-to-end visibility for HTTP requests.
-    new TracingInstrumentation(),
+    instrumentations: [
+      // Mandatory, omits default instrumentations otherwise.
+      ...getWebInstrumentations(),
 
-    // React integration for React applications.
-    new ReactIntegration({
-      router: createReactRouterV6Options({
-        createRoutesFromChildren,
-        matchRoutes,
-        Routes,
-        useLocation,
-        useNavigationType,
+      // Tracing package to get end-to-end visibility for HTTP requests.
+      new TracingInstrumentation(),
+
+      // React integration for React applications.
+      new ReactIntegration({
+        router: createReactRouterV6Options({
+          createRoutesFromChildren,
+          matchRoutes,
+          Routes,
+          useLocation,
+          useNavigationType,
+        }),
       }),
-    }),
-  ],
-});
+    ],
+  });
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
