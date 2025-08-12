@@ -19,6 +19,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
             # Change to repo directory
             cd ~/TourGo || { echo "Directory ~/TourGo does not exist"; exit 1; }
