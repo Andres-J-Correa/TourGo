@@ -17,9 +17,52 @@ import { es } from "date-fns/locale/es";
 
 import dayjs from "dayjs";
 
+import {
+  createRoutesFromChildren,
+  matchRoutes,
+  Routes,
+  useLocation,
+  useNavigationType,
+} from "react-router-dom";
+import {
+  createReactRouterV6Options,
+  getWebInstrumentations,
+  initializeFaro,
+  ReactIntegration,
+} from "@grafana/faro-react";
+import { TracingInstrumentation } from "@grafana/faro-web-tracing";
+
 require("dayjs/locale/es"); // Import Spanish locale
 dayjs.locale("es");
 registerLocale("es", es);
+
+initializeFaro({
+  url: "https://faro-collector-prod-us-east-2.grafana.net/collect/b7ceccb90a4d2a84d177f764ab670090",
+  app: {
+    name: "TourGo_Prod",
+    version: "1.0.0",
+    environment: "production",
+  },
+
+  instrumentations: [
+    // Mandatory, omits default instrumentations otherwise.
+    ...getWebInstrumentations(),
+
+    // Tracing package to get end-to-end visibility for HTTP requests.
+    new TracingInstrumentation(),
+
+    // React integration for React applications.
+    new ReactIntegration({
+      router: createReactRouterV6Options({
+        createRoutesFromChildren,
+        matchRoutes,
+        Routes,
+        useLocation,
+        useNavigationType,
+      }),
+    }),
+  ],
+});
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

@@ -10,7 +10,9 @@ import RouteWrapper from "contexts/RouteWrapper";
 
 import { useAppContext } from "./contexts/GlobalAppContext";
 
-import { Routes, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
+import { FaroRoutes } from "@grafana/faro-react";
+
 import { publicFlattenedRoutes, privateFlattenedRoutes } from "./routes";
 
 import { ToastContainer } from "react-toastify";
@@ -62,7 +64,7 @@ const App = () => {
           <Fragment>
             <NavbarContainer />
             <Container className="my-4 main-container" fluid>
-              <Routes>{routes}</Routes>
+              <FaroRoutes>{routes}</FaroRoutes>
             </Container>
             <Footer hotelId={hotel.current.id} />
           </Fragment>
