@@ -43,17 +43,17 @@ const TabNavigation = ({
 export default TabNavigation;
 
 TabNavigation.propTypes = {
-  currentStep: PropTypes.number.isRequired,
+  currentStep: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+    .isRequired,
   setCurrentStep: PropTypes.func.isRequired,
   isStepComplete: PropTypes.shape({
     0: PropTypes.bool.isRequired,
     1: PropTypes.bool.isRequired,
     2: PropTypes.bool.isRequired,
-    3: PropTypes.bool.isRequired,
   }),
   tabs: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
       name: PropTypes.string.isRequired,
       icon: PropTypes.object.isRequired,
     })

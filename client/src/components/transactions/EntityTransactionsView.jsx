@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Row } from "reactstrap";
 import classNames from "classnames";
 import Transaction from "components/transactions/Transaction";
-import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import { formatCurrency } from "utils/currencyHelper";
 import TransactionAddForm from "components/transactions/TransactionAddForm";
 import TransactionUpdateForm from "components/transactions/TransactionUpdateForm";
@@ -14,7 +13,6 @@ import { useLanguage } from "contexts/LanguageContext";
 
 const EntityTransactionsView = ({
   hotelId,
-  submitting,
   entity,
   setEntity,
   showTotals = true,
@@ -217,7 +215,6 @@ const EntityTransactionsView = ({
 
   return (
     <>
-      <LoadingOverlay isVisible={submitting} />
       <div>
         {showTotals && (
           <>
@@ -266,7 +263,6 @@ const EntityTransactionsView = ({
         <TransactionAddForm
           hotelId={hotelId}
           entity={entity}
-          submitting={submitting}
           showForm={showForm}
           setShowForm={setShowForm}
           onTransactionAdded={onTransactionAdded}

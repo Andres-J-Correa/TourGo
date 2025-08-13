@@ -19,7 +19,7 @@ const CustomerInfo = ({ customer }) => {
           </Row>
           <Row>
             <strong>{t("booking.customerInfo.email")}</strong>
-            <p>{customer?.email}</p>
+            <p>{customer?.email || "N/A"}</p>
           </Row>
         </Col>
         <Col md={12} lg={5}>

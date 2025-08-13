@@ -1,71 +1,89 @@
-import React, { useState } from "react";
-import { Formik, Form } from "formik";
-import { Row, Col, Button, FormGroup, Spinner } from "reactstrap";
-import PropTypes from "prop-types";
-import Swal from "sweetalert2";
-import { getByDocumentNumber, add, update } from "services/customerService";
-import PhoneInputField from "components/commonUI/forms/PhoneInputField";
-import CustomField from "components/commonUI/forms/CustomField";
-import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
-import ErrorAlert from "components/commonUI/errors/ErrorAlert";
-import useBookingSchemas from "./useBookingSchemas";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+//types
+import type { JSX } from "react";
+import type { CustomerFormV2Props } from "./customerFormV2.types";
+import type { CustomerPayload } from "types/customer.types";
+
+//libs
+import { useState, useMemo } from "react";
+import { Button, Row, Col, FormGroup, Spinner } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useLanguage } from "contexts/LanguageContext"; // add import
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { Formik, Form } from "formik";
+import Swal from "sweetalert2";
 
-function CustomerForm({
-  customer,
-  setCustomer,
-  setCurrentStep,
-  submitting,
-  setCreating,
-  setSubmitting,
+//components
+import CustomField from "components/commonUI/forms/CustomField";
+import ErrorAlert from "components/commonUI/errors/ErrorAlert";
+import PhoneInputField from "components/commonUI/forms/PhoneInputField";
+import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
+
+//services & utils
+import { useLanguage } from "contexts/LanguageContext";
+import useCustomerValidationSchemas from "./useCustomerValidationSchemas";
+import { add, update, getByDocumentNumber } from "services/customerServiceV2";
+
+function CustomerFormV2({
   hotelId,
-  creating = false,
+  customer,
   booking,
-}) {
-  const isUpdate = booking?.id;
-  const [editing, setEditing] = useState(false);
+  goToNextStep,
+  handleCustomerChange,
+}: CustomerFormV2Props): JSX.Element {
+  const [creating, setCreating] = useState<boolean>(false);
+  const [editing, setEditing] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
-  const { customerSchema, searchCustomerSchema } = useBookingSchemas();
-  const { t } = useLanguage(); // add hook
+  const { t } = useLanguage();
+  const { customerAddEditSchema, searchCustomerSchema } =
+    useCustomerValidationSchemas();
 
-  const handleDocumentSubmit = async (values) => {
-    try {
-      setSubmitting(true);
+  const isUpdate = useMemo(() => {
+    return Boolean(booking?.id);
+  }, [booking]);
 
-      Swal.fire({
-        title: t("booking.customerForm.searching"),
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
+  const initialValues: CustomerPayload = useMemo(
+    () => ({
+      documentNumber: customer?.documentNumber || "",
+      firstName: customer?.firstName || "",
+      lastName: customer?.lastName || "",
+      phone: customer?.phone || "",
+      email: customer?.email || "",
+    }),
+    [customer]
+  );
+
+  const handleDocumentSubmit = async (values: { documentNumber: string }) => {
+    setSubmitting(true);
+
+    Swal.fire({
+      title: t("booking.customerForm.searching"),
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    const res = await getByDocumentNumber(
+      hotelId,
+      values.documentNumber.trim()
+    );
+
+    Swal.close();
+
+    if (res.isSuccessful) {
+      handleCustomerChange(res.item);
+
+      await Swal.fire({
+        icon: "success",
+        title: t("booking.customerForm.found"),
+        timer: 1500,
+        didClose: () => {
+          goToNextStep();
+        },
       });
-
-      const res = await getByDocumentNumber(
-        hotelId,
-        values.documentNumber.trim()
-      );
-
-      Swal.close();
-
-      if (res.item) {
-        setCustomer(res.item);
-
-        await Swal.fire({
-          icon: "success",
-          title: t("booking.customerForm.found"),
-          timer: 1500,
-          didClose: () => {
-            setCurrentStep(1);
-          },
-        });
-      }
-    } catch (err) {
-      Swal.close();
-
-      if (err.response?.status === 404) {
+    } else {
+      if (res.error.response?.status === 404) {
         setCreating(true);
 
-        await Swal.fire({
+        Swal.fire({
           icon: "info",
           title: t("booking.customerForm.notFound"),
           text: t("booking.customerForm.completeData"),
@@ -73,67 +91,76 @@ function CustomerForm({
           showConfirmButton: false,
         });
       } else {
-        await Swal.fire({
+        Swal.fire({
           icon: "error",
           title: t("common.error"),
           text: t("booking.customerForm.searchError"),
         });
       }
-    } finally {
-      setSubmitting(false);
     }
+
+    setSubmitting(false);
   };
 
-  const handleCustomerCreate = async (values) => {
-    try {
-      setSubmitting(true);
+  const trimPayload = (payload: CustomerPayload): CustomerPayload => {
+    return {
+      ...payload,
+      documentNumber: payload.documentNumber.trim(),
+      firstName: payload.firstName.trim(),
+      lastName: payload.lastName.trim(),
+      phone: payload.phone.trim(),
+      email: payload.email.trim(),
+    };
+  };
 
-      Swal.fire({
-        title: t("booking.customerForm.creating"),
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
+  const handleCustomerCreate = async (
+    values: CustomerPayload
+  ): Promise<void> => {
+    setSubmitting(true);
+
+    Swal.fire({
+      title: t("booking.customerForm.creating"),
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    const trimmedData: CustomerPayload = trimPayload(values);
+
+    const res = await add(trimmedData, hotelId);
+
+    Swal.close();
+
+    if (res.isSuccessful) {
+      handleCustomerChange({
+        ...trimmedData,
+        id: res.item,
       });
-
-      const trimmedData = {
-        ...values,
-        documentNumber: values.documentNumber.trim(),
-        firstName: values.firstName.trim(),
-        lastName: values.lastName.trim(),
-        phone: values.phone.trim(),
-        email: values.email.trim(),
-      };
-
-      const res = await add(trimmedData, hotelId);
-
-      Swal.close();
-
-      if (res.item > 0) {
-        setCustomer({ ...trimmedData, id: res.item });
-        setCreating(false);
-
-        await Swal.fire({
-          icon: "success",
-          title: t("booking.customerForm.created"),
-          timer: 1500,
-          didClose: () => {
-            setCurrentStep(1);
-          },
-        });
-      }
-    } catch (err) {
-      Swal.close();
+      setCreating(false);
 
       await Swal.fire({
+        icon: "success",
+        title: t("booking.customerForm.created"),
+        timer: 1500,
+        didClose: () => {
+          goToNextStep();
+        },
+      });
+    } else {
+      Swal.close();
+
+      Swal.fire({
         icon: "error",
         title: t("common.error"),
         text: t("booking.customerForm.createError"),
       });
-    } finally {
-      setSubmitting(false);
     }
+
+    setSubmitting(false);
   };
 
-  const handleCustomerUpdate = async (values) => {
+  const handleCustomerUpdate = async (values: CustomerPayload) => {
+    if (!customer?.id) return;
+
     const result = await Swal.fire({
       title: t("booking.customerForm.updateConfirmTitle"),
       text: t("booking.customerForm.updateConfirmText"),
@@ -145,42 +172,42 @@ function CustomerForm({
 
     if (!result.isConfirmed) return;
 
-    try {
-      setSubmitting(true);
-      Swal.fire({
-        title: t("booking.customerForm.updating"),
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
+    setSubmitting(true);
+    Swal.fire({
+      title: t("booking.customerForm.updating"),
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    const trimmedData: CustomerPayload = trimPayload(values);
+
+    const res = await update(trimmedData, hotelId, customer.id);
+    Swal.close();
+    if (res.isSuccessful) {
+      handleCustomerChange({
+        ...trimmedData,
+        id: customer.id,
       });
-      const res = await update(values, hotelId, customer.id);
-      Swal.close();
-      if (res.isSuccessful) {
-        setCustomer((prev) => ({
-          ...prev,
-          ...values,
-        }));
-        setEditing(false);
-        await Swal.fire({
-          icon: "success",
-          title: t("booking.customerForm.updated"),
-          timer: 1500,
-          showConfirmButton: false,
-          allowOutsideClick: false,
-        });
-      }
-    } catch (err) {
-      Swal.close();
+      setEditing(false);
       await Swal.fire({
+        icon: "success",
+        title: t("booking.customerForm.updated"),
+        timer: 1500,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+      });
+    } else {
+      Swal.fire({
         icon: "error",
         title: t("common.error"),
         text: t("booking.customerForm.updateError"),
       });
-    } finally {
-      setSubmitting(false);
     }
+
+    setSubmitting(false);
   };
 
-  const handleCancelEdit = (resetForm) => {
+  const handleCancelEdit = (resetForm: () => void) => {
     setEditing(false);
     resetForm();
   };
@@ -190,24 +217,18 @@ function CustomerForm({
       <div className="text-end mb-4">
         {customer?.id && (
           <Button
-            onClick={() => setCurrentStep(1)}
+            onClick={() => goToNextStep()}
             color="dark"
-            disabled={submitting || editing}>
+            disabled={editing}>
             {t("booking.navigation.next")}
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </Button>
         )}
       </div>
       <Formik
-        initialValues={{
-          documentNumber: customer?.documentNumber || "",
-          firstName: customer?.firstName || "",
-          lastName: customer?.lastName || "",
-          phone: customer?.phone || "",
-          email: customer?.email || "",
-        }}
+        initialValues={initialValues}
         validationSchema={
-          creating || editing ? customerSchema : searchCustomerSchema
+          creating || editing ? customerAddEditSchema : searchCustomerSchema
         }
         onSubmit={
           creating
@@ -218,11 +239,10 @@ function CustomerForm({
         }
         enableReinitialize>
         {({ values, setFieldValue, resetForm }) => {
-          const handleDocChange = (e) => {
+          const handleDocChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const docValue = e.target.value;
-            setFieldValue("documentNumber", docValue);
             if ((customer?.id || creating) && !editing) {
-              setCustomer({
+              handleCustomerChange({
                 documentNumber: docValue,
                 firstName: "",
                 lastName: "",
@@ -232,6 +252,7 @@ function CustomerForm({
               setCreating(false);
               setEditing(false);
             }
+            setFieldValue("documentNumber", docValue);
           };
 
           return (
@@ -306,15 +327,6 @@ function CustomerForm({
                   </Row>
                   <Row>
                     <Col md="6">
-                      <CustomField
-                        name="email"
-                        placeholder={t("booking.customerForm.email")}
-                        disabled={(!!customer?.id && !editing) || submitting}
-                        isRequired={creating || editing}
-                        autoComplete="email"
-                      />
-                    </Col>
-                    <Col md="6">
                       <FormGroup className="position-relative">
                         <PhoneInputField
                           name="phone"
@@ -328,6 +340,15 @@ function CustomerForm({
                         <CustomErrorMessage name="phone" />
                       </FormGroup>
                     </Col>
+                    <Col md="6">
+                      <CustomField
+                        name="email"
+                        placeholder={t("booking.customerForm.email")}
+                        disabled={(!!customer?.id && !editing) || submitting}
+                        isRequired={false}
+                        autoComplete="email"
+                      />
+                    </Col>
                   </Row>
                   <ErrorAlert />
                 </>
@@ -340,13 +361,4 @@ function CustomerForm({
   );
 }
 
-export default CustomerForm;
-
-CustomerForm.propTypes = {
-  customer: PropTypes.object,
-  setCustomer: PropTypes.func.isRequired,
-  setCurrentStep: PropTypes.func.isRequired,
-  submitting: PropTypes.bool.isRequired,
-  setCreating: PropTypes.func.isRequired,
-  creating: PropTypes.bool,
-};
+export default CustomerFormV2;

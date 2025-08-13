@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, type AxiosResponse } from "axios";
 
 import type { ErrorResponse } from "types/apiResponse.types";
 
@@ -15,6 +15,10 @@ const isErrorResponse = (data: unknown): data is ErrorResponse => {
     "isSuccessful" in data &&
     "transactionId" in data
   );
+};
+
+export const handleGlobalSuccess = <T>(res: AxiosResponse<T>): T => {
+  return res.data;
 };
 
 export const handleGlobalError = (error: unknown): ErrorResponse => {

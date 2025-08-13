@@ -57,7 +57,6 @@ const emptyFormData = {
 };
 
 function BookingForm({
-  submitting,
   customer,
   setCurrentStep,
   booking,
@@ -125,7 +124,7 @@ function BookingForm({
   };
 
   const isSubmitDisabled =
-    submitting || isSubmitting || (Boolean(values?.id) && !formChanged());
+    isSubmitting || (Boolean(values?.id) && !formChanged());
 
   const resetFormToPrevious = () => {
     resetForm();
@@ -455,7 +454,7 @@ function BookingForm({
           onClick={() => setCurrentStep(0)}
           color="dark"
           className="me-auto"
-          disabled={submitting || isSubmitting}>
+          disabled={isSubmitting}>
           <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
           {t("booking.navigation.previous")}
         </Button>
@@ -465,7 +464,7 @@ function BookingForm({
             onClick={handleNextClick}
             color="dark"
             className="ms-auto"
-            disabled={submitting || isSubmitting}>
+            disabled={isSubmitting}>
             {t("booking.navigation.next")}
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </Button>
@@ -476,10 +475,7 @@ function BookingForm({
           dates={dates}
           onDateChange={handleDateChange}
           isDisabled={
-            submitting ||
-            isLoadingBookings ||
-            isSubmitting ||
-            isLoadingRoomAvailability
+            isLoadingBookings || isSubmitting || isLoadingRoomAvailability
           }
           selectedRoomBookings={selectedRoomBookings}
           setSelectedRoomBookings={setSelectedRoomBookings}
@@ -508,7 +504,7 @@ function BookingForm({
           charges={charges}
           selectedCharges={selectedCharges}
           toggleCharge={toggleCharge}
-          submitting={submitting || isSubmitting}
+          submitting={isSubmitting}
           hotelId={hotelId}
         />
 
@@ -521,7 +517,7 @@ function BookingForm({
         <Form>
           <AdditionalInfoForm
             bookingProviderOptions={bookingProviderOptions}
-            submitting={submitting || isSubmitting}
+            submitting={isSubmitting}
           />
           <ErrorAlert />
           <div className="text-center my-3">
