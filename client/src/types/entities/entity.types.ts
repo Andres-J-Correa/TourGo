@@ -5,8 +5,8 @@ import type { Customer } from "../customer.types";
 export interface AuditableEntity {
   dateCreated: Date;
   dateModified: Date;
-  createdBy: User;
-  modifiedBy: User;
+  createdBy?: User;
+  modifiedBy?: User;
 }
 
 export interface EntityBase extends AuditableEntity {

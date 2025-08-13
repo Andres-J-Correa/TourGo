@@ -165,7 +165,7 @@ const InvoiceView = () => {
                     <Col>
                       <span>
                         <strong>{t("invoices.view.email")}</strong>
-                        <p>{invoiceData?.details?.customer?.email}</p>
+                        <p>{invoiceData?.details?.customer?.email || "N/A"}</p>
                       </span>
                     </Col>
                     <Col>

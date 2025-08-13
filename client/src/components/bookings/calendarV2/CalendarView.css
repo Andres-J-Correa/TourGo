@@ -60,12 +60,13 @@
     transform: rotate(0deg);
   }
   to {
-    transform: rotate(360deg);
+    transform: rotate(180deg);
   }
 }
 
 .animation-rotate:hover .icon-rotate {
-  animation: rotate 1s linear infinite;
+  animation: rotate 0.5s linear;
+  animation-fill-mode: forwards;
 }
 
 @media (max-width: 600px) {

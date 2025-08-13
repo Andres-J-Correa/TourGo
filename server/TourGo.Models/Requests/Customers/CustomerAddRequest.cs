@@ -12,22 +12,21 @@ namespace TourGo.Models.Requests.Customers
 
         [Required]
         [StringLength(100, MinimumLength = 2)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100, MinimumLength = 2)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
         [Required]
         [Phone]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = string.Empty;
 
-        [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Required]
         [StringLength(100, MinimumLength = 2)]
-        public string DocumentNumber { get; set; }
+        public string DocumentNumber { get; set; } = string.Empty;
     }
 }

@@ -23,7 +23,7 @@ import { LOCKED_BOOKING_STATUSES } from "../constants";
 import { defaultBooking } from "components/bookings/booking-add-edit-view/constants";
 import useBookingSchemas from "./useBookingSchemas";
 
-import CustomerForm from "components/bookings/booking-add-edit-view/CustomerForm";
+import CustomerFormV2 from "components/customers/forms/CustomerFormV2";
 import BookingForm from "components/bookings/booking-add-edit-view/BookingForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import EntityTransactionsView from "components/transactions/EntityTransactionsView";
@@ -31,8 +31,6 @@ import ErrorBoundary from "components/commonUI/ErrorBoundary";
 
 const BookingAddUpdateView = () => {
   const [customer, setCustomer] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [creating, setCreating] = useState(false);
   const [booking, setBooking] = useState({ ...defaultBooking });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -87,8 +85,7 @@ const BookingAddUpdateView = () => {
   const isStepComplete = {
     0: customer?.id > 0,
     1: !!booking?.id,
-    2: booking?.transactions?.length > 0,
-    3: false,
+    2: true, // transactions step is optional
   };
 
   const setCurrentStep = useCallback(
@@ -144,6 +141,10 @@ const BookingAddUpdateView = () => {
     [t]
   );
 
+  const handleCustomerChange = (customer) => {
+    setCustomer(customer);
+  };
+
   useEffect(() => {
     if (bookingId) {
       setIsLoading(true);
@@ -166,7 +167,7 @@ const BookingAddUpdateView = () => {
   return (
     <>
       <LoadingOverlay
-        isVisible={submitting || isLoading}
+        isVisible={isLoading}
         message={
           isLoading
             ? t("booking.loadingOverlay.loadingInfo")
@@ -190,22 +191,17 @@ const BookingAddUpdateView = () => {
         <TabContent activeTab={currentStep}>
           <h4 className="mb-3">{tabs[currentStep].name} </h4>
           <TabPane tabId={"0"}>
-            <CustomerForm
-              customer={customer}
-              setCustomer={setCustomer}
-              setCurrentStep={setCurrentStep}
-              submitting={submitting}
-              setCreating={setCreating}
-              setSubmitting={setSubmitting}
+            <CustomerFormV2
               hotelId={hotelId}
-              creating={creating}
+              customer={customer}
               booking={booking}
+              goToNextStep={() => setCurrentStep(1)}
+              handleCustomerChange={handleCustomerChange}
             />
           </TabPane>
           <TabPane tabId={"1"}>
             <BookingForm
               setCurrentStep={setCurrentStep}
-              submitting={submitting}
               customer={customer}
               booking={booking}
               setBooking={setBooking}
@@ -228,12 +224,11 @@ const BookingAddUpdateView = () => {
                 type="button"
                 onClick={() => setCurrentStep(1)}
                 color="dark"
-                className="me-auto"
-                disabled={submitting}>
+                className="me-auto">
                 <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
                 {t("booking.navigation.previous")}
               </Button>
-              {isStepComplete[2] && !submitting && (
+              {isStepComplete[2] && (
                 <Link
                   className="ms-auto btn btn-dark"
                   to={`/hotels/${hotelId}/bookings/${booking.id}`}>
@@ -244,7 +239,6 @@ const BookingAddUpdateView = () => {
             </div>
             <EntityTransactionsView
               hotelId={hotelId}
-              submitting={submitting}
               entity={booking}
               setEntity={setBooking}
               showAddButton={
