@@ -6,6 +6,7 @@ import type {
   RoomAvailability,
   RoomAvailabilityRequest,
 } from "types/entities/roomAvailability.types";
+import type { Breadcrumb } from "components/commonUI/Breadcrumbs.types";
 import type { Dayjs } from "dayjs";
 
 //libs
@@ -31,6 +32,7 @@ import { useLanguage } from "contexts/LanguageContext";
 import { useCalendarTableData } from "./hooks/useCalendarTableData";
 import { getDateString } from "utils/dateHelper";
 import { upsertRoomAvailability } from "services/roomAvailabilityService";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 //styles
 import "./CalendarView.css";
@@ -52,14 +54,13 @@ function CalendarView(): JSX.Element {
   const { t } = useLanguage();
   const { hotelId } = useParams<{ hotelId: string }>();
 
-  const breadcrumbs: { label: string; path?: string }[] = useMemo(
-    () => [
-      { label: t("booking.breadcrumb.home"), path: "/" },
-      { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
-      { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
-    ],
-    [hotelId, t]
-  );
+  const breadcrumbs: Breadcrumb[] = useMemo(() => {
+    return new BreadcrumbBuilder(t)
+      .addHome()
+      .addHotels()
+      .addHotel(hotelId)
+      .build();
+  }, [hotelId, t]);
 
   const isDateRangeValid: boolean = useMemo(() => {
     return (

@@ -232,6 +232,7 @@ function BookingFiltersV2({
               <Input
                 id="bookingId"
                 type="text"
+                maxLength={12}
                 placeholder={t("booking.filters.bookingIdPlaceholder")}
                 value={bookingIdInput}
                 onChange={handleBookingIdChange}

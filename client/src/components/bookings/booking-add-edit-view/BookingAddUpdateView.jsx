@@ -194,7 +194,7 @@ const BookingAddUpdateView = () => {
             <CustomerFormV2
               hotelId={hotelId}
               customer={customer}
-              booking={booking}
+              isUpdate={booking?.id}
               goToNextStep={() => setCurrentStep(1)}
               handleCustomerChange={handleCustomerChange}
             />
