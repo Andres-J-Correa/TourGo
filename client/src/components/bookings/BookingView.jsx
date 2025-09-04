@@ -344,6 +344,7 @@ function BookingView() {
               </Button>
             )}
             {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) &&
+              booking?.status?.id !== BOOKING_STATUS_IDS.COMPLETED &&
               dayjs(dayjs()).isAfter(booking?.arrivalDate) && (
                 <Button
                   color="outline-dark"
@@ -383,15 +384,16 @@ function BookingView() {
                   <FontAwesomeIcon icon={faPenToSquare} className="ms-2" />
                 </Link>
               )}
-              {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) && (
-                <Button
-                  color="outline-danger"
-                  className="me-2  mb-2"
-                  onClick={handleCancel}>
-                  {t("booking.view.cancelBooking")}
-                  <FontAwesomeIcon icon={faRectangleXmark} className="ms-2" />
-                </Button>
-              )}
+              {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) &&
+                booking?.status?.id !== BOOKING_STATUS_IDS.COMPLETED && (
+                  <Button
+                    color="outline-danger"
+                    className="me-2  mb-2"
+                    onClick={handleCancel}>
+                    {t("booking.view.cancelBooking")}
+                    <FontAwesomeIcon icon={faRectangleXmark} className="ms-2" />
+                  </Button>
+                )}
             </div>
           </Col>
         </Row>
