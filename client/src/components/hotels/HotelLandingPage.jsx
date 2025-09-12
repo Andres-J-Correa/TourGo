@@ -635,6 +635,7 @@ const HotelLandingPage = () => {
                           </ol>
                         )}
                       </Col>
+                      <hr />
                       <Col md={12}>
                         <strong>
                           {t("hotels.landing.availableRooms")}
