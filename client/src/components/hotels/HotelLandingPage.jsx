@@ -42,6 +42,7 @@ import {
   getForCleaningRooms,
 } from "services/bookingService";
 import { leaveHotel } from "services/staffService";
+import { getAvailableRoomsByDate } from "services/roomService";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 import { BOOKING_STATUS_IDS } from "components/bookings/constants";
 import "./HotelLandingPage.css";
@@ -60,6 +61,7 @@ const HotelLandingPage = () => {
     departingRooms: [],
     stays: [],
     forCleaningRooms: [],
+    availableRooms: [],
   });
   const [date, setDate] = useState(dateOptions.today);
   const [loadingArrivalsDepartures, setLoadingArrivalsDepartures] =
@@ -289,6 +291,7 @@ const HotelLandingPage = () => {
       getDepartingRooms(hotelId, date),
       getStays(hotelId, date),
       getForCleaningRooms(hotelId, date),
+      getAvailableRoomsByDate(hotelId, date),
     ])
       .then(
         ([
@@ -298,6 +301,7 @@ const HotelLandingPage = () => {
           departingRoomsResult,
           staysResult,
           forCleaningRoomsResult,
+          availableRoomsResult,
         ]) => {
           const errors = [];
           let arrivals = [];
@@ -306,6 +310,7 @@ const HotelLandingPage = () => {
           let departingRooms = [];
           let stays = [];
           let forCleaningRooms = [];
+          let availableRooms = [];
 
           if (arrivalsResult.status === "fulfilled") {
             arrivals = arrivalsResult.value?.items || [];
@@ -343,6 +348,12 @@ const HotelLandingPage = () => {
             errors.push("Error al cargar habitaciones en limpieza");
           }
 
+          if (availableRoomsResult.status === "fulfilled") {
+            availableRooms = availableRoomsResult.value?.items || [];
+          } else if (availableRoomsResult.reason?.response?.status !== 404) {
+            errors.push("Error al cargar las habitaciones disponibles");
+          }
+
           setData({
             arrivals,
             departures,
@@ -350,6 +361,7 @@ const HotelLandingPage = () => {
             departingRooms,
             stays,
             forCleaningRooms,
+            availableRooms,
           });
 
           if (errors.length > 0) {
@@ -618,6 +630,25 @@ const HotelLandingPage = () => {
                                   )}>
                                   {item.firstName} {item.lastName}
                                 </Link>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
+                      </Col>
+                      <Col md={12}>
+                        <strong>
+                          {t("hotels.landing.availableRooms")}
+                          {data.availableRooms?.length > 0
+                            ? ` (${data.availableRooms.length})`
+                            : ""}
+                        </strong>
+                        {data.availableRooms?.length === 0 ? (
+                          <p>{t("hotels.landing.none")}</p>
+                        ) : (
+                          <ol className="available-rooms-list">
+                            {data.availableRooms.map((item) => (
+                              <li key={`available-rooms-${item.id}`}>
+                                <strong>{item.name}</strong>
                               </li>
                             ))}
                           </ol>

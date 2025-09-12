@@ -8,3 +8,21 @@
 .hotel-landing-page strong {
   color: var(--bs-dark);
 }
+
+@media (max-width: 576px) {
+  .available-rooms-list {
+    columns: 1;
+  }
+}
+
+@media (min-width: 576px) {
+  .available-rooms-list {
+    columns: 2;
+  }
+}
+
+@media (min-width: 992px) {
+  .available-rooms-list {
+    columns: 3;
+  }
+}
