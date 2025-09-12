@@ -102,3 +102,21 @@ export const deleteById = async (id, hotelId) => {
     return onGlobalError(error);
   }
 };
+
+export const getAvailableRoomsByDate = async (hotelId, date) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "GET",
+    url: `${api.replace(/{hotelId}/, hotelId)}/available?date=${date}`,
+  };
+
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

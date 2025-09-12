@@ -1110,7 +1110,8 @@
       "completeSuccess": "Booking marked as completed",
       "completeError": "Error marking as completed",
       "roomChange": "Room Change",
-      "forCleaning": "Cleaning"
+      "forCleaning": "Cleaning",
+      "availableRooms": "Available"
     },
     "settings": {
       "title": "Settings",

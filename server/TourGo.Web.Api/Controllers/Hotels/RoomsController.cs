@@ -11,6 +11,7 @@ using TourGo.Web.Api.Extensions;
 using TourGo.Services.Interfaces;
 using MySql.Data.MySqlClient;
 using TourGo.Web.Models.Enums;
+using System.Net;
 
 namespace TourGo.Web.Api.Controllers.Hotels
 {
@@ -94,6 +95,35 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
             return StatusCode(code, response);
 
+        }
+
+        [HttpGet("available")]
+        [EntityAuth(EntityTypeEnum.Rooms, EntityActionTypeEnum.Read)]
+        public ActionResult<ItemsResponse<Room>> GetAvailableByDate(string hotelId, [FromQuery] DateOnly date) {
+
+            ObjectResult result;
+
+            try
+            {
+                List<Room>? rooms = _roomService.GetAvailableByDate(hotelId, date);
+
+                if(rooms == null)
+                {
+                    result = NotFound404(new ErrorResponse("No Records Found"));
+                } else
+                {
+                    ItemsResponse<Room> response = new() { Items = rooms };
+                    result = Ok200(response);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                result = CustomResponse(HttpStatusCode.InternalServerError, new ErrorResponse());
+            }
+
+            return result;
         }
 
         [HttpPut("{id:int}")]
