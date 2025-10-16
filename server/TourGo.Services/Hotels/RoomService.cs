@@ -99,6 +99,28 @@ namespace TourGo.Services.Hotels
             return list;
         }
 
+        public List<Room>? GetAvailableByDate(string hotelId, DateOnly date)
+        {
+            string proc = "rooms_select_available_by_date";
+            List<Room>? list = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, param =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_date", date.ToString("yyyy-MM-dd"));
+            }, (reader, set) =>
+            {
+                Room room = new();
+                room.Id = reader.GetSafeInt32(0);
+                room.Name = reader.GetString(1);
+                
+                list ??= new List<Room>();
+                list.Add(room);
+            });
+
+            return list;
+        }
+
         private static Room MapRoom(IDataReader reader, ref int index)
         {
             Room room = new Room();

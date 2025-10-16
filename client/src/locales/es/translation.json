@@ -1126,7 +1126,8 @@
       "completeSuccess": "Reserva marcada como completada",
       "completeError": "Error al marcar como completada",
       "roomChange": "Cambio de Hab.",
-      "forCleaning": "Limpieza"
+      "forCleaning": "Limpieza",
+      "availableRooms": "Disponibles"
     },
     "settings": {
       "title": "Configuración",
