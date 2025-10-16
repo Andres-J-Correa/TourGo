@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "./commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "./commonUI/ErrorBoundary";
+import BreadcrumbBuilder from "./commonUI/BreadcrumbsBuilder";
 
 import { UserSignInForm } from "components/users/UserSignInForm";
 import { SignUpForm } from "components/users/SignUpForm";
@@ -17,6 +17,10 @@ const LandingPage = () => {
 
   const { user } = useAppContext();
   const { t } = useLanguage();
+
+  const breadcrumbs = new BreadcrumbBuilder(t)
+    .addActive(t("common.breadcrumbs.home"))
+    .build();
 
   const handleSignUp = () => {
     setIsSignUp(true);
@@ -58,7 +62,7 @@ const LandingPage = () => {
 
   return (
     <>
-      <Breadcrumb active={t("common.breadcrumbs.home")} />
+      {breadcrumbs}
       <LoadingOverlay isVisible={loading} />
       <ErrorBoundary>
         <div className="jumbotron text-center">

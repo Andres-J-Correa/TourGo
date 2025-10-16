@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 
 import { Row, Col, Label, Input, InputGroup, Button, Form } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import Select from "react-select";
 
 import {
   TRANSACTION_CATEGORIES,
@@ -119,6 +120,49 @@ function TransactionsTableFilters({
     };
   }, [selectData, paginationData, t]);
 
+  const reactSelectOptions = useMemo(() => {
+    const documentOptions = [
+      { value: "true", label: t("transactions.filters.withDocument") },
+      { value: "false", label: t("transactions.filters.withoutDocument") },
+    ];
+
+    const categories = TRANSACTION_CATEGORIES.map((category) => ({
+      value: category.id,
+      label: t(category.name),
+    }));
+
+    const subcategories = selectData.transactionSubcategories.map(
+      (subcategory) => ({
+        value: subcategory.id,
+        label: subcategory.name,
+      })
+    );
+
+    const paymentMethods = selectData.paymentMethods.map((method) => ({
+      value: method.id,
+      label: method.name,
+    }));
+
+    const financePartners = selectData.financePartners.map((partner) => ({
+      value: partner.id,
+      label: partner.name,
+    }));
+
+    const statuses = TRANSACTION_STATUSES.map((status) => ({
+      value: status.id,
+      label: t(status.name),
+    }));
+
+    return {
+      categories,
+      documentOptions,
+      paymentMethods,
+      subcategories,
+      financePartners,
+      statuses,
+    };
+  }, [t, selectData]);
+
   const onTransactionInputChange = (e) => {
     const { value } = e.target;
     setTransactionIdInput(value);
@@ -211,6 +255,12 @@ function TransactionsTableFilters({
     handleClearAllFilters();
   };
 
+  const getCsvOptions = useCallback((selectedOptions) => {
+    const values = selectedOptions.map((option) => option.value).join(",");
+
+    return values;
+  }, []);
+
   useEffect(() => {
     if (hotelId) {
       setIsLoadingSelectData(true);
@@ -281,188 +331,7 @@ function TransactionsTableFilters({
             allowSameDay={true}
           />
         </Col>
-        <Col lg="auto" xl="auto" className="mb-3">
-          <Label for="transaction-category" className="text-dark">
-            {t("transactions.table.category")}
-          </Label>
-          <select
-            id="transaction-category"
-            className={classNames("form-select filter-select", {
-              "bg-success-subtle": paginationData.categoryId,
-            })}
-            disabled={loading}
-            value={paginationData.categoryId}
-            onChange={(e) => {
-              const { value } = e.target;
-              handleCategoryChange(value);
-            }}>
-            <option
-              className={classNames({
-                "bg-dark-subtle": paginationData.categoryId,
-              })}
-              value="">
-              {paginationData.categoryId
-                ? t("transactions.filters.clearFilter")
-                : t("transactions.filters.select")}
-            </option>
-            {selectOptions.transactionCategories}
-          </select>
-        </Col>
-        <Col lg="auto" xl="auto" className="mb-3">
-          <Label for="transaction-subcategory" className="text-dark">
-            {t("transactions.table.subcategory")}
-          </Label>
-          <select
-            id="transaction-subcategory"
-            className={classNames("form-select filter-select", {
-              "bg-success-subtle": paginationData.subcategoryId,
-            })}
-            disabled={loading}
-            value={paginationData.subcategoryId}
-            onChange={(e) => {
-              const { value } = e.target;
-              handleSubcategoryChange(value);
-            }}>
-            <option
-              className={classNames({
-                "bg-dark-subtle": paginationData.subcategoryId,
-              })}
-              value="">
-              {isLoadingSelectData
-                ? t("transactions.filters.loading")
-                : paginationData.subcategoryId
-                ? t("transactions.filters.clearFilter")
-                : t("transactions.filters.select")}
-            </option>
-            {selectOptions.transactionSubcategories}
-          </select>
-        </Col>
-        <Col lg="auto" xl="auto" className="mb-3">
-          <Label for="payment-method" className="text-dark">
-            {t("transactions.table.paymentMethod")}
-          </Label>
-          <select
-            id="payment-method"
-            className={classNames("form-select filter-select", {
-              "bg-success-subtle": paginationData.paymentMethodId,
-            })}
-            disabled={loading}
-            value={paginationData.paymentMethodId}
-            onChange={(e) => {
-              const { value } = e.target;
-              handlePaymentMethodChange(value);
-            }}>
-            <option
-              className={classNames({
-                "bg-dark-subtle": paginationData.paymentMethodId,
-              })}
-              value="">
-              {isLoadingSelectData
-                ? t("transactions.filters.loading")
-                : paginationData.paymentMethodId
-                ? t("transactions.filters.clearFilter")
-                : t("transactions.filters.select")}
-            </option>
-            {selectOptions.paymentMethods}
-          </select>
-        </Col>
-        <Col lg="auto" xl="auto" className="mb-3">
-          <Label for="finance-partner" className="text-dark">
-            {t("transactions.table.financePartner")}
-          </Label>
-          <select
-            id="finance-partner"
-            className={classNames("form-select filter-select", {
-              "bg-success-subtle": paginationData.financePartnerId,
-            })}
-            disabled={loading}
-            value={paginationData.financePartnerId}
-            onChange={(e) => {
-              const { value } = e.target;
-              handleFinancePartnerChange(value);
-            }}>
-            <option
-              className={classNames({
-                "bg-dark-subtle": paginationData.financePartnerId,
-              })}
-              value="">
-              {isLoadingSelectData
-                ? t("transactions.filters.loading")
-                : paginationData.financePartnerId
-                ? t("transactions.filters.clearFilter")
-                : t("transactions.filters.select")}
-            </option>
-            {selectOptions.financePartners}
-          </select>
-        </Col>
-        <Col lg="auto" xl="auto" className="mb-3">
-          <Label for="statusId" className="text-dark">
-            {t("transactions.table.status")}
-          </Label>
-          <select
-            id="statusId"
-            className={classNames("form-select filter-select", {
-              "bg-success-subtle": paginationData.statusId,
-            })}
-            disabled={loading}
-            value={paginationData.statusId}
-            onChange={(e) => {
-              const { value } = e.target;
-              handleStatusChange(value);
-            }}>
-            <option
-              className={classNames({
-                "bg-dark-subtle": paginationData.statusId,
-              })}
-              value="">
-              {paginationData.statusId
-                ? t("transactions.filters.clearFilter")
-                : t("transactions.filters.select")}
-            </option>
-            {selectOptions.transactionStatuses}
-          </select>
-        </Col>
-        <Col lg="auto" xl="auto" className="mb-3">
-          <Label for="hasDocumentUrl" className="text-dark">
-            {t("transactions.filters.document")}
-          </Label>
-          <select
-            id="hasDocumentUrl"
-            className={classNames("form-select filter-select", {
-              "bg-success-subtle": paginationData.hasDocumentUrl,
-            })}
-            disabled={loading}
-            value={paginationData.hasDocumentUrl}
-            onChange={(e) => {
-              const { value } = e.target;
-              handleHasDocumentUrlChange(value);
-            }}>
-            <option
-              value=""
-              className={classNames({
-                "bg-dark-subtle": paginationData.hasDocumentUrl,
-              })}>
-              {t("transactions.filters.all")}
-            </option>
-            <option
-              value="true"
-              className={classNames({
-                "selected-option": paginationData.hasDocumentUrl === "true",
-              })}>
-              {t("transactions.filters.withDocument")}
-            </option>
-            <option
-              value="false"
-              className={classNames({
-                "selected-option": paginationData.hasDocumentUrl === "false",
-              })}>
-              {t("transactions.filters.withoutDocument")}
-            </option>
-          </select>
-        </Col>
-      </Row>
-      <Row>
-        <Col lg={6} xl={3} className="mb-3">
+        <Col md={6} xl={3} className="mb-3">
           <Form onSubmit={handleTransactionIdFilterSubmit}>
             <Label for="transactionId" className="text-dark">
               {t("transactions.filters.transactionId")}
@@ -494,7 +363,7 @@ function TransactionsTableFilters({
             </InputGroup>
           </Form>
         </Col>
-        <Col lg={6} xl={3} className="mb-3">
+        <Col md={6} xl={3} className="mb-3">
           <Form onSubmit={handleReferenceNumberFilterSubmit}>
             <Label for="referenceNumber" className="text-dark">
               {t("transactions.filters.referenceNumber")}
@@ -528,7 +397,7 @@ function TransactionsTableFilters({
             </InputGroup>
           </Form>
         </Col>
-        <Col lg={6} xl={3} className="mb-3">
+        <Col md={6} xl={3} className="mb-3">
           <Form onSubmit={handleEntityIdFilterSubmit}>
             <Label for="entityId" className="text-dark">
               {t("transactions.filters.entityId")}
@@ -560,7 +429,7 @@ function TransactionsTableFilters({
             </InputGroup>
           </Form>
         </Col>
-        <Col lg={6} xl={3} className="mb-3">
+        <Col md={6} xl={3} className="mb-3">
           <Form onSubmit={handleDescriptionFilterSubmit}>
             <Label for="description" className="text-dark">
               {t("transactions.filters.description")}
@@ -591,6 +460,105 @@ function TransactionsTableFilters({
               </Button>
             </InputGroup>
           </Form>
+        </Col>
+
+        <Col md={6} xl={3} className="mb-3">
+          <Label for="hasDocumentUrl" className="text-dark">
+            {t("transactions.filters.document")}
+          </Label>
+          <Select
+            id="hasDocumentUrl"
+            options={reactSelectOptions.documentOptions}
+            isClearable
+            isDisabled={loading}
+            placeholder={t("transactions.filters.select")}
+            onChange={(selectedOption) =>
+              handleHasDocumentUrlChange(selectedOption?.value)
+            }
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col sm="6" lg="4" xl="3" className="mb-3">
+          <Label for="transaction-category" className="text-dark">
+            {t("transactions.filters.categories")}
+          </Label>
+          <Select
+            id="transaction-category"
+            isMulti
+            options={reactSelectOptions.categories}
+            onChange={(selectedOptions) =>
+              handleCategoryChange(getCsvOptions(selectedOptions))
+            }
+            isClearable
+            isDisabled={loading}
+            placeholder={t("transactions.filters.select")}
+          />
+        </Col>
+        <Col sm="6" lg="4" xl="3" className="mb-3">
+          <Label for="transaction-subcategory" className="text-dark">
+            {t("transactions.filters.subcategories")}
+          </Label>
+          <Select
+            id="transaction-subcategory"
+            options={reactSelectOptions.subcategories}
+            isClearable
+            isMulti
+            isDisabled={loading}
+            placeholder={t("transactions.filters.select")}
+            onChange={(selectedOptions) =>
+              handleSubcategoryChange(getCsvOptions(selectedOptions))
+            }
+          />
+        </Col>
+        <Col sm="6" lg="4" xl="3" className="mb-3">
+          <Label for="payment-method" className="text-dark">
+            {t("transactions.filters.paymentMethods")}
+          </Label>
+          <Select
+            id="payment-method"
+            options={reactSelectOptions.paymentMethods}
+            isClearable
+            isDisabled={loading}
+            placeholder={t("transactions.filters.select")}
+            isMulti
+            onChange={(selectedOptions) =>
+              handlePaymentMethodChange(getCsvOptions(selectedOptions))
+            }
+          />
+        </Col>
+        <Col sm="6" lg="4" xl="3" className="mb-3">
+          <Label for="finance-partner" className="text-dark">
+            {t("transactions.filters.financePartners")}
+          </Label>
+
+          <Select
+            id="finance-partner"
+            options={reactSelectOptions.financePartners}
+            isMulti
+            isClearable
+            isDisabled={loading}
+            placeholder={t("transactions.filters.select")}
+            onChange={(selectedOptions) =>
+              handleFinancePartnerChange(getCsvOptions(selectedOptions))
+            }
+          />
+        </Col>
+        <Col sm="6" lg="4" xl="3" className="mb-3">
+          <Label for="statusId" className="text-dark">
+            {t("transactions.filters.statuses")}
+          </Label>
+          <Select
+            id="statusId"
+            isMulti
+            options={reactSelectOptions.statuses}
+            isClearable
+            isDisabled={loading}
+            placeholder={t("transactions.filters.select")}
+            onChange={(selectedOptions) =>
+              handleStatusChange(getCsvOptions(selectedOptions))
+            }
+          />
         </Col>
       </Row>
       <Row>

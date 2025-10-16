@@ -6,7 +6,7 @@ import CustomField from "components/commonUI/forms/CustomField";
 import { getDetailsById, updateById, deleteById } from "services/hotelService";
 import {
   useAddValidationSchema,
-  HOTEL_ROLES,
+  HOTEL_ROLES_IDS,
 } from "components/hotels/constants";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { toast } from "react-toastify";
@@ -224,7 +224,7 @@ const HotelEdit = ({ hotelId }) => {
                 onClick={() => setIsEditing(true)}>
                 {t("hotels.edit.edit")}
               </Button>
-              {currentHotel.current.roleId === HOTEL_ROLES.OWNER && (
+              {currentHotel.current.roleId === HOTEL_ROLES_IDS.OWNER && (
                 <Button
                   className="ms-2 bg-danger text-white"
                   type="button"

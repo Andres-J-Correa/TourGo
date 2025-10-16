@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Nav, NavItem, NavLink } from "reactstrap";
 import { useAppContext } from "contexts/GlobalAppContext";
 import EmailVerification from "components/users/EmailVerification";
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import UserPasswordChange from "components/users/UserPasswordChange";
 import { useLanguage } from "contexts/LanguageContext";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const tabComponents = {
   email: EmailVerification,
@@ -23,10 +23,14 @@ const UserSettingsView = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
-  const breadcrumbs = [
-    { label: t("common.breadcrumbs.home"), path: "/" },
-    { label: t("users.profile.breadcrumbActive"), path: "/profile" },
-  ];
+  const breadcrumbs = useMemo(
+    () =>
+      new BreadcrumbBuilder(t)
+        .addUserProfile()
+        .addActive(t("users.accountDropdown.settings"))
+        .build(),
+    [t]
+  );
 
   const activeTab = useMemo(
     () => new URLSearchParams(location.search).get("tab") || "email",
@@ -53,10 +57,7 @@ const UserSettingsView = () => {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("users.accountDropdown.settings")}
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <LoadingOverlay isVisible={user.isLoading} />
         <Row className="min-vh-50">

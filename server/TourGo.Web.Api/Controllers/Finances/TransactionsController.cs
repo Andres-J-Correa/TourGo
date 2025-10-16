@@ -291,14 +291,14 @@ namespace TourGo.Web.Api.Controllers.Finances
             [FromQuery] string? txnId,
             [FromQuery] string? parentId,
             [FromQuery] string? entityId,
-            [FromQuery] int? categoryId,
-            [FromQuery] int? statusId,
+            [FromQuery] string? categoryId,
+            [FromQuery] string? statusId,
             [FromQuery] string? referenceNumber,
             [FromQuery] string? description,
             [FromQuery] bool? hasDocumentUrl,
-            [FromQuery] int? paymentMethodId,
-            [FromQuery] int? subcategoryId,
-            [FromQuery] int? financePartnerId)
+            [FromQuery] string? paymentMethodId,
+            [FromQuery] string? subcategoryId,
+            [FromQuery] string? financePartnerId)
         {
             ObjectResult result = null;
 

@@ -31,11 +31,11 @@ import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 
 // Components
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import DataTable from "components/commonUI/tables/DataTable"; // Add this import
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 function PaymentMethodsView() {
   const { t } = useLanguage();
@@ -61,11 +61,14 @@ function PaymentMethodsView() {
       .required(t("transactions.paymentMethods.validation.nameRequired")),
   });
 
-  const breadcrumbs = [
-    { label: t("common.breadcrumbs.home"), path: "/" },
-    { label: t("common.breadcrumbs.hotels"), path: "/hotels" },
-    { label: t("common.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("transactions.paymentMethods.title"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const filteredData = useMemo(() => {
     switch (isActiveFilter) {
@@ -351,10 +354,7 @@ function PaymentMethodsView() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("transactions.paymentMethods.title")}
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <h3>{t("transactions.paymentMethods.title")}</h3>
         {showForm && (

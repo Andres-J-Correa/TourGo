@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import Breadcrumb from "components/commonUI/Breadcrumb";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 import TabNavigation from "components/bookings/booking-add-edit-view/TabNavigation";
 
 import { toast } from "react-toastify";
@@ -56,21 +56,22 @@ const BookingAddUpdateView = () => {
     [user]
   );
 
-  const breadcrumbs = [
-    { label: t("booking.breadcrumb.home"), path: "/" },
-    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
-    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
-    {
-      label: t("booking.breadcrumb.bookings"),
-      path: `/hotels/${hotelId}/bookings`,
-    },
-    bookingId
-      ? {
-          label: t("booking.breadcrumb.booking"),
-          path: `/hotels/${hotelId}/bookings/${bookingId}`,
-        }
-      : undefined,
-  ];
+  const breadcrumbs = useMemo(() => {
+    if (hotelId) {
+      const breadcrumbs = new BreadcrumbBuilder(t);
+
+      if (bookingId) {
+        breadcrumbs.addBooking(hotelId, bookingId);
+        breadcrumbs.addActive(t("booking.breadcrumb.edit"));
+      } else {
+        breadcrumbs.addBookings(hotelId);
+        breadcrumbs.addActive(t("booking.breadcrumb.new"));
+      }
+
+      return breadcrumbs.build();
+    }
+    return null;
+  }, [hotelId, bookingId, t]);
 
   const tabs = [
     { id: "0", icon: faUser, name: t("booking.form.tabs.customer") },
@@ -175,12 +176,7 @@ const BookingAddUpdateView = () => {
         }
       />
 
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={
-          bookingId ? t("booking.breadcrumb.edit") : t("booking.breadcrumb.new")
-        }
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <TabNavigation
           currentStep={currentStep}
@@ -194,7 +190,7 @@ const BookingAddUpdateView = () => {
             <CustomerFormV2
               hotelId={hotelId}
               customer={customer}
-              booking={booking}
+              isUpdate={booking?.id}
               goToNextStep={() => setCurrentStep(1)}
               handleCustomerChange={handleCustomerChange}
             />

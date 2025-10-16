@@ -1,7 +1,8 @@
+export interface Breadcrumb {
+  label: string;
+  path?: string;
+}
 export interface BreadcrumbsProps {
-  breadcrumbs: Array<{
-    label: string;
-    path?: string;
-  }>;
+  breadcrumbs: Breadcrumb[];
   active: string;
 }

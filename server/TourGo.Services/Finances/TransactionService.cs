@@ -95,10 +95,10 @@ namespace TourGo.Services.Finances
             return newId;
         }
         public Paged<Transaction>? GetPaginated(string hotelId, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
-            DateOnly? startDate, DateOnly? endDate, string? txnId, string? parentId, string? entityId, int? categoryId, int? statusId, string? referenceNumber, 
-            string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId)
+            DateOnly? startDate, DateOnly? endDate, string? txnId, string? parentId, string? entityId, string? categoryId, string? statusId, string? referenceNumber, 
+            string? description, bool? hasDocumentUrl, string? paymentMethodId, string? subcategoryId, string? financePartnerId)
         {
-            string proc = "transactions_select_paginated_v7";
+            string proc = "transactions_select_paginated_v8";
             Paged<Transaction>? paged = null;
             List<Transaction>? transactions = null;
             int totalCount = 0;
@@ -118,14 +118,14 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_id", string.IsNullOrEmpty(txnId) ? DBNull.Value : txnId);
                 col.AddWithValue("p_parentId", string.IsNullOrEmpty(parentId) ? DBNull.Value : parentId);
                 col.AddWithValue("p_entityId", string.IsNullOrEmpty(entityId) ? DBNull.Value : entityId);
-                col.AddWithValue("p_categoryId", categoryId > 0 ? categoryId : DBNull.Value);
-                col.AddWithValue("p_statusId", statusId > 0 ? statusId : DBNull.Value);
+                col.AddWithValue("p_categoryId", string.IsNullOrEmpty(categoryId) ? DBNull.Value : categoryId);
+                col.AddWithValue("p_statusId", string.IsNullOrEmpty(statusId) ? DBNull.Value : statusId);
                 col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(referenceNumber) ? DBNull.Value : referenceNumber);
                 col.AddWithValue("p_description", string.IsNullOrEmpty(description) ? DBNull.Value : description);
                 col.AddWithValue("p_hasDocumentUrl", hasDocumentUrl.HasValue ? hasDocumentUrl.Value : DBNull.Value);
-                col.AddWithValue("p_paymentMethodId", paymentMethodId > 0 ? paymentMethodId : DBNull.Value);
-                col.AddWithValue("p_subcategoryId", subcategoryId > 0 ? subcategoryId : DBNull.Value);
-                col.AddWithValue("p_financePartnerId", financePartnerId > 0 ? financePartnerId : DBNull.Value);
+                col.AddWithValue("p_paymentMethodId", string.IsNullOrEmpty(paymentMethodId) ? DBNull.Value: paymentMethodId);
+                col.AddWithValue("p_subcategoryId", string.IsNullOrEmpty(subcategoryId) ? DBNull.Value : subcategoryId);
+                col.AddWithValue("p_financePartnerId", string.IsNullOrEmpty(financePartnerId) ? DBNull.Value : financePartnerId);
                 }, (reader, returnCol) =>
                 {
                     int index = 0;

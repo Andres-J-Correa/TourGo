@@ -14,7 +14,7 @@ import { getDetailsById as getHotelDetailsById } from "services/hotelService";
 import { getWithEntitiesById as getInvoiceDetailsById } from "services/invoiceService";
 import { formatCurrency } from "utils/currencyHelper";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
-import Breadcrumb from "components/commonUI/Breadcrumb";
+
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import BookingGeneralCharges from "components/bookings/booking-summary/BookingGeneralCharges";
 import BookingFinancials from "components/bookings/booking-summary/BookingFinancials";
@@ -25,6 +25,7 @@ import classNames from "classnames";
 import DOMPurify from "dompurify";
 import "./InvoiceView.css";
 import { useLanguage } from "contexts/LanguageContext"; // added
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const InvoiceView = () => {
   const [invoiceData, setInvoiceData] = useState({
@@ -43,11 +44,14 @@ const InvoiceView = () => {
 
   const { t } = useLanguage(); // added
 
-  const breadcrumbs = [
-    { label: t("invoices.view.breadcrumbs.home"), path: "/" },
-    { label: t("invoices.view.breadcrumbs.hotels"), path: "/hotels" },
-    { label: t("invoices.view.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("invoices.view.breadcrumbActive"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const sanitizedTerms = useMemo(() => {
     return (
@@ -95,10 +99,7 @@ const InvoiceView = () => {
 
   return (
     <div>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("invoices.view.breadcrumbActive")}
-      />
+      {breadcrumbs}
       <LoadingOverlay isVisible={loading} />
       <ErrorBoundary>
         <Button

@@ -28,7 +28,7 @@ import {
   deleteById,
 } from "services/extraChargeService";
 import { useAppContext } from "contexts/GlobalAppContext";
-import Breadcrumb from "components/commonUI/Breadcrumb";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
@@ -61,6 +61,15 @@ const ExtraChargesView = () => {
   const { getTranslatedErrorMessage, t } = useLanguage(); // changed
   const validationSchema = useAddValidationSchema();
 
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("extraCharges.title"))
+          .build()
+      : null;
+  }, [hotelId, t]);
+
   const { format, removeFormatting } = useNumericFormat({
     thousandSeparator: ".",
     decimalSeparator: ",",
@@ -71,12 +80,6 @@ const ExtraChargesView = () => {
     const numericValue = removeFormatting(rawValue);
     setFieldValue("amount", numericValue);
   };
-
-  const breadcrumbs = [
-    { label: t("booking.breadcrumb.home"), path: "/" },
-    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
-    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
-  ];
 
   const filteredData = useMemo(() => {
     switch (isActiveFilter) {
@@ -386,7 +389,7 @@ const ExtraChargesView = () => {
 
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active={t("extraCharges.title")} />
+      {breadcrumbs}
       <h3>
         {t("extraCharges.title")}
         <ChargeTypesExplanationIcon />

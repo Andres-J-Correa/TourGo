@@ -25,7 +25,7 @@ import { add, update, getByDocumentNumber } from "services/customerServiceV2";
 function CustomerFormV2({
   hotelId,
   customer,
-  booking,
+  isUpdate,
   goToNextStep,
   handleCustomerChange,
 }: CustomerFormV2Props): JSX.Element {
@@ -36,10 +36,6 @@ function CustomerFormV2({
   const { t } = useLanguage();
   const { customerAddEditSchema, searchCustomerSchema } =
     useCustomerValidationSchemas();
-
-  const isUpdate = useMemo(() => {
-    return Boolean(booking?.id);
-  }, [booking]);
 
   const initialValues: CustomerPayload = useMemo(
     () => ({
@@ -53,6 +49,8 @@ function CustomerFormV2({
   );
 
   const handleDocumentSubmit = async (values: { documentNumber: string }) => {
+    if (!hotelId) return;
+
     setSubmitting(true);
 
     Swal.fire({
@@ -116,6 +114,8 @@ function CustomerFormV2({
   const handleCustomerCreate = async (
     values: CustomerPayload
   ): Promise<void> => {
+    if (!hotelId) return;
+
     setSubmitting(true);
 
     Swal.fire({
@@ -159,7 +159,7 @@ function CustomerFormV2({
   };
 
   const handleCustomerUpdate = async (values: CustomerPayload) => {
-    if (!customer?.id) return;
+    if (!customer?.id || !hotelId) return;
 
     const result = await Swal.fire({
       title: t("booking.customerForm.updateConfirmTitle"),

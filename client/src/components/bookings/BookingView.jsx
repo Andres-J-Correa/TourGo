@@ -16,7 +16,7 @@ import BookingSummary from "components/bookings/booking-summary/BookingSummary";
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 import BookingTransactions from "components/bookings/booking-summary/BookingTransactions";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
-import Breadcrumb from "components/commonUI/Breadcrumb";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
@@ -67,15 +67,14 @@ function BookingView() {
     return sum < total;
   }, [booking]);
 
-  const breadcrumbs = [
-    { label: t("booking.breadcrumb.home"), path: "/" },
-    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
-    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
-    {
-      label: t("booking.breadcrumb.bookings"),
-      path: `/hotels/${hotelId}/bookings`,
-    },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addBookings(hotelId)
+          .addActive(t("booking.breadcrumb.booking"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const onGetBookingSuccess = (res) => {
     if (res.isSuccessful) {
@@ -326,10 +325,7 @@ function BookingView() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("booking.breadcrumb.booking")}
-      />
+      {breadcrumbs}
       <h3 className="mb-4">{t("booking.view.title")}</h3>
       <ErrorBoundary>
         <Row className="mb-1">

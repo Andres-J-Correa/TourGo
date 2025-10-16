@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
 import { Button, Row, Col, FormGroup } from "reactstrap";
 import { add } from "services/hotelService";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import { useAddValidationSchema } from "./constants";
 import { useAppContext } from "contexts/GlobalAppContext";
 import VerifyAccountFallback from "components/commonUI/VerifyAccountFallback";
@@ -14,6 +13,7 @@ import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import Swal from "sweetalert2";
 import { useLanguage } from "contexts/LanguageContext";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const HotelAdd = () => {
   const navigate = useNavigate();
@@ -21,10 +21,12 @@ const HotelAdd = () => {
   const addValidationSchema = useAddValidationSchema();
   const { t } = useLanguage();
 
-  const breadcrumbs = [
-    { label: t("hotels.breadcrumbs.home"), path: "/" },
-    { label: t("hotels.breadcrumbs.hotels"), path: "/hotels" },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return new BreadcrumbBuilder(t)
+      .addHotels()
+      .addActive(t("hotels.add.breadcrumbActive"))
+      .build();
+  }, [t]);
 
   // Form Submission
   const handleAddHotel = async (values) => {
@@ -63,10 +65,7 @@ const HotelAdd = () => {
   if (!user.current.isVerified) {
     return (
       <>
-        <Breadcrumb
-          breadcrumbs={breadcrumbs}
-          active={t("hotels.add.breadcrumbActive")}
-        />
+        {breadcrumbs}
         <h2 className="display-6 mb-4">{t("hotels.add.title")}</h2>
         <VerifyAccountFallback />
       </>
@@ -75,10 +74,7 @@ const HotelAdd = () => {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("hotels.add.breadcrumbActive")}
-      />
+      {breadcrumbs}
       <h2 className="display-6 mb-4">{t("hotels.add.title")}</h2>
       <ErrorBoundary>
         <Formik

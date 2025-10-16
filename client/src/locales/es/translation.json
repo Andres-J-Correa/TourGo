@@ -721,6 +721,22 @@
     "phoneWspLink": {
       "invalidPhoneSwalTitle": "Número de teléfono inválido",
       "invalidPhoneSwalText": "Por favor, revisa el número de teléfono."
+    },
+    "breadcrumbs": {
+      "home": "Inicio",
+      "hotels": "Hoteles",
+      "hotel": "Hotel",
+      "bookings": "Reservas",
+      "booking": "Reserva",
+      "editBooking": "Editar Reserva",
+      "newBooking": "Nueva Reserva",
+      "transactions": "Transacciones",
+      "transaction": "Transacción",
+      "editTransaction": "Editar Transacción",
+      "newTransaction": "Nueva Transacción",
+      "rooms": "Habitaciones",
+      "extraCharges": "Cargos Extra",
+      "bookingProviders": "Proveedores de Reservas"
     }
   },
   "extraCharges": {
@@ -1559,7 +1575,12 @@
       "descriptionPlaceholder": "Descripción",
       "filter": "Filtrar",
       "clear": "Limpiar filtro",
-      "clearAll": "Limpiar Filtros"
+      "clearAll": "Limpiar Filtros",
+      "categories": "Categorías",
+      "subcategories": "Subcategorías",
+      "paymentMethods": "Métodos de pago",
+      "financePartners": "Socios financieros",
+      "statuses": "Estados:"
     },
     "view": {
       "title": "Transacciones",

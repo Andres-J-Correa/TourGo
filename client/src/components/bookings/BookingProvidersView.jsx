@@ -30,7 +30,7 @@ import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 
 // Components
-import Breadcrumb from "components/commonUI/Breadcrumb";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
@@ -57,11 +57,14 @@ function BookingProvidersView() {
     name: "",
   });
 
-  const breadcrumbs = [
-    { label: t("booking.breadcrumb.home"), path: "/" },
-    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
-    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("booking.providers.title"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const filteredData = useMemo(() => {
     switch (isActiveFilter) {
@@ -351,10 +354,7 @@ function BookingProvidersView() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("booking.providers.title")}
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <h3>{t("booking.providers.title")}</h3>
 

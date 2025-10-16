@@ -51,6 +51,7 @@
     "react-phone-number-input": "^3.4.3",
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
+    "react-select": "^5.10.2",
     "react-to-pdf": "^2.0.1",
     "react-toastify": "^10.0.5",
     "reactstrap": "^9.2.2",

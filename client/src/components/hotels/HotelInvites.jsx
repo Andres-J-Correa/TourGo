@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Swal from "sweetalert2";
 
 import { toast } from "react-toastify";
 import { Col, Row } from "reactstrap";
 
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import HotelInviteCard from "components/hotels/HotelInviteCard";
@@ -18,6 +17,7 @@ import {
 } from "services/staffService";
 import { INVITE_FLAGS_IDS } from "components/staff/constants";
 import { useLanguage } from "contexts/LanguageContext";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 function HotelInvites() {
   const [invites, setInvites] = useState([]);
@@ -28,10 +28,14 @@ function HotelInvites() {
   const { user, toggleUserSignInModal } = useAppContext();
   const { t } = useLanguage();
 
-  const breadcrumbs = [
-    { label: t("hotels.breadcrumbs.home"), path: "/" },
-    { label: t("hotels.breadcrumbs.hotels"), path: "/hotels" },
-  ];
+  const breadcrumbs = useMemo(
+    () =>
+      new BreadcrumbBuilder(t)
+        .addHotel()
+        .addActive(t("hotels.invites.breadcrumbActive"))
+        .build(),
+    [t]
+  );
 
   useEffect(() => {
     if (user.current.isAuthenticated && user.current.hasFetched) {
@@ -183,10 +187,7 @@ function HotelInvites() {
   if (!user.current.isVerified) {
     return (
       <>
-        <Breadcrumb
-          breadcrumbs={breadcrumbs}
-          active={t("hotels.invites.breadcrumbActive")}
-        />
+        {breadcrumbs}
         <h3>{t("hotels.invites.title")}</h3>
         <VerifyAccountFallback />
       </>
@@ -195,10 +196,7 @@ function HotelInvites() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("hotels.invites.breadcrumbActive")}
-      />
+      {breadcrumbs}
       <LoadingOverlay isVisible={loading} />
       <h3>{t("hotels.invites.title")}</h3>
       <ErrorBoundary>

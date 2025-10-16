@@ -8,7 +8,7 @@ import {
   getExpandedRowModel,
 } from "@tanstack/react-table";
 import { getPagedMinimalBookingsByDateRange } from "services/bookingService";
-import Breadcrumb from "components/commonUI/Breadcrumb";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 import Pagination from "components/commonUI/Pagination";
 
 import dayjs from "dayjs";
@@ -54,11 +54,14 @@ const BookingsView = () => {
     statusId: "",
   });
 
-  const breadcrumbs = [
-    { label: t("booking.breadcrumb.home"), path: "/" },
-    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
-    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("booking.breadcrumb.bookings"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const actionsColumn = useMemo(
     () => ({
@@ -284,10 +287,7 @@ const BookingsView = () => {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("booking.breadcrumb.bookings")}
-      />
+      {breadcrumbs}
       <h3>{t("booking.bookingsView.title")}</h3>
       <ErrorBoundary>
         <BookingFilters

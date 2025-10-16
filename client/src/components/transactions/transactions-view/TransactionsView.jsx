@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import Pagination from "components/commonUI/Pagination";
 import TransactionDetails from "components/transactions/TransactionDetails";
@@ -51,6 +50,7 @@ import { getDateString } from "utils/dateHelper";
 import { utils, writeFile } from "xlsx";
 
 import "./TransactionsView.css";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const defaultData = {
   items: [],
@@ -138,11 +138,14 @@ function TransactionsView() {
     randomIdForUpdate: "",
   });
 
-  const breadcrumbs = [
-    { label: t("common.breadcrumbs.home"), path: "/" },
-    { label: t("common.breadcrumbs.hotels"), path: "/hotels" },
-    { label: t("common.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("transactions.view.title"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const columns = useMemo(
     () => transactionsTableColumns,
@@ -534,10 +537,7 @@ function TransactionsView() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("transactions.view.title")}
-      />
+      {breadcrumbs}
       <LoadingOverlay isVisible={hotel.isLoading} />
       <h3>{t("transactions.view.title")}</h3>
       <ErrorBoundary>
