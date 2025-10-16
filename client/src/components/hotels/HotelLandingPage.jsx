@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import {
   Row,
   Col,
@@ -24,7 +24,6 @@ import Swal from "sweetalert2";
 
 import { useLanguage } from "contexts/LanguageContext";
 
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import BookingDeparture from "components/bookings/BookingDeparture";
@@ -46,6 +45,7 @@ import { getAvailableRoomsByDate } from "services/roomService";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
 import { BOOKING_STATUS_IDS } from "components/bookings/constants";
 import "./HotelLandingPage.css";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const dateOptions = {
   yesterday: dayjs().subtract(1, "day").format("YYYY-MM-DD"),
@@ -74,10 +74,14 @@ const HotelLandingPage = () => {
   const { hotel } = useAppContext();
   const { t } = useLanguage();
 
-  const breadcrumbs = [
-    { label: t("hotels.breadcrumbs.home"), path: "/" },
-    { label: t("hotels.breadcrumbs.hotels"), path: "/hotels" },
-  ];
+  const breadcrumbs = useMemo(
+    () =>
+      new BreadcrumbBuilder(t)
+        .addHotels()
+        .addActive(t("hotels.landing.breadcrumbActive"))
+        .build(),
+    [t]
+  );
 
   const handleDateChange = (e) => {
     if (e.target.value === "more") {
@@ -379,10 +383,7 @@ const HotelLandingPage = () => {
       <LoadingOverlay
         isVisible={hotel.isLoading || loadingArrivalsDepartures}
       />
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("hotels.landing.breadcrumbActive")}
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <div className="hotel-landing-page">
           <Row className="align-items-center my-3">

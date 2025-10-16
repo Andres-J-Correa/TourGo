@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { Row, Col, Nav, NavItem, NavLink } from "reactstrap";
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import AccountBalancesReport from "components/financial-reports/AccountBalancesReport";
 import ProfitAndLossReport from "components/financial-reports/ProfitAndLossReport";
@@ -15,6 +14,7 @@ import UtilityCostAnalysisReport from "components/financial-reports/UtilityCostA
 import HotelOccupancyOverTimeReport from "components/financial-reports/HotelOccupancyOverTimeReport";
 import RoomOccupancyReport from "components/financial-reports/RoomOccupancyReport";
 import { useLanguage } from "contexts/LanguageContext";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const TABS = [
   { key: "balance", labelKey: "financialReports.dashboard.tabs.balance" },
@@ -85,13 +85,14 @@ function FinanceDashboard() {
     });
   };
 
-  const breadcrumbs = [
-    { label: t("financialReports.dashboard.breadcrumbs.home"), path: "/" },
-    {
-      label: t("financialReports.dashboard.breadcrumbs.hotel"),
-      path: `/hotels/${hotelId}`,
-    },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("financialReports.dashboard.title"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const renderContent = () => {
     const Component = tabComponents[activeTab] || AccountBalancesReport;
@@ -100,10 +101,7 @@ function FinanceDashboard() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("financialReports.dashboard.title")}
-      />
+      {breadcrumbs}
       <h3 className="mb-4">{t("financialReports.dashboard.title")}</h3>
       <ErrorBoundary>
         <Row>

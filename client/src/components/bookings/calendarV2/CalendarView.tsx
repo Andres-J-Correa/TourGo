@@ -6,7 +6,6 @@ import type {
   RoomAvailability,
   RoomAvailabilityRequest,
 } from "types/entities/roomAvailability.types";
-import type { Breadcrumb } from "components/commonUI/Breadcrumbs.types";
 import type { Dayjs } from "dayjs";
 
 //libs
@@ -20,7 +19,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 //components
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
-import Breadcrumbs from "components/commonUI/Breadcrumbs";
 import Alert from "components/commonUI/Alert";
 import RoomTable from "./components/RoomTable";
 import DatesTable from "./components/DatesTable";
@@ -54,12 +52,13 @@ function CalendarView(): JSX.Element {
   const { t } = useLanguage();
   const { hotelId } = useParams<{ hotelId: string }>();
 
-  const breadcrumbs: Breadcrumb[] = useMemo(() => {
-    return new BreadcrumbBuilder(t)
-      .addHome()
-      .addHotels()
-      .addHotel(hotelId)
-      .build();
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("booking.calendar.title"))
+          .build()
+      : null;
   }, [hotelId, t]);
 
   const isDateRangeValid: boolean = useMemo(() => {
@@ -229,10 +228,7 @@ function CalendarView(): JSX.Element {
 
   return (
     <div>
-      <Breadcrumbs
-        breadcrumbs={breadcrumbs}
-        active={t("booking.calendar.title")}
-      />
+      {breadcrumbs}
       <h3>{t("booking.calendar.title")}</h3>
       <ErrorBoundary>
         <LoadingOverlay

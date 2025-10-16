@@ -32,7 +32,6 @@ import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 
 // Components
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
@@ -41,6 +40,7 @@ import TransactionCategoriesExplanationIcon from "components/transactions/Transa
 
 // Constants/Static Data
 import { TRANSACTION_CATEGORIES } from "components/transactions/constants";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 function TransactionSubcategoriesView() {
   const { hotelId } = useParams();
@@ -57,11 +57,14 @@ function TransactionSubcategoriesView() {
     categoryId: "",
   });
 
-  const breadcrumbs = [
-    { label: t("common.breadcrumbs.home"), path: "/" },
-    { label: t("common.breadcrumbs.hotels"), path: "/hotels" },
-    { label: t("common.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("transactions.subcategories.title"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string()
@@ -382,10 +385,7 @@ function TransactionSubcategoriesView() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("transactions.subcategories.title")}
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <h3>{t("transactions.subcategories.title")}</h3>
         {showForm && (

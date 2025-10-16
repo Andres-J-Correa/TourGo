@@ -30,12 +30,12 @@ import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 
 // Components
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import DataTable from "components/commonUI/tables/DataTable";
 import FinancePartnersExplanationIcon from "components/transactions/finance-partners/FinancePartnersExplanationIcon";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -58,11 +58,14 @@ function FinancePartnersView() {
     name: "",
   });
 
-  const breadcrumbs = [
-    { label: t("common.breadcrumbs.home"), path: "/" },
-    { label: t("common.breadcrumbs.hotels"), path: "/hotels" },
-    { label: t("common.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("transactions.financePartners.title"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const filteredData = useMemo(() => {
     switch (isActiveFilter) {
@@ -351,10 +354,7 @@ function FinancePartnersView() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("transactions.financePartners.title")}
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <h3>
           {t("transactions.financePartners.title")}{" "}

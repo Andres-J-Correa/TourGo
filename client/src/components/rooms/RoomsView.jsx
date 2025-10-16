@@ -27,11 +27,11 @@ import {
 } from "services/roomService";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import DataTable from "components/commonUI/tables/DataTable";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const RoomsView = () => {
   const { hotelId } = useParams();
@@ -50,11 +50,14 @@ const RoomsView = () => {
 
   const { getTranslatedErrorMessage, t } = useLanguage();
 
-  const breadcrumbs = [
-    { label: t("rooms.breadcrumbs.home"), path: "/" },
-    { label: t("rooms.breadcrumbs.hotels"), path: "/hotels" },
-    { label: t("rooms.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("rooms.breadcrumbActive"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const filteredData = useMemo(() => {
     switch (isActiveFilter) {
@@ -388,10 +391,7 @@ const RoomsView = () => {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("rooms.breadcrumbActive")}
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <h3>{t("rooms.title")}</h3>
 

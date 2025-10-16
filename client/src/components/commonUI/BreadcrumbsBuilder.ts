@@ -1,7 +1,11 @@
+import * as React from "react";
 import type { Breadcrumb } from "./Breadcrumbs.types";
+
+import Breadcrumbs from "./Breadcrumbs";
 
 class BreadcrumbBuilder {
   private breadcrumbs: Breadcrumb[] = [];
+  private activeLabel: string = "";
 
   constructor(private t: (key: string) => string) {}
 
@@ -14,6 +18,7 @@ class BreadcrumbBuilder {
   }
 
   addHotels(): this {
+    this.addHome();
     this.breadcrumbs.push({
       label: this.t("commonUI.breadcrumbs.hotels"),
       path: "/hotels",
@@ -21,38 +26,55 @@ class BreadcrumbBuilder {
     return this;
   }
 
-  addHotel(hotelId?: string): this {
-    if (hotelId) {
-      this.breadcrumbs.push({
-        label: this.t("commonUI.breadcrumbs.hotel"),
-        path: `/hotels/${hotelId}`,
-      });
-    }
+  addUserProfile(): this {
+    this.addHome();
+    this.breadcrumbs.push({
+      label: this.t("users.profile.breadcrumbActive"),
+      path: "/profile",
+    });
     return this;
   }
 
-  addBookings(hotelId?: string): this {
-    if (hotelId) {
-      this.breadcrumbs.push({
-        label: this.t("commonUI.breadcrumbs.bookings"),
-        path: `/hotels/${hotelId}/bookings`,
-      });
-    }
+  addHotel(hotelId: string): this {
+    this.addHotels();
+
+    this.breadcrumbs.push({
+      label: this.t("commonUI.breadcrumbs.hotel"),
+      path: `/hotels/${hotelId}`,
+    });
+
     return this;
   }
 
-  addBooking(hotelId?: string, bookingId?: string): this {
-    if (hotelId && bookingId) {
-      this.breadcrumbs.push({
-        label: this.t("commonUI.breadcrumbs.booking"),
-        path: `/hotels/${hotelId}/bookings/${bookingId}`,
-      });
-    }
+  addBookings(hotelId: string): this {
+    this.addHotel(hotelId);
+
+    this.breadcrumbs.push({
+      label: this.t("commonUI.breadcrumbs.bookings"),
+      path: `/hotels/${hotelId}/bookings`,
+    });
     return this;
   }
 
-  build(): Breadcrumb[] {
-    return this.breadcrumbs;
+  addBooking(hotelId: string, bookingId: string): this {
+    this.addBookings(hotelId);
+    this.breadcrumbs.push({
+      label: this.t("commonUI.breadcrumbs.booking"),
+      path: `/hotels/${hotelId}/bookings/${bookingId}`,
+    });
+    return this;
+  }
+
+  addActive(label: string): this {
+    this.activeLabel = label;
+    return this;
+  }
+
+  build(): JSX.Element {
+    return React.createElement(Breadcrumbs, {
+      breadcrumbs: this.breadcrumbs,
+      active: this.activeLabel,
+    });
   }
 }
 

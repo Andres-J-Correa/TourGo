@@ -3,11 +3,11 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Row, Col, Nav, NavItem, NavLink } from "reactstrap";
 import { useAppContext } from "contexts/GlobalAppContext";
 import HotelEdit from "components/hotels/HotelEdit";
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import InvoicesTC from "components/hotels/InvoicesTC";
 import { useLanguage } from "contexts/LanguageContext";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const tabComponents = {
   edit: HotelEdit,
@@ -29,11 +29,14 @@ const HotelSettings = () => {
     [location.search]
   );
 
-  const breadcrumbs = [
-    { label: t("hotels.breadcrumbs.home"), path: "/" },
-    { label: t("hotels.breadcrumbs.hotels"), path: "/hotels" },
-    { label: t("hotels.settings.breadcrumbHotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("hotels.settings.title"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const handleTabChange = (tab) => {
     const newTab = validTabs.includes(tab) ? tab : "edit";
@@ -55,10 +58,7 @@ const HotelSettings = () => {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("hotels.settings.title")}
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <LoadingOverlay isVisible={user.isLoading} />
         <Row className="min-vh-50">

@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { getAll } from "services/hotelService";
 import { Row, Col, Card, CardBody } from "reactstrap";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
-import Breadcrumb from "components/commonUI/Breadcrumb";
 import { toast } from "react-toastify";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import HotelDefaultImage from "assets/images/default-hotel.jpg"; // Adjust the path as necessary
 import "./hotelsview.css";
 import { useLanguage } from "contexts/LanguageContext"; // added
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 const HotelsView = () => {
   const [hotels, setHotels] = useState([]);
@@ -17,7 +17,14 @@ const HotelsView = () => {
   const navigate = useNavigate();
   const { t } = useLanguage(); // added
 
-  const breadcrumbs = [{ label: t("hotels.breadcrumbs.home"), path: "/" }];
+  const breadcrumbs = useMemo(
+    () =>
+      new BreadcrumbBuilder(t)
+        .addHome()
+        .addActive(t("hotels.breadcrumbs.hotels"))
+        .build(),
+    [t]
+  );
 
   const fetchHotels = useCallback(async () => {
     try {
@@ -45,10 +52,7 @@ const HotelsView = () => {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("hotels.breadcrumbs.hotels")}
-      />
+      {breadcrumbs}
       <LoadingOverlay isVisible={isLoading} message={t("common.loading")} />
       <ErrorBoundary>
         <Row>

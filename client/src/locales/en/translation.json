@@ -1575,7 +1575,12 @@
       "descriptionPlaceholder": "Description",
       "filter": "Filter",
       "clear": "Clear filter",
-      "clearAll": "Clear Filters"
+      "clearAll": "Clear Filters",
+      "categories": "Categories",
+      "subcategories": "Subcategories",
+      "paymentMethods": "Payment Methods",
+      "financePartners": "Finance Partners",
+      "statuses": "Statuses"
     },
     "view": {
       "title": "Transactions",

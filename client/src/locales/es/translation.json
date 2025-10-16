@@ -1575,7 +1575,12 @@
       "descriptionPlaceholder": "Descripción",
       "filter": "Filtrar",
       "clear": "Limpiar filtro",
-      "clearAll": "Limpiar Filtros"
+      "clearAll": "Limpiar Filtros",
+      "categories": "Categorías",
+      "subcategories": "Subcategorías",
+      "paymentMethods": "Métodos de pago",
+      "financePartners": "Socios financieros",
+      "statuses": "Estados:"
     },
     "view": {
       "title": "Transacciones",

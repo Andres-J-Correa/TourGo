@@ -6,12 +6,13 @@ import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { usersUpdate } from "services/userAuthService";
 import { useUserUpdateSchema } from "components/users/validationSchemas";
-import Breadcrumb from "components/commonUI/Breadcrumb";
+
 import PhoneInputField from "components/commonUI/forms/PhoneInputField";
 import CustomErrorMessage from "components/commonUI/forms/CustomErrorMessage";
 import Swal from "sweetalert2";
 import { ERROR_CODES } from "constants/errorCodes";
 import { useLanguage } from "contexts/LanguageContext";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 
 function UserProfile() {
   const { user } = useAppContext();
@@ -19,7 +20,14 @@ function UserProfile() {
   const { t, getTranslatedErrorMessage } = useLanguage();
   const userUpdateSchema = useUserUpdateSchema();
 
-  const breadcrumbs = [{ label: t("common.breadcrumbs.home"), path: "/" }];
+  const breadcrumbs = useMemo(
+    () =>
+      new BreadcrumbBuilder(t)
+        .addHome()
+        .addActive(t("users.profile.breadcrumbActive"))
+        .build(),
+    [t]
+  );
 
   const initialValues = useMemo(
     () => ({
@@ -121,10 +129,7 @@ function UserProfile() {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("users.profile.breadcrumbActive")}
-      />
+      {breadcrumbs}
       <h2 className="display-6 mb-4">{t("users.profile.title")}</h2>
       <ErrorBoundary>
         <Formik

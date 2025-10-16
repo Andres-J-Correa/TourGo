@@ -1,6 +1,5 @@
 //types
 import type { JSX } from "react";
-import type { Breadcrumb } from "components/commonUI/Breadcrumbs.types";
 import type { Tab } from "./components/tabNavigation.types";
 import type { Customer } from "types/customer.types";
 import type { Booking } from "types/entities/booking.types";
@@ -18,7 +17,6 @@ import Swal from "sweetalert2";
 
 //components
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
-import Breadcrumbs from "components/commonUI/Breadcrumbs";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import TabNavigation from "./components/TabNavigation";
 import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
@@ -46,14 +44,21 @@ function BookingAddEditView(): JSX.Element {
   const [customer, setCustomer] = useState<Partial<Customer> | null>(null);
   const [booking, setBooking] = useState<Booking | null>(null);
 
-  const breadcrumbs: Breadcrumb[] = useMemo(() => {
-    return new BreadcrumbBuilder(t)
-      .addHome()
-      .addHotels()
-      .addHotel(hotelId)
-      .addBookings()
-      .addBooking(hotelId, bookingId)
-      .build();
+  const breadcrumbs = useMemo(() => {
+    if (hotelId) {
+      const breadcrumbs = new BreadcrumbBuilder(t);
+
+      if (bookingId) {
+        breadcrumbs.addBooking(hotelId, bookingId);
+        breadcrumbs.addActive(t("booking.breadcrumb.edit"));
+      } else {
+        breadcrumbs.addBookings(hotelId);
+        breadcrumbs.addActive(t("booking.breadcrumb.new"));
+      }
+
+      return breadcrumbs.build();
+    }
+    return null;
   }, [hotelId, bookingId, t]);
 
   const tabs = useMemo(
@@ -134,12 +139,7 @@ function BookingAddEditView(): JSX.Element {
   return (
     <>
       <LoadingOverlay isVisible={isLoadingHotelData} />
-      <Breadcrumbs
-        breadcrumbs={breadcrumbs}
-        active={
-          bookingId ? t("booking.breadcrumb.edit") : t("booking.breadcrumb.new")
-        }
-      />
+      {breadcrumbs}
       <ErrorBoundary>
         <TabNavigation
           currentStep={currentStep}

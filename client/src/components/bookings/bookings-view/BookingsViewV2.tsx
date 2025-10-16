@@ -5,7 +5,7 @@ import type { ErrorResponse, PagedResponse } from "types/apiResponse.types";
 import type { BookingData, PaginationData } from "./BookingsViewV2.types";
 
 //libs
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import classNames from "classnames";
@@ -14,7 +14,7 @@ import { utils, writeFile } from "xlsx";
 //components
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import BookingCard from "components/bookings/bookings-view/BookingCard";
-import Breadcrumb from "components/commonUI/Breadcrumb";
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import BookingFiltersV2 from "./BookingFiltersV2";
 import Pagination from "components/commonUI/Pagination";
@@ -61,11 +61,14 @@ function BookingsViewV2(): JSX.Element {
 
   const { t } = useLanguage();
 
-  const breadcrumbs = [
-    { label: t("booking.breadcrumb.home"), path: "/" },
-    { label: t("booking.breadcrumb.hotels"), path: "/hotels" },
-    { label: t("booking.breadcrumb.hotel"), path: `/hotels/${hotelId}` },
-  ];
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("booking.breadcrumb.bookings"))
+          .build()
+      : null;
+  }, [hotelId, t]);
 
   const columnOrderTranslated: { id: string; label: string }[] = [
     { id: "id", label: t("booking.minimalCard.reservationNumber") },
@@ -269,10 +272,7 @@ function BookingsViewV2(): JSX.Element {
 
   return (
     <>
-      <Breadcrumb
-        breadcrumbs={breadcrumbs}
-        active={t("booking.breadcrumb.bookings")}
-      />
+      {breadcrumbs}
       <LoadingOverlay isVisible={loading} />
       <h3>{t("booking.bookingsView.title")}</h3>
       <ErrorBoundary>

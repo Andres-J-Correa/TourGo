@@ -13,8 +13,8 @@ namespace TourGo.Services.Interfaces
         string? GetSupportDocumentUrl(string transactionId);
         string GetFileKey(TransactionFileAddRequest model, string hotelId);
         Paged<Transaction>? GetPaginated(string hotelId, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
-            DateOnly? startDate, DateOnly? endDate, string? txnId, string? parentId, string? entityId, int? categoryId, int? statusId, string? referenceNumber,
-            string? description, bool? hasDocumentUrl, int? paymentMethodId, int? subcategoryId, int? financePartnerId);
+            DateOnly? startDate, DateOnly? endDate, string? txnId, string? parentId, string? entityId, string? categoryId, string? statusId, string? referenceNumber,
+            string? description, bool? hasDocumentUrl, string? paymentMethodId, string? subcategoryId, string? financePartnerId);
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
         int Reverse(string txnId, string userId, string publicId);

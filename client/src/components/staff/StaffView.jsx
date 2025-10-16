@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Nav, NavItem, NavLink, Row, Col } from "reactstrap";
-import Breadcrumb from "components/commonUI/Breadcrumb";
+
+import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import StaffList from "components/staff/StaffList";
 import StaffInvites from "components/staff/StaffInvites";
@@ -30,6 +31,15 @@ const StaffView = () => {
     [location.search]
   );
 
+  const breadcrumbs = useMemo(() => {
+    return hotelId
+      ? new BreadcrumbBuilder(t)
+          .addHotel(hotelId)
+          .addActive(t("staff.view.title"))
+          .build()
+      : null;
+  }, [hotelId, t]);
+
   const handleTabChange = (tab) => {
     const newTab = validTabs.includes(tab) ? tab : "staff";
     const newParams = new URLSearchParams(location.search);
@@ -45,15 +55,9 @@ const StaffView = () => {
     return <Component />;
   };
 
-  const breadcrumbs = [
-    { label: t("staff.view.breadcrumbs.home"), path: "/" },
-    { label: t("staff.view.breadcrumbs.hotels"), path: "/hotels" },
-    { label: t("staff.view.breadcrumbs.hotel"), path: `/hotels/${hotelId}` },
-  ];
-
   return (
     <>
-      <Breadcrumb breadcrumbs={breadcrumbs} active={t("staff.view.title")} />
+      {breadcrumbs}
       <h3>{t("staff.view.title")}</h3>
       <ErrorBoundary>
         <Row className="mt-4">
