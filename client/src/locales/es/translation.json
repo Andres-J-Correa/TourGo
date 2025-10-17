@@ -1580,7 +1580,9 @@
       "subcategories": "Subcategorías",
       "paymentMethods": "Métodos de pago",
       "financePartners": "Socios financieros",
-      "statuses": "Estados:"
+      "statuses": "Estados:",
+      "incomeCategories": "Ingresos",
+      "expenseCategories": "Gastos"
     },
     "view": {
       "title": "Transacciones",

@@ -5,17 +5,17 @@ import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import { Row, Col, Label, Input, InputGroup, Button, Form } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import Select from "react-select";
+import Select, { components } from "react-select";
 
 import {
   TRANSACTION_CATEGORIES,
   TRANSACTION_STATUSES,
+  TRANSACTION_CATEGORY_TYPES_IDS,
 } from "components/transactions/constants";
 import { getPaymentMethodsByHotelId } from "services/paymentMethodService";
 import { getFinancePartnersByHotelId } from "services/financePartnerService";
 import { getTransactionSubcategories } from "services/transactionsSubcategoryService";
 
-import classNames from "classnames";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
 
@@ -42,83 +42,17 @@ function TransactionsTableFilters({
     transactionSubcategories: [],
     financePartners: [],
   });
-  const [isLoadingSelectData, setIsLoadingSelectData] = useState(false);
+
   const [transactionIdInput, setTransactionIdInput] = useState("");
   const [referenceNumberInput, setReferenceNumberInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
   const [entityIdInput, setEntityIdInput] = useState("");
-
-  const selectOptions = useMemo(() => {
-    const transactionCategoriesOptions = TRANSACTION_CATEGORIES.map(
-      (category) => (
-        <option
-          key={`transaction-category-${category.id}`}
-          value={category.id}
-          className={classNames({
-            "selected-option":
-              Number(paginationData.categoryId) === category.id,
-          })}>
-          {t(category.name)}
-        </option>
-      )
-    );
-
-    const transactionStatusesOptions = TRANSACTION_STATUSES.map((status) => (
-      <option
-        key={`transaction status-${status.id}`}
-        value={status.id}
-        className={classNames({
-          "selected-option": Number(paginationData.statusId) === status.id,
-        })}>
-        {t(status.name)}
-      </option>
-    ));
-
-    const paymentMethodsOptions = selectData.paymentMethods.map((method) => (
-      <option
-        key={`payment-method-${method.id}`}
-        value={method.id}
-        className={classNames({
-          "selected-option":
-            Number(paginationData.paymentMethodId) === method.id,
-        })}>
-        {method.name}
-      </option>
-    ));
-
-    const transactionSubcategoriesOptions =
-      selectData.transactionSubcategories.map((subcategory) => (
-        <option
-          key={`transaction-subcategory-${subcategory.id}`}
-          value={subcategory.id}
-          className={classNames({
-            "selected-option":
-              Number(paginationData.subcategoryId) === subcategory.id,
-          })}>
-          {subcategory.name}
-        </option>
-      ));
-
-    const financePartnersOptions = selectData.financePartners.map((partner) => (
-      <option
-        key={`finance-partner-${partner.id}`}
-        value={partner.id}
-        className={classNames({
-          "selected-option":
-            Number(paginationData.financePartnerId) === partner.id,
-        })}>
-        {partner.name}
-      </option>
-    ));
-
-    return {
-      transactionCategories: transactionCategoriesOptions,
-      transactionStatuses: transactionStatusesOptions,
-      paymentMethods: paymentMethodsOptions,
-      transactionSubcategories: transactionSubcategoriesOptions,
-      financePartners: financePartnersOptions,
-    };
-  }, [selectData, paginationData, t]);
+  const [selectedCategories, setSelectedCategories] = useState(null);
+  const [selectedSubcategories, setSelectedSubcategories] = useState(null);
+  const [selectedPaymentMethods, setSelectedPaymentMethods] = useState(null);
+  const [selectedFinancePartners, setSelectedFinancePartners] = useState(null);
+  const [selectedStatuses, setSelectedStatuses] = useState(null);
+  const [selectedHasDocument, setSelectedHasDocument] = useState(null);
 
   const reactSelectOptions = useMemo(() => {
     const documentOptions = [
@@ -126,17 +60,51 @@ function TransactionsTableFilters({
       { value: "false", label: t("transactions.filters.withoutDocument") },
     ];
 
-    const categories = TRANSACTION_CATEGORIES.map((category) => ({
-      value: category.id,
-      label: t(category.name),
-    }));
+    const incomeCategories = [];
+    const expenseCategories = [];
+    const subcategories = [];
 
-    const subcategories = selectData.transactionSubcategories.map(
-      (subcategory) => ({
-        value: subcategory.id,
-        label: subcategory.name,
-      })
-    );
+    TRANSACTION_CATEGORIES.forEach((category) => {
+      const option = {
+        value: category.id,
+        label: t(category.name),
+      };
+
+      const subcategory = {
+        options: [],
+        label: t(category.name),
+        id: category.id,
+      };
+
+      subcategories.push(subcategory);
+
+      if (category.typeId === TRANSACTION_CATEGORY_TYPES_IDS.INCOME) {
+        incomeCategories.push(option);
+      }
+
+      if (category.typeId === TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE) {
+        expenseCategories.push(option);
+      }
+    });
+
+    const categories = [
+      {
+        label: t("transactions.filters.incomeCategories"),
+        options: incomeCategories,
+        id: TRANSACTION_CATEGORY_TYPES_IDS.INCOME,
+      },
+      {
+        label: t("transactions.filters.expenseCategories"),
+        options: expenseCategories,
+        id: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
+      },
+    ];
+
+    selectData.transactionSubcategories.forEach((subcategory) => {
+      subcategories
+        .find((option) => option.id === subcategory.categoryId)
+        ?.options.push({ value: subcategory.id, label: subcategory.name });
+    });
 
     const paymentMethods = selectData.paymentMethods.map((method) => ({
       value: method.id,
@@ -160,8 +128,54 @@ function TransactionsTableFilters({
       subcategories,
       financePartners,
       statuses,
+      incomeCategories,
+      expenseCategories,
     };
   }, [t, selectData]);
+
+  const getCsvOptions = useCallback((selectedOptions) => {
+    const values = selectedOptions.map((option) => option.value).join(",");
+
+    return values;
+  }, []);
+
+  const onGroupHeadingClick = useCallback(
+    (e) => {
+      const headingId = e.currentTarget.id;
+
+      const toCompare =
+        +headingId === +TRANSACTION_CATEGORY_TYPES_IDS.INCOME
+          ? reactSelectOptions.incomeCategories
+          : reactSelectOptions.expenseCategories;
+
+      const toSelect = toCompare.filter(
+        (option) =>
+          !selectedCategories?.some(
+            (selected) => selected.value === option.value
+          )
+      );
+      const newSelected = [...(selectedCategories || []), ...toSelect];
+      setSelectedCategories(newSelected);
+      handleCategoryChange(getCsvOptions(newSelected));
+    },
+    [
+      reactSelectOptions,
+      selectedCategories,
+      getCsvOptions,
+      handleCategoryChange,
+    ]
+  );
+
+  const GroupHeading = (props) => (
+    <components.GroupHeading {...props}>
+      <div
+        id={props?.data?.id}
+        className="cursor-pointer"
+        onClick={onGroupHeadingClick}>
+        <span>{props.children}</span>
+      </div>
+    </components.GroupHeading>
+  );
 
   const onTransactionInputChange = (e) => {
     const { value } = e.target;
@@ -170,7 +184,7 @@ function TransactionsTableFilters({
 
   const handleTransactionIdFilterSubmit = (e) => {
     e.preventDefault();
-    if (!transactionIdInput) return;
+    if (!transactionIdInput && !paginationData.txnId) return;
     handleTransactionIdInputChange(transactionIdInput.trim());
   };
 
@@ -181,7 +195,7 @@ function TransactionsTableFilters({
 
   const handleReferenceNumberFilterSubmit = (e) => {
     e.preventDefault();
-    if (!referenceNumberInput) return;
+    if (!referenceNumberInput && !paginationData.referenceNumber) return;
     handleReferenceNumberInputChange(referenceNumberInput.trim());
   };
 
@@ -192,7 +206,7 @@ function TransactionsTableFilters({
 
   const handleDescriptionFilterSubmit = (e) => {
     e.preventDefault();
-    if (!descriptionInput) return;
+    if (!descriptionInput && !paginationData.description) return;
     handleDescriptionInputChange(descriptionInput.trim());
   };
 
@@ -203,8 +217,38 @@ function TransactionsTableFilters({
 
   const handleEntityIdFilterSubmit = (e) => {
     e.preventDefault();
-    if (!entityIdInput) return;
+    if (!entityIdInput && !paginationData.entityId) return;
     handleEntityIdInputChange(entityIdInput.trim());
+  };
+
+  const onCategoryChange = (selectedOptions) => {
+    handleCategoryChange(getCsvOptions(selectedOptions));
+    setSelectedCategories(selectedOptions);
+  };
+
+  const onSubcategoryChange = (selectedOptions) => {
+    handleSubcategoryChange(getCsvOptions(selectedOptions));
+    setSelectedSubcategories(selectedOptions);
+  };
+
+  const onPaymentMethodChange = (selectedOptions) => {
+    handlePaymentMethodChange(getCsvOptions(selectedOptions));
+    setSelectedPaymentMethods(selectedOptions);
+  };
+
+  const onFinancePartnerChange = (selectedOptions) => {
+    handleFinancePartnerChange(getCsvOptions(selectedOptions));
+    setSelectedFinancePartners(selectedOptions);
+  };
+
+  const onStatusChange = (selectedOptions) => {
+    handleStatusChange(getCsvOptions(selectedOptions));
+    setSelectedStatuses(selectedOptions);
+  };
+
+  const onHasDocumentChange = (selectedOption) => {
+    handleHasDocumentUrlChange(selectedOption?.value);
+    setSelectedHasDocument(selectedOption);
   };
 
   const onClearTransactionId = () => {
@@ -253,68 +297,63 @@ function TransactionsTableFilters({
     setDescriptionInput("");
     setEntityIdInput("");
     handleClearAllFilters();
+    setSelectedCategories(null);
+    setSelectedSubcategories(null);
+    setSelectedPaymentMethods(null);
+    setSelectedFinancePartners(null);
+    setSelectedStatuses(null);
+    setSelectedHasDocument(null);
   };
-
-  const getCsvOptions = useCallback((selectedOptions) => {
-    const values = selectedOptions.map((option) => option.value).join(",");
-
-    return values;
-  }, []);
 
   useEffect(() => {
     if (hotelId) {
-      setIsLoadingSelectData(true);
       Promise.allSettled([
         getPaymentMethodsByHotelId(hotelId),
         getFinancePartnersByHotelId(hotelId),
         getTransactionSubcategories(hotelId),
-      ])
-        .then(
-          ([
-            paymentMethodsResult,
-            financePartnersResult,
-            transactionSubcategoriesResult,
-          ]) => {
-            const errors = [];
+      ]).then(
+        ([
+          paymentMethodsResult,
+          financePartnersResult,
+          transactionSubcategoriesResult,
+        ]) => {
+          const errors = [];
 
-            if (paymentMethodsResult.status === "fulfilled") {
-              setSelectData((prev) => ({
-                ...prev,
-                paymentMethods: paymentMethodsResult.value.items,
-              }));
-            } else if (paymentMethodsResult.reason?.response?.status !== 404) {
-              errors.push("Error al cargar los métodos de pago");
-            }
-
-            if (financePartnersResult.status === "fulfilled") {
-              setSelectData((prev) => ({
-                ...prev,
-                financePartners: financePartnersResult.value.items,
-              }));
-            } else if (financePartnersResult.reason?.response?.status !== 404) {
-              errors.push("Error al cargar los socios financieros");
-            }
-
-            if (transactionSubcategoriesResult.status === "fulfilled") {
-              setSelectData((prev) => ({
-                ...prev,
-                transactionSubcategories:
-                  transactionSubcategoriesResult.value.items,
-              }));
-            } else if (
-              transactionSubcategoriesResult.reason?.response?.status !== 404
-            ) {
-              errors.push("Error al cargar las subcategorías de transacción");
-            }
-
-            if (errors.length > 0) {
-              toast.error(errors.join(" | "));
-            }
+          if (paymentMethodsResult.status === "fulfilled") {
+            setSelectData((prev) => ({
+              ...prev,
+              paymentMethods: paymentMethodsResult.value.items,
+            }));
+          } else if (paymentMethodsResult.reason?.response?.status !== 404) {
+            errors.push("Error al cargar los métodos de pago");
           }
-        )
-        .finally(() => {
-          setIsLoadingSelectData(false);
-        });
+
+          if (financePartnersResult.status === "fulfilled") {
+            setSelectData((prev) => ({
+              ...prev,
+              financePartners: financePartnersResult.value.items,
+            }));
+          } else if (financePartnersResult.reason?.response?.status !== 404) {
+            errors.push("Error al cargar los socios financieros");
+          }
+
+          if (transactionSubcategoriesResult.status === "fulfilled") {
+            setSelectData((prev) => ({
+              ...prev,
+              transactionSubcategories:
+                transactionSubcategoriesResult.value.items,
+            }));
+          } else if (
+            transactionSubcategoriesResult.reason?.response?.status !== 404
+          ) {
+            errors.push("Error al cargar las subcategorías de transacción");
+          }
+
+          if (errors.length > 0) {
+            toast.error(errors.join(" | "));
+          }
+        }
+      );
     }
   }, [hotelId]);
 
@@ -472,9 +511,8 @@ function TransactionsTableFilters({
             isClearable
             isDisabled={loading}
             placeholder={t("transactions.filters.select")}
-            onChange={(selectedOption) =>
-              handleHasDocumentUrlChange(selectedOption?.value)
-            }
+            onChange={onHasDocumentChange}
+            value={selectedHasDocument}
           />
         </Col>
       </Row>
@@ -487,12 +525,12 @@ function TransactionsTableFilters({
             id="transaction-category"
             isMulti
             options={reactSelectOptions.categories}
-            onChange={(selectedOptions) =>
-              handleCategoryChange(getCsvOptions(selectedOptions))
-            }
+            onChange={onCategoryChange}
             isClearable
             isDisabled={loading}
             placeholder={t("transactions.filters.select")}
+            value={selectedCategories}
+            components={{ GroupHeading }}
           />
         </Col>
         <Col sm="6" lg="4" xl="3" className="mb-3">
@@ -506,9 +544,8 @@ function TransactionsTableFilters({
             isMulti
             isDisabled={loading}
             placeholder={t("transactions.filters.select")}
-            onChange={(selectedOptions) =>
-              handleSubcategoryChange(getCsvOptions(selectedOptions))
-            }
+            onChange={onSubcategoryChange}
+            value={selectedSubcategories}
           />
         </Col>
         <Col sm="6" lg="4" xl="3" className="mb-3">
@@ -522,9 +559,8 @@ function TransactionsTableFilters({
             isDisabled={loading}
             placeholder={t("transactions.filters.select")}
             isMulti
-            onChange={(selectedOptions) =>
-              handlePaymentMethodChange(getCsvOptions(selectedOptions))
-            }
+            onChange={onPaymentMethodChange}
+            value={selectedPaymentMethods}
           />
         </Col>
         <Col sm="6" lg="4" xl="3" className="mb-3">
@@ -539,9 +575,8 @@ function TransactionsTableFilters({
             isClearable
             isDisabled={loading}
             placeholder={t("transactions.filters.select")}
-            onChange={(selectedOptions) =>
-              handleFinancePartnerChange(getCsvOptions(selectedOptions))
-            }
+            onChange={onFinancePartnerChange}
+            value={selectedFinancePartners}
           />
         </Col>
         <Col sm="6" lg="4" xl="3" className="mb-3">
@@ -555,9 +590,8 @@ function TransactionsTableFilters({
             isClearable
             isDisabled={loading}
             placeholder={t("transactions.filters.select")}
-            onChange={(selectedOptions) =>
-              handleStatusChange(getCsvOptions(selectedOptions))
-            }
+            onChange={onStatusChange}
+            value={selectedStatuses}
           />
         </Col>
       </Row>

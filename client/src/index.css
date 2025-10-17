@@ -1317,7 +1317,7 @@ hr.horizontal.dark {
   opacity: 0.8;
 }
 .cursor-pointer {
-  cursor: pointer;
+  cursor: pointer !important;
 }
 .cursor-not-allowed {
   cursor: not-allowed;

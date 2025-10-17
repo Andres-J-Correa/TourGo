@@ -1580,7 +1580,9 @@
       "subcategories": "Subcategories",
       "paymentMethods": "Payment Methods",
       "financePartners": "Finance Partners",
-      "statuses": "Statuses"
+      "statuses": "Statuses",
+      "incomeCategories": "Revenue",
+      "expenseCategories": "Expense"
     },
     "view": {
       "title": "Transactions",
