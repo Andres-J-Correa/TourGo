@@ -170,7 +170,7 @@ function TransactionsTableFilters({
     <components.GroupHeading {...props}>
       <div
         id={props?.data?.id}
-        className="cursor-pointer"
+        className="cursor-pointer transactions-filter-group-header"
         onClick={onGroupHeadingClick}>
         <span>{props.children}</span>
       </div>
