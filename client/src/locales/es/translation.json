@@ -1582,7 +1582,7 @@
       "financePartners": "Socios financieros",
       "statuses": "Estados:",
       "incomeCategories": "Ingresos",
-      "expenseCategories": "Gastos"
+      "expenseCategories": "Egresos"
     },
     "view": {
       "title": "Transacciones",

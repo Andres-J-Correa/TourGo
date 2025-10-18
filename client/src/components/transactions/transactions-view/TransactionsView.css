@@ -9,3 +9,7 @@
 .filter-select option {
   background-color: white;
 }
+
+.transactions-filter-group-header:hover {
+  color: var(--bs-dark);
+}
