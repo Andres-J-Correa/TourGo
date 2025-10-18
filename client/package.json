@@ -17,7 +17,7 @@
     "@tiptap/pm": "^2.14.0",
     "@tiptap/react": "^2.14.0",
     "@tiptap/starter-kit": "^2.14.0",
-    "axios": "^1.7.2",
+    "axios": "^1.12.2",
     "axios-retry": "^4.5.0",
     "bootstrap": "^5.3.3",
     "classnames": "^2.5.1",
