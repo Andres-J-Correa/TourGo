@@ -137,6 +137,8 @@
       "4004": "No se encontraron registros",
       "4005": "No tiene permisos suficientes para realizar esta acción",
       "4006": "Ya existe una reserva con este ID externo",
+      "4007": "Estado de reserva invalido",
+      "4008": "Algunas habitaciones ya no están disponibles en estas fechas",
       "5000": "Error de gestión de transacciones",
       "5001": "La solicitud no es válida",
       "5002": "Ya existe una transacción con este número de referencia",
@@ -254,7 +256,8 @@
         "customer": "Cliente",
         "booking": "Información de la Reserva",
         "transactions": "Transacciones"
-      }
+      },
+      "roomBookingsConflicts": "Las habitaciones y fechas se actualizaron debido a conflictos de reservas. Por favor, revise."
     },
     "validation": {
       "documentShort": "Documento muy corto (mínimo {{min}} caracteres)",

@@ -32,9 +32,11 @@ export const LanguageProvider = ({ children }) => {
   const getTranslatedErrorMessage = useCallback(
     (error) => {
       if (Boolean(error?.response?.data?.code)) {
-        return `${t(`errors.http.${error?.response?.status ?? 500}`)}:\n${t(
-          `errors.custom.${error.response.data.code}`
-        )}`;
+        //TODO fix asp.net to send correct http errors
+        // return `${t(`errors.http.${error?.response?.status ?? 500}`)}:\n${t(
+        //   `errors.custom.${error.response.data.code}`
+        // )}`;
+        return t(`errors.custom.${error.response.data.code}`);
       } else {
         return `${t(`errors.http.${error?.response?.status ?? 500}`)}:\n${t(
           `errors.custom.1000`

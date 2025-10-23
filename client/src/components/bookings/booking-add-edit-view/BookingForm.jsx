@@ -45,6 +45,7 @@ import PersonalizedCharges from "./PersonalizedCharges";
 import { useLanguage } from "contexts/LanguageContext"; // add import
 import { ERROR_CODES } from "constants/errorCodes";
 import { BOOKING_STATUS_IDS } from "../constants";
+import { toast } from "react-toastify";
 
 const emptyFormData = {
   customerId: "",
@@ -129,41 +130,55 @@ function BookingForm({
     isSubmitting || (Boolean(values?.id) && !formChanged());
 
   const removeBookedRoomBookings = useCallback(
-    (bookingsToCheck) => {
-      const roomBookingsSet = new Set();
+    (bookingsToCheck, roomBookings, roomAvailability) => {
+      const roomBookingsMap = new Map();
+      const roomAvailabilitySet = new Set();
 
       const currentRoomBookings = [...bookingsToCheck];
 
       for (const roomBooking of roomBookings) {
-        roomBookingsSet.add(`${roomBooking.roomId}-${roomBooking.date}`);
+        roomBookingsMap.set(
+          `${roomBooking.roomId}-${roomBooking.date}`,
+          roomBooking.bookingId
+        );
+      }
+
+      for (const availability of roomAvailability) {
+        roomAvailabilitySet.add(`${availability.roomId}-${availability.date}`);
       }
 
       for (let i = 0; i < currentRoomBookings.length; ) {
         const roomBooking = currentRoomBookings[i];
-        if (
-          roomBookingsSet.has(`${roomBooking.roomId}-${roomBooking.date}`) &&
-          roomBooking.bookingId !== bookingId
-        ) {
+        const key = `${roomBooking.roomId}-${roomBooking.date}`;
+        const existingBookingId = roomBookingsMap.get(key);
+
+        const isBooked = existingBookingId && existingBookingId !== bookingId;
+        const isClosed = roomAvailabilitySet.has(key);
+
+        if (isBooked || isClosed) {
           currentRoomBookings.splice(i, 1);
           continue;
         }
         i++;
       }
 
+      if (bookingsToCheck.length !== currentRoomBookings.length) {
+        toast.info(t("booking.form.roomBookingsConflicts"), {
+          autoClose: 5000,
+          pauseOnHover: true,
+        });
+      }
+
       return currentRoomBookings;
     },
-    [roomBookings, bookingId]
+    [bookingId, t]
   );
 
   const resetFormToPrevious = () => {
     resetForm();
     const previousForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
     setSelectedCharges(previousForm.extraCharges || []);
-    setSelectedRoomBookings(
-      previousForm.roomBookings
-        ? removeBookedRoomBookings(previousForm.roomBookings)
-        : []
-    );
+    setSelectedRoomBookings(previousForm.roomBookings || []);
     setPersonalizedCharges(previousForm.personalizedCharges || []);
 
     const isSameStartDate = isSameDate(dates.start, previousForm.arrivalDate);
@@ -193,9 +208,7 @@ function BookingForm({
       }
 
       if (formData.roomBookings?.length > 0) {
-        setSelectedRoomBookings(
-          removeBookedRoomBookings(formData.roomBookings)
-        );
+        setSelectedRoomBookings(formData.roomBookings);
       }
 
       if (formData.personalizedCharges?.length > 0) {
@@ -214,7 +227,7 @@ function BookingForm({
 
       setCustomer(formData.customer);
     },
-    [setCustomer, setValues, removeBookedRoomBookings]
+    [setCustomer, setValues]
   );
 
   const handleDateChange = (field) => (value) => {
@@ -298,7 +311,7 @@ function BookingForm({
           : [];
 
       if (isSameDates && currentRoomBookings.length > 0) {
-        setSelectedRoomBookings(removeBookedRoomBookings(currentRoomBookings));
+        setSelectedRoomBookings(currentRoomBookings);
       }
 
       const currentExtraCharges =
@@ -332,7 +345,6 @@ function BookingForm({
     bookingPersonalizedCharges,
     hotelId,
     roomBookings,
-    removeBookedRoomBookings,
   ]);
 
   useEffect(() => {
@@ -478,6 +490,14 @@ function BookingForm({
       });
     }
   }, [rooms.length, hotelId, navigate, isHotelDataInitialFetch, t]);
+
+  useEffect(() => {
+    if (roomBookings.length) {
+      setSelectedRoomBookings((prev) =>
+        removeBookedRoomBookings(prev, roomBookings, roomAvailability)
+      );
+    }
+  }, [roomBookings, roomAvailability, removeBookedRoomBookings]);
 
   return (
     <>

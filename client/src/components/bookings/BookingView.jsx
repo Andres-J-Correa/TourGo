@@ -61,7 +61,7 @@ function BookingView() {
   const [isUploading, setIsUploading] = useState(false);
 
   const { user } = useAppContext();
-  const { t } = useLanguage(); // added
+  const { t, getTranslatedErrorMessage } = useLanguage(); // added
 
   const modifiedBy = useMemo(
     () => ({
@@ -349,12 +349,21 @@ function BookingView() {
       } else {
         throw new Error("Error activating booking");
       }
-    } catch (error) {
-      toast.error(t("common.requestFailed"));
+    } catch (err) {
+      const errorMessage = getTranslatedErrorMessage(err);
+
+      Swal.close();
+
+      Swal.fire({
+        title: t("common.error"),
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     } finally {
       setIsUploading(false);
     }
-  }, [bookingId, customer, hotelId, t, modifiedBy]);
+  }, [bookingId, customer, hotelId, t, modifiedBy, getTranslatedErrorMessage]);
 
   const handleCustomerModalClose = useCallback(() => {
     if (!isUploading) {

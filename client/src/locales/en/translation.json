@@ -137,6 +137,8 @@
       "4004": "No records found",
       "4005": "You do not have sufficient permissions to perform this action",
       "4006": "External booking ID conflict",
+      "4007": "Booking status invalid",
+      "4008": "Some rooms are no longer available on these dates",
       "5000": "Transaction management error",
       "5001": "The request is invalid",
       "5002": "A transaction with this reference number already exists",
@@ -254,7 +256,8 @@
         "customer": "Customer",
         "booking": "Booking Information",
         "transactions": "Transactions"
-      }
+      },
+      "roomBookingsConflicts": "The rooms and dates were updated due to reservation conflicts. Please review."
     },
     "validation": {
       "documentShort": "Document too short (minimum {{min}} characters)",
