@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using TourGo.Models.Attributes;
+using TourGo.Models.Enums.Bookings;
 
 namespace TourGo.Models.Requests.Bookings
 {
@@ -50,6 +51,10 @@ namespace TourGo.Models.Requests.Bookings
         [Required]
         [Range(0, double.MaxValue)]
         public decimal Charges { get; set; }
+
+        [Required]
+        [ValidEnum(typeof(BookingStatusEnum))]
+        public int StatusId { get; set; }
 
         [JsonIgnore]
         public decimal Total => Subtotal + Charges;

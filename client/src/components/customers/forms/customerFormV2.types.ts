@@ -4,6 +4,8 @@ export interface CustomerFormV2Props {
   hotelId?: string;
   customer?: Partial<Customer> | null;
   isUpdate?: boolean;
-  goToNextStep: () => void;
+  onChangeSuccessful?: () => void;
   handleCustomerChange: (customer: Partial<Customer> | null) => void;
+  canUpdate?: boolean;
+  disableButtons?: boolean;
 }

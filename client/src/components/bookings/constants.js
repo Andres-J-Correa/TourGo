@@ -3,13 +3,13 @@ import { formatCurrency } from "utils/currencyHelper";
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 import { useTranslation } from "react-i18next";
 
-// Use translation keys instead of hardcoded strings
 export const BOOKING_STATUS_BY_ID = {
   1: "booking.status.active",
   2: "booking.status.cancelled",
   3: "booking.status.completed",
   4: "booking.status.noShow",
   5: "booking.status.arrived",
+  6: "booking.status.quote",
 };
 
 export const BOOKING_STATUSES = [
@@ -18,6 +18,7 @@ export const BOOKING_STATUSES = [
   { id: 3, name: "booking.status.completed" },
   { id: 4, name: "booking.status.noShow" },
   { id: 5, name: "booking.status.arrived" },
+  { id: 6, name: "booking.status.quote" },
 ];
 
 export const BOOKING_STATUS_IDS = {
@@ -26,6 +27,7 @@ export const BOOKING_STATUS_IDS = {
   COMPLETED: 3,
   NO_SHOW: 4,
   ARRIVED: 5,
+  QUOTE: 6,
 };
 
 export const LOCKED_BOOKING_STATUSES = [

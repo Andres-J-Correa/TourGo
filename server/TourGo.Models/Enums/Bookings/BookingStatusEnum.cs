@@ -13,5 +13,6 @@ namespace TourGo.Models.Enums.Bookings
         Completed = 3,
         NoShow = 4,
         Arrived = 5,
+        Quote = 6
     }
 }

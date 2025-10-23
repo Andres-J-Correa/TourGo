@@ -144,12 +144,16 @@
     }
   },
   "booking": {
+    "quote": {
+      "title": "Cotización de Reserva"
+    },
     "status": {
       "active": "Activa",
       "cancelled": "Cancelada",
       "completed": "Completada",
       "noShow": "No llegó",
-      "arrived": "Arribada"
+      "arrived": "Arribada",
+      "quote": "Cotización"
     },
     "errors": {
       "loadRooms": "Error al cargar habitaciones",
@@ -214,7 +218,8 @@
       "bookings": "Reservas",
       "booking": "Reserva",
       "edit": "Editar Reserva",
-      "new": "Nueva Reserva"
+      "new": "Nueva Reserva",
+      "quote": "Cotización"
     },
     "navigation": {
       "previous": "Anterior",
@@ -591,6 +596,8 @@
       "cancelError": "Error al cancelar la reserva",
       "pleaseWait": "Por favor, espere.",
       "confirmYes": "Sí, confirmar",
+      "activate": "Activar Reserva",
+      "updateCustomer": "Actualizar Cliente",
       "errors": {
         "loadBooking": "Error al cargar reserva",
         "downloadInvoice": "Error al descargar factura"
@@ -683,7 +690,8 @@
       "admin": "Administración",
       "hotelSettings": "Configuración del Hotel",
       "finances": "Finanzas",
-      "financeDashboard": "Panel de Finanzas"
+      "financeDashboard": "Panel de Finanzas",
+      "bookingQuote": "Nueva Cotización"
     },
     "dataTable": {
       "loading": "Cargando...",
@@ -701,7 +709,9 @@
       "rightsReserved": "Todos los derechos reservados.",
       "privacyPolicy": "Política de Privacidad",
       "investors": "Inversores",
-      "careers": "Trabaja con nosotros"
+      "careers": "Trabaja con nosotros",
+      "newBooking": "Nueva Reserva",
+      "newQuote": "Nueva Cotización"
     },
     "pagination": {
       "of": "de"

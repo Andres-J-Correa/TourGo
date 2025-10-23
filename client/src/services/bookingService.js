@@ -342,3 +342,21 @@ export const add = async (payload, hotelId) => {
     return onGlobalError(error);
   }
 };
+
+export const activateBooking = async (bookingId, hotelId, customerId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/activate`,
+    data: customerId,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

@@ -107,6 +107,13 @@ const bookings = [
     ),
   },
   {
+    name: "quoteBooking",
+    path: "/hotels/:hotelId/bookings/quote",
+    component: lazy(() =>
+      import("components/bookings/booking-quote-view/BookingQuoteView")
+    ),
+  },
+  {
     name: "viewBooking",
     path: "/hotels/:hotelId/bookings/:bookingId",
     component: lazy(() => import("components/bookings/BookingView")),

@@ -44,6 +44,7 @@ import ChargeTypesExplanationIcon from "components/extra-charges/ChargeTypesExpl
 import PersonalizedCharges from "./PersonalizedCharges";
 import { useLanguage } from "contexts/LanguageContext"; // add import
 import { ERROR_CODES } from "constants/errorCodes";
+import { BOOKING_STATUS_IDS } from "../constants";
 
 const emptyFormData = {
   customerId: "",
@@ -66,6 +67,7 @@ function BookingForm({
   bookingCharges = [],
   bookingRoomBookings = [],
   bookingPersonalizedCharges = [],
+  isQuote,
   //formik props
   values,
   setValues,
@@ -126,11 +128,42 @@ function BookingForm({
   const isSubmitDisabled =
     isSubmitting || (Boolean(values?.id) && !formChanged());
 
+  const removeBookedRoomBookings = useCallback(
+    (bookingsToCheck) => {
+      const roomBookingsSet = new Set();
+
+      const currentRoomBookings = [...bookingsToCheck];
+
+      for (const roomBooking of roomBookings) {
+        roomBookingsSet.add(`${roomBooking.roomId}-${roomBooking.date}`);
+      }
+
+      for (let i = 0; i < currentRoomBookings.length; ) {
+        const roomBooking = currentRoomBookings[i];
+        if (
+          roomBookingsSet.has(`${roomBooking.roomId}-${roomBooking.date}`) &&
+          roomBooking.bookingId !== bookingId
+        ) {
+          currentRoomBookings.splice(i, 1);
+          continue;
+        }
+        i++;
+      }
+
+      return currentRoomBookings;
+    },
+    [roomBookings, bookingId]
+  );
+
   const resetFormToPrevious = () => {
     resetForm();
     const previousForm = getLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS);
     setSelectedCharges(previousForm.extraCharges || []);
-    setSelectedRoomBookings(previousForm.roomBookings || []);
+    setSelectedRoomBookings(
+      previousForm.roomBookings
+        ? removeBookedRoomBookings(previousForm.roomBookings)
+        : []
+    );
     setPersonalizedCharges(previousForm.personalizedCharges || []);
 
     const isSameStartDate = isSameDate(dates.start, previousForm.arrivalDate);
@@ -160,7 +193,9 @@ function BookingForm({
       }
 
       if (formData.roomBookings?.length > 0) {
-        setSelectedRoomBookings(formData.roomBookings);
+        setSelectedRoomBookings(
+          removeBookedRoomBookings(formData.roomBookings)
+        );
       }
 
       if (formData.personalizedCharges?.length > 0) {
@@ -179,7 +214,7 @@ function BookingForm({
 
       setCustomer(formData.customer);
     },
-    [setCustomer, setValues]
+    [setCustomer, setValues, removeBookedRoomBookings]
   );
 
   const handleDateChange = (field) => (value) => {
@@ -263,7 +298,7 @@ function BookingForm({
           : [];
 
       if (isSameDates && currentRoomBookings.length > 0) {
-        setSelectedRoomBookings([...currentRoomBookings]);
+        setSelectedRoomBookings(removeBookedRoomBookings(currentRoomBookings));
       }
 
       const currentExtraCharges =
@@ -296,6 +331,8 @@ function BookingForm({
     bookingRoomBookings,
     bookingPersonalizedCharges,
     hotelId,
+    roomBookings,
+    removeBookedRoomBookings,
   ]);
 
   useEffect(() => {
@@ -377,7 +414,7 @@ function BookingForm({
   }, [bookingPersonalizedCharges]);
 
   useEffect(() => {
-    if (!bookingId) {
+    if (!bookingId && !isQuote) {
       setSelectedRoomBookings([]);
       setSelectedCharges([]);
       setPersonalizedCharges([]);
@@ -424,7 +461,7 @@ function BookingForm({
         removeItemFromLocalStorage(LOCAL_STORAGE_FORM_KEYS.CURRENT);
       }
     }
-  }, [bookingId, autoCompleteForm, hotelId, t]);
+  }, [bookingId, autoCompleteForm, hotelId, t, isQuote]);
 
   useEffect(() => {
     if (rooms.length === 0 && !isHotelDataInitialFetch) {
@@ -448,28 +485,30 @@ function BookingForm({
         isVisible={isLoading}
         message={t("booking.loadingOverlay.loadingInfo")}
       />
-      <div className="d-flex mb-4">
-        <Button
-          type="button"
-          onClick={() => setCurrentStep(0)}
-          color="dark"
-          className="me-auto"
-          disabled={isSubmitting}>
-          <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-          {t("booking.navigation.previous")}
-        </Button>
-        {booking?.id && (
+      {setCurrentStep && (
+        <div className="d-flex mb-4">
           <Button
             type="button"
-            onClick={handleNextClick}
+            onClick={() => setCurrentStep(0)}
             color="dark"
-            className="ms-auto"
+            className="me-auto"
             disabled={isSubmitting}>
-            {t("booking.navigation.next")}
-            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+            <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+            {t("booking.navigation.previous")}
           </Button>
-        )}
-      </div>
+          {booking?.id && (
+            <Button
+              type="button"
+              onClick={handleNextClick}
+              color="dark"
+              className="ms-auto"
+              disabled={isSubmitting}>
+              {t("booking.navigation.next")}
+              <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+            </Button>
+          )}
+        </div>
+      )}
       {customer?.id && (
         <DateSelector
           dates={dates}
@@ -547,6 +586,7 @@ export default withFormik({
   enableReinitialize: true,
   handleSubmit: async (values, { props, setSubmitting, setFieldError }) => {
     const {
+      booking,
       hotelId,
       customer,
       setBooking,
@@ -554,6 +594,7 @@ export default withFormik({
       getTranslatedErrorMessage,
       t,
       navigate,
+      isQuote,
     } = props;
 
     const result = await Swal.fire({
@@ -579,10 +620,24 @@ export default withFormik({
       });
 
       let res = null;
+
       if (values.id) {
-        res = await updateBooking(values, hotelId);
+        res = await updateBooking(
+          { ...values, statusId: booking.status.id },
+          hotelId
+        );
       } else {
-        res = await addBooking(values, hotelId);
+        const statusId = isQuote
+          ? BOOKING_STATUS_IDS.QUOTE
+          : BOOKING_STATUS_IDS.ACTIVE;
+
+        res = await addBooking(
+          {
+            ...values,
+            statusId,
+          },
+          hotelId
+        );
       }
 
       Swal.close(); // Close loading
@@ -626,9 +681,13 @@ export default withFormik({
           text: t("booking.form.saveSuccessText"),
           timer: 1500,
           didClose: () => {
-            navigate(
-              `/hotels/${hotelId}/bookings/${newBooking.id}/edit?step=2`
-            );
+            let route = `/hotels/${hotelId}/bookings/${newBooking.id}`;
+
+            if (!isQuote) {
+              route += "/edit?step=2";
+            }
+
+            navigate(route);
           },
         });
       } else {

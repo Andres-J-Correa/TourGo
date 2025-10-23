@@ -6,8 +6,6 @@ import type { CustomerPayload } from "types/customer.types";
 //libs
 import { useState, useMemo } from "react";
 import { Button, Row, Col, FormGroup, Spinner } from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { Formik, Form } from "formik";
 import Swal from "sweetalert2";
 
@@ -26,8 +24,10 @@ function CustomerFormV2({
   hotelId,
   customer,
   isUpdate,
-  goToNextStep,
+  onChangeSuccessful = () => {},
   handleCustomerChange,
+  canUpdate = true,
+  disableButtons,
 }: CustomerFormV2Props): JSX.Element {
   const [creating, setCreating] = useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
@@ -74,7 +74,7 @@ function CustomerFormV2({
         title: t("booking.customerForm.found"),
         timer: 1500,
         didClose: () => {
-          goToNextStep();
+          onChangeSuccessful();
         },
       });
     } else {
@@ -142,7 +142,7 @@ function CustomerFormV2({
         title: t("booking.customerForm.created"),
         timer: 1500,
         didClose: () => {
-          goToNextStep();
+          onChangeSuccessful();
         },
       });
     } else {
@@ -214,17 +214,6 @@ function CustomerFormV2({
 
   return (
     <>
-      <div className="text-end mb-4">
-        {customer?.id && (
-          <Button
-            onClick={() => goToNextStep()}
-            color="dark"
-            disabled={editing}>
-            {t("booking.navigation.next")}
-            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
-          </Button>
-        )}
-      </div>
       <Formik
         initialValues={initialValues}
         validationSchema={
@@ -269,11 +258,11 @@ function CustomerFormV2({
                   />
                 </Col>
                 <Col md="6" className="text-end">
-                  {customer?.id && !editing && (
+                  {customer?.id && !editing && canUpdate && (
                     <Button
                       onClick={() => setEditing(true)}
                       color="warning"
-                      disabled={submitting}
+                      disabled={submitting || disableButtons}
                       className="me-2">
                       {t("booking.customerForm.edit")}
                     </Button>
@@ -290,7 +279,9 @@ function CustomerFormV2({
                   )}
                   <Button
                     type="submit"
-                    disabled={submitting || (isUpdate && !editing)}
+                    disabled={
+                      submitting || disableButtons || (isUpdate && !editing)
+                    }
                     className="bg-gradient-success">
                     {submitting ? (
                       <Spinner size="sm" />

@@ -258,6 +258,47 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
+        [HttpPatch("{id}/activate")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> Activate(string id, string hotelId, [FromBody] int customerId)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                string userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.Activate(id, hotelId, customerId, userId);
+
+                SuccessResponse response = new SuccessResponse();
+
+                result = Ok200(response);
+            }
+            catch (MySqlException dbEx)
+            {
+                ErrorResponse error;
+
+                if (Enum.IsDefined(typeof(HotelManagementErrorCode), dbEx.Number))
+                {
+                    error = new ErrorResponse((HotelManagementErrorCode)dbEx.Number);
+                }
+                else
+                {
+                    error = new ErrorResponse();
+                    Logger.LogErrorWithDb(dbEx, _errorLoggingService, HttpContext);
+                }
+                result = StatusCode(500, error);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
         [HttpPatch("room-booking/toggle-should-clean")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
         public ActionResult<SuccessResponse> ToggleRoomBookingShouldClean(ToggleRoomBookingShouldCleanRequest model, string hotelId)

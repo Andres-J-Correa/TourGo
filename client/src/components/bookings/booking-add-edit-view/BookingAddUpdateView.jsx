@@ -18,7 +18,7 @@ import { getBookingById } from "services/bookingService";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 
-import { LOCKED_BOOKING_STATUSES } from "../constants";
+import { BOOKING_STATUS_IDS, LOCKED_BOOKING_STATUSES } from "../constants";
 
 import { defaultBooking } from "components/bookings/booking-add-edit-view/constants";
 import useBookingSchemas from "./useBookingSchemas";
@@ -187,12 +187,21 @@ const BookingAddUpdateView = () => {
         <TabContent activeTab={currentStep}>
           <h4 className="mb-3">{tabs[currentStep].name} </h4>
           <TabPane tabId={"0"}>
+            <div className="text-end mb-4">
+              {customer?.id && (
+                <Button onClick={() => setCurrentStep(1)} color="dark">
+                  {t("booking.navigation.next")}
+                  <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+                </Button>
+              )}
+            </div>
             <CustomerFormV2
               hotelId={hotelId}
               customer={customer}
               isUpdate={booking?.id}
-              goToNextStep={() => setCurrentStep(1)}
+              onChangeSuccessful={() => setCurrentStep(1)}
               handleCustomerChange={handleCustomerChange}
+              canUpdate={booking?.status?.id !== BOOKING_STATUS_IDS.QUOTE}
             />
           </TabPane>
           <TabPane tabId={"1"}>
@@ -238,7 +247,8 @@ const BookingAddUpdateView = () => {
               entity={booking}
               setEntity={setBooking}
               showAddButton={
-                !LOCKED_BOOKING_STATUSES.includes(booking?.status?.id)
+                !LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) &&
+                booking?.status?.id !== BOOKING_STATUS_IDS.QUOTE
               }
             />
           </TabPane>
