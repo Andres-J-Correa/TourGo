@@ -14,9 +14,8 @@ function BookingTransactions({ hotelId, booking, setBooking }) {
         setEntity={setBooking}
         showTotals={false}
         showAddButton={
-          booking?.status?.id !== BOOKING_STATUS_IDS.CANCELLED &&
-          booking?.status?.id !== BOOKING_STATUS_IDS.NO_SHOW &&
-          booking?.status?.id !== BOOKING_STATUS_IDS.COMPLETED
+          booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE ||
+          booking?.status?.id === BOOKING_STATUS_IDS.ARRIVED
         }
       />
     </div>

@@ -68,8 +68,14 @@ export const useNavbarItems = () => {
                 capitalize: true,
               },
               {
+                name: t("commonUI.navbar.bookingQuote"),
+                path: `/hotels/${hotel.current.id}/bookings/quote`,
+                capitalize: true,
+              },
+              {
                 name: t("commonUI.navbar.bookingsList"),
                 path: `/hotels/${hotel.current.id}/bookings`,
+                capitalize: true,
               },
             ],
           },

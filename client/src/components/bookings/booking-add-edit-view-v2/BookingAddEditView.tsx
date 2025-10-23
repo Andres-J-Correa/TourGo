@@ -153,7 +153,7 @@ function BookingAddEditView(): JSX.Element {
               hotelId={hotelId}
               customer={customer}
               isUpdate={!!booking?.id}
-              goToNextStep={() => setCurrentStep("1")}
+              onChangeSuccessful={() => setCurrentStep("1")}
               handleCustomerChange={handleCustomerChange}
             />
           </TabPane>

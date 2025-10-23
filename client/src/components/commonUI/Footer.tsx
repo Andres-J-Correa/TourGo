@@ -1,6 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, Container } from "reactstrap";
+import {
+  Row,
+  Col,
+  Container,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+} from "reactstrap";
 import { useLanguage } from "contexts/LanguageContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -16,6 +24,13 @@ interface FooterNavigationProps {
 }
 
 const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
+  const [bookingsDropdownOpen, setBookingsDropdownOpen] = useState(false);
+
+  const toggleBookingsDropdown = () =>
+    setBookingsDropdownOpen((prevState) => !prevState);
+
+  const { t } = useLanguage();
+
   if (!hotelId) {
     return null;
   }
@@ -43,9 +58,28 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
         </Col>
         <Col>
           <Row className="d-flex align-items-center">
-            <Link to={`/hotels/${hotelId}/bookings/new`}>
-              <FontAwesomeIcon icon={faCalendarPlus} size="lg" />
-            </Link>
+            <Dropdown
+              isOpen={bookingsDropdownOpen}
+              toggle={toggleBookingsDropdown}
+              inNavbar
+              direction="up">
+              <DropdownToggle nav color="dark">
+                <FontAwesomeIcon icon={faCalendarPlus} size="lg" />
+              </DropdownToggle>
+              <DropdownMenu>
+                <DropdownItem>
+                  <Link to={`/hotels/${hotelId}/bookings/new`}>
+                    {t("commonUI.footer.newBooking")}
+                  </Link>
+                </DropdownItem>
+                <DropdownItem divider />
+                <DropdownItem>
+                  <Link to={`/hotels/${hotelId}/bookings/quote`}>
+                    {t("commonUI.footer.newQuote")}
+                  </Link>
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           </Row>
         </Col>
         <Col>
@@ -68,7 +102,7 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
 };
 
 const FooterInfo = () => {
-  const { t } = useLanguage(); // added
+  const { t } = useLanguage();
 
   return (
     <Row className="w-100 no-print py-3 d-none d-md-flex">

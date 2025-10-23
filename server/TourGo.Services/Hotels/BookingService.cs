@@ -22,6 +22,7 @@ using TourGo.Models.Responses;
 using TourGo.Services.Customers;
 using TourGo.Services.Finances;
 using TourGo.Services.Interfaces;
+using TourGo.Data.Extensions;
 
 namespace TourGo.Services.Hotels
 {
@@ -118,16 +119,19 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_pageIndex", pageIndex);
                 param.AddWithValue("p_pageSize", pageSize);
 
-                param.AddWithValue("p_sortColumn", string.IsNullOrEmpty(mappedColumn) ? DBNull.Value : mappedColumn);
-                param.AddWithValue("p_sortDirection", string.IsNullOrEmpty(sortDirection) ? DBNull.Value : sortDirection);
-                param.AddWithValue("p_startDate", startDate?.ToString("yyyy-MM-dd") ?? (object)DBNull.Value);
-                param.AddWithValue("p_endDate", endDate?.ToString("yyyy-MM-dd") ?? (object)DBNull.Value);
-                param.AddWithValue("p_isArrivalDate", isArrivalDate.HasValue ? (isArrivalDate.Value ? 1 : 0) : DBNull.Value);
-                param.AddWithValue("p_firstName", string.IsNullOrWhiteSpace(firstName) ? DBNull.Value : firstName);
-                param.AddWithValue("p_lastName", string.IsNullOrWhiteSpace(lastName) ? DBNull.Value : lastName);
-                param.AddWithValue("p_externalBookingId", string.IsNullOrWhiteSpace(bookingExternalId) ? DBNull.Value : bookingExternalId);
-                param.AddWithValue("p_statusId", statusId.HasValue ? statusId.Value : DBNull.Value);
-                param.AddWithValue("p_bookingId", string.IsNullOrWhiteSpace(bookingId) ? DBNull.Value : bookingId);
+                param.AddWithNullableString("p_sortColumn", mappedColumn);
+                param.AddWithNullableString("p_sortDirection", sortDirection);
+                param.AddWithNullableDateOnly("p_startDate", startDate);
+                param.AddWithNullableDateOnly("p_endDate", endDate);
+
+                param.AddWithNullableObject("p_isArrivalDate", isArrivalDate);
+
+                param.AddWithNullableString("p_firstName", firstName);
+                param.AddWithNullableString("p_lastName", lastName);
+                param.AddWithNullableString("p_externalBookingId", bookingExternalId);
+
+                param.AddWithNullableInt("p_statusId", statusId);
+                param.AddWithNullableString("p_bookingId", bookingId);
             }, (reader, set) =>
             {
                 int index = 0;
@@ -178,21 +182,21 @@ namespace TourGo.Services.Hotels
         {
             BookingAddResponse? response = null;
 
-            string proc = "bookings_insert_v8";
+            string proc = "bookings_insert_v9";
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
                 param.AddWithValue("p_customerId", model.CustomerId);
-                param.AddWithValue("p_externalBookingId", string.IsNullOrEmpty(model.ExternalId) ? (object)DBNull.Value : model.ExternalId);
-                param.AddWithValue("p_bookingProviderId", model.BookingProviderId > 0 ? model.BookingProviderId: DBNull.Value);
+                param.AddWithNullableString("p_externalBookingId", model.ExternalId);
+                param.AddWithNullableInt("p_bookingProviderId", model.BookingProviderId);
                 param.AddWithValue("p_arrivalDate", model.ArrivalDate.ToString("yyyy-MM-dd"));
                 param.AddWithValue("p_departureDate", model.DepartureDate.ToString("yyyy-MM-dd"));
-                param.AddWithValue("p_eta", model.ETA?.ToString("yyyy-MM-ddTHH:mm:ss") ?? (object)DBNull.Value);
+                param.AddWithNullableDateTime("p_eta", model.ETA);
                 param.AddWithValue("p_adultGuests", model.AdultGuests);
-                param.AddWithValue("p_childGuests", model.ChildGuests > 0 ? model.ChildGuests : DBNull.Value);
-                param.AddWithValue("p_notes", model.Notes ?? (object)DBNull.Value);
+                param.AddWithNullableInt("p_childGuests", model.ChildGuests);
+                param.AddWithNullableString("p_notes", model.Notes);
                 param.AddWithValue("p_modifiedBy", userId);
                 param.AddWithValue("p_hotelId", hotelId);
-                param.AddWithValue("p_externalComission", model.ExternalCommission > 0 ? model.ExternalCommission : 0);
+                param.AddWithValue("p_externalComission", model.ExternalCommission ?? 0);
                 param.AddWithValue("p_roomBookingsJson", JsonConvert.SerializeObject(model.RoomBookings));
                 param.AddWithValue("p_extraChargesJson", model.ExtraCharges?.Count > 0 ? JsonConvert.SerializeObject(model.ExtraCharges) : DBNull.Value);
                 param.AddWithValue("p_personalizedChargesJson", model.PersonalizedCharges?.Count > 0 ? JsonConvert.SerializeObject(model.PersonalizedCharges) : DBNull.Value);
@@ -200,6 +204,7 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_charges", model.Charges);
                 param.AddWithValue("p_total", model.Total);
                 param.AddWithValue("p_publicId", publicId);
+                param.AddWithValue("p_statusId", model.StatusId);
 
             }, (reader, set) =>
             {             
@@ -224,7 +229,7 @@ namespace TourGo.Services.Hotels
 
         public void Update(BookingsUpdateRequest model, string userId, string hotelId)
         {
-            string proc = "bookings_update_v6";
+            string proc = "bookings_update_v7";
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_id", model.Id);
@@ -250,7 +255,7 @@ namespace TourGo.Services.Hotels
 
         public List<RoomBooking>? GetRoomBookingsByDateRange(DateOnly startDate, DateOnly endDate, string hotelId)
         {
-            string proc = "room_bookings_select_by_date_range_v4";
+            string proc = "room_bookings_select_by_date_range_v5";
             List<RoomBooking>? list = null;
 
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
@@ -279,6 +284,18 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_modifiedBy", userId);
                 param.AddWithValue("p_statusId", (int)status);
                 param.AddWithValue("p_hotelId", hotelId);
+            });
+        }
+
+        public void Activate(string bookingId, string hotelId, int customerId, string userId)
+        {
+            string proc = "bookings_activate";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+                param.AddWithValue("p_id", bookingId);
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_customerId", customerId);
+                param.AddWithValue("p_modifiedBy", userId);
             });
         }
 

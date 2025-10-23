@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourGo.Data;
+using TourGo.Data.Extensions;
 using TourGo.Data.Providers;
 using TourGo.Models;
 using TourGo.Models.Domain;
@@ -35,18 +36,18 @@ namespace TourGo.Services.Finances
 
             _dataProvider.ExecuteNonQuery(proc, (col) =>
             {
-                col.AddWithValue("p_entityId", string.IsNullOrEmpty(request.EntityId) ? DBNull.Value : request.EntityId);
-                col.AddWithValue("p_invoiceId", string.IsNullOrEmpty(request.InvoiceId) ? DBNull.Value : request.InvoiceId);
+                col.AddWithNullableString("p_entityId", request.EntityId);
+                col.AddWithNullableString("p_invoiceId", request.InvoiceId);
                 col.AddWithValue("p_amount", request.Amount);
                 col.AddWithValue("p_transactionDate", request.TransactionDate.ToString("yyyy-MM-dd"));
                 col.AddWithValue("p_paymentMethodId", request.PaymentMethodId);
                 col.AddWithValue("p_categoryId", request.CategoryId);
                 col.AddWithValue("p_subcategoryId", request.SubcategoryId);
-                col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(request.ReferenceNumber) ? DBNull.Value : request.ReferenceNumber);
+                col.AddWithNullableString("p_referenceNumber", request.ReferenceNumber);
                 col.AddWithValue("p_statusId", request.StatusId);
                 col.AddWithValue("p_description", request.Description);
                 col.AddWithValue("p_currencyCode", request.CurrencyCode);
-                col.AddWithValue("p_financePartnerId", request.FinancePartnerId > 0 ? request.FinancePartnerId : DBNull.Value);
+                col.AddWithNullableInt("p_financePartnerId", request.FinancePartnerId);
                 col.AddWithValue("p_createdBy", userId);
                 col.AddWithValue("p_approvedBy", userId);
                 col.AddWithValue("p_hotelId", hotelId);
@@ -111,22 +112,26 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_pageSize", pageSize);
                 col.AddWithValue("p_hotelId", hotelId);
 
-                col.AddWithValue("p_sortColumn", string.IsNullOrEmpty(mappedColumn) ? DBNull.Value: mappedColumn);
-                col.AddWithValue("p_sortDirection", string.IsNullOrEmpty(sortDirection) ? DBNull.Value : sortDirection);
-                col.AddWithValue("p_startDate", startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
-                col.AddWithValue("p_endDate", endDate.HasValue ? endDate.Value.ToString("yyyy-MM-dd") : DBNull.Value);
-                col.AddWithValue("p_id", string.IsNullOrEmpty(txnId) ? DBNull.Value : txnId);
-                col.AddWithValue("p_parentId", string.IsNullOrEmpty(parentId) ? DBNull.Value : parentId);
-                col.AddWithValue("p_entityId", string.IsNullOrEmpty(entityId) ? DBNull.Value : entityId);
-                col.AddWithValue("p_categoryId", string.IsNullOrEmpty(categoryId) ? DBNull.Value : categoryId);
-                col.AddWithValue("p_statusId", string.IsNullOrEmpty(statusId) ? DBNull.Value : statusId);
-                col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(referenceNumber) ? DBNull.Value : referenceNumber);
-                col.AddWithValue("p_description", string.IsNullOrEmpty(description) ? DBNull.Value : description);
-                col.AddWithValue("p_hasDocumentUrl", hasDocumentUrl.HasValue ? hasDocumentUrl.Value : DBNull.Value);
-                col.AddWithValue("p_paymentMethodId", string.IsNullOrEmpty(paymentMethodId) ? DBNull.Value: paymentMethodId);
-                col.AddWithValue("p_subcategoryId", string.IsNullOrEmpty(subcategoryId) ? DBNull.Value : subcategoryId);
-                col.AddWithValue("p_financePartnerId", string.IsNullOrEmpty(financePartnerId) ? DBNull.Value : financePartnerId);
-                }, (reader, returnCol) =>
+
+                col.AddWithNullableString("p_sortColumn", mappedColumn);
+                col.AddWithNullableString("p_sortDirection", sortDirection);
+                col.AddWithNullableDateOnly("p_startDate", startDate);
+                col.AddWithNullableDateOnly("p_endDate", endDate);
+
+                col.AddWithNullableString("p_id", txnId);
+                col.AddWithNullableString("p_parentId", parentId);
+                col.AddWithNullableString("p_entityId", entityId);
+                col.AddWithNullableString("p_categoryId", categoryId);
+                col.AddWithNullableString("p_statusId", statusId);
+                col.AddWithNullableString("p_referenceNumber", referenceNumber);
+                col.AddWithNullableString("p_description", description);
+
+                col.AddWithNullableObject("p_hasDocumentUrl", hasDocumentUrl);
+
+                col.AddWithNullableString("p_paymentMethodId", paymentMethodId);
+                col.AddWithNullableString("p_subcategoryId", subcategoryId);
+                col.AddWithNullableString("p_financePartnerId", financePartnerId);
+            }, (reader, returnCol) =>
                 {
                     int index = 0;
                     Transaction transaction = MapTransaction(reader, ref index);
@@ -244,10 +249,10 @@ namespace TourGo.Services.Finances
                 col.AddWithValue("p_paymentMethodId", model.PaymentMethodId);
                 col.AddWithValue("p_categoryId", model.CategoryId);
                 col.AddWithValue("p_subcategoryId", model.SubcategoryId);
-                col.AddWithValue("p_referenceNumber", string.IsNullOrEmpty(model.ReferenceNumber) ? DBNull.Value : model.ReferenceNumber);
-                col.AddWithValue("p_description", string.IsNullOrEmpty(model.Description) ? DBNull.Value : model.Description);
+                col.AddWithNullableString("p_referenceNumber", model.ReferenceNumber);
+                col.AddWithNullableString("p_description", model.Description);
                 col.AddWithValue("p_currencyCode", model.CurrencyCode);
-                col.AddWithValue("p_financePartnerId", model.FinancePartnerId > 0 ? model.FinancePartnerId : DBNull.Value);
+                col.AddWithNullableInt("p_financerPartnerId", model.FinancePartnerId);
                 col.AddWithValue("p_hotelId", hotelId);
                 col.AddWithValue("p_modifiedBy", userId);
                 col.AddWithValue("p_txnId", model.Id);

@@ -7,6 +7,7 @@ import {
   updateStatusToNoShow,
   updateStatusToCompleted,
   updateStatusToCancelled,
+  activateBooking,
 } from "services/bookingService";
 import {
   BOOKING_STATUS_IDS,
@@ -21,7 +22,19 @@ import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import { Button, Col, Row, Card, CardBody, CardHeader } from "reactstrap";
+import {
+  Button,
+  Col,
+  Row,
+  Card,
+  CardBody,
+  CardHeader,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  ModalFooter,
+  Spinner,
+} from "reactstrap";
 import {
   faPlaneArrival,
   faRectangleXmark,
@@ -29,11 +42,13 @@ import {
   faCalendarXmark,
   faPenToSquare,
   faFileInvoiceDollar,
+  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { useLanguage } from "contexts/LanguageContext";
 import DownloadInvoicePdfButton from "components/invoices/DownloadInvoicePdfButton";
+import CustomerFormV2 from "components/customers/forms/CustomerFormV2";
 
 dayjs.extend(isSameOrAfter);
 
@@ -41,6 +56,9 @@ function BookingView() {
   const { hotelId, bookingId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [booking, setBooking] = useState(null);
+  const [customerModalOpen, setCustomerModalOpen] = useState(false);
+  const [customer, setCustomer] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { user } = useAppContext();
   const { t } = useLanguage(); // added
@@ -313,6 +331,38 @@ function BookingView() {
     }
   }, [bookingId, modifiedBy, hotelId, t]);
 
+  const handleActivate = useCallback(async () => {
+    try {
+      setIsUploading(true);
+      const res = await activateBooking(bookingId, hotelId, customer.id);
+
+      if (res.isSuccessful) {
+        setBooking((prevBooking) => ({
+          ...prevBooking,
+          status: { id: BOOKING_STATUS_IDS.ACTIVE },
+          customer: { ...customer },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+        }));
+        setCustomerModalOpen(false);
+        toast.success(t("common.success"));
+      } else {
+        throw new Error("Error activating booking");
+      }
+    } catch (error) {
+      toast.error(t("common.requestFailed"));
+    } finally {
+      setIsUploading(false);
+    }
+  }, [bookingId, customer, hotelId, t, modifiedBy]);
+
+  const handleCustomerModalClose = useCallback(() => {
+    if (!isUploading) {
+      setCustomer(null);
+      setCustomerModalOpen(false);
+    }
+  }, [isUploading]);
+
   useEffect(() => {
     if (bookingId) {
       setIsLoading(true);
@@ -328,6 +378,32 @@ function BookingView() {
       {breadcrumbs}
       <h3 className="mb-4">{t("booking.view.title")}</h3>
       <ErrorBoundary>
+        <Modal
+          isOpen={customerModalOpen}
+          size="lg"
+          centered
+          toggle={handleCustomerModalClose}
+          backdrop={isUploading ? "static" : true}>
+          <ModalHeader toggle={handleCustomerModalClose}>
+            {t("booking.view.updateCustomer")}
+          </ModalHeader>
+          <ModalBody>
+            <CustomerFormV2
+              hotelId={hotelId}
+              customer={customer}
+              handleCustomerChange={(customer) => setCustomer(customer)}
+              disableButtons={isUploading}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="dark"
+              onClick={handleActivate}
+              disabled={!customer?.id || isUploading}>
+              {isUploading ? <Spinner size="sm" /> : t("booking.view.activate")}
+            </Button>
+          </ModalFooter>
+        </Modal>
         <Row className="mb-1">
           <Col md={6} className="ps-3 gap-1">
             {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE && (
@@ -341,6 +417,7 @@ function BookingView() {
             )}
             {!LOCKED_BOOKING_STATUSES.includes(booking?.status?.id) &&
               booking?.status?.id !== BOOKING_STATUS_IDS.COMPLETED &&
+              booking?.status?.id !== BOOKING_STATUS_IDS.QUOTE &&
               dayjs(dayjs()).isAfter(booking?.arrivalDate) && (
                 <Button
                   color="outline-dark"
@@ -360,6 +437,15 @@ function BookingView() {
                   <FontAwesomeIcon icon={faCalendarXmark} className="ms-2" />
                 </Button>
               )}
+            {booking?.status?.id === BOOKING_STATUS_IDS.QUOTE && (
+              <Button
+                color="outline-dark"
+                className="me-2 mb-2"
+                onClick={() => setCustomerModalOpen(true)}>
+                {t("booking.view.activate")}
+                <FontAwesomeIcon icon={faCheckCircle} className="ms-2" />
+              </Button>
+            )}
           </Col>
           <Col md={6} className="gap-1 pe-1">
             <div className="text-md-end ps-1">

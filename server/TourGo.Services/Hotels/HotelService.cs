@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourGo.Data;
+using TourGo.Data.Extensions;
 using TourGo.Data.Providers;
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Finances;
@@ -231,7 +232,7 @@ namespace TourGo.Services.Hotels
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_hotelId", hotelId);
-                param.AddWithValue("p_terms", string.IsNullOrEmpty(model.Terms) ? DBNull.Value : model.Terms);
+                param.AddWithNullableString("p_terms", model.Terms);
                 param.AddWithValue("p_modifiedBy", userId);
             });
         }

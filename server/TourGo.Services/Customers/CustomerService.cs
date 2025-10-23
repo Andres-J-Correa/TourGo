@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourGo.Data;
+using TourGo.Data.Extensions;
 using TourGo.Data.Providers;
 using TourGo.Models.Domain;
 using TourGo.Models.Domain.Customers;
@@ -33,14 +34,12 @@ namespace TourGo.Services.Customers
                 param.AddWithValue("p_firstName", model.FirstName);
                 param.AddWithValue("p_lastName", model.LastName);
                 param.AddWithValue("p_phone", model.Phone);
-                param.AddWithValue("p_email", string.IsNullOrEmpty(model.Email) ? DBNull.Value : model.Email);
+                param.AddWithNullableString("p_email", model.Email);
                 param.AddWithValue("p_documentNumber", model.DocumentNumber);
                 param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_modifiedBy", userId);
 
-                MySqlParameter newIdOut = new MySqlParameter("p_newId", MySqlDbType.Int32);
-                newIdOut.Direction = System.Data.ParameterDirection.Output;
-                param.Add(newIdOut);
+                param.AddOutputParameter("p_newId", MySqlDbType.Int32);
             }, (returnColl) =>
             {
                 object newIdObj = returnColl["p_newId"].Value;
@@ -81,7 +80,7 @@ namespace TourGo.Services.Customers
                 param.AddWithValue("p_firstName", model.FirstName);
                 param.AddWithValue("p_lastName", model.LastName);
                 param.AddWithValue("p_phone", model.Phone);
-                param.AddWithValue("p_email", string.IsNullOrEmpty(model.Email) ? DBNull.Value : model.Email);
+                param.AddWithNullableString("p_email", model.Email);
                 param.AddWithValue("p_documentNumber", model.DocumentNumber);
                 param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_modifiedBy", userId);

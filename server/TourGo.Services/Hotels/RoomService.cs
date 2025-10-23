@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TourGo.Data;
+using TourGo.Data.Extensions;
 using TourGo.Data.Providers;
 using TourGo.Models.Domain.Finances;
 using TourGo.Models.Domain.Hotels;
@@ -32,7 +33,7 @@ namespace TourGo.Services.Hotels
             {
                 param.AddWithValue("p_name", model.Name);
                 param.AddWithValue("p_capacity", model.Capacity);
-                param.AddWithValue("p_description", string.IsNullOrEmpty(model.Description) ? DBNull.Value : model.Description);
+                param.AddWithNullableString("p_description", model.Description);
                 param.AddWithValue("p_hotelId", hotelId);
                 param.AddWithValue("p_modifiedBy", userId);
 
@@ -57,7 +58,7 @@ namespace TourGo.Services.Hotels
             {
                 param.AddWithValue("p_name", model.Name);
                 param.AddWithValue("p_capacity", model.Capacity);
-                param.AddWithValue("p_description", string.IsNullOrEmpty(model.Description) ? DBNull.Value : model.Description);
+                param.AddWithNullableString("p_description", model.Description);
                 param.AddWithValue("p_roomId", model.Id);
                 param.AddWithValue("p_modifiedBy", userId);
                 param.AddWithValue("p_hotelId", hotelId);

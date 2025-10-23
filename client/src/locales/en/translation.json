@@ -144,12 +144,16 @@
     }
   },
   "booking": {
+    "quote": {
+      "title": "Booking Quote"
+    },
     "status": {
       "active": "Active",
       "cancelled": "Cancelled",
       "completed": "Completed",
       "noShow": "No show",
-      "arrived": "Arrived"
+      "arrived": "Arrived",
+      "quote": "Quote"
     },
     "errors": {
       "loadRooms": "Error loading rooms",
@@ -214,7 +218,8 @@
       "bookings": "Bookings",
       "booking": "Booking",
       "edit": "Edit Booking",
-      "new": "New Booking"
+      "new": "New Booking",
+      "quote": "Quote"
     },
     "navigation": {
       "previous": "Previous",
@@ -591,6 +596,8 @@
       "cancelError": "Error cancelling the booking",
       "pleaseWait": "Please wait.",
       "confirmYes": "Yes, confirm",
+      "activate": "Activate Booking",
+      "updateCustomer": "Update Customer",
       "errors": {
         "loadBooking": "Error loading booking",
         "downloadInvoice": "Error downloading invoice"
@@ -683,7 +690,8 @@
       "admin": "Administration",
       "hotelSettings": "Hotel Settings",
       "finances": "Finances",
-      "financeDashboard": "Finance Dashboard"
+      "financeDashboard": "Finance Dashboard",
+      "bookingQuote": "New Quote"
     },
     "dataTable": {
       "loading": "Loading...",
@@ -701,7 +709,9 @@
       "rightsReserved": "All rights reserved.",
       "privacyPolicy": "Privacy Policy",
       "investors": "Investors",
-      "careers": "Careers"
+      "careers": "Careers",
+      "newBooking": "New Booking",
+      "newQuote": "New Quote"
     },
     "pagination": {
       "of": "of"

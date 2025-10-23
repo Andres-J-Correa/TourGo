@@ -18,6 +18,7 @@ function BookingStatusBadge({ statusId, className = "", ...props }) {
         "bg-primary": statusId === BOOKING_STATUS_IDS.COMPLETED,
         "bg-warning": statusId === BOOKING_STATUS_IDS.NO_SHOW,
         "bg-info": statusId === BOOKING_STATUS_IDS.ARRIVED,
+        "bg-secondary": statusId === BOOKING_STATUS_IDS.QUOTE,
       })}>
       {t(BOOKING_STATUS_BY_ID[statusId])}
     </span>
