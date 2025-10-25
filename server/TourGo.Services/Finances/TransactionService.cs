@@ -252,7 +252,7 @@ namespace TourGo.Services.Finances
                 col.AddWithNullableString("p_referenceNumber", model.ReferenceNumber);
                 col.AddWithNullableString("p_description", model.Description);
                 col.AddWithValue("p_currencyCode", model.CurrencyCode);
-                col.AddWithNullableInt("p_financerPartnerId", model.FinancePartnerId);
+                col.AddWithNullableInt("p_financePartnerId", model.FinancePartnerId);
                 col.AddWithValue("p_hotelId", hotelId);
                 col.AddWithValue("p_modifiedBy", userId);
                 col.AddWithValue("p_txnId", model.Id);
