@@ -1,5 +1,5 @@
 {
-  "homepage": "/",
+  "homepage": "/app",
   "name": "tour-go",
   "version": "0.1.0",
   "dependencies": {
