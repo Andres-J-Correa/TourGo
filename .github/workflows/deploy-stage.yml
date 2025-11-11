@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy to VPS (Stage)
 
 on:
   push:
@@ -21,33 +21,40 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            # Change to repo directory
+            # --- CHANGE TO REPO DIRECTORY ---
             cd ~/TourGo-Stage || { echo "Directory ~/TourGo-Stage does not exist"; exit 1; }
 
-            # Pull latest changes
+            # --- SYNC LATEST CODE ---
             git checkout stage || { echo "git checkout stage failed"; exit 1; }
             git fetch origin stage || { echo "Failed to fetch origin/stage"; exit 1; }
             git reset --hard origin/stage || { echo "Failed to reset to origin/stage"; exit 1; }
 
-            # Inject secrets into .env.staging
+            # --- CLIENT DEPLOYMENT ---
             cd client
-
-            # Client Deployment
             yarn install || { echo "yarn install failed"; exit 1; }
             yarn build:stage || { echo "yarn build:stage failed"; exit 1; }
+
             if [ -d "./build" ] && [ "$(ls -A ./build)" ]; then
-                # Create the /app subfolder if it doesn't exist
                 sudo mkdir -p /var/www/html-stage/app
-                # Sync build output to /app
                 sudo rsync -avz --delete ./build/ /var/www/html-stage/app/
             else
                 echo "Build directory is missing or empty"
                 exit 1
             fi
 
-            # Server Deployment
+            # --- LEGAL PAGES DEPLOYMENT ---
             cd ..
+            if [ -d "./legal" ] && [ "$(ls -A ./legal)" ]; then
+                echo "Deploying legal pages..."
+                sudo mkdir -p /var/www/html-stage/legal
+                sudo rsync -avz --delete ./legal/ /var/www/html-stage/legal/
+            else
+                echo "Legal folder is missing or empty — skipping."
+            fi
+
+            # --- SERVER DEPLOYMENT ---
             dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish || { echo "dotnet publish failed"; exit 1; }
+
             if [ -d "./server/publish" ] && [ "$(ls -A ./server/publish)" ]; then
                 sudo rsync -avz --delete ./server/publish/ /var/www/server-stage/
             else
@@ -55,9 +62,7 @@ jobs:
                 exit 1
             fi
 
-
-            # Inject secrets into appsettings.Staging.json
-            cd ~
+            # --- INJECT SECRETS INTO appsettings.Staging.json ---
             cd /var/www/server-stage
             jq --arg json_token_secret "${{ secrets.SERVER_JSON_WEB_TOKEN_SECRET }}" \
                --arg mysql_conn_string "${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_STAGE }}" \
@@ -75,4 +80,5 @@ jobs:
                 .GoogleRecaptchaConfig.SecretKey = $google_recaptcha_v3_secret_key' \
                appsettings.Staging.json > appsettings.Staging.tmp && mv appsettings.Staging.tmp appsettings.Staging.json
 
+            # --- RESTART SERVER ---
             sudo systemctl restart kestrel-tourgo-stage

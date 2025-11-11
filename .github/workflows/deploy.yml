@@ -21,33 +21,40 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            # Change to repo directory
+            # --- CHANGE TO REPO DIRECTORY ---
             cd ~/TourGo || { echo "Directory ~/TourGo does not exist"; exit 1; }
 
-            # Pull latest changes
+            # --- SYNC LATEST CODE ---
             git checkout main || { echo "git checkout main failed"; exit 1; }
             git fetch origin main || { echo "Failed to fetch origin/main"; exit 1; }
             git reset --hard origin/main || { echo "Failed to reset to origin/main"; exit 1; }
 
-            # Inject secrets into .env
+            # --- CLIENT DEPLOYMENT ---
             cd client
-
-            # Client Deployment
             yarn install || { echo "yarn install failed"; exit 1; }
             yarn build || { echo "yarn build failed"; exit 1; }
+
             if [ -d "./build" ] && [ "$(ls -A ./build)" ]; then
-                # Create the /app subfolder if it doesn't exist
                 sudo mkdir -p /var/www/html/app
-                # Sync build output to /app
                 sudo rsync -avz --delete ./build/ /var/www/html/app/
             else
                 echo "Build directory is missing or empty"
                 exit 1
             fi
 
-            # Server Deployment
+            # --- LEGAL PAGES DEPLOYMENT ---
             cd ..
+            if [ -d "./legal" ] && [ "$(ls -A ./legal)" ]; then
+                echo "Deploying legal pages..."
+                sudo mkdir -p /var/www/html/legal
+                sudo rsync -avz --delete ./legal/ /var/www/html/legal/
+            else
+                echo "Legal folder is missing or empty — skipping."
+            fi
+
+            # --- SERVER DEPLOYMENT ---
             dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish || { echo "dotnet publish failed"; exit 1; }
+
             if [ -d "./server/publish" ] && [ "$(ls -A ./server/publish)" ]; then
                 sudo rsync -avz --delete ./server/publish/ /var/www/server/
             else
@@ -55,8 +62,7 @@ jobs:
                 exit 1
             fi
 
-            # Inject secrets into appsettings.Production.json
-            cd ~
+            # --- INJECT SECRETS ---
             cd /var/www/server
             jq --arg json_token_secret "${{ secrets.SERVER_JSON_WEB_TOKEN_SECRET }}" \
                --arg mysql_conn_string "${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_PROD }}" \
@@ -74,4 +80,5 @@ jobs:
                 .GoogleRecaptchaConfig.SecretKey = $google_recaptcha_v3_secret_key' \
                appsettings.Production.json > appsettings.Production.tmp && mv appsettings.Production.tmp appsettings.Production.json
 
+            # --- RESTART SERVER ---
             sudo systemctl restart kestrel-tourgo
