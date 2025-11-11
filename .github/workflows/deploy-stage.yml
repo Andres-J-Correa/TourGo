@@ -36,7 +36,10 @@ jobs:
             yarn install || { echo "yarn install failed"; exit 1; }
             yarn build:stage || { echo "yarn build:stage failed"; exit 1; }
             if [ -d "./build" ] && [ "$(ls -A ./build)" ]; then
-                sudo rsync -avz --delete ./build/ /var/www/html-stage/
+                # Create the /app subfolder if it doesn't exist
+                sudo mkdir -p /var/www/html-stage/app
+                # Sync build output to /app
+                sudo rsync -avz --delete ./build/ /var/www/html-stage/app/
             else
                 echo "Build directory is missing or empty"
                 exit 1
