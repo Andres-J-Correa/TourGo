@@ -400,7 +400,9 @@ button:not(:disabled),
 .dropdown-item:hover,
 .dropdown-item:focus {
   color: var(--bs-dropdown-link-hover-color);
-  background-color: var(--bs-dropdown-link-hover-bg);
+  background-color: unset !important;
+  opacity: 1 !important;
+  transition: opacity 0.3s ease;
 }
 .dropdown-item:active {
   color: var(--bs-dropdown-link-active-color);
