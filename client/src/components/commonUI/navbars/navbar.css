@@ -52,14 +52,6 @@
 }
 
 @media (min-width: 991.98px) {
-  .navbar .nav-action-item {
-    transition: all 0.2s ease;
-  }
-  .navbar .nav-action-item:hover {
-    transform: scale(1.1);
-    background-color: transparent;
-  }
-
   .navbar .left-items {
     margin-right: auto;
     display: flex;

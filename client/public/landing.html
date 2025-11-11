@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlLang">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- SEO Meta Tags -->
+    <title id="metaTitle">TourGo - Simplify Your Property Management | Property Management Software</title>
+    <meta name="description" id="metaDescription" content="TourGo helps property managers and landlords organize their bookings and finances, track room cleaning, and get property insights in one place. Start using for free.">
+    <meta name="keywords" content="property management software, landlord tools, booking management, property management system, rental management, property insights">
+    <meta name="author" content="TourGo">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://tourgo.com/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tourgo.com/">
+    <meta property="og:title" content="TourGo - Simplify Your Property Management">
+    <meta property="og:description" content="TourGo helps property managers and landlords organize their bookings and finances, track room cleaning, and get property insights in one place.">
+    <meta property="og:image" content="https://tourgo.com/logo512.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://tourgo.com/">
+    <meta property="twitter:title" content="TourGo - Simplify Your Property Management">
+    <meta property="twitter:description" content="TourGo helps property managers and landlords organize their bookings and finances, track room cleaning, and get property insights in one place.">
+    <meta property="twitter:image" content="https://tourgo.com/logo512.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/logo192.png">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary-color: #344767;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            font-size: 1.25rem;
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+        }
+        
+        .navbar-toggler {
+            border: none;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4a5d7a 100%);
+            color: white;
+            padding: 100px 0;
+            margin-top: 0;
+        }
+        
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-section .lead {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+        
+        .btn-primary-custom {
+            background-color: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 12px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .section-padding {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-card {
+            padding: 2rem;
+            border-radius: 12px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        .value-prop-card {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .value-prop-icon {
+            width: 80px;
+            height: 80px;
+            background-color: rgba(52, 71, 103, 0.1);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .screenshot-placeholder {
+            background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+            border-radius: 12px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 1.2rem;
+            border: 2px dashed #ddd;
+        }
+        
+        .testimonial-card {
+            background-color: #f8f9fa;
+            padding: 2rem;
+            border-radius: 12px;
+            height: 100%;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 1rem;
+        }
+        
+        .testimonial-role {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 1.5rem 0;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .faq-answer {
+            color: #666;
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        footer h5 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .language-switcher {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+        
+        .language-switcher button {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .language-switcher button:hover,
+        .language-switcher button.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-section .lead {
+                font-size: 1.2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .section-padding {
+                padding: 50px 0;
+            }
+        }
+    </style>
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://tourgo.com/#website",
+          "url": "https://tourgo.com",
+          "name": "TourGo",
+          "description": "Property management software that helps landlords and property managers organize bookings, finances, and property insights.",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://tourgo.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://tourgo.com/#software",
+          "name": "TourGo",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "description": "TourGo helps property managers and landlords organize their bookings and finances, track room cleaning, and get property insights in one place.",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "127"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is TourGo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "TourGo is a comprehensive property management software designed to help property managers and landlords organize bookings, manage finances, track room cleaning, and gain valuable property insights all in one centralized platform."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is TourGo free to use?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, TourGo offers a free tier that allows you to get started with basic property management features. You can start using TourGo for free and upgrade as your needs grow."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What features does TourGo offer?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "TourGo includes booking management, financial tracking and reporting, room cleaning status tracking, property analytics and insights, customer management, and invoice generation. All features are designed to streamline your property management workflow."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do I need technical knowledge to use TourGo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No, TourGo is designed with ease of use in mind. The intuitive interface makes it simple for property managers and landlords of all technical levels to manage their properties effectively."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I manage multiple properties with TourGo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, TourGo supports managing multiple properties from a single dashboard. You can organize bookings, finances, and insights for all your properties in one place."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="%PUBLIC_URL%/app">
+                <span>TourGo</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about" data-i18n="nav.about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features" data-i18n="nav.features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#screenshots" data-i18n="nav.screenshots">Screenshots</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#testimonials" data-i18n="nav.testimonials">Testimonials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#faq" data-i18n="nav.faq">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact" data-i18n="nav.contact">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="%PUBLIC_URL%/app" data-i18n="nav.login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="language-switcher">
+                            <button id="langEn" class="active" onclick="switchLanguage('en')">EN</button>
+                            <button id="langEs" onclick="switchLanguage('es')">ES</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 data-i18n="hero.title">Simplify Your Property Management</h1>
+                    <p class="lead" data-i18n="hero.subtitle">TourGo helps property managers and landlords organize their bookings and finances, track room cleaning, and get property insights in one place.</p>
+                    <a href="%PUBLIC_URL%/app" class="btn btn-primary-custom" aria-label="Start Using TourGo For Free" data-i18n="hero.cta">Start Using For Free</a>
+                </div>
+                <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                    <img src="landing-assets/tourgo-landing-sc.png" alt="TourGo landing screenshot" class="d-inline-block rounded-3" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About / Value Proposition Section -->
+    <section class="section-padding" id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center mb-5">
+                    <h2 class="section-title" data-i18n="about.title">Why Choose TourGo?</h2>
+                    <p class="section-subtitle" data-i18n="about.subtitle">The all-in-one property management solution designed to streamline your operations and boost your efficiency.</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="value-prop-card">
+                        <div class="value-prop-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h3 data-i18n="about.card1.title">Streamlined Bookings</h3>
+                        <p data-i18n="about.card1.text">Manage all your property bookings in one centralized calendar. Never miss a reservation with automated reminders and real-time availability tracking.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="value-prop-card">
+                        <div class="value-prop-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h3 data-i18n="about.card2.title">Financial Insights</h3>
+                        <p data-i18n="about.card2.text">Track income, expenses, and generate comprehensive financial reports. Make data-driven decisions with clear visibility into your property's performance.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="value-prop-card">
+                        <div class="value-prop-icon">
+                            <i class="bi bi-clipboard-check"></i>
+                        </div>
+                        <h3 data-i18n="about.card3.title">Room Management</h3>
+                        <p data-i18n="about.card3.text">Keep track of room cleaning status, maintenance schedules, and occupancy. Ensure your properties are always guest-ready.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section-padding bg-light" id="features">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center mb-5">
+                    <h2 class="section-title" data-i18n="features.title">Powerful Features for Property Managers</h2>
+                    <p class="section-subtitle" data-i18n="features.subtitle">Everything you need to manage your properties efficiently and effectively.</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <h4 data-i18n="features.f1.title">Booking Management</h4>
+                        <p data-i18n="features.f1.text">Comprehensive booking system with calendar view, guest information management, and automated confirmation emails.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <h4 data-i18n="features.f2.title">Financial Tracking</h4>
+                        <p data-i18n="features.f2.text">Track all transactions, generate invoices, monitor expenses, and access detailed financial reports and analytics.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-house-check"></i>
+                        </div>
+                        <h4 data-i18n="features.f3.title">Room Status Tracking</h4>
+                        <p data-i18n="features.f3.text">Real-time room cleaning status, maintenance tracking, and occupancy management to ensure optimal property readiness.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h4 data-i18n="features.f4.title">Customer Management</h4>
+                        <p data-i18n="features.f4.text">Maintain detailed customer profiles, booking history, and communication logs for better guest relationship management.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-bar-chart"></i>
+                        </div>
+                        <h4 data-i18n="features.f5.title">Property Analytics</h4>
+                        <p data-i18n="features.f5.text">Get valuable insights into occupancy rates, revenue trends, and performance metrics to optimize your property operations.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                        <h4 data-i18n="features.f6.title">Invoice Generation</h4>
+                        <p data-i18n="features.f6.text">Create professional invoices automatically, track payments, and manage billing cycles with ease.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots / UI Preview Section -->
+    <section class="section-padding" id="screenshots">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center mb-5">
+                    <h2 class="section-title" data-i18n="screenshots.title">See TourGo in Action</h2>
+                    <p class="section-subtitle" data-i18n="screenshots.subtitle">Experience the intuitive interface designed for property management professionals.</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <img src="landing-assets/calendar-view-sc.png" alt="TourGo calendar view screenshot" class="d-inline-block rounded-3" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <img src="landing-assets/financial-dashboard-view-sc.png" alt="TourGo financial dashboard screenshot" class="d-inline-block rounded-3" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <img src="landing-assets/transactions-management-sc.png" alt="TourGo transactions management screenshot" class="d-inline-block rounded-3" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section-padding bg-light" id="testimonials">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center mb-5">
+                    <h2 class="section-title" data-i18n="testimonials.title">What Our Users Say</h2>
+                    <p class="section-subtitle" data-i18n="testimonials.subtitle">Join thousands of property managers who trust TourGo for their daily operations.</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="testimonial-card">
+                        <p data-i18n="testimonials.t1.text">"TourGo has completely transformed how I manage my properties. The booking system is intuitive, and the financial reports give me insights I never had before. Highly recommended!"</p>
+                        <div class="testimonial-author" data-i18n="testimonials.t1.author">Sarah Johnson</div>
+                        <div class="testimonial-role" data-i18n="testimonials.t1.role">Property Manager, Coastal Rentals</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="testimonial-card">
+                        <p data-i18n="testimonials.t2.text">"As a landlord with multiple properties, TourGo has been a game-changer. I can track everything from bookings to cleaning status in one place. It's saved me hours every week."</p>
+                        <div class="testimonial-author" data-i18n="testimonials.t2.author">Michael Chen</div>
+                        <div class="testimonial-role" data-i18n="testimonials.t2.role">Property Owner, Urban Properties LLC</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="testimonial-card">
+                        <p data-i18n="testimonials.t3.text">"The room management feature is fantastic. I always know which rooms are ready for guests, and the automated reminders ensure nothing falls through the cracks. Excellent software!"</p>
+                        <div class="testimonial-author" data-i18n="testimonials.t3.author">Emily Rodriguez</div>
+                        <div class="testimonial-role" data-i18n="testimonials.t3.role">Operations Manager, Mountain View Lodging</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section-padding" id="faq">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="text-center mb-5">
+                        <h2 class="section-title" data-i18n="faq.title">Frequently Asked Questions</h2>
+                        <p class="section-subtitle" data-i18n="faq.subtitle">Find answers to common questions about TourGo property management software.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3 class="faq-question" data-i18n="faq.q1.question">What is TourGo?</h3>
+                        <p class="faq-answer" data-i18n="faq.q1.answer">TourGo is a comprehensive property management software designed to help property managers and landlords organize bookings, manage finances, track room cleaning, and gain valuable property insights all in one centralized platform.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3 class="faq-question" data-i18n="faq.q2.question">Is TourGo free to use?</h3>
+                        <p class="faq-answer" data-i18n="faq.q2.answer">Yes, TourGo offers a free tier that allows you to get started with basic property management features. You can start using TourGo for free and upgrade as your needs grow.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3 class="faq-question" data-i18n="faq.q3.question">What features does TourGo offer?</h3>
+                        <p class="faq-answer" data-i18n="faq.q3.answer">TourGo includes booking management, financial tracking and reporting, room cleaning status tracking, property analytics and insights, customer management, and invoice generation. All features are designed to streamline your property management workflow.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3 class="faq-question" data-i18n="faq.q4.question">Do I need technical knowledge to use TourGo?</h3>
+                        <p class="faq-answer" data-i18n="faq.q4.answer">No, TourGo is designed with ease of use in mind. The intuitive interface makes it simple for property managers and landlords of all technical levels to manage their properties effectively.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3 class="faq-question" data-i18n="faq.q5.question">Can I manage multiple properties with TourGo?</h3>
+                        <p class="faq-answer" data-i18n="faq.q5.answer">Yes, TourGo supports managing multiple properties from a single dashboard. You can organize bookings, finances, and insights for all your properties in one place.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5>TourGo</h5>
+                    <p data-i18n="footer.tagline">Simplify Your Property Management</p>
+                    <p data-i18n="footer.description">TourGo helps property managers and landlords organize their bookings and finances, track room cleaning, and get property insights in one place.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 data-i18n="footer.contact">Contact</h5>
+                    <p><i class="bi bi-envelope me-2"></i> <a href="mailto:andresj.correas@outlook.com">andresj.correas@outlook.com</a></p>
+                    <p><i class="bi bi-github me-2"></i> <a href="https://github.com/Andres-J-Correa" target="_blank" rel="noopener noreferrer">Andres-J-Correa</a></p>
+                    <p><i class="bi bi-linkedin me-2"></i> <a href="https://www.linkedin.com/in/andres-correa-dev/" target="_blank" rel="noopener noreferrer">Andres Correa</a></p>
+                </div>
+                <div class="col-md-4">
+                    <h5 data-i18n="footer.follow">Follow Us</h5>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 TourGo. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="landing-assets/privacy-policy.html" class="me-3" data-i18n="footer.privacy">Privacy Policy</a>
+                    <a href="landing-assets/terms-of-service.html" data-i18n="footer.terms">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- Language Translation Script -->
+    <script>
+        // Translation data
+        const translations = {
+            en: {
+                meta: {
+                    title: "TourGo - Simplify Your Property Management | Property Management Software",
+                    description: "TourGo helps property managers and landlords organize their bookings and finances, track room cleaning, and get property insights in one place. Start using for free."
+                },
+                nav: {
+                    about: "About",
+                    features: "Features",
+                    screenshots: "Screenshots",
+                    testimonials: "Testimonials",
+                    faq: "FAQ",
+                    contact: "Contact",
+                    login: "Login"
+                },
+                hero: {
+                    title: "Simplify Your Property Management",
+                    subtitle: "TourGo helps property managers and landlords organize their bookings and finances, track room cleaning, and get property insights in one place.",
+                    cta: "Start Using For Free"
+                },
+                about: {
+                    title: "Why Choose TourGo?",
+                    subtitle: "The all-in-one property management solution designed to streamline your operations and boost your efficiency.",
+                    card1: {
+                        title: "Streamlined Bookings",
+                        text: "Manage all your property bookings in one centralized calendar. Never miss a reservation with automated reminders and real-time availability tracking."
+                    },
+                    card2: {
+                        title: "Financial Insights",
+                        text: "Track income, expenses, and generate comprehensive financial reports. Make data-driven decisions with clear visibility into your property's performance."
+                    },
+                    card3: {
+                        title: "Room Management",
+                        text: "Keep track of room cleaning status, maintenance schedules, and occupancy. Ensure your properties are always guest-ready."
+                    }
+                },
+                features: {
+                    title: "Powerful Features for Property Managers",
+                    subtitle: "Everything you need to manage your properties efficiently and effectively.",
+                    f1: {
+                        title: "Booking Management",
+                        text: "Comprehensive booking system with calendar view, guest information management, and automated confirmation emails."
+                    },
+                    f2: {
+                        title: "Financial Tracking",
+                        text: "Track all transactions, generate invoices, monitor expenses, and access detailed financial reports and analytics."
+                    },
+                    f3: {
+                        title: "Room Status Tracking",
+                        text: "Real-time room cleaning status, maintenance tracking, and occupancy management to ensure optimal property readiness."
+                    },
+                    f4: {
+                        title: "Customer Management",
+                        text: "Maintain detailed customer profiles, booking history, and communication logs for better guest relationship management."
+                    },
+                    f5: {
+                        title: "Property Analytics",
+                        text: "Get valuable insights into occupancy rates, revenue trends, and performance metrics to optimize your property operations."
+                    },
+                    f6: {
+                        title: "Invoice Generation",
+                        text: "Create professional invoices automatically, track payments, and manage billing cycles with ease."
+                    }
+                },
+                screenshots: {
+                    title: "See TourGo in Action",
+                    subtitle: "Experience the intuitive interface designed for property management professionals."
+                },
+                testimonials: {
+                    title: "What Our Users Say",
+                    subtitle: "Join thousands of property managers who trust TourGo for their daily operations.",
+                    t1: {
+                        text: "\"TourGo has completely transformed how I manage my properties. The booking system is intuitive, and the financial reports give me insights I never had before. Highly recommended!\"",
+                        author: "Sarah Johnson",
+                        role: "Property Manager, Coastal Rentals"
+                    },
+                    t2: {
+                        text: "\"As a landlord with multiple properties, TourGo has been a game-changer. I can track everything from bookings to cleaning status in one place. It's saved me hours every week.\"",
+                        author: "Michael Chen",
+                        role: "Property Owner, Urban Properties LLC"
+                    },
+                    t3: {
+                        text: "\"The room management feature is fantastic. I always know which rooms are ready for guests, and the automated reminders ensure nothing falls through the cracks. Excellent software!\"",
+                        author: "Emily Rodriguez",
+                        role: "Operations Manager, Mountain View Lodging"
+                    }
+                },
+                faq: {
+                    title: "Frequently Asked Questions",
+                    subtitle: "Find answers to common questions about TourGo property management software.",
+                    q1: {
+                        question: "What is TourGo?",
+                        answer: "TourGo is a comprehensive property management software designed to help property managers and landlords organize bookings, manage finances, track room cleaning, and gain valuable property insights all in one centralized platform."
+                    },
+                    q2: {
+                        question: "Is TourGo free to use?",
+                        answer: "Yes, TourGo offers a free tier that allows you to get started with basic property management features. You can start using TourGo for free and upgrade as your needs grow."
+                    },
+                    q3: {
+                        question: "What features does TourGo offer?",
+                        answer: "TourGo includes booking management, financial tracking and reporting, room cleaning status tracking, property analytics and insights, customer management, and invoice generation. All features are designed to streamline your property management workflow."
+                    },
+                    q4: {
+                        question: "Do I need technical knowledge to use TourGo?",
+                        answer: "No, TourGo is designed with ease of use in mind. The intuitive interface makes it simple for property managers and landlords of all technical levels to manage their properties effectively."
+                    },
+                    q5: {
+                        question: "Can I manage multiple properties with TourGo?",
+                        answer: "Yes, TourGo supports managing multiple properties from a single dashboard. You can organize bookings, finances, and insights for all your properties in one place."
+                    }
+                },
+                footer: {
+                    tagline: "Simplify Your Property Management",
+                    description: "TourGo helps property managers and landlords organize their bookings and finances, track room cleaning, and get property insights in one place.",
+                    contact: "Contact",
+                    follow: "Follow Us",
+                    copyright: "© 2025 TourGo. All rights reserved.",
+                    privacy: "Privacy Policy",
+                    terms: "Terms of Service"
+                }
+            },
+            es: {
+                meta: {
+                    title: "TourGo - Simplifica la Gestión de Propiedades | Software de Gestión de Propiedades",
+                    description: "TourGo ayuda a administradores de propiedades y propietarios a organizar sus reservas y finanzas, rastrear la limpieza de habitaciones y obtener información de propiedades en un solo lugar. Comienza a usarlo gratis."
+                },
+                nav: {
+                    about: "Acerca de",
+                    features: "Características",
+                    screenshots: "Capturas",
+                    testimonials: "Testimonios",
+                    faq: "Preguntas",
+                    contact: "Contacto",
+                    login: "Iniciar"
+                },
+                hero: {
+                    title: "Simplifica la Gestión de tus Propiedades",
+                    subtitle: "TourGo ayuda a administradores de propiedades y propietarios a organizar sus reservas y finanzas, rastrear la limpieza de habitaciones y obtener información de propiedades en un solo lugar.",
+                    cta: "Comienza a Usar Gratis"
+                },
+                about: {
+                    title: "¿Por Qué Elegir TourGo?",
+                    subtitle: "La solución integral de gestión de propiedades diseñada para optimizar tus operaciones y aumentar tu eficiencia.",
+                    card1: {
+                        title: "Reservas Optimizadas",
+                        text: "Gestiona todas tus reservas de propiedades en un calendario centralizado. Nunca pierdas una reserva con recordatorios automatizados y seguimiento de disponibilidad en tiempo real."
+                    },
+                    card2: {
+                        title: "Información Financiera",
+                        text: "Rastrea ingresos, gastos y genera informes financieros completos. Toma decisiones basadas en datos con visibilidad clara del rendimiento de tu propiedad."
+                    },
+                    card3: {
+                        title: "Gestión de Habitaciones",
+                        text: "Mantén un seguimiento del estado de limpieza de las habitaciones, horarios de mantenimiento y ocupación. Asegúrate de que tus propiedades estén siempre listas para los huéspedes."
+                    }
+                },
+                features: {
+                    title: "Características Poderosas para Administradores de Propiedades",
+                    subtitle: "Todo lo que necesitas para gestionar tus propiedades de manera eficiente y efectiva.",
+                    f1: {
+                        title: "Gestión de Reservas",
+                        text: "Sistema integral de reservas con vista de calendario, gestión de información de huéspedes y correos de confirmación automatizados."
+                    },
+                    f2: {
+                        title: "Seguimiento Financiero",
+                        text: "Rastrea todas las transacciones, genera facturas, monitorea gastos y accede a informes financieros detallados y análisis."
+                    },
+                    f3: {
+                        title: "Seguimiento de Estado de Habitaciones",
+                        text: "Estado de limpieza de habitaciones en tiempo real, seguimiento de mantenimiento y gestión de ocupación para asegurar la preparación óptima de la propiedad."
+                    },
+                    f4: {
+                        title: "Gestión de Clientes",
+                        text: "Mantén perfiles detallados de clientes, historial de reservas y registros de comunicación para una mejor gestión de relaciones con huéspedes."
+                    },
+                    f5: {
+                        title: "Análisis de Propiedades",
+                        text: "Obtén información valiosa sobre tasas de ocupación, tendencias de ingresos y métricas de rendimiento para optimizar las operaciones de tu propiedad."
+                    },
+                    f6: {
+                        title: "Generación de Facturas",
+                        text: "Crea facturas profesionales automáticamente, rastrea pagos y gestiona ciclos de facturación con facilidad."
+                    }
+                },
+                screenshots: {
+                    title: "Ve TourGo en Acción",
+                    subtitle: "Experimenta la interfaz intuitiva diseñada para profesionales de gestión de propiedades."
+                },
+                testimonials: {
+                    title: "Lo Que Dicen Nuestros Usuarios",
+                    subtitle: "Únete a miles de administradores de propiedades que confían en TourGo para sus operaciones diarias.",
+                    t1: {
+                        text: "\"TourGo ha transformado completamente cómo gestiono mis propiedades. El sistema de reservas es intuitivo y los informes financieros me dan información que nunca tuve antes. ¡Muy recomendado!\"",
+                        author: "Sarah Johnson",
+                        role: "Administradora de Propiedades, Coastal Rentals"
+                    },
+                    t2: {
+                        text: "\"Como propietario con múltiples propiedades, TourGo ha sido un cambio radical. Puedo rastrear todo desde reservas hasta el estado de limpieza en un solo lugar. Me ha ahorrado horas cada semana.\"",
+                        author: "Michael Chen",
+                        role: "Propietario, Urban Properties LLC"
+                    },
+                    t3: {
+                        text: "\"La función de gestión de habitaciones es fantástica. Siempre sé qué habitaciones están listas para los huéspedes, y los recordatorios automatizados aseguran que nada se pase por alto. ¡Excelente software!\"",
+                        author: "Emily Rodriguez",
+                        role: "Gerente de Operaciones, Mountain View Lodging"
+                    }
+                },
+                faq: {
+                    title: "Preguntas Frecuentes",
+                    subtitle: "Encuentra respuestas a preguntas comunes sobre el software de gestión de propiedades TourGo.",
+                    q1: {
+                        question: "¿Qué es TourGo?",
+                        answer: "TourGo es un software integral de gestión de propiedades diseñado para ayudar a administradores de propiedades y propietarios a organizar reservas, gestionar finanzas, rastrear la limpieza de habitaciones y obtener información valiosa de propiedades en una plataforma centralizada."
+                    },
+                    q2: {
+                        question: "¿Es gratis usar TourGo?",
+                        answer: "Sí, TourGo ofrece un nivel gratuito que te permite comenzar con características básicas de gestión de propiedades. Puedes comenzar a usar TourGo gratis y actualizar según crezcan tus necesidades."
+                    },
+                    q3: {
+                        question: "¿Qué características ofrece TourGo?",
+                        answer: "TourGo incluye gestión de reservas, seguimiento y reportes financieros, seguimiento del estado de limpieza de habitaciones, análisis e información de propiedades, gestión de clientes y generación de facturas. Todas las características están diseñadas para optimizar tu flujo de trabajo de gestión de propiedades."
+                    },
+                    q4: {
+                        question: "¿Necesito conocimientos técnicos para usar TourGo?",
+                        answer: "No, TourGo está diseñado pensando en la facilidad de uso. La interfaz intuitiva hace que sea simple para administradores de propiedades y propietarios de todos los niveles técnicos gestionar sus propiedades de manera efectiva."
+                    },
+                    q5: {
+                        question: "¿Puedo gestionar múltiples propiedades con TourGo?",
+                        answer: "Sí, TourGo admite la gestión de múltiples propiedades desde un solo panel. Puedes organizar reservas, finanzas e información de todas tus propiedades en un solo lugar."
+                    }
+                },
+                footer: {
+                    tagline: "Simplifica la Gestión de tus Propiedades",
+                    description: "TourGo ayuda a administradores de propiedades y propietarios a organizar sus reservas y finanzas, rastrear la limpieza de habitaciones y obtener información de propiedades en un solo lugar.",
+                    contact: "Contacto",
+                    follow: "Síguenos",
+                    copyright: "© 2025 TourGo. Todos los derechos reservados.",
+                    privacy: "Política de Privacidad",
+                    terms: "Términos de Servicio"
+                }
+            }
+        };
+
+        // Get current language from localStorage or default to 'en'
+        let currentLang = localStorage.getItem('tourgo-lang') || 'en';
+
+        // Function to update language
+        function switchLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('tourgo-lang', lang);
+            
+            // Update HTML lang attribute
+            document.getElementById('htmlLang').setAttribute('lang', lang);
+            
+            // Update meta tags
+            document.getElementById('metaTitle').textContent = translations[lang].meta.title;
+            document.getElementById('metaDescription').setAttribute('content', translations[lang].meta.description);
+            
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const keys = key.split('.');
+                let value = translations[lang];
+                
+                for (const k of keys) {
+                    value = value[k];
+                }
+                
+                if (value !== undefined) {
+                    element.textContent = value;
+                }
+            });
+            
+            // Update language switcher buttons
+            document.getElementById('langEn').classList.toggle('active', lang === 'en');
+            document.getElementById('langEs').classList.toggle('active', lang === 'es');
+        }
+
+        // Initialize language on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            switchLanguage(currentLang);
+        });
+    </script>
+</body>
+</html>
+

@@ -150,7 +150,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem, toggle }) => {
         end
         to={navItem.path}
         target={navItem.newTab ? "_blank" : undefined}
-        className={classNames("nav-action-item mx-1 px-2", {
+        className={classNames("mx-1 px-2", {
           "text-uppercase": navItem.uppercase,
           "text-capitalize": navItem.capitalize,
           "dropdown-item": isInnerItem,
@@ -171,7 +171,7 @@ const NavbarItem = React.memo(({ navItem, isInnerItem, toggle }) => {
   // Render a dropdown item with an action if the nav item has an action property
   const renderActionItem = () => (
     <div
-      className={classNames("dropdown-item px-1 nav-action-item", {
+      className={classNames("px-1", {
         "text-uppercase": navItem?.uppercase,
         "text-capitalize": navItem?.capitalize,
         "dropdown-item": isInnerItem,
