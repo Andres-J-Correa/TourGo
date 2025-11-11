@@ -6,27 +6,6 @@ const generalRoutes = [
     path: "*",
     component: lazy(() => import("components/commonUI/errors/NoRecords404")),
   },
-  {
-    name: "privacyPolicy",
-    path: "/privacy-policy",
-    component: lazy(() =>
-      import("components/commonUI/fallback/SiteUnderConstruction")
-    ),
-  },
-  {
-    name: "investors",
-    path: "/investors",
-    component: lazy(() =>
-      import("components/commonUI/fallback/SiteUnderConstruction")
-    ),
-  },
-  {
-    name: "careers",
-    path: "/careers",
-    component: lazy(() =>
-      import("components/commonUI/fallback/SiteUnderConstruction")
-    ),
-  },
 ];
 
 const userRoutes = [

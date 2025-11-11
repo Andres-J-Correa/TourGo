@@ -109,14 +109,11 @@ const FooterInfo = () => {
       <footer className="text-center mt-2">
         &copy; 2025 Tourgo. {t("commonUI.footer.rightsReserved")}
         <div></div>
-        <Link to={`/privacy-policy`} className="footer-link mx-2">
+        <Link to={`/privacy-policy.html`} className="footer-link mx-2">
           {t("commonUI.footer.privacyPolicy")}
         </Link>
-        <Link to="/investors" className="footer-link mx-2">
-          {t("commonUI.footer.investors")}
-        </Link>
-        <Link to="/careers" className="footer-link mx-2">
-          {t("commonUI.footer.careers")}
+        <Link to={`/terms-of-service.html`} className="footer-link mx-2">
+          {t("commonUI.footer.termsOfService")}
         </Link>
       </footer>
     </Row>
