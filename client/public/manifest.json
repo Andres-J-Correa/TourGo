@@ -2,34 +2,34 @@
   "short_name": "TourGo",
   "name": "TourGo",
   "description": "Administra tu hotel, gestiona reservas y ofrece una experiencia única a tus huéspedes con TourGo.",
-  "scope": "/",
+  "scope": "/app/",
+  "start_url": "/app/",
   "orientation": "portrait",
+  "display": "standalone",
+  "theme_color": "#344767",
+  "background_color": "#ffffff",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "/app/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "/app/logo192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "logo512.png",
+      "src": "/app/logo512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     },
     {
-      "src": "apple-touch-icon.png",
+      "src": "/app/apple-touch-icon.png",
       "type": "image/png",
       "sizes": "180x180"
     }
-  ],
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#344767",
-  "background_color": "#ffffff"
+  ]
 }
