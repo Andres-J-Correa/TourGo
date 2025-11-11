@@ -70,7 +70,7 @@ if (env !== "development") {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <BrowserRouter>
+  <BrowserRouter basename="/app">
     <React.StrictMode>
       <LanguageProvider>
         <GoogleReCaptchaProvider
