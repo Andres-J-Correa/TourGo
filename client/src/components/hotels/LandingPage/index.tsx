@@ -31,6 +31,8 @@ import ArrivalsPane from "./components/ArrivalsPane";
 import DeparturesPane from "./components/DeparturesPane";
 import StaysPane from "./components/StaysPane";
 import RoomsPane from "./components/RoomsPane";
+import TasksPane from "./components/TasksPane";
+import { useTasks } from "./hooks/useTasks";
 
 const HotelLandingPage = (): JSX.Element => {
   const [date, setDate] = useState(dateOptions.today);
@@ -47,6 +49,14 @@ const HotelLandingPage = (): JSX.Element => {
     t,
     setData
   );
+  const {
+    tasks,
+    loading: tasksLoading,
+    addTask,
+    updateTask,
+    toggleReminders,
+    deleteTask,
+  } = useTasks(hotelId, date);
 
   const breadcrumbs = useMemo(
     () =>
@@ -71,7 +81,7 @@ const HotelLandingPage = (): JSX.Element => {
 
   return (
     <>
-      <LoadingOverlay isVisible={hotel.isLoading || loading} />
+      <LoadingOverlay isVisible={hotel.isLoading || loading || tasksLoading} />
       {breadcrumbs}
       <ErrorBoundary>
         <div className="hotel-landing-page">
@@ -139,6 +149,15 @@ const HotelLandingPage = (): JSX.Element => {
                       {t("hotels.landing.rooms")}
                     </NavLink>
                   </NavItem>
+                  <NavItem>
+                    <NavLink
+                      className={classnames("cursor-pointer", {
+                        active: activeTab === "tasks",
+                      })}
+                      onClick={() => toggleTab("tasks")}>
+                      Tasks
+                    </NavLink>
+                  </NavItem>
                 </Nav>
                 <TabContent activeTab={activeTab} className="w-100 mt-3">
                   <TabPane tabId="arrivals">
@@ -165,6 +184,16 @@ const HotelLandingPage = (): JSX.Element => {
                       forCleaningRooms={data.forCleaningRooms}
                       availableRooms={data.availableRooms}
                       hotelId={hotelId}
+                    />
+                  </TabPane>
+                  <TabPane tabId="tasks">
+                    <TasksPane
+                      tasks={tasks}
+                      loading={tasksLoading}
+                      onAddTask={addTask}
+                      onUpdateTask={updateTask}
+                      onToggleReminders={toggleReminders}
+                      onDeleteTask={deleteTask}
                     />
                   </TabPane>
                 </TabContent>
