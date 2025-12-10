@@ -9,7 +9,7 @@ const hotelRoutes = [
   {
     name: "hotelLandingPage",
     path: "/hotels/:hotelId",
-    component: lazy(() => import("components/hotels/HotelLandingPage")),
+    component: lazy(() => import("components/hotels/LandingPage")),
   },
   {
     name: "hotelSettings",
