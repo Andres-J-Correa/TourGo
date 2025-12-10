@@ -20,6 +20,7 @@ using TourGo.Services.Interfaces.Security;
 using TourGo.Services.Interfaces.Users;
 using TourGo.Services.Security;
 using TourGo.Services.Templates;
+using TourGo.Services.Tasks;
 using TourGo.Services.Users;
 using TourGo.Web.Api.StartUp.DependencyInjection;
 using TourGo.Web.Core.Services;
@@ -120,6 +121,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IGoogleRecaptchaService, GoogleRecaptchaService>();
             services.AddSingleton<IRoomAvailabilityService, RoomAvailabilityService>();
             services.AddSingleton<ITemplateService, TemplateService>();
+            services.AddSingleton<ITaskService, TaskService>();
 
             services.AddScoped<IClaimsTransformation, ClaimsEnrichmentTransformation>();
 

@@ -22,5 +22,6 @@ namespace TourGo.Models.Enums
         HotelInvites = 12,
         FinancialReports = 13,
         RoomAvailability = 14,
+        Tasks = 15,
     }
 }
