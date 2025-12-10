@@ -15,6 +15,7 @@ import {
 } from "services/taskService";
 import TaskModal from "./TaskModal";
 import Swal from "sweetalert2";
+import dayjs from "dayjs";
 
 interface TasksPaneProps {
   tasks: Task[];
@@ -100,7 +101,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({
                     ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
                     : "Unassigned"}
                 </td>
-                <td>{new Date(task.dueDate).toLocaleDateString()}</td>
+                <td>{dayjs(task.dueDate).format("YYYY-MM-DD HH:mm")}</td>
                 <td>
                   <Button
                     color="info"
@@ -141,10 +142,11 @@ const TasksPane: React.FC<TasksPaneProps> = ({
         toggle={toggleModal}
         onSave={async (task) => {
           if ("id" in task) {
-            await onUpdateTask(task as TaskUpdateRequest);
+            await onUpdateTask(task);
           } else {
-            await onAddTask(task as TaskAddRequest);
+            await onAddTask(task);
           }
+          toggleModal();
         }}
         taskToEdit={taskToEdit}
       />

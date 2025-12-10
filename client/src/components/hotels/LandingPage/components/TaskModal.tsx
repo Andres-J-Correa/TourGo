@@ -1,35 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import {
   Modal,
   ModalHeader,
   ModalBody,
   ModalFooter,
   Button,
-  Form,
   FormGroup,
   Label,
   Input,
 } from "reactstrap";
+import { Formik, Form, type FormikHelpers } from "formik";
 import {
   type Task,
   type TaskAddRequest,
   type TaskUpdateRequest,
 } from "services/taskService";
 import { useAppContext } from "contexts/GlobalAppContext";
-// Note: We might need a user selector here in the future.
-// For now, we'll assume the current user is the assignee or provide a simple input.
-// Given requirement: "AssigneeId". I'll put a placeholder input for now or fetch users if I could.
-// But the user didn't ask for user fetching logic yet, so I'll stick to a simple input or just use current user if possible?
-// The prompt said "Display... AssigneeId".
-// The Request models need "AssignedUserId".
-// I'll add a numeric input for AssignedUserId for now to satisfy the API contract.
+import CustomField from "components/commonUI/forms/CustomField";
+import DateTimePicker from "components/commonUI/forms/DateTimePicker";
+import { useTaskValidationSchema } from "./schemas";
 
 interface TaskModalProps {
   isOpen: boolean;
   toggle: () => void;
   onSave: (task: TaskAddRequest | TaskUpdateRequest) => Promise<boolean | void>;
   taskToEdit?: Task | null;
-  currentUserId?: number; // fallback if needed
+  currentUserId?: number;
+}
+
+interface TaskFormValues {
+  title: string;
+  description: string;
+  dueDate: string;
+  assignedUserId: string;
+  remindersEnabled: boolean;
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({
@@ -39,47 +43,38 @@ const TaskModal: React.FC<TaskModalProps> = ({
   taskToEdit,
 }) => {
   const { user } = useAppContext();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [assignedUserId, setAssignedUserId] = useState<string>(user.current.id);
-  const [remindersEnabled, setRemindersEnabled] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const validationSchema = useTaskValidationSchema();
 
-  useEffect(() => {
+  const initialValues = useMemo(() => {
     if (taskToEdit) {
-      setTitle(taskToEdit.title);
-      setDescription(taskToEdit.description || "");
-      // taskToEdit.dueDate is ISO string, input type="date" needs YYYY-MM-DD
-      // or type="datetime-local" needs YYYY-MM-DDThh:mm
-      const datePart = taskToEdit.dueDate.split("T")[0];
-      setDueDate(datePart ?? "");
-      setAssignedUserId(taskToEdit.assignedUser?.id || "");
-      setRemindersEnabled(taskToEdit.remindersEnabled);
-    } else {
-      resetForm();
+      return {
+        title: taskToEdit.title,
+        description: taskToEdit.description || "",
+        dueDate: taskToEdit.dueDate,
+        assignedUserId: taskToEdit.assignedUser?.id || "",
+        remindersEnabled: taskToEdit.remindersEnabled,
+      };
     }
-  }, [taskToEdit, isOpen]);
+    return {
+      title: "",
+      description: "",
+      dueDate: "",
+      assignedUserId: String(user.current.id),
+      remindersEnabled: true,
+    };
+  }, [taskToEdit, user, isOpen]);
 
-  const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    const today = new Date().toISOString().split("T")[0];
-    setDueDate(today ?? "");
-    setAssignedUserId(user.current.id); // Default to 0 or current user if available
-    setRemindersEnabled(true);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
+  const handleSubmit = async (
+    values: TaskFormValues,
+    { setSubmitting }: FormikHelpers<TaskFormValues>
+  ) => {
+    setSubmitting(true);
     const taskData = {
-      title,
-      description,
-      dueDate: new Date(dueDate).toISOString(),
-      assignedUserId,
-      remindersEnabled,
+      title: values.title,
+      description: values.description,
+      dueDate: values.dueDate,
+      assignedUserId: values.assignedUserId,
+      remindersEnabled: values.remindersEnabled,
     };
 
     let result;
@@ -89,7 +84,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       result = await onSave(taskData);
     }
 
-    setIsSubmitting(false);
+    setSubmitting(false);
     if (result) {
       toggle();
     }
@@ -100,66 +95,67 @@ const TaskModal: React.FC<TaskModalProps> = ({
       <ModalHeader toggle={toggle}>
         {taskToEdit ? "Update Task" : "Add Task"}
       </ModalHeader>
-      <Form onSubmit={handleSubmit}>
-        <ModalBody>
-          <FormGroup>
-            <Label for="taskTitle">Title</Label>
-            <Input
-              id="taskTitle"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label for="taskDescription">Description</Label>
-            <Input
-              id="taskDescription"
-              type="textarea"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label for="taskDueDate">Due Date</Label>
-            <Input
-              id="taskDueDate"
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              required
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label for="assignedUserId">Assignee ID</Label>
-            <Input
-              id="assignedUserId"
-              type="text"
-              value={assignedUserId}
-              onChange={(e) => setAssignedUserId(e.target.value)}
-              required
-            />
-          </FormGroup>
-          <FormGroup check>
-            <Label check>
-              <Input
-                type="checkbox"
-                checked={remindersEnabled}
-                onChange={(e) => setRemindersEnabled(e.target.checked)}
-              />{" "}
-              Enable Reminders
-            </Label>
-          </FormGroup>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="secondary" onClick={toggle} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button color="primary" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save"}
-          </Button>
-        </ModalFooter>
-      </Form>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+        enableReinitialize>
+        {({ isSubmitting, values, handleChange, handleBlur }) => (
+          <Form>
+            <ModalBody>
+              <CustomField
+                name="title"
+                type="text"
+                placeholder="Title"
+                isRequired={true}
+              />
+              <CustomField
+                name="description"
+                as="textarea"
+                placeholder="Description"
+                style={{ height: "100px" }}
+                isRequired={false}
+              />
+              <DateTimePicker
+                name="dueDate"
+                placeholder="Due Date"
+                className="mb-3"
+                isRequired={true}
+              />
+              <CustomField
+                name="assignedUserId"
+                type="text"
+                placeholder="Assignee ID"
+                isRequired={true}
+              />
+
+              <FormGroup check className="mt-3">
+                <Label check>
+                  <Input
+                    type="checkbox"
+                    name="remindersEnabled"
+                    checked={values.remindersEnabled}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />{" "}
+                  Enable Reminders
+                </Label>
+              </FormGroup>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                color="secondary"
+                onClick={toggle}
+                disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button color="primary" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save"}
+              </Button>
+            </ModalFooter>
+          </Form>
+        )}
+      </Formik>
     </Modal>
   );
 };
