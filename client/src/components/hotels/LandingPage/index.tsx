@@ -32,7 +32,6 @@ import DeparturesPane from "./components/DeparturesPane";
 import StaysPane from "./components/StaysPane";
 import RoomsPane from "./components/RoomsPane";
 import TasksPane from "./components/TasksPane";
-import { useTasks } from "./hooks/useTasks";
 
 const HotelLandingPage = (): JSX.Element => {
   const [date, setDate] = useState(dateOptions.today);
@@ -49,16 +48,6 @@ const HotelLandingPage = (): JSX.Element => {
     t,
     setData
   );
-  const {
-    tasks,
-    loading: tasksLoading,
-    addTask,
-    updateTask,
-    toggleReminders,
-    deleteTask,
-    staff,
-    loadingStaff,
-  } = useTasks(hotelId, date);
 
   const breadcrumbs = useMemo(
     () =>
@@ -83,7 +72,7 @@ const HotelLandingPage = (): JSX.Element => {
 
   return (
     <>
-      <LoadingOverlay isVisible={hotel.isLoading || loading || tasksLoading} />
+      <LoadingOverlay isVisible={hotel.isLoading || loading} />
       {breadcrumbs}
       <ErrorBoundary>
         <div className="hotel-landing-page">
@@ -189,16 +178,7 @@ const HotelLandingPage = (): JSX.Element => {
                     />
                   </TabPane>
                   <TabPane tabId="tasks">
-                    <TasksPane
-                      tasks={tasks}
-                      loading={tasksLoading}
-                      onAddTask={addTask}
-                      onUpdateTask={updateTask}
-                      onToggleReminders={toggleReminders}
-                      onDeleteTask={deleteTask}
-                      staff={staff}
-                      loadingStaff={loadingStaff}
-                    />
+                    <TasksPane hotelId={hotelId} initialDate={date} />
                   </TabPane>
                 </TabContent>
               </CardBody>

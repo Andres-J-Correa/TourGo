@@ -14,7 +14,11 @@ import { getByHotelId as getStaffByHotelId } from "services/staffService";
 import type { Staff } from "types/entities/staff.types";
 import { useLanguage } from "contexts/LanguageContext";
 
-export const useTasks = (hotelId: string | undefined, date: string) => {
+export const useTasks = (
+  hotelId: string | undefined,
+  startDate: string | null,
+  endDate: string | null
+) => {
   const { t } = useLanguage();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
@@ -22,10 +26,10 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
   const [loadingStaff, setLoadingStaff] = useState(false);
 
   const fetchTasks = useCallback(async () => {
-    if (!hotelId || !date) return;
+    if (!hotelId || !startDate || !endDate) return;
     setLoading(true);
     try {
-      const response = await getTasks(hotelId, date, date);
+      const response = await getTasks(hotelId, startDate, endDate);
 
       if (response.isSuccessful) {
         setTasks(response.items || []);
@@ -41,7 +45,7 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
     } finally {
       setLoading(false);
     }
-  }, [hotelId, date, t]);
+  }, [hotelId, startDate, endDate, t]);
 
   useEffect(() => {
     fetchTasks();

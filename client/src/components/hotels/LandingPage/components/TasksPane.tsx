@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Button,
   Accordion,
@@ -17,39 +17,36 @@ import {
   faPlus,
   faUserCheck,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  type Task,
-  type TaskAddRequest,
-  type TaskUpdateRequest,
-} from "services/taskService";
+import { type Task } from "services/taskService";
 import TaskModal from "./TaskModal";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
-import type { Staff } from "types/entities/staff.types";
 import { useLanguage } from "contexts/LanguageContext";
+import { useTasks } from "../hooks/useTasks";
+import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
+import { getDateString } from "utils/dateHelper";
 
 interface TasksPaneProps {
-  tasks: Task[];
-  loading: boolean;
-  onAddTask: (task: TaskAddRequest) => Promise<boolean | void>;
-  onUpdateTask: (task: TaskUpdateRequest) => Promise<boolean | void>;
-  onToggleReminders: (task: Task) => Promise<void>;
-  onDeleteTask: (id: number) => Promise<void>;
-  staff: Staff[];
-  loadingStaff: boolean;
+  hotelId: string | undefined;
+  initialDate: string;
 }
 
-const TasksPane: React.FC<TasksPaneProps> = ({
-  tasks,
-  loading,
-  onAddTask,
-  onUpdateTask,
-  onToggleReminders,
-  onDeleteTask,
-  staff,
-  loadingStaff,
-}) => {
+const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
   const { t } = useLanguage();
+  const [startDate, setStartDate] = useState<string | null>(initialDate);
+  const [endDate, setEndDate] = useState<string | null>(initialDate); // Initially same day
+
+  const {
+    tasks,
+    loading,
+    addTask,
+    updateTask,
+    toggleReminders,
+    deleteTask,
+    staff,
+    loadingStaff,
+  } = useTasks(hotelId, startDate, endDate);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [openAccordion, setOpenAccordion] = useState<string>("");
@@ -85,28 +82,46 @@ const TasksPane: React.FC<TasksPaneProps> = ({
     });
 
     if (result.isConfirmed) {
-      await onDeleteTask(id);
+      await deleteTask(id);
     }
   };
 
-  if (loading) {
-    return <div className="text-center py-4">{t("tasks.loading")}</div>;
-  }
+  const handleStartDateChange = (date: Date | null) => {
+    setStartDate(getDateString(date));
+  };
+
+  const handleEndDateChange = (date: Date | null) => {
+    setEndDate(getDateString(date));
+  };
 
   return (
     <div>
-      <div className="d-flex justify-content-end mb-3">
-        <Button color="dark" onClick={toggleModal}>
-          <FontAwesomeIcon icon={faPlus} className="me-2" />
-          {t("tasks.addTask")}
-        </Button>
+      <div className="mb-3">
+        <Row>
+          <Col xs={12} md={8}>
+            <DatePickersV2
+              startDate={startDate}
+              endDate={endDate}
+              handleStartChange={handleStartDateChange}
+              handleEndChange={handleEndDateChange}
+              allowSameDay={true}
+            />
+          </Col>
+          <Col className="text-end align-content-center">
+            <Button color="dark" onClick={toggleModal}>
+              <FontAwesomeIcon icon={faPlus} className="me-2" />
+              {t("tasks.addTask")}
+            </Button>
+          </Col>
+        </Row>
       </div>
 
-      {tasks.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-4">{t("tasks.loading")}</div>
+      ) : tasks.length === 0 ? (
         <div className="text-center py-4 text-muted">{t("tasks.noTasks")}</div>
       ) : (
         <div className="tasks-accordion">
-          {/* Note: In Reactstrap 9, Accordion uses 'open' prop (string | string[]) and 'toggle' function */}
           <Accordion open={openAccordion} toggle={toggleAccordion}>
             {tasks.map((task) => (
               <AccordionItem key={task.id}>
@@ -144,7 +159,6 @@ const TasksPane: React.FC<TasksPaneProps> = ({
                     <p className="mb-0 text-break">
                       {task.description ||
                         t("tasks.form.descriptionPlaceholder")}{" "}
-                      {/* Assuming description placeholder is suitable fallback */}
                     </p>
                   </div>
 
@@ -160,7 +174,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({
                     <Button
                       color={task.remindersEnabled ? "success" : "secondary"}
                       size="sm"
-                      onClick={() => onToggleReminders(task)}
+                      onClick={() => toggleReminders(task)}
                       title={t("tasks.actions.toggleReminders")}>
                       <FontAwesomeIcon
                         icon={task.remindersEnabled ? faBell : faBellSlash}
@@ -189,9 +203,9 @@ const TasksPane: React.FC<TasksPaneProps> = ({
         loadingStaff={loadingStaff}
         onSave={async (task) => {
           if ("id" in task) {
-            await onUpdateTask(task);
+            await updateTask(task);
           } else {
-            await onAddTask(task);
+            await addTask(task);
           }
           toggleModal();
         }}
