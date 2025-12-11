@@ -1141,7 +1141,8 @@
       "completeError": "Error marking as completed",
       "roomChange": "Room Change",
       "forCleaning": "Cleaning",
-      "availableRooms": "Available"
+      "availableRooms": "Available",
+      "tasks": "Tasks"
     },
     "settings": {
       "title": "Settings",
@@ -1862,5 +1863,56 @@
   "app": {
     "loading": "loading",
     "loadingUser": "loading user"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "addTask": "Add Task",
+    "editTask": "Edit Task",
+    "updateTask": "Update Task",
+    "noTasks": "No tasks found for this date.",
+    "loading": "Loading tasks...",
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Title",
+      "description": "Description",
+      "descriptionPlaceholder": "Description (Optional)",
+      "dueDate": "Due Date",
+      "dueDatePlaceholder": "Due Date",
+      "assignee": "Assignee",
+      "assigneePlaceholder": "Select Assignee",
+      "unassigned": "Unassigned",
+      "enableReminders": "Enable Reminders",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "titleMin": "Title must be at least {{min}} characters long",
+      "titleMax": "Title must be at most {{max}} characters long",
+      "dueDateRequired": "Due Date is required",
+      "assigneeRequired": "Assignee ID is required",
+      "descriptionMax": "Description must be at most {{max}} characters long"
+    },
+    "actions": {
+      "edit": "Edit",
+      "toggleReminders": "Toggle Reminders",
+      "delete": "Delete",
+      "deleteConfirmTitle": "Are you sure?",
+      "deleteConfirmText": "You won't be able to revert this!",
+      "deleteConfirmYes": "Yes, delete it!"
+    },
+    "notifications": {
+      "addSuccess": "Task added successfully",
+      "addError": "Failed to add task",
+      "updateSuccess": "Task updated successfully",
+      "updateError": "Failed to update task",
+      "reminderSuccess": "Task reminders updated",
+      "reminderError": "Failed to update reminders",
+      "deleteSuccess": "Task deleted successfully",
+      "deleteError": "Failed to delete task",
+      "loadStaffError": "Failed to load staff",
+      "loadTasksError": "Failed to load tasks"
+    }
   }
 }

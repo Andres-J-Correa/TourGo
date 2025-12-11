@@ -46,6 +46,7 @@ namespace TourGo.Services.Tasks
                 col.AddWithValue("p_dueDate", model.DueDate);
                 col.AddWithValue("p_assigneeId", model.AssignedUserId);
                 col.AddWithValue("p_modifiedBy", userId);
+                col.AddWithValue("p_remindersEnabled", model.RemindersEnabled);
             });
         }
 
@@ -103,16 +104,19 @@ namespace TourGo.Services.Tasks
                 RemindersEnabled = reader.GetBoolean(index++),
                 CreatedBy = new Models.Domain.Users.UserBase()
                 {
+                    Id = reader.GetString(index++),
                     FirstName = reader.GetString(index++),
                     LastName = reader.GetString(index++),
                 },
                 ModifiedBy = new Models.Domain.Users.UserBase()
                 {
+                    Id = reader.GetString(index++),
                     FirstName = reader.GetString(index++),
                     LastName = reader.GetString(index++),
                 },
                 AssignedUser = new Models.Domain.Users.UserBase()
                 {
+                    Id = reader.GetString(index++),
                     FirstName = reader.GetString(index++),
                     LastName = reader.GetString(index++),
                 },

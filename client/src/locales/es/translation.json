@@ -1141,7 +1141,8 @@
       "completeError": "Error al marcar como completada",
       "roomChange": "Cambio de Hab.",
       "forCleaning": "Limpieza",
-      "availableRooms": "Disponibles"
+      "availableRooms": "Disponibles",
+      "tasks": "Tareas"
     },
     "settings": {
       "title": "Configuración",
@@ -1862,5 +1863,56 @@
   "app": {
     "loading": "cargando",
     "loadingUser": "cargando usuario"
+  },
+  "tasks": {
+    "title": "Tareas",
+    "addTask": "Agregar Tarea",
+    "editTask": "Editar Tarea",
+    "updateTask": "Actualizar Tarea",
+    "noTasks": "No se encontraron tareas para esta fecha.",
+    "loading": "Cargando tareas...",
+    "form": {
+      "title": "Título",
+      "titlePlaceholder": "Título",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Descripción (Opcional)",
+      "dueDate": "Fecha de Vencimiento",
+      "dueDatePlaceholder": "Fecha de Vencimiento",
+      "assignee": "Asignado a",
+      "assigneePlaceholder": "Seleccionar Asignado",
+      "unassigned": "Sin asignar",
+      "enableReminders": "Activar Recordatorios",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    },
+    "validation": {
+      "titleRequired": "El título es obligatorio",
+      "titleMin": "El título debe tener al menos {{min}} caracteres",
+      "titleMax": "El título debe tener como máximo {{max}} caracteres",
+      "dueDateRequired": "La fecha de vencimiento es obligatoria",
+      "assigneeRequired": "El asignado es obligatorio",
+      "descriptionMax": "La descripción debe tener como máximo {{max}} caracteres"
+    },
+    "actions": {
+      "edit": "Editar",
+      "toggleReminders": "Alternar Recordatorios",
+      "delete": "Eliminar",
+      "deleteConfirmTitle": "¿Estás seguro?",
+      "deleteConfirmText": "¡No podrás revertir esto!",
+      "deleteConfirmYes": "¡Sí, eliminar!"
+    },
+    "notifications": {
+      "addSuccess": "Tarea agregada correctamente",
+      "addError": "Error al agregar la tarea",
+      "updateSuccess": "Tarea actualizada correctamente",
+      "updateError": "Error al actualizar la tarea",
+      "reminderSuccess": "Recordatorios de tarea actualizados",
+      "reminderError": "Error al actualizar recordatorios",
+      "deleteSuccess": "Tarea eliminada correctamente",
+      "deleteError": "Error al eliminar la tarea",
+      "loadStaffError": "Error al cargar el personal",
+      "loadTasksError": "Error al cargar las tareas"
+    }
   }
 }
