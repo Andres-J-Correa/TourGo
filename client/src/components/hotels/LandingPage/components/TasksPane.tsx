@@ -153,7 +153,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
                   </div>
                 </AccordionHeader>
                 <AccordionBody accordionId={task.id.toString()}>
-                  <h6>{task.title}</h6>
+                  <h6 className="d-md-none">{task.title}</h6>
                   <div className="mb-3">
                     <strong>{t("tasks.form.description")}:</strong>
                     <p className="mb-0 text-break">
