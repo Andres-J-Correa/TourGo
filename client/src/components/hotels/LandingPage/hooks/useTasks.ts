@@ -12,8 +12,10 @@ import {
 } from "services/taskService";
 import { getByHotelId as getStaffByHotelId } from "services/staffService";
 import type { Staff } from "types/entities/staff.types";
+import { useLanguage } from "contexts/LanguageContext";
 
 export const useTasks = (hotelId: string | undefined, date: string) => {
+  const { t } = useLanguage();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [staff, setStaff] = useState<Staff[]>([]);
@@ -35,11 +37,11 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
         }
       }
     } catch {
-      toast.error("Failed to load tasks");
+      toast.error(t("tasks.notifications.loadTasksError"));
     } finally {
       setLoading(false);
     }
-  }, [hotelId, date]);
+  }, [hotelId, date, t]);
 
   useEffect(() => {
     fetchTasks();
@@ -61,11 +63,11 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
         }
       }
     } catch {
-      toast.error("Failed to load staff");
+      toast.error(t("tasks.notifications.loadStaffError"));
     } finally {
       setLoadingStaff(false);
     }
-  }, [hotelId]);
+  }, [hotelId, t]);
 
   useEffect(() => {
     fetchStaff();
@@ -75,12 +77,11 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
     if (!hotelId) return;
     try {
       await addTaskService(hotelId, task);
-      toast.success("Task added successfully");
+      toast.success(t("tasks.notifications.addSuccess"));
       fetchTasks();
       return true;
     } catch (error) {
-      console.error("Failed to add task", error);
-      toast.error("Failed to add task");
+      toast.error(t("tasks.notifications.addError"));
       return false;
     }
   };
@@ -89,12 +90,11 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
     if (!hotelId) return;
     try {
       await updateTaskService(hotelId, task);
-      toast.success("Task updated successfully");
+      toast.success(t("tasks.notifications.updateSuccess"));
       fetchTasks();
       return true;
     } catch (error) {
-      console.error("Failed to update task", error);
-      toast.error("Failed to update task");
+      toast.error(t("tasks.notifications.updateError"));
       return false;
     }
   };
@@ -103,7 +103,7 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
     if (!hotelId) return;
     try {
       await updateRemindersService(hotelId, task.id);
-      toast.success("Task reminders updated");
+      toast.success(t("tasks.notifications.reminderSuccess"));
       // Optimistic update
       setTasks((prev) =>
         prev.map((t) =>
@@ -111,8 +111,7 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
         )
       );
     } catch (error) {
-      console.error("Failed to update reminders", error);
-      toast.error("Failed to update reminders");
+      toast.error(t("tasks.notifications.reminderError"));
       fetchTasks(); // Revert on error
     }
   };
@@ -121,11 +120,10 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
     if (!hotelId) return;
     try {
       await deleteTaskService(hotelId, id);
-      toast.success("Task deleted successfully");
+      toast.success(t("tasks.notifications.deleteSuccess"));
       setTasks((prev) => prev.filter((t) => t.id !== id));
     } catch (error) {
-      console.error("Failed to delete task", error);
-      toast.error("Failed to delete task");
+      toast.error(t("tasks.notifications.deleteError"));
     }
   };
 

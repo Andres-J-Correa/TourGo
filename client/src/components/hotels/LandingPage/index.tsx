@@ -157,7 +157,7 @@ const HotelLandingPage = (): JSX.Element => {
                         active: activeTab === "tasks",
                       })}
                       onClick={() => toggleTab("tasks")}>
-                      Tasks
+                      {t("hotels.landing.tasks")}
                     </NavLink>
                   </NavItem>
                 </Nav>

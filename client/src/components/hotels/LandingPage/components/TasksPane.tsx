@@ -26,6 +26,7 @@ import TaskModal from "./TaskModal";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 import type { Staff } from "types/entities/staff.types";
+import { useLanguage } from "contexts/LanguageContext";
 
 interface TasksPaneProps {
   tasks: Task[];
@@ -48,6 +49,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({
   staff,
   loadingStaff,
 }) => {
+  const { t } = useLanguage();
   const [modalOpen, setModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [openAccordion, setOpenAccordion] = useState<string>("");
@@ -72,13 +74,14 @@ const TasksPane: React.FC<TasksPaneProps> = ({
 
   const handleDeleteClick = async (id: number) => {
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("tasks.actions.deleteConfirmTitle"),
+      text: t("tasks.actions.deleteConfirmText"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: t("tasks.actions.deleteConfirmYes"),
+      cancelButtonText: t("tasks.form.cancel"),
     });
 
     if (result.isConfirmed) {
@@ -87,7 +90,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({
   };
 
   if (loading) {
-    return <div className="text-center py-4">Loading tasks...</div>;
+    return <div className="text-center py-4">{t("tasks.loading")}</div>;
   }
 
   return (
@@ -95,14 +98,12 @@ const TasksPane: React.FC<TasksPaneProps> = ({
       <div className="d-flex justify-content-end mb-3">
         <Button color="dark" onClick={toggleModal}>
           <FontAwesomeIcon icon={faPlus} className="me-2" />
-          Add Task
+          {t("tasks.addTask")}
         </Button>
       </div>
 
       {tasks.length === 0 ? (
-        <div className="text-center py-4 text-muted">
-          No tasks found for this date.
-        </div>
+        <div className="text-center py-4 text-muted">{t("tasks.noTasks")}</div>
       ) : (
         <div className="tasks-accordion">
           {/* Note: In Reactstrap 9, Accordion uses 'open' prop (string | string[]) and 'toggle' function */}
@@ -130,7 +131,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({
                         <small className="me-4">
                           {task.assignedUser
                             ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
-                            : "Unassigned"}
+                            : t("tasks.form.unassigned")}
                         </small>
                       </Col>
                     </Row>
@@ -139,9 +140,11 @@ const TasksPane: React.FC<TasksPaneProps> = ({
                 <AccordionBody accordionId={task.id.toString()}>
                   <h6>{task.title}</h6>
                   <div className="mb-3">
-                    <strong>Description:</strong>
+                    <strong>{t("tasks.form.description")}:</strong>
                     <p className="mb-0 text-break">
-                      {task.description || "No description provided."}
+                      {task.description ||
+                        t("tasks.form.descriptionPlaceholder")}{" "}
+                      {/* Assuming description placeholder is suitable fallback */}
                     </p>
                   </div>
 
@@ -150,15 +153,15 @@ const TasksPane: React.FC<TasksPaneProps> = ({
                       color="dark"
                       size="sm"
                       onClick={() => handleEditClick(task)}
-                      title="Edit">
+                      title={t("tasks.actions.edit")}>
                       <FontAwesomeIcon icon={faEdit} className="me-1" />
-                      Edit
+                      {t("tasks.actions.edit")}
                     </Button>
                     <Button
                       color={task.remindersEnabled ? "success" : "secondary"}
                       size="sm"
                       onClick={() => onToggleReminders(task)}
-                      title="Toggle Reminders">
+                      title={t("tasks.actions.toggleReminders")}>
                       <FontAwesomeIcon
                         icon={task.remindersEnabled ? faBell : faBellSlash}
                       />
@@ -168,7 +171,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({
                       color="danger"
                       size="sm"
                       onClick={() => handleDeleteClick(task.id)}
-                      title="Delete">
+                      title={t("tasks.actions.delete")}>
                       <FontAwesomeIcon icon={faTrash} />
                     </Button>
                   </div>

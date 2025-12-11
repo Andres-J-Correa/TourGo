@@ -15,7 +15,7 @@ import {
   type TaskAddRequest,
   type TaskUpdateRequest,
 } from "services/taskService";
-import { useAppContext } from "contexts/GlobalAppContext";
+import { useLanguage } from "contexts/LanguageContext";
 import CustomField from "components/commonUI/forms/CustomField";
 import DateTimePicker from "components/commonUI/forms/DateTimePicker";
 import { useTaskValidationSchema } from "./schemas";
@@ -46,7 +46,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   staff,
   loadingStaff,
 }) => {
-  const { user } = useAppContext();
+  const { t } = useLanguage();
   const validationSchema = useTaskValidationSchema();
 
   const initialValues = useMemo(() => {
@@ -63,10 +63,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
       title: "",
       description: "",
       dueDate: "",
-      assignedUserId: String(user.current.id),
+      assignedUserId: "",
       remindersEnabled: true,
     };
-  }, [taskToEdit, user]);
+  }, [taskToEdit]);
 
   const handleSubmit = async (
     values: TaskFormValues,
@@ -97,7 +97,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   return (
     <Modal isOpen={isOpen} toggle={toggle} centered>
       <ModalHeader toggle={toggle}>
-        {taskToEdit ? "Update Task" : "Add Task"}
+        {taskToEdit ? t("tasks.updateTask") : t("tasks.addTask")}
       </ModalHeader>
       <Formik
         initialValues={initialValues}
@@ -110,34 +110,40 @@ const TaskModal: React.FC<TaskModalProps> = ({
               <CustomField
                 name="title"
                 type="text"
-                placeholder="Title"
+                placeholder={t("tasks.form.titlePlaceholder")}
                 isRequired={true}
               />
               <CustomField
                 name="description"
                 as="textarea"
-                placeholder="Description (Optional)"
+                placeholder={t("tasks.form.descriptionPlaceholder")}
                 style={{ height: "100px" }}
                 isRequired={false}
-              />
-              <DateTimePicker
-                name="dueDate"
-                placeholder="Due Date"
-                className="mb-3"
-                isRequired={true}
               />
               <CustomField
                 name="assignedUserId"
                 as="select"
-                placeholder="Assignee"
+                placeholder={t("tasks.form.assignee")}
                 isRequired={true}>
-                <option value="">Select Assignee</option>
+                <option value="">
+                  {loadingStaff
+                    ? t("common.loading")
+                    : t("tasks.form.assigneePlaceholder")}
+                </option>
                 {staff.map((staff) => (
                   <option key={staff.id} value={staff.id}>
                     {staff.firstName} {staff.lastName}
                   </option>
                 ))}
               </CustomField>
+
+              <Label>{t("tasks.form.dueDatePlaceholder")}</Label>
+              <DateTimePicker
+                name="dueDate"
+                placeholder={t("tasks.form.dueDatePlaceholder")}
+                className="mb-3"
+                isRequired={true}
+              />
 
               <FormGroup check className="mt-3">
                 <Label check>
@@ -148,7 +154,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                     onChange={handleChange}
                     onBlur={handleBlur}
                   />{" "}
-                  Enable Reminders
+                  {t("tasks.form.enableReminders")}
                 </Label>
               </FormGroup>
             </ModalBody>
@@ -157,10 +163,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 color="secondary"
                 onClick={toggle}
                 disabled={isSubmitting}>
-                Cancel
+                {t("tasks.form.cancel")}
               </Button>
               <Button color="primary" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save"}
+                {isSubmitting ? t("tasks.form.saving") : t("tasks.form.save")}
               </Button>
             </ModalFooter>
           </Form>
