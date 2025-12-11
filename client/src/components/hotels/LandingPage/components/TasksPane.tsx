@@ -157,8 +157,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
                   <div className="mb-3">
                     <strong>{t("tasks.form.description")}:</strong>
                     <p className="mb-0 text-break">
-                      {task.description ||
-                        t("tasks.form.descriptionPlaceholder")}{" "}
+                      {task.description || t("tasks.noDescription")}
                     </p>
                   </div>
 

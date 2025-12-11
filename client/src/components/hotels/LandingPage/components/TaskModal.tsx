@@ -20,6 +20,7 @@ import CustomField from "components/commonUI/forms/CustomField";
 import DateTimePicker from "components/commonUI/forms/DateTimePicker";
 import { useTaskValidationSchema } from "./schemas";
 import type { Staff } from "types/entities/staff.types";
+import dayjs from "dayjs";
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -76,7 +77,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     const taskData = {
       title: values.title,
       description: values.description,
-      dueDate: values.dueDate,
+      dueDate: dayjs(values.dueDate).format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
       assignedUserId: values.assignedUserId,
       remindersEnabled: values.remindersEnabled,
     };

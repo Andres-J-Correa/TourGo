@@ -1871,6 +1871,7 @@
     "updateTask": "Update Task",
     "noTasks": "No tasks found for this date.",
     "loading": "Loading tasks...",
+    "noDescription": "No description",
     "form": {
       "title": "Title",
       "titlePlaceholder": "Title",
