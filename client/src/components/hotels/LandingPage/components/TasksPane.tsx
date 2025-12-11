@@ -25,6 +25,7 @@ import {
 import TaskModal from "./TaskModal";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
+import type { Staff } from "types/entities/staff.types";
 
 interface TasksPaneProps {
   tasks: Task[];
@@ -33,6 +34,8 @@ interface TasksPaneProps {
   onUpdateTask: (task: TaskUpdateRequest) => Promise<boolean | void>;
   onToggleReminders: (task: Task) => Promise<void>;
   onDeleteTask: (id: number) => Promise<void>;
+  staff: Staff[];
+  loadingStaff: boolean;
 }
 
 const TasksPane: React.FC<TasksPaneProps> = ({
@@ -42,6 +45,8 @@ const TasksPane: React.FC<TasksPaneProps> = ({
   onUpdateTask,
   onToggleReminders,
   onDeleteTask,
+  staff,
+  loadingStaff,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
@@ -177,6 +182,8 @@ const TasksPane: React.FC<TasksPaneProps> = ({
       <TaskModal
         isOpen={modalOpen}
         toggle={toggleModal}
+        staff={staff}
+        loadingStaff={loadingStaff}
         onSave={async (task) => {
           if ("id" in task) {
             await onUpdateTask(task);

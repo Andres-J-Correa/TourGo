@@ -56,6 +56,8 @@ const HotelLandingPage = (): JSX.Element => {
     updateTask,
     toggleReminders,
     deleteTask,
+    staff,
+    loadingStaff,
   } = useTasks(hotelId, date);
 
   const breadcrumbs = useMemo(
@@ -194,6 +196,8 @@ const HotelLandingPage = (): JSX.Element => {
                       onUpdateTask={updateTask}
                       onToggleReminders={toggleReminders}
                       onDeleteTask={deleteTask}
+                      staff={staff}
+                      loadingStaff={loadingStaff}
                     />
                   </TabPane>
                 </TabContent>

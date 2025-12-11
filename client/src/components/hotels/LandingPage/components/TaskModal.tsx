@@ -19,13 +19,15 @@ import { useAppContext } from "contexts/GlobalAppContext";
 import CustomField from "components/commonUI/forms/CustomField";
 import DateTimePicker from "components/commonUI/forms/DateTimePicker";
 import { useTaskValidationSchema } from "./schemas";
+import type { Staff } from "types/entities/staff.types";
 
 interface TaskModalProps {
   isOpen: boolean;
   toggle: () => void;
   onSave: (task: TaskAddRequest | TaskUpdateRequest) => Promise<boolean | void>;
   taskToEdit?: Task | null;
-  currentUserId?: number;
+  staff: Staff[];
+  loadingStaff: boolean;
 }
 
 interface TaskFormValues {
@@ -41,6 +43,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
   toggle,
   onSave,
   taskToEdit,
+  staff,
+  loadingStaff,
 }) => {
   const { user } = useAppContext();
   const validationSchema = useTaskValidationSchema();
@@ -112,7 +116,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
               <CustomField
                 name="description"
                 as="textarea"
-                placeholder="Description"
+                placeholder="Description (Optional)"
                 style={{ height: "100px" }}
                 isRequired={false}
               />
@@ -124,10 +128,16 @@ const TaskModal: React.FC<TaskModalProps> = ({
               />
               <CustomField
                 name="assignedUserId"
-                type="text"
-                placeholder="Assignee ID"
-                isRequired={true}
-              />
+                as="select"
+                placeholder="Assignee"
+                isRequired={true}>
+                <option value="">Select Assignee</option>
+                {staff.map((staff) => (
+                  <option key={staff.id} value={staff.id}>
+                    {staff.firstName} {staff.lastName}
+                  </option>
+                ))}
+              </CustomField>
 
               <FormGroup check className="mt-3">
                 <Label check>

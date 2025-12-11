@@ -10,10 +10,14 @@ import {
   type TaskAddRequest,
   type TaskUpdateRequest,
 } from "services/taskService";
+import { getByHotelId as getStaffByHotelId } from "services/staffService";
+import type { Staff } from "types/entities/staff.types";
 
 export const useTasks = (hotelId: string | undefined, date: string) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [loadingStaff, setLoadingStaff] = useState(false);
 
   const fetchTasks = useCallback(async () => {
     if (!hotelId || !date) return;
@@ -40,6 +44,32 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
+
+  const fetchStaff = useCallback(async () => {
+    if (!hotelId) return;
+    setLoadingStaff(true);
+    try {
+      const response = await getStaffByHotelId(hotelId);
+
+      if (response.isSuccessful) {
+        setStaff(response.items || []);
+      } else {
+        if (response.error.status === 404) {
+          setStaff([]);
+        } else {
+          throw response.error;
+        }
+      }
+    } catch {
+      toast.error("Failed to load staff");
+    } finally {
+      setLoadingStaff(false);
+    }
+  }, [hotelId]);
+
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]);
 
   const addTask = async (task: TaskAddRequest) => {
     if (!hotelId) return;
@@ -107,5 +137,7 @@ export const useTasks = (hotelId: string | undefined, date: string) => {
     toggleReminders,
     deleteTask,
     refreshTasks: fetchTasks,
+    staff,
+    loadingStaff,
   };
 };
