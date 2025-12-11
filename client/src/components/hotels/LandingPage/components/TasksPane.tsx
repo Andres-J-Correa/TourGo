@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Table, Button } from "reactstrap";
+import {
+  Button,
+  Accordion,
+  AccordionBody,
+  AccordionHeader,
+  AccordionItem,
+  Row,
+  Col,
+} from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEdit,
@@ -7,6 +15,7 @@ import {
   faBell,
   faBellSlash,
   faPlus,
+  faUserCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   type Task,
@@ -36,6 +45,15 @@ const TasksPane: React.FC<TasksPaneProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+  const [openAccordion, setOpenAccordion] = useState<string>("");
+
+  const toggleAccordion = (id: string) => {
+    if (openAccordion === id) {
+      setOpenAccordion("");
+    } else {
+      setOpenAccordion(id);
+    }
+  };
 
   const toggleModal = () => {
     setModalOpen(!modalOpen);
@@ -70,7 +88,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({
   return (
     <div>
       <div className="d-flex justify-content-end mb-3">
-        <Button color="primary" onClick={toggleModal}>
+        <Button color="dark" onClick={toggleModal}>
           <FontAwesomeIcon icon={faPlus} className="me-2" />
           Add Task
         </Button>
@@ -81,60 +99,79 @@ const TasksPane: React.FC<TasksPaneProps> = ({
           No tasks found for this date.
         </div>
       ) : (
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Assignee</th>
-              <th>Due Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div className="tasks-accordion">
+          {/* Note: In Reactstrap 9, Accordion uses 'open' prop (string | string[]) and 'toggle' function */}
+          <Accordion open={openAccordion} toggle={toggleAccordion}>
             {tasks.map((task) => (
-              <tr key={task.id}>
-                <td>{task.title}</td>
-                <td>{task.description}</td>
-                <td>
-                  {task.assignedUser
-                    ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
-                    : "Unassigned"}
-                </td>
-                <td>{dayjs(task.dueDate).format("YYYY-MM-DD HH:mm")}</td>
-                <td>
-                  <Button
-                    color="info"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => handleEditClick(task)}
-                    title="Edit">
-                    <FontAwesomeIcon icon={faEdit} />
-                  </Button>
-                  <Button
-                    color={task.remindersEnabled ? "success" : "secondary"}
-                    size="sm"
-                    className="me-2"
-                    onClick={() => onToggleReminders(task)}
-                    title={
-                      task.remindersEnabled ? "Reminders On" : "Reminders Off"
-                    }>
-                    <FontAwesomeIcon
-                      icon={task.remindersEnabled ? faBell : faBellSlash}
-                    />
-                  </Button>
-                  <Button
-                    color="danger"
-                    size="sm"
-                    onClick={() => handleDeleteClick(task.id)}
-                    title="Delete">
-                    <FontAwesomeIcon icon={faTrash} />
-                  </Button>
-                </td>
-              </tr>
+              <AccordionItem key={task.id}>
+                <AccordionHeader targetId={task.id.toString()}>
+                  <div className="w-90">
+                    <Row>
+                      <Col xs={12} className="mb-2 text-truncate">
+                        <span className="fw-bold text-dark">{task.title}</span>
+                      </Col>
+                      <Col xs={12} md={6} className="mb-2">
+                        <span
+                          className={`badge ${
+                            dayjs(task.dueDate).isBefore(dayjs())
+                              ? "bg-danger"
+                              : "bg-info"
+                          } me-2`}>
+                          {dayjs(task.dueDate).format("MMM D - h:mm a")}
+                        </span>
+                      </Col>
+                      <Col xs={12} md={6} className="text-md-end">
+                        <FontAwesomeIcon icon={faUserCheck} className="me-2" />
+                        <small className="me-4">
+                          {task.assignedUser
+                            ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
+                            : "Unassigned"}
+                        </small>
+                      </Col>
+                    </Row>
+                  </div>
+                </AccordionHeader>
+                <AccordionBody accordionId={task.id.toString()}>
+                  <h6>{task.title}</h6>
+                  <div className="mb-3">
+                    <strong>Description:</strong>
+                    <p className="mb-0 text-break">
+                      {task.description || "No description provided."}
+                    </p>
+                  </div>
+
+                  <div className="d-flex gap-2 justify-content-end">
+                    <Button
+                      color="dark"
+                      size="sm"
+                      onClick={() => handleEditClick(task)}
+                      title="Edit">
+                      <FontAwesomeIcon icon={faEdit} className="me-1" />
+                      Edit
+                    </Button>
+                    <Button
+                      color={task.remindersEnabled ? "success" : "secondary"}
+                      size="sm"
+                      onClick={() => onToggleReminders(task)}
+                      title="Toggle Reminders">
+                      <FontAwesomeIcon
+                        icon={task.remindersEnabled ? faBell : faBellSlash}
+                      />
+                    </Button>
+                    <Button
+                      outline
+                      color="danger"
+                      size="sm"
+                      onClick={() => handleDeleteClick(task.id)}
+                      title="Delete">
+                      <FontAwesomeIcon icon={faTrash} />
+                    </Button>
+                  </div>
+                </AccordionBody>
+              </AccordionItem>
             ))}
-          </tbody>
-        </Table>
+          </Accordion>
+        </div>
       )}
 
       <TaskModal

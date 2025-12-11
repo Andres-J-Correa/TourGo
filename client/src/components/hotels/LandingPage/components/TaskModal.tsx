@@ -62,7 +62,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       assignedUserId: String(user.current.id),
       remindersEnabled: true,
     };
-  }, [taskToEdit, user, isOpen]);
+  }, [taskToEdit, user]);
 
   const handleSubmit = async (
     values: TaskFormValues,

@@ -2280,3 +2280,7 @@ p {
     --bs-btn-border-radius: var(--bs-border-radius-sm);
   }
 }
+
+.w-90 {
+  width: 90% !important;
+}
