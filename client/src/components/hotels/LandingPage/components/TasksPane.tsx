@@ -136,7 +136,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
                           className={`badge ${
                             dayjs(task.dueDate).isBefore(dayjs())
                               ? "bg-danger"
-                              : "bg-info"
+                              : "bg-success"
                           } me-2`}>
                           {dayjs(task.dueDate).format("MMM D - h:mm a")}
                         </span>
