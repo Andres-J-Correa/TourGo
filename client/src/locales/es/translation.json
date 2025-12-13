@@ -1871,6 +1871,7 @@
     "updateTask": "Actualizar Tarea",
     "noTasks": "No se encontraron tareas para esta fecha.",
     "loading": "Cargando tareas...",
+    "noDescription": "Sin descripción",
     "form": {
       "title": "Título",
       "titlePlaceholder": "Título",
