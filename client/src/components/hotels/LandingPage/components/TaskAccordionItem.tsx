@@ -22,10 +22,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useLanguage } from "contexts/LanguageContext";
 import type { Task } from "services/taskService";
+import Swal from "sweetalert2";
 
 interface TaskAccordionItemProps {
   task: Task;
-  onDelete: (id: number) => Promise<void>;
+  deleteTask: (id: number) => Promise<void>;
   handleEditClick: (task: Task) => void;
   toggleReminders: (task: Task) => Promise<void>;
   toggleCompleted: (task: Task) => Promise<void>;
@@ -33,7 +34,7 @@ interface TaskAccordionItemProps {
 
 export default function TaskAccordionItem({
   task,
-  onDelete,
+  deleteTask,
   handleEditClick,
   toggleReminders,
   toggleCompleted,
@@ -42,9 +43,21 @@ export default function TaskAccordionItem({
 
   const handleDeleteClick = async (id: number) => {
     if (isUpdating) return;
-    setIsUpdating(true);
-    await onDelete(id);
-    setIsUpdating(false);
+
+    const result = await Swal.fire({
+      title: t("tasks.actions.deleteConfirmTitle"),
+      text: t("tasks.actions.deleteConfirmText"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: t("tasks.actions.deleteConfirmYes"),
+      cancelButtonText: t("tasks.form.cancel"),
+    });
+
+    if (result.isConfirmed) {
+      setIsUpdating(true);
+      await deleteTask(id);
+      setIsUpdating(false);
+    }
   };
 
   const handleToggleReminders = async (task: Task) => {

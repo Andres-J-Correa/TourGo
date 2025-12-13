@@ -14,8 +14,8 @@ namespace TourGo.Models.Domain.Tasks
 
         public DateTime DueDate { get; set; }
 
-        public int AssigneeId { get; set; }
-        public int HotelId { get; set; }
+        public string AssigneeId { get; set; } = string.Empty;
+        public string HotelId { get; set; } = string.Empty;
         public string HotelName { get; set; } = string.Empty;
     }
 }

@@ -6,6 +6,7 @@ using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Config.Emails;
 using TourGo.Services;
 using TourGo.Web.Api.Extensions;
+using TourGo.Web.Api.Hubs;
 using TourGo.Web.Api.Middleware;
 using TourGo.Web.Core;
 using TourGo.Web.StartUp;
@@ -35,12 +36,13 @@ namespace TourGo.Web.Api
             services.AddQuartz(q =>
             {
                 //for trivial jobs
-                q.AddQuartzJobsFromConfig(Configuration, typeof(ServicesAssemblyMarker).Assembly);
+                q.AddQuartzJobsFromConfig(Configuration, typeof(Program).Assembly);
             });
             services.AddQuartzHostedService(options =>
             {
                 options.WaitForJobsToComplete = true;
             });
+            services.AddSignalR();
         }
 
         private void ConfigureAppSettings(IServiceCollection services)
@@ -88,6 +90,7 @@ namespace TourGo.Web.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<TaskRemindersHub>("/hubs/task-reminders");
             });
 
             if (!env.IsDevelopment())

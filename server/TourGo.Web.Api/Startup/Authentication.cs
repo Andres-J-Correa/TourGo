@@ -67,7 +67,7 @@ namespace TourGo.Web.StartUp
         private static Task RedirectContext(RedirectContext<CookieAuthenticationOptions> context)
         {
             // If we need to treat ajx request differently this is where we do it. for now, it is the same.
-            if (IsAjaxRequest(context.Request) || IsApi(context.Request))
+            if (IsAjaxRequest(context.Request) || IsApi(context.Request) || IsHub(context.Request))
             {
                 //context.Response.Headers["Location"] = context.RedirectUri;
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
@@ -91,7 +91,15 @@ namespace TourGo.Web.StartUp
 
         private static bool IsApi(HttpRequest request)
         {
-            return request.Path.Value.ToLower().StartsWith("/api");
+            var path = request.Path.Value?.ToLower();
+            return path != null && path.StartsWith("/api");
+
+        }
+
+        private static bool IsHub(HttpRequest request)
+        {
+            var path = request.Path.Value?.ToLower();
+            return path != null && path.StartsWith("/hubs");
         }
     }
 }

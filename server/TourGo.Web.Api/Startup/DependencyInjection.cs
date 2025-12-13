@@ -1,5 +1,6 @@
 ﻿using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using sib_api_v3_sdk.Api;
 using sib_api_v3_sdk.Client;
@@ -19,8 +20,8 @@ using TourGo.Services.Interfaces.Hotels;
 using TourGo.Services.Interfaces.Security;
 using TourGo.Services.Interfaces.Users;
 using TourGo.Services.Security;
-using TourGo.Services.Templates;
 using TourGo.Services.Tasks;
+using TourGo.Services.Templates;
 using TourGo.Services.Users;
 using TourGo.Web.Api.StartUp.DependencyInjection;
 using TourGo.Web.Core.Services;
@@ -122,6 +123,7 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IRoomAvailabilityService, RoomAvailabilityService>();
             services.AddSingleton<ITemplateService, TemplateService>();
             services.AddSingleton<ITaskService, TaskService>();
+            services.AddSingleton<IUserIdProvider, SIdUserProvider>();
 
             services.AddScoped<IClaimsTransformation, ClaimsEnrichmentTransformation>();
 

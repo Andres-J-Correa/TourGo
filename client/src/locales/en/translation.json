@@ -1905,7 +1905,8 @@
       "deleteConfirmText": "You won't be able to revert this!",
       "deleteConfirmYes": "Yes, delete it!",
       "markComplete": "Mark Complete",
-      "markIncomplete": "Mark Incomplete"
+      "markIncomplete": "Mark Incomplete",
+      "goToHotel": "Go to Hotel"
     },
     "notifications": {
       "addSuccess": "Task added successfully",
@@ -1918,6 +1919,10 @@
       "deleteError": "Failed to delete task",
       "loadStaffError": "Failed to load staff",
       "loadTasksError": "Failed to load tasks"
+    },
+    "reminders": {
+      "title": "Overdue Tasks!",
+      "subtitle": "You have overdue tasks. Please mark as completed or edit due date."
     }
   }
 }

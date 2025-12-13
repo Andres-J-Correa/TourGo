@@ -22,6 +22,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 import Footer from "components/commonUI/Footer";
+import TaskRemindersListener from "components/hotels/LandingPage/components/TaskRemindersListener";
 
 const App = () => {
   const [routes, setRoutes] = useState([]);
@@ -86,6 +87,8 @@ const App = () => {
         pauseOnHover
         theme="light"
       />
+
+      <TaskRemindersListener />
     </HelmetProvider>
   );
 };
