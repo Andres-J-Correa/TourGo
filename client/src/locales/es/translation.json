@@ -1905,7 +1905,8 @@
       "deleteConfirmText": "¡No podrás revertir esto!",
       "deleteConfirmYes": "¡Sí, eliminar!",
       "markComplete": "Marcar como completada",
-      "markIncomplete": "Marcar como incompleta"
+      "markIncomplete": "Marcar como incompleta",
+      "goToHotel": "Ir a Hotel"
     },
     "notifications": {
       "addSuccess": "Tarea agregada correctamente",
@@ -1918,6 +1919,10 @@
       "deleteError": "Error al eliminar la tarea",
       "loadStaffError": "Error al cargar el personal",
       "loadTasksError": "Error al cargar las tareas"
+    },
+    "reminders": {
+      "title": "Tareas Atrasadas!",
+      "subtitle": "Tienes tareas atrasadas. Porfavor marca como completado o edita la fecha de vencimiento."
     }
   }
 }

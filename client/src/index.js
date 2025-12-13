@@ -1,11 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
-
-import { BrowserRouter } from "react-router-dom";
-import { AppContextProvider } from "./contexts/GlobalAppContext";
-import { LanguageProvider } from "./contexts/LanguageContext";
-import i18n from "./locales/i18n";
 
 import App from "./App";
 import "./index.css";
@@ -31,6 +25,7 @@ import {
   ReactIntegration,
 } from "@grafana/faro-react";
 import { TracingInstrumentation } from "@grafana/faro-web-tracing";
+import { AppProviders } from "providers/AppProvider";
 
 require("dayjs/locale/es"); // Import Spanish locale
 dayjs.locale("es");
@@ -70,19 +65,11 @@ if (env !== "development") {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <BrowserRouter basename="/app">
-    <React.StrictMode>
-      <LanguageProvider>
-        <GoogleReCaptchaProvider
-          reCaptchaKey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-          language={i18n.language}>
-          <AppContextProvider>
-            <App />
-          </AppContextProvider>
-        </GoogleReCaptchaProvider>
-      </LanguageProvider>
-    </React.StrictMode>
-  </BrowserRouter>
+  <React.StrictMode>
+    <AppProviders>
+      <App />
+    </AppProviders>
+  </React.StrictMode>
 );
 
 serviceWorker.unregister();

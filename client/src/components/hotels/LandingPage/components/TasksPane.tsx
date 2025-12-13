@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { type Task } from "services/taskService";
 import TaskModal from "./TaskModal";
-import Swal from "sweetalert2";
 import { useLanguage } from "contexts/LanguageContext";
 import { useTasks } from "../hooks/useTasks";
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
@@ -55,21 +54,6 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
     setModalOpen(true);
   };
 
-  const onDelete = async (id: number) => {
-    const result = await Swal.fire({
-      title: t("tasks.actions.deleteConfirmTitle"),
-      text: t("tasks.actions.deleteConfirmText"),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: t("tasks.actions.deleteConfirmYes"),
-      cancelButtonText: t("tasks.form.cancel"),
-    });
-
-    if (result.isConfirmed) {
-      await deleteTask(id);
-    }
-  };
-
   const handleStartDateChange = (date: Date | null) => {
     setStartDate(getDateString(date));
   };
@@ -113,7 +97,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
                 task={task}
                 toggleReminders={toggleReminders}
                 toggleCompleted={toggleCompleted}
-                onDelete={onDelete}
+                deleteTask={deleteTask}
                 handleEditClick={handleEditClick}
               />
             ))}

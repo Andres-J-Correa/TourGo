@@ -141,8 +141,8 @@ namespace TourGo.Services.Tasks
                 Title = reader.GetSafeString(index++),
                 Description = reader.GetSafeString(index++),
                 DueDate = DateTime.SpecifyKind(reader.GetSafeDateTime(index++), DateTimeKind.Utc),
-                AssigneeId = reader.GetSafeInt32(index++),
-                HotelId = reader.GetSafeInt32(index++),
+                AssigneeId = reader.GetSafeString(index++),
+                HotelId = reader.GetSafeString(index++),
                 HotelName = reader.GetSafeString(index++)
             };
         }

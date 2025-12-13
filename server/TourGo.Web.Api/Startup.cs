@@ -36,7 +36,7 @@ namespace TourGo.Web.Api
             services.AddQuartz(q =>
             {
                 //for trivial jobs
-                q.AddQuartzJobsFromConfig(Configuration, typeof(ServicesAssemblyMarker).Assembly);
+                q.AddQuartzJobsFromConfig(Configuration, typeof(Program).Assembly);
             });
             services.AddQuartzHostedService(options =>
             {
