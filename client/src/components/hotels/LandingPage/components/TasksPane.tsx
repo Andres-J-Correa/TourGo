@@ -1,32 +1,15 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Accordion,
-  AccordionBody,
-  AccordionHeader,
-  AccordionItem,
-  Row,
-  Col,
-  Spinner,
-} from "reactstrap";
+import { Button, Accordion, Row, Col } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEdit,
-  faTrash,
-  faBell,
-  faBellSlash,
-  faPlus,
-  faUserCheck,
-  faHourglassEnd,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { type Task } from "services/taskService";
 import TaskModal from "./TaskModal";
 import Swal from "sweetalert2";
-import dayjs from "dayjs";
 import { useLanguage } from "contexts/LanguageContext";
 import { useTasks } from "../hooks/useTasks";
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import { getDateString } from "utils/dateHelper";
+import TaskAccordionItem from "./TaskAccordionItem";
 
 interface TasksPaneProps {
   hotelId: string | undefined;
@@ -47,8 +30,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
     deleteTask,
     staff,
     loadingStaff,
-    deletingId,
-    updatingRemindersId,
+    toggleCompleted,
   } = useTasks(hotelId, startDate, endDate);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -73,7 +55,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
     setModalOpen(true);
   };
 
-  const handleDeleteClick = async (id: number) => {
+  const onDelete = async (id: number) => {
     const result = await Swal.fire({
       title: t("tasks.actions.deleteConfirmTitle"),
       text: t("tasks.actions.deleteConfirmText"),
@@ -125,104 +107,16 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
       ) : (
         <div className="tasks-accordion">
           <Accordion open={openAccordion} toggle={toggleAccordion}>
-            {tasks.map((task) => {
-              const isLate = dayjs(task.dueDate).isBefore(dayjs());
-              return (
-                <AccordionItem key={task.id}>
-                  <AccordionHeader targetId={task.id.toString()}>
-                    <div className="w-90">
-                      <Row>
-                        <Col xs={12} className="mb-2 text-truncate">
-                          <span className="fw-bold text-dark">
-                            {task.title}
-                          </span>
-                        </Col>
-                        <Col xs={12} md={6} className="mb-2">
-                          <span
-                            className={`badge ${
-                              isLate ? "bg-danger" : "bg-success"
-                            } me-2`}>
-                            {dayjs(task.dueDate)
-                              .local()
-                              .format("MMM D - h:mm a")}
-                            {isLate && (
-                              <FontAwesomeIcon
-                                icon={faHourglassEnd}
-                                className="ms-2"
-                              />
-                            )}
-                          </span>
-                        </Col>
-                        <Col xs={12} md={6} className="text-md-end">
-                          <FontAwesomeIcon
-                            icon={faUserCheck}
-                            className="me-2"
-                          />
-                          <small className="me-4">
-                            {task.assignedUser
-                              ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
-                              : t("tasks.form.unassigned")}
-                          </small>
-                        </Col>
-                      </Row>
-                    </div>
-                  </AccordionHeader>
-                  <AccordionBody accordionId={task.id.toString()}>
-                    <h6 className="d-md-none">{task.title}</h6>
-                    <div className="mb-3">
-                      <strong>{t("tasks.form.description")}:</strong>
-                      <p className="mb-0 text-break">
-                        {task.description || t("tasks.noDescription")}
-                      </p>
-                    </div>
-
-                    <div className="d-flex gap-2 justify-content-end">
-                      <Button
-                        color="dark"
-                        size="sm"
-                        onClick={() => handleEditClick(task)}
-                        title={t("tasks.actions.edit")}>
-                        <FontAwesomeIcon icon={faEdit} className="me-1" />
-                        {t("tasks.actions.edit")}
-                      </Button>
-                      <Button
-                        color={task.remindersEnabled ? "success" : "secondary"}
-                        size="sm"
-                        onClick={() => toggleReminders(task)}
-                        title={t("tasks.actions.toggleReminders")}
-                        disabled={
-                          updatingRemindersId === task.id ||
-                          deletingId === task.id
-                        }>
-                        {updatingRemindersId === task.id ? (
-                          <Spinner size="sm" />
-                        ) : (
-                          <FontAwesomeIcon
-                            icon={task.remindersEnabled ? faBell : faBellSlash}
-                          />
-                        )}
-                      </Button>
-                      <Button
-                        outline
-                        color="danger"
-                        size="sm"
-                        onClick={() => handleDeleteClick(task.id)}
-                        title={t("tasks.actions.delete")}
-                        disabled={
-                          deletingId === task.id ||
-                          updatingRemindersId === task.id
-                        }>
-                        {deletingId === task.id ? (
-                          <Spinner size="sm" />
-                        ) : (
-                          <FontAwesomeIcon icon={faTrash} />
-                        )}
-                      </Button>
-                    </div>
-                  </AccordionBody>
-                </AccordionItem>
-              );
-            })}
+            {tasks.map((task) => (
+              <TaskAccordionItem
+                key={task.id}
+                task={task}
+                toggleReminders={toggleReminders}
+                toggleCompleted={toggleCompleted}
+                onDelete={onDelete}
+                handleEditClick={handleEditClick}
+              />
+            ))}
           </Accordion>
         </div>
       )}

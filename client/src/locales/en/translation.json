@@ -1872,6 +1872,7 @@
     "noTasks": "No tasks found for this date.",
     "loading": "Loading tasks...",
     "noDescription": "No description",
+    "completed": "Completed",
     "form": {
       "title": "Title",
       "titlePlaceholder": "Title",
@@ -1897,11 +1898,14 @@
     },
     "actions": {
       "edit": "Edit",
-      "toggleReminders": "Toggle Reminders",
+      "activateReminders": "Activate Reminders",
+      "deactivateReminders": "Deactivate Reminders",
       "delete": "Delete",
       "deleteConfirmTitle": "Are you sure?",
       "deleteConfirmText": "You won't be able to revert this!",
-      "deleteConfirmYes": "Yes, delete it!"
+      "deleteConfirmYes": "Yes, delete it!",
+      "markComplete": "Mark Complete",
+      "markIncomplete": "Mark Incomplete"
     },
     "notifications": {
       "addSuccess": "Task added successfully",

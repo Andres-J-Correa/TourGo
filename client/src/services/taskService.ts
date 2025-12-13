@@ -15,6 +15,7 @@ export interface Task {
   description?: string;
   dueDate: string; // ISO date string
   remindersEnabled: boolean;
+  isCompleted: boolean;
   assignedUser: User;
   createdBy: User;
   modifiedBy: User;
@@ -104,7 +105,8 @@ const updateTask = async (
 // Update task reminders
 const updateReminders = async (
   hotelId: string,
-  id: number
+  id: number,
+  remindersEnabled: boolean
 ): Promise<ApiResponse<SuccessfulResponse>> => {
   const config: AxiosRequestConfig = {
     headers: {
@@ -112,6 +114,29 @@ const updateReminders = async (
     },
     method: "PATCH",
     url: `${endpoint(hotelId)}/${id}/reminders`,
+    params: { remindersEnabled },
+  };
+  try {
+    const response = await axiosClient<SuccessfulResponse>(config);
+    return response.data;
+  } catch (error: unknown) {
+    return handleGlobalError(error);
+  }
+};
+
+// update task completed status
+export const updateCompleted = async (
+  hotelId: string,
+  id: number,
+  isCompleted: boolean
+): Promise<ApiResponse<SuccessfulResponse>> => {
+  const config: AxiosRequestConfig = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${endpoint(hotelId)}/${id}/completed`,
+    params: { isCompleted },
   };
   try {
     const response = await axiosClient<SuccessfulResponse>(config);

@@ -14,6 +14,7 @@ namespace TourGo.Models.Domain.Tasks
         public string? Description { get; set; }
         public DateTime DueDate { get; set; }
         public bool RemindersEnabled { get; set; }
+        public bool IsCompleted { get; set; }
         public UserBase AssignedUser { get; set; } = new UserBase();
         public UserBase CreatedBy { get; set; } = new UserBase();
         public UserBase ModifiedBy { get; set; } = new UserBase();

@@ -4,9 +4,9 @@ using TourGo.Models.Attributes;
 
 namespace TourGo.Services.Quartz
 {
-    public class SampleJob (ILogger<SampleJob> logger): IJob
+    public class TaskReminderJob (ILogger<TaskReminderJob> logger): IJob
     {
-        private readonly ILogger<SampleJob> _logger = logger;
+        private readonly ILogger<TaskReminderJob> _logger = logger;
         public Task Execute(IJobExecutionContext context)
         {
             _logger.LogInformation("SampleJob is executing at {time}", DateTimeOffset.Now);

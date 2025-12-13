@@ -1872,6 +1872,7 @@
     "noTasks": "No se encontraron tareas para esta fecha.",
     "loading": "Cargando tareas...",
     "noDescription": "Sin descripción",
+    "completed": "Completada",
     "form": {
       "title": "Título",
       "titlePlaceholder": "Título",
@@ -1897,11 +1898,14 @@
     },
     "actions": {
       "edit": "Editar",
-      "toggleReminders": "Alternar Recordatorios",
+      "activateReminders": "Activar Recordatorios",
+      "deactivateReminders": "Desactivar Recordatorios",
       "delete": "Eliminar",
       "deleteConfirmTitle": "¿Estás seguro?",
       "deleteConfirmText": "¡No podrás revertir esto!",
-      "deleteConfirmYes": "¡Sí, eliminar!"
+      "deleteConfirmYes": "¡Sí, eliminar!",
+      "markComplete": "Marcar como completada",
+      "markIncomplete": "Marcar como incompleta"
     },
     "notifications": {
       "addSuccess": "Tarea agregada correctamente",
