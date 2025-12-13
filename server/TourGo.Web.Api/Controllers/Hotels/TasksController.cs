@@ -32,7 +32,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             {
                 string userId = _webAuthService.GetCurrentUserId();
 
-                List<Task>? tasks = _taskService.GetTasksByDueDateRange(hotelId, startDate, endDate);
+                List<Task>? tasks = _taskService.GetByDueDateRange(hotelId, startDate, endDate);
 
                 if(tasks == null || tasks.Count == 0)
                 {
@@ -62,7 +62,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                int id = _taskService.AddTask(model, hotelId, userId);
+                int id = _taskService.Add(model, hotelId, userId);
                 ItemResponse<int> response = new() { Item = id };
                 return Created201(response);
             }
@@ -81,7 +81,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _taskService.UpdateTask(model, userId);
+                _taskService.Update(model, userId);
                 return Ok200(new SuccessResponse());
             }
             catch (Exception ex)
@@ -94,17 +94,35 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
         [HttpPatch("{id:int}/reminders")]
         [EntityAuth(EntityTypeEnum.Tasks, EntityActionTypeEnum.Update)]
-        public ActionResult<SuccessResponse> UpdateReminders(int id)
+        public ActionResult<SuccessResponse> UpdateReminders(int id, [FromQuery] bool remindersEnabled)
         {
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _taskService.UpdateTaskReminders(id, userId);
+                _taskService.UpdateTaskReminders(id, userId, remindersEnabled);
                 return Ok200(new SuccessResponse());
             }
             catch (Exception ex)
             {
                 ErrorResponse response = new("An error occurred while updating task reminders.");
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                return StatusCode(500, response);
+            }
+        }
+
+        [HttpPatch("{id:int}/completed")]
+        [EntityAuth(EntityTypeEnum.Tasks, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> UpdateCompletedStatus(int id, [FromQuery] bool isCompleted)
+        {
+            try
+            {
+                string userId = _webAuthService.GetCurrentUserId();
+                _taskService.UpdateCompleted(id, userId, isCompleted);
+                return Ok200(new SuccessResponse());
+            }
+            catch (Exception ex)
+            {
+                ErrorResponse response = new("An error occurred while updating task completed status.");
                 Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
                 return StatusCode(500, response);
             }
@@ -117,7 +135,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
             try
             {
                 string userId = _webAuthService.GetCurrentUserId();
-                _taskService.UpdateIsActive(id, userId);
+                _taskService.Delete(id, userId);
                 return Ok200(new SuccessResponse());
             }
             catch (Exception ex)

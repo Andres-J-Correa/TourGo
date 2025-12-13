@@ -1,6 +1,9 @@
-﻿using TourGo.Data;
+﻿using System.Data;
+using TourGo.Data;
 using TourGo.Data.Extensions;
 using TourGo.Data.Providers;
+using TourGo.Models.Domain.Tasks;
+using TourGo.Models.Domain.Users;
 using TourGo.Models.Requests.Tasks;
 using TourGo.Services.Interfaces;
 using Task = TourGo.Models.Domain.Tasks.Task;
@@ -11,7 +14,7 @@ namespace TourGo.Services.Tasks
     {
         private readonly IMySqlDataProvider _mySqlDataProvider = mySqlDataProvider;
 
-        public int AddTask(TaskAddRequest model, string hotelId, string userId)
+        public int Add(TaskAddRequest model, string hotelId, string userId)
         {
             int newId = 0;
             string proc = "tasks_create";
@@ -37,7 +40,7 @@ namespace TourGo.Services.Tasks
             return newId;
         }
 
-        public void UpdateTask(TaskUpdateRequest model, string userId)
+        public void Update(TaskUpdateRequest model, string userId)
         {
             string proc = "tasks_update";
 
@@ -55,31 +58,33 @@ namespace TourGo.Services.Tasks
             });
         }
 
-        public void UpdateTaskReminders(int taskId, string userId)
+        public void UpdateTaskReminders(int taskId, string userId, bool remindersEnabled)
         {
-            string proc = "tasks_update_reminders_enabled";
+            string proc = "tasks_update_reminders_enabled_v2";
             _mySqlDataProvider.ExecuteNonQuery(proc, (col) =>
             {
                 col.AddWithValue("p_id", taskId);
                 col.AddWithValue("p_modifiedBy", userId);
+                col.AddWithValue("p_remindersEnabled", remindersEnabled ? 1 : 0);
             });
         }
 
-        public void UpdateIsActive(int taskId, string userId)
+        public void Delete(int taskId, string userId)
         {
-            string proc = "tasks_update_is_active";
+            string proc = "tasks_update_is_active_v2";
             _mySqlDataProvider.ExecuteNonQuery(proc, (col) =>
             {
                 col.AddWithValue("p_id", taskId);
                 col.AddWithValue("p_modifiedBy", userId);
+                col.AddWithValue("p_isActive", 0);
             });
         }
 
-        public List<Task>? GetTasksByDueDateRange(string hotelId, DateTime startDate, DateTime endDate)
+        public List<Task>? GetByDueDateRange(string hotelId, DateTime startDate, DateTime endDate)
         {
             List<Task>? tasks = null;
 
-            string proc = "tasks_select_by_due_date_range";
+            string proc = "tasks_select_by_due_date_range_v2";
 
             DateTime utcStartDate = startDate.ToUniversalTime();
             DateTime utcEndDate = endDate.ToUniversalTime();
@@ -101,35 +106,77 @@ namespace TourGo.Services.Tasks
             return tasks;
         }
 
-        private static Task MapTask(System.Data.IDataReader reader, ref int index)
+        public void UpdateCompleted (int taskId, string userId, bool isComplete)
+        {
+            string proc = "tasks_update_completed";
+            _mySqlDataProvider.ExecuteNonQuery(proc, (col) =>
+            {
+                col.AddWithValue("p_id", taskId);
+                col.AddWithValue("p_modifiedBy", userId);
+                col.AddWithValue("p_isComplete", isComplete ? 1 : 0);
+            });
+        }
+
+        public List<TaskReminder>? GetOverdue()
+        {
+            string proc = "tasks_select_overdue";
+            List<TaskReminder>? reminders = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, null, (reader, set) =>
+            {
+                int index = 0;
+                TaskReminder reminder = MapTaskReminder(reader, ref index);
+                reminders ??= [];
+                reminders.Add(reminder);
+            });
+
+            return reminders;
+        }
+
+        private static TaskReminder MapTaskReminder(IDataReader reader, ref int index)
+        {
+            return new TaskReminder()
+            {
+                Id = reader.GetSafeInt32(index++),
+                Title = reader.GetSafeString(index++),
+                Description = reader.GetSafeString(index++),
+                DueDate = DateTime.SpecifyKind(reader.GetSafeDateTime(index++), DateTimeKind.Utc),
+                AssigneeId = reader.GetSafeInt32(index++),
+                HotelId = reader.GetSafeInt32(index++),
+                HotelName = reader.GetSafeString(index++)
+            };
+        }
+
+        private static Task MapTask(IDataReader reader, ref int index)
         {
             Task task = new Task()
             {
-                Id = reader.GetInt32(index++),
-                Title = reader.GetString(index++),
+                Id = reader.GetSafeInt32(index++),
+                Title = reader.GetSafeString(index++),
                 Description = reader.GetSafeString(index++),
-                DueDate = DateTime.SpecifyKind(reader.GetDateTime(index++), DateTimeKind.Utc),
-                RemindersEnabled = reader.GetBoolean(index++),
-                CreatedBy = new Models.Domain.Users.UserBase()
+                DueDate = DateTime.SpecifyKind(reader.GetSafeDateTime(index++), DateTimeKind.Utc),
+                RemindersEnabled = reader.GetSafeBool(index++),
+                IsCompleted = reader.GetSafeBool(index++),
+                CreatedBy = new UserBase()
                 {
-                    Id = reader.GetString(index++),
-                    FirstName = reader.GetString(index++),
-                    LastName = reader.GetString(index++),
+                    Id = reader.GetSafeString(index++),
+                    FirstName = reader.GetSafeString(index++),
+                    LastName = reader.GetSafeString(index++),
                 },
-                ModifiedBy = new Models.Domain.Users.UserBase()
+                ModifiedBy = new UserBase()
                 {
-                    Id = reader.GetString(index++),
-                    FirstName = reader.GetString(index++),
-                    LastName = reader.GetString(index++),
+                    Id = reader.GetSafeString(index++),
+                    FirstName = reader.GetSafeString(index++),
+                    LastName = reader.GetSafeString(index++),
                 },
-                AssignedUser = new Models.Domain.Users.UserBase()
+                AssignedUser = new UserBase()
                 {
-                    Id = reader.GetString(index++),
-                    FirstName = reader.GetString(index++),
-                    LastName = reader.GetString(index++),
+                    Id = reader.GetSafeString(index++),
+                    FirstName = reader.GetSafeString(index++),
+                    LastName = reader.GetSafeString(index++),
                 },
-                DateCreated = reader.GetDateTime(index++),
-                DateModified = reader.GetDateTime(index++)
+                DateCreated = reader.GetSafeDateTime(index++),
+                DateModified = reader.GetSafeDateTime(index++)
             };
 
             return task;

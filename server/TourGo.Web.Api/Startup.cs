@@ -1,8 +1,11 @@
 ﻿using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Localization;
+using Quartz;
 using System.Globalization;
 using TourGo.Models.Domain.Config;
 using TourGo.Models.Domain.Config.Emails;
+using TourGo.Services;
+using TourGo.Web.Api.Extensions;
 using TourGo.Web.Api.Middleware;
 using TourGo.Web.Core;
 using TourGo.Web.StartUp;
@@ -29,6 +32,15 @@ namespace TourGo.Web.Api
             MVC.ConfigureServices(services);
             SPA.ConfigureServices(services);
             services.AddInMemoryRateLimiting();
+            services.AddQuartz(q =>
+            {
+                //for trivial jobs
+                q.AddQuartzJobsFromConfig(Configuration, typeof(ServicesAssemblyMarker).Assembly);
+            });
+            services.AddQuartzHostedService(options =>
+            {
+                options.WaitForJobsToComplete = true;
+            });
         }
 
         private void ConfigureAppSettings(IServiceCollection services)

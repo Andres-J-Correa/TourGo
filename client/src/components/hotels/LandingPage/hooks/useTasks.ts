@@ -6,6 +6,7 @@ import {
   updateTask as updateTaskService,
   updateReminders as updateRemindersService,
   deleteTask as deleteTaskService,
+  updateCompleted as updateCompletedService,
   type Task,
   type TaskAddRequest,
   type TaskUpdateRequest,
@@ -25,10 +26,6 @@ export const useTasks = (
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [updating, setUpdating] = useState(false);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [updatingRemindersId, setUpdatingRemindersId] = useState<number | null>(
-    null
-  );
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loadingStaff, setLoadingStaff] = useState(false);
 
@@ -129,30 +126,36 @@ export const useTasks = (
 
   const toggleReminders = async (task: Task) => {
     if (!hotelId) return;
-    setUpdatingRemindersId(task.id);
     try {
-      await updateRemindersService(hotelId, task.id);
+      await updateRemindersService(hotelId, task.id, !task.remindersEnabled);
       toast.success(t("tasks.notifications.reminderSuccess"));
       // No optimistic update to properly show spinner state and ensure server sync
       await fetchTasks();
     } catch (error) {
       toast.error(t("tasks.notifications.reminderError"));
-    } finally {
-      setUpdatingRemindersId(null);
     }
   };
 
   const deleteTask = async (id: number) => {
     if (!hotelId) return;
-    setDeletingId(id);
     try {
       await deleteTaskService(hotelId, id);
       toast.success(t("tasks.notifications.deleteSuccess"));
       setTasks((prev) => prev.filter((t) => t.id !== id));
     } catch (error) {
       toast.error(t("tasks.notifications.deleteError"));
-    } finally {
-      setDeletingId(null);
+    }
+  };
+
+  const toggleCompleted = async (task: Task) => {
+    if (!hotelId) return;
+    try {
+      await updateCompletedService(hotelId, task.id, !task.isCompleted);
+      toast.success(t("tasks.notifications.updateSuccess"));
+      // No optimistic update to properly show spinner state and ensure server sync
+      await fetchTasks();
+    } catch (error) {
+      toast.error(t("tasks.notifications.updateError"));
     }
   };
 
@@ -161,8 +164,6 @@ export const useTasks = (
     loading,
     creating,
     updating,
-    deletingId,
-    updatingRemindersId,
     addTask,
     updateTask,
     toggleReminders,
@@ -170,5 +171,6 @@ export const useTasks = (
     refreshTasks: fetchTasks,
     staff,
     loadingStaff,
+    toggleCompleted,
   };
 };
