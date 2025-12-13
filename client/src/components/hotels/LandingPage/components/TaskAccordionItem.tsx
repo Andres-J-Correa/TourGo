@@ -32,6 +32,8 @@ interface TaskAccordionItemProps {
   toggleCompleted: (task: Task) => Promise<void>;
 }
 
+type LoadingAction = "editing" | "deleting" | "completing" | "reminders" | null;
+
 export default function TaskAccordionItem({
   task,
   deleteTask,
@@ -39,10 +41,10 @@ export default function TaskAccordionItem({
   toggleReminders,
   toggleCompleted,
 }: TaskAccordionItemProps) {
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [loadingAction, setLoadingAction] = useState<LoadingAction>(null);
 
   const handleDeleteClick = async (id: number) => {
-    if (isUpdating) return;
+    if (loadingAction) return;
 
     const result = await Swal.fire({
       title: t("tasks.actions.deleteConfirmTitle"),
@@ -54,24 +56,43 @@ export default function TaskAccordionItem({
     });
 
     if (result.isConfirmed) {
-      setIsUpdating(true);
-      await deleteTask(id);
-      setIsUpdating(false);
+      setLoadingAction("deleting");
+      try {
+        await deleteTask(id);
+      } finally {
+        setLoadingAction(null);
+      }
     }
   };
 
   const handleToggleReminders = async (task: Task) => {
-    if (isUpdating) return;
-    setIsUpdating(true);
-    await toggleReminders(task);
-    setIsUpdating(false);
+    if (loadingAction) return;
+    setLoadingAction("reminders");
+    try {
+      await toggleReminders(task);
+    } finally {
+      setLoadingAction(null);
+    }
   };
 
   const handleToggleCompleted = async (task: Task) => {
-    if (isUpdating) return;
-    setIsUpdating(true);
-    await toggleCompleted(task);
-    setIsUpdating(false);
+    if (loadingAction) return;
+    setLoadingAction("completing");
+    try {
+      await toggleCompleted(task);
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const onEditClick = async (task: Task) => {
+    if (loadingAction) return;
+    setLoadingAction("editing");
+    try {
+      await handleEditClick(task);
+    } finally {
+      setLoadingAction(null);
+    }
   };
 
   const { t } = useLanguage();
@@ -121,9 +142,14 @@ export default function TaskAccordionItem({
             <Button
               color="dark"
               size="sm"
-              onClick={() => handleEditClick(task)}
-              title={t("tasks.actions.edit")}>
-              <FontAwesomeIcon icon={faEdit} className="me-1" />
+              onClick={() => onEditClick(task)}
+              title={t("tasks.actions.edit")}
+              disabled={loadingAction !== null}>
+              {loadingAction === "editing" ? (
+                <Spinner size="sm" />
+              ) : (
+                <FontAwesomeIcon icon={faEdit} className="me-1" />
+              )}
               {t("tasks.actions.edit")}
             </Button>
           )}
@@ -137,8 +163,8 @@ export default function TaskAccordionItem({
                   ? t("tasks.actions.deactivateReminders")
                   : t("tasks.actions.activateReminders")
               }
-              disabled={isUpdating}>
-              {isUpdating ? (
+              disabled={loadingAction !== null}>
+              {loadingAction === "reminders" ? (
                 <Spinner size="sm" />
               ) : (
                 <FontAwesomeIcon
@@ -156,8 +182,8 @@ export default function TaskAccordionItem({
                 ? t("tasks.actions.markIncomplete")
                 : t("tasks.actions.markComplete")
             }
-            disabled={isUpdating}>
-            {isUpdating ? (
+            disabled={loadingAction !== null}>
+            {loadingAction === "completing" ? (
               <Spinner size="sm" />
             ) : (
               <FontAwesomeIcon icon={!task.isCompleted ? faCheck : faTimes} />
@@ -169,8 +195,8 @@ export default function TaskAccordionItem({
             size="sm"
             onClick={() => handleDeleteClick(task.id)}
             title={t("tasks.actions.delete")}
-            disabled={isUpdating}>
-            {isUpdating ? (
+            disabled={loadingAction !== null}>
+            {loadingAction === "deleting" ? (
               <Spinner size="sm" />
             ) : (
               <FontAwesomeIcon icon={faTrash} />
