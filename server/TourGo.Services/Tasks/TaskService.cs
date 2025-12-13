@@ -16,11 +16,13 @@ namespace TourGo.Services.Tasks
             int newId = 0;
             string proc = "tasks_create";
 
+            DateTime utcdate = model.DueDate.ToUniversalTime();
+
             _mySqlDataProvider.ExecuteNonQuery(proc, (col) =>
             {
                 col.AddWithValue("p_title", model.Title);
                 col.AddWithNullableValue("p_description", model.Description);
-                col.AddWithValue("p_dueDate", model.DueDate);
+                col.AddWithValue("p_dueDate", utcdate);
                 col.AddWithValue("p_assigneeId", model.AssignedUserId);
                 col.AddWithValue("p_remindersEnabled", model.RemindersEnabled);
                 col.AddWithValue("p_hotelId", hotelId);
@@ -38,12 +40,15 @@ namespace TourGo.Services.Tasks
         public void UpdateTask(TaskUpdateRequest model, string userId)
         {
             string proc = "tasks_update";
+
+            DateTime utcdate = model.DueDate.ToUniversalTime();
+
             _mySqlDataProvider.ExecuteNonQuery(proc, (col) =>
             {
                 col.AddWithValue("p_id", model.Id);
                 col.AddWithValue("p_title", model.Title);
                 col.AddWithNullableValue("p_description", model.Description);
-                col.AddWithValue("p_dueDate", model.DueDate);
+                col.AddWithValue("p_dueDate", utcdate);
                 col.AddWithValue("p_assigneeId", model.AssignedUserId);
                 col.AddWithValue("p_modifiedBy", userId);
                 col.AddWithValue("p_remindersEnabled", model.RemindersEnabled);
@@ -76,11 +81,14 @@ namespace TourGo.Services.Tasks
 
             string proc = "tasks_select_by_due_date_range";
 
+            DateTime utcStartDate = startDate.ToUniversalTime();
+            DateTime utcEndDate = endDate.ToUniversalTime();
+
             _mySqlDataProvider.ExecuteCmd(proc, (col) =>
             {
                 col.AddWithValue("p_hotelId", hotelId);
-                col.AddWithValue("p_startDate", startDate);
-                col.AddWithValue("p_endDate", endDate);
+                col.AddWithValue("p_startDate", utcStartDate);
+                col.AddWithValue("p_endDate", utcEndDate);
             }, (reader, set) =>
             {
                 int index = 0;
@@ -100,7 +108,7 @@ namespace TourGo.Services.Tasks
                 Id = reader.GetInt32(index++),
                 Title = reader.GetString(index++),
                 Description = reader.GetSafeString(index++),
-                DueDate = reader.GetDateTime(index++),
+                DueDate = DateTime.SpecifyKind(reader.GetDateTime(index++), DateTimeKind.Utc),
                 RemindersEnabled = reader.GetBoolean(index++),
                 CreatedBy = new Models.Domain.Users.UserBase()
                 {
@@ -123,6 +131,7 @@ namespace TourGo.Services.Tasks
                 DateCreated = reader.GetDateTime(index++),
                 DateModified = reader.GetDateTime(index++)
             };
+
             return task;
         }
     }

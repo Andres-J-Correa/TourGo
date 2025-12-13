@@ -8,6 +8,7 @@ import {
   FormGroup,
   Label,
   Input,
+  Spinner,
 } from "reactstrap";
 import { Formik, Form, type FormikHelpers } from "formik";
 import {
@@ -96,17 +97,22 @@ const TaskModal: React.FC<TaskModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} toggle={toggle} centered>
-      <ModalHeader toggle={toggle}>
-        {taskToEdit ? t("tasks.updateTask") : t("tasks.addTask")}
-      </ModalHeader>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-        enableReinitialize>
-        {({ isSubmitting, values, handleChange, handleBlur }) => (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+      enableReinitialize>
+      {({ isSubmitting, values, handleChange, handleBlur }) => (
+        <Modal
+          isOpen={isOpen}
+          toggle={!isSubmitting ? toggle : undefined}
+          centered
+          backdrop={isSubmitting ? "static" : true}
+          keyboard={!isSubmitting}>
           <Form>
+            <ModalHeader toggle={!isSubmitting ? toggle : undefined}>
+              {taskToEdit ? t("tasks.updateTask") : t("tasks.addTask")}
+            </ModalHeader>
             <ModalBody>
               <CustomField
                 name="title"
@@ -166,14 +172,21 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 disabled={isSubmitting}>
                 {t("tasks.form.cancel")}
               </Button>
-              <Button color="primary" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? t("tasks.form.saving") : t("tasks.form.save")}
+              <Button color="dark" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Spinner size="sm" className="me-2" />
+                    {t("tasks.form.saving")}
+                  </>
+                ) : (
+                  t("tasks.form.save")
+                )}
               </Button>
             </ModalFooter>
           </Form>
-        )}
-      </Formik>
-    </Modal>
+        </Modal>
+      )}
+    </Formik>
   );
 };
 

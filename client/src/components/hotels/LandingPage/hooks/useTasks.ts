@@ -13,6 +13,7 @@ import {
 import { getByHotelId as getStaffByHotelId } from "services/staffService";
 import type { Staff } from "types/entities/staff.types";
 import { useLanguage } from "contexts/LanguageContext";
+import dayjs from "dayjs";
 
 export const useTasks = (
   hotelId: string | undefined,
@@ -22,6 +23,12 @@ export const useTasks = (
   const { t } = useLanguage();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [updatingRemindersId, setUpdatingRemindersId] = useState<number | null>(
+    null
+  );
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loadingStaff, setLoadingStaff] = useState(false);
 
@@ -29,7 +36,18 @@ export const useTasks = (
     if (!hotelId || !startDate || !endDate) return;
     setLoading(true);
     try {
-      const response = await getTasks(hotelId, startDate, endDate);
+      const formattedStartDate = dayjs(startDate).format(
+        "YYYY-MM-DDT00:00:00.SSSZ"
+      );
+      const formattedEndDate = dayjs(endDate).format(
+        "YYYY-MM-DDT23:59:59.SSSZ"
+      );
+
+      const response = await getTasks(
+        hotelId,
+        formattedStartDate,
+        formattedEndDate
+      );
 
       if (response.isSuccessful) {
         setTasks(response.items || []);
@@ -79,61 +97,72 @@ export const useTasks = (
 
   const addTask = async (task: TaskAddRequest) => {
     if (!hotelId) return;
+    setCreating(true);
     try {
       await addTaskService(hotelId, task);
       toast.success(t("tasks.notifications.addSuccess"));
-      fetchTasks();
+      await fetchTasks();
       return true;
     } catch (error) {
       toast.error(t("tasks.notifications.addError"));
       return false;
+    } finally {
+      setCreating(false);
     }
   };
 
   const updateTask = async (task: TaskUpdateRequest) => {
     if (!hotelId) return;
+    setUpdating(true);
     try {
       await updateTaskService(hotelId, task);
       toast.success(t("tasks.notifications.updateSuccess"));
-      fetchTasks();
+      await fetchTasks();
       return true;
     } catch (error) {
       toast.error(t("tasks.notifications.updateError"));
       return false;
+    } finally {
+      setUpdating(false);
     }
   };
 
   const toggleReminders = async (task: Task) => {
     if (!hotelId) return;
+    setUpdatingRemindersId(task.id);
     try {
       await updateRemindersService(hotelId, task.id);
       toast.success(t("tasks.notifications.reminderSuccess"));
-      // Optimistic update
-      setTasks((prev) =>
-        prev.map((t) =>
-          t.id === task.id ? { ...t, remindersEnabled: !t.remindersEnabled } : t
-        )
-      );
+      // No optimistic update to properly show spinner state and ensure server sync
+      await fetchTasks();
     } catch (error) {
       toast.error(t("tasks.notifications.reminderError"));
-      fetchTasks(); // Revert on error
+    } finally {
+      setUpdatingRemindersId(null);
     }
   };
 
   const deleteTask = async (id: number) => {
     if (!hotelId) return;
+    setDeletingId(id);
     try {
       await deleteTaskService(hotelId, id);
       toast.success(t("tasks.notifications.deleteSuccess"));
       setTasks((prev) => prev.filter((t) => t.id !== id));
     } catch (error) {
       toast.error(t("tasks.notifications.deleteError"));
+    } finally {
+      setDeletingId(null);
     }
   };
 
   return {
     tasks,
     loading,
+    creating,
+    updating,
+    deletingId,
+    updatingRemindersId,
     addTask,
     updateTask,
     toggleReminders,
