@@ -26,6 +26,7 @@ import "../HotelLandingPage.css"; // Reuse existing CSS
 
 import { useHotelDashboard } from "./hooks/useHotelDashboard";
 import { useHotelActions } from "./hooks/useHotelActions";
+import { useHotelNavigation } from "./hooks/useHotelNavigation";
 import DateFilter, { dateOptions } from "./components/DateFilter";
 import ArrivalsPane from "./components/ArrivalsPane";
 import DeparturesPane from "./components/DeparturesPane";
@@ -35,7 +36,7 @@ import TasksPane from "./components/TasksPane";
 
 const HotelLandingPage = (): JSX.Element => {
   const [date, setDate] = useState(dateOptions.today);
-  const [activeTab, setActiveTab] = useState("arrivals");
+  const { activeTab, setActiveTab } = useHotelNavigation();
 
   const navigate = useNavigate();
   const { hotelId } = useParams();
@@ -53,9 +54,11 @@ const HotelLandingPage = (): JSX.Element => {
     () =>
       new BreadcrumbBuilder(t)
         .addHotels()
-        .addActive(t("hotels.landing.breadcrumbActive"))
+        .addActive(
+          `${hotel.current.name} - ${t(`hotels.landing.${activeTab}`)}`
+        )
         .build(),
-    [t]
+    [t, hotel]
   );
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +70,7 @@ const HotelLandingPage = (): JSX.Element => {
   };
 
   const toggleTab = (tab: string) => {
-    if (activeTab !== tab) setActiveTab(tab);
+    setActiveTab(tab);
   };
 
   return (

@@ -1,6 +1,7 @@
 import type { JSX } from "react";
 import * as React from "react";
 import type { Breadcrumb } from "./Breadcrumbs.types";
+import { Helmet } from "react-helmet-async";
 
 import Breadcrumbs from "./Breadcrumbs";
 
@@ -72,10 +73,19 @@ class BreadcrumbBuilder {
   }
 
   build(): JSX.Element {
-    return React.createElement(Breadcrumbs, {
-      breadcrumbs: this.breadcrumbs,
-      active: this.activeLabel,
-    });
+    return React.createElement(
+      React.Fragment,
+      null,
+      React.createElement(
+        Helmet,
+        null,
+        React.createElement("title", null, `${this.activeLabel}`)
+      ),
+      React.createElement(Breadcrumbs, {
+        breadcrumbs: this.breadcrumbs,
+        active: this.activeLabel,
+      })
+    );
   }
 }
 
