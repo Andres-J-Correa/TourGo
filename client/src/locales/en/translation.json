@@ -19,8 +19,8 @@
     "sessionExpired": "Session expired, please log in again",
     "areYouProvider": "Sell your tours, join us!",
     "breadcrumbs": {
-      "home": "Inicio",
-      "hotels": "Hoteles",
+      "home": "Home",
+      "hotels": "Hotels",
       "hotel": "Hotel"
     },
     "downloading": "Downloading",

@@ -80,7 +80,7 @@ export default function TaskRemindersModal({
 
   const onGotoHotelClicked = (task: TaskReminder) => {
     toggle();
-    navigate(`/hotels/${task.hotelId}`);
+    navigate(`/hotels/${task.hotelId}?view=tasks`);
   };
 
   return (
