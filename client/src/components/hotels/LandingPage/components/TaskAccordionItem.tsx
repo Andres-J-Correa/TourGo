@@ -186,7 +186,13 @@ export default function TaskAccordionItem({
             {loadingAction === "completing" ? (
               <Spinner size="sm" />
             ) : (
-              <FontAwesomeIcon icon={!task.isCompleted ? faCheck : faTimes} />
+              <>
+                <FontAwesomeIcon
+                  icon={!task.isCompleted ? faCheck : faTimes}
+                  className={task.isCompleted ? "me-2" : ""}
+                />
+                {task.isCompleted && t("tasks.actions.markIncomplete")}
+              </>
             )}
           </Button>
           <Button

@@ -33,7 +33,7 @@ const Breadcrumbs = ({
   }, [breadcrumbs]);
 
   return (
-    <Row className="no-print">
+    <Row className="no-print mb-3">
       <Col xs="12">
         <div className="page-title-box d-flex align-items-center justify-content-end">
           <ol className="breadcrumb m-0 justify-content-end">
