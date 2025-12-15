@@ -1869,7 +1869,7 @@
     "addTask": "Agregar Tarea",
     "editTask": "Editar Tarea",
     "updateTask": "Actualizar Tarea",
-    "noTasks": "No se encontraron tareas para esta fecha.",
+    "noTasks": "No se encontraron tareas para esta fechas.",
     "loading": "Cargando tareas...",
     "noDescription": "Sin descripción",
     "completed": "Completada",
@@ -1923,6 +1923,23 @@
     "reminders": {
       "title": "Tareas Atrasadas!",
       "subtitle": "Tienes tareas atrasadas. Porfavor marca como completado o edita la fecha de vencimiento."
+    },
+    "calendar": {
+      "more": "Mas",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "today": "Hoy",
+      "month": "Mes",
+      "week": "Semana",
+      "workWeek": "Semana de Trabajo",
+      "day": "Dia",
+      "agenda": "Agenda",
+      "list": "Lista",
+      "date": "Fecha",
+      "time": "Hora",
+      "event": "Evento",
+      "allDay": "Todo el dia",
+      "noEventsInRange": "No hay eventos en el rango seleccionado"
     }
   }
 }

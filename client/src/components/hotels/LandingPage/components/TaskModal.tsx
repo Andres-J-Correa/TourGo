@@ -84,7 +84,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     };
 
     let result;
-    if (taskToEdit) {
+    if (taskToEdit?.id) {
       result = await onSave({ ...taskData, id: taskToEdit.id });
     } else {
       result = await onSave(taskData);
@@ -111,7 +111,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           keyboard={!isSubmitting}>
           <Form>
             <ModalHeader toggle={!isSubmitting ? toggle : undefined}>
-              {taskToEdit ? t("tasks.updateTask") : t("tasks.addTask")}
+              {taskToEdit?.id ? t("tasks.updateTask") : t("tasks.addTask")}
             </ModalHeader>
             <ModalBody>
               <CustomField
