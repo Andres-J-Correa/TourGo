@@ -1923,6 +1923,23 @@
     "reminders": {
       "title": "Overdue Tasks!",
       "subtitle": "You have overdue tasks. Please mark as completed or edit due date."
+    },
+    "calendar": {
+      "more": "More",
+      "previous": "Previous",
+      "next": "Next",
+      "today": "Today",
+      "month": "Month",
+      "week": "Week",
+      "workWeek": "Work Week",
+      "day": "Day",
+      "agenda": "Agenda",
+      "list": "List",
+      "date": "Date",
+      "time": "Time",
+      "event": "Event",
+      "allDay": "All day",
+      "noEventsInRange": "No events in the selected range"
     }
   }
 }

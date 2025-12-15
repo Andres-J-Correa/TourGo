@@ -58,7 +58,7 @@ const HotelLandingPage = (): JSX.Element => {
           `${hotel.current.name} - ${t(`hotels.landing.${activeTab}`)}`
         )
         .build(),
-    [t, hotel]
+    [t, hotel, activeTab]
   );
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
