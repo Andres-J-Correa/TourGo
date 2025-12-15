@@ -43,12 +43,11 @@ interface CalendarEvent {
 }
 
 const eventPropGetter = (event: CalendarEvent) => {
-  const task = event.resource;
+  const isLate = dayjs(event.resource.dueDate).isBefore(dayjs());
   let className = "";
-  if (task.isCompleted)
+  if (event.resource.isCompleted)
     className = "bg-success text-white text-decoration-line-through opacity-75";
-  else if (dayjs(task.dueDate).isBefore(dayjs(), "day"))
-    className = "bg-danger text-white";
+  else if (isLate) className = "bg-danger text-white";
   else className = "bg-dark text-white";
 
   return { className };
