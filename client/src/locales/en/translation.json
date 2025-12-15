@@ -1869,7 +1869,7 @@
     "addTask": "Add Task",
     "editTask": "Edit Task",
     "updateTask": "Update Task",
-    "noTasks": "No tasks found for this date.",
+    "noTasks": "No tasks found for these dates.",
     "loading": "Loading tasks...",
     "noDescription": "No description",
     "completed": "Completed",

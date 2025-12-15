@@ -1869,7 +1869,7 @@
     "addTask": "Agregar Tarea",
     "editTask": "Editar Tarea",
     "updateTask": "Actualizar Tarea",
-    "noTasks": "No se encontraron tareas para esta fecha.",
+    "noTasks": "No se encontraron tareas para esta fechas.",
     "loading": "Cargando tareas...",
     "noDescription": "Sin descripción",
     "completed": "Completada",

@@ -23,6 +23,7 @@ import {
 import { useLanguage } from "contexts/LanguageContext";
 import type { Task } from "services/taskService";
 import Swal from "sweetalert2";
+import classNames from "classnames";
 
 interface TaskAccordionItemProps {
   task: Task;
@@ -97,7 +98,7 @@ export default function TaskAccordionItem({
 
   const { t } = useLanguage();
   const isLate = dayjs(task.dueDate).isBefore(dayjs()) && !task.isCompleted;
-  const badgeContent = task.isCompleted
+  const badgeContent: string = task.isCompleted
     ? t("tasks.completed")
     : dayjs(task.dueDate).local().format("MMM D - h:mm a");
   return (
@@ -110,7 +111,11 @@ export default function TaskAccordionItem({
             </Col>
             <Col xs={12} md={6} className="mb-2">
               <span
-                className={`badge me-2 ${isLate ? "bg-danger" : "bg-success"}`}>
+                className={classNames("badge me-2", {
+                  "bg-danger": isLate,
+                  "bg-success": task.isCompleted,
+                  "bg-dark": !isLate && !task.isCompleted,
+                })}>
                 {badgeContent}
                 {isLate && (
                   <FontAwesomeIcon icon={faHourglassEnd} className="ms-2" />

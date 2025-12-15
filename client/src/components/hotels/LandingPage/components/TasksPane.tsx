@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Button, Accordion, Row, Col, ButtonGroup } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList, faCalendar } from "@fortawesome/free-solid-svg-icons";
@@ -10,10 +10,19 @@ import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import { getDateString } from "utils/dateHelper";
 import TaskAccordionItem from "./TaskAccordionItem";
 import dayjs from "dayjs";
-import { Calendar, dayjsLocalizer, type View, Views } from "react-big-calendar";
+import {
+  Calendar,
+  dayjsLocalizer,
+  type EventProps,
+  type View,
+  Views,
+} from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import "./TasksPane.css";
+import TaskCalendarEvent from "./TaskCalendarEvent";
+import Popover from "components/commonUI/popover/Popover";
+import TaskCalendarEventDetailsCard from "./TaskCalendarEventDetailsCard";
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -32,6 +41,18 @@ interface CalendarEvent {
   allDay: boolean;
   resource: Task;
 }
+
+const eventPropGetter = (event: CalendarEvent) => {
+  const task = event.resource;
+  let className = "";
+  if (task.isCompleted)
+    className = "bg-success text-white text-decoration-line-through opacity-75";
+  else if (dayjs(task.dueDate).isBefore(dayjs(), "day"))
+    className = "bg-danger text-white";
+  else className = "bg-dark text-white";
+
+  return { className };
+};
 
 const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
   const { t } = useLanguage();
@@ -126,7 +147,6 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
 
   const handleCalendarNavigate = (date: Date) => {
     setCalendarDate(date);
-    // When navigating, update the global start/end date context to fetch tasks for the new range
     const start = dayjs(date).startOf("month").format("YYYY-MM-DD");
     const end = dayjs(date).endOf("month").format("YYYY-MM-DD");
     setStartDate(start);
@@ -137,18 +157,19 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
     setCalendarView(view);
   };
 
-  const handleSelectEvent = (event: object) => {
-    const resource = (event as { resource: Task }).resource;
-    handleEditClick(resource);
-  };
-
   const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
-    // Open modal to create new task on this date
     setTaskToEdit({
       dueDate: slotInfo.start.toISOString(),
-    } as Task); // Prefill date, using partial Task type hack or handle in Modal
+    } as Task);
     setModalOpen(true);
   };
+
+  useEffect(() => {
+    if (viewMode === "calendar") {
+      setStartDate((prev) => dayjs(prev).startOf("month").format("YYYY-MM-DD"));
+      setEndDate((prev) => dayjs(prev).endOf("month").format("YYYY-MM-DD"));
+    }
+  }, [viewMode]);
 
   return (
     <div>
@@ -169,16 +190,16 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
           <Col className="d-flex justify-content-end gap-2 ms-auto">
             <ButtonGroup>
               <Button
-                color={viewMode === "list" ? "dark" : "outline-dark"}
-                onClick={() => setViewMode("list")}
-                active={viewMode === "list"}>
-                <FontAwesomeIcon icon={faList} />
-              </Button>
-              <Button
                 color={viewMode === "calendar" ? "dark" : "outline-dark"}
                 onClick={() => setViewMode("calendar")}
                 active={viewMode === "calendar"}>
                 <FontAwesomeIcon icon={faCalendar} />
+              </Button>
+              <Button
+                color={viewMode === "list" ? "dark" : "outline-dark"}
+                onClick={() => setViewMode("list")}
+                active={viewMode === "list"}>
+                <FontAwesomeIcon icon={faList} />
               </Button>
             </ButtonGroup>
 
@@ -234,24 +255,33 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
                 onView={handleCalendarViewChange}
                 date={calendarDate}
                 onNavigate={handleCalendarNavigate}
-                onSelectEvent={handleSelectEvent}
                 onSelectSlot={handleSelectSlot}
                 selectable
                 popup
                 messages={calendarMessages}
-                views={["month", "week", "day"]}
-                eventPropGetter={(event: CalendarEvent) => {
-                  const task = event.resource;
-                  let className = "";
-                  if (task.isCompleted)
-                    className =
-                      "bg-success text-white text-decoration-line-through opacity-75";
-                  else if (dayjs(task.dueDate).isBefore(dayjs(), "day"))
-                    className = "bg-danger text-white";
-                  else className = "bg-dark text-white";
-
-                  return { className };
+                views={["month"]}
+                components={{
+                  event: (props: EventProps<CalendarEvent>) => (
+                    <Popover
+                      action="click"
+                      content={
+                        <TaskCalendarEventDetailsCard
+                          task={props.event.resource}
+                        />
+                      }>
+                      <div>
+                        <TaskCalendarEvent
+                          {...props}
+                          onDelete={deleteTask}
+                          handleEditClick={handleEditClick}
+                          onToggleReminders={toggleReminders}
+                          onToggleCompleted={toggleCompleted}
+                        />
+                      </div>
+                    </Popover>
+                  ),
                 }}
+                eventPropGetter={eventPropGetter}
               />
             </div>
           )}
