@@ -13,6 +13,8 @@ import dayjs from "dayjs";
 import { Calendar, dayjsLocalizer, type View, Views } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
+import "./TasksPane.css";
+
 const localizer = dayjsLocalizer(dayjs);
 
 interface TasksPaneProps {
@@ -219,7 +221,9 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
               </div>
             )
           ) : (
-            <div style={{ height: "600px" }} className="mt-3">
+            <div
+              style={{ height: "600px" }}
+              className="mt-3 tasks-calendar-wrapper">
               <Calendar
                 localizer={localizer}
                 events={events}
@@ -235,7 +239,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
                 selectable
                 popup
                 messages={calendarMessages}
-                views={["month", "week"]}
+                views={["month", "week", "day"]}
                 eventPropGetter={(event: CalendarEvent) => {
                   const task = event.resource;
                   let className = "";
