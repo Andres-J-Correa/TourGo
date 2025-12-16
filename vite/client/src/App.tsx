@@ -17,6 +17,7 @@ import NavbarContainer from "components/commonUI/navbars/NavbarContainer";
 import SiteUnderMaintenance from "components/commonUI/fallback/SiteUnderMaintenance";
 import Footer from "components/commonUI/Footer";
 import RouteWrapper from "providers/RouteWrapper";
+import TaskRemindersListener from "components/hotels/LandingPage/components/TaskRemindersListener";
 
 import { useAppContext } from "./contexts/GlobalAppContext";
 import { publicFlattenedRoutes, privateFlattenedRoutes } from "./routes";
@@ -85,6 +86,8 @@ function App() {
         pauseOnHover
         theme="light"
       />
+
+      <TaskRemindersListener />
     </Fragment>
   );
 }
