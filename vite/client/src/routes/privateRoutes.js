@@ -1,65 +1,65 @@
 import { lazy } from "react";
 
-// const hotelRoutes = [
-//   {
-//     name: "hotelsView",
-//     path: "/hotels",
-//     component: lazy(() => import("components/hotels/HotelsView")),
-//   },
-//   {
-//     name: "hotelLandingPage",
-//     path: "/hotels/:hotelId",
-//     component: lazy(() => import("components/hotels/LandingPage")),
-//   },
-//   {
-//     name: "hotelSettings",
-//     path: "/hotels/:hotelId/settings",
-//     component: lazy(() => import("components/hotels/HotelSettings")),
-//   },
-//   {
-//     name: "hotelAdd",
-//     path: "/hotels/add",
-//     component: lazy(() => import("components/hotels/HotelAdd")),
-//   },
-//   {
-//     name: "calendar",
-//     path: "/hotels/:hotelId/calendar",
-//     component: lazy(() =>
-//       import("components/bookings/calendarV2/CalendarView")
-//     ),
-//   },
-//   {
-//     name: "customer",
-//     path: "/hotels/:hotelId/customers",
-//     component: lazy(() =>
-//       import("components/commonUI/fallback/SiteUnderConstruction")
-//     ),
-//   },
-//   {
-//     name: "staff",
-//     path: "/hotels/:hotelId/staff",
-//     component: lazy(() => import("components/staff/StaffView")),
-//   },
-//   {
-//     name: "paymentMethods",
-//     path: "/hotels/:hotelId/payment-methods",
-//     component: lazy(() =>
-//       import("components/transactions/payment-methods/PaymentMethodsView")
-//     ),
-//   },
-//   {
-//     name: "financePartners",
-//     path: "/hotels/:hotelId/finance-partners",
-//     component: lazy(() =>
-//       import("components/transactions/finance-partners/FinancePartnersView")
-//     ),
-//   },
-//   {
-//     name: "bookingProviders",
-//     path: "/hotels/:hotelId/booking-providers",
-//     component: lazy(() => import("components/bookings/BookingProvidersView")),
-//   },
-// ];
+const hotelRoutes = [
+  {
+    name: "hotelsView",
+    path: "/hotels",
+    component: lazy(() => import("components/hotels/HotelsView")),
+  },
+  //   {
+  //     name: "hotelLandingPage",
+  //     path: "/hotels/:hotelId",
+  //     component: lazy(() => import("components/hotels/LandingPage")),
+  //   },
+  //   {
+  //     name: "hotelSettings",
+  //     path: "/hotels/:hotelId/settings",
+  //     component: lazy(() => import("components/hotels/HotelSettings")),
+  //   },
+  //   {
+  //     name: "hotelAdd",
+  //     path: "/hotels/add",
+  //     component: lazy(() => import("components/hotels/HotelAdd")),
+  //   },
+  //   {
+  //     name: "calendar",
+  //     path: "/hotels/:hotelId/calendar",
+  //     component: lazy(() =>
+  //       import("components/bookings/calendarV2/CalendarView")
+  //     ),
+  //   },
+  //   {
+  //     name: "customer",
+  //     path: "/hotels/:hotelId/customers",
+  //     component: lazy(() =>
+  //       import("components/commonUI/fallback/SiteUnderConstruction")
+  //     ),
+  //   },
+  //   {
+  //     name: "staff",
+  //     path: "/hotels/:hotelId/staff",
+  //     component: lazy(() => import("components/staff/StaffView")),
+  //   },
+  //   {
+  //     name: "paymentMethods",
+  //     path: "/hotels/:hotelId/payment-methods",
+  //     component: lazy(() =>
+  //       import("components/transactions/payment-methods/PaymentMethodsView")
+  //     ),
+  //   },
+  //   {
+  //     name: "financePartners",
+  //     path: "/hotels/:hotelId/finance-partners",
+  //     component: lazy(() =>
+  //       import("components/transactions/finance-partners/FinancePartnersView")
+  //     ),
+  //   },
+  //   {
+  //     name: "bookingProviders",
+  //     path: "/hotels/:hotelId/booking-providers",
+  //     component: lazy(() => import("components/bookings/BookingProvidersView")),
+  //   },
+];
 
 // const roomRoutes = [
 //   {
@@ -177,4 +177,4 @@ import { lazy } from "react";
 //   ...transactionSubCategories,
 // ];
 
-export const privateRoutes = [];
+export const privateRoutes = [...hotelRoutes];

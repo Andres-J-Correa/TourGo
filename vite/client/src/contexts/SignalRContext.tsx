@@ -9,10 +9,12 @@ import * as signalR from "@microsoft/signalr";
 
 const _logger = require("debug")("SignalRContext");
 
-const baseUrl = "hubs";
+const baseUrl = "/hubs";
 const HUB_CONFIG = {
   taskReminders: `${baseUrl}/task-reminders`,
 };
+
+_logger(HUB_CONFIG);
 
 export type HubKey = keyof typeof HUB_CONFIG;
 
