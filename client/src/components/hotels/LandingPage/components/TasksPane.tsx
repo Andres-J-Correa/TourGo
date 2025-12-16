@@ -156,13 +156,6 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
     setCalendarView(view);
   };
 
-  const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
-    setTaskToEdit({
-      dueDate: slotInfo.start.toISOString(),
-    } as Task);
-    setModalOpen(true);
-  };
-
   useEffect(() => {
     if (viewMode === "calendar") {
       setStartDate((prev) => dayjs(prev).startOf("month").format("YYYY-MM-DD"));
@@ -254,7 +247,6 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
                 onView={handleCalendarViewChange}
                 date={calendarDate}
                 onNavigate={handleCalendarNavigate}
-                onSelectSlot={handleSelectSlot}
                 selectable
                 popup
                 messages={calendarMessages}
@@ -266,6 +258,10 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
                       content={
                         <TaskCalendarEventDetailsCard
                           task={props.event.resource}
+                          onDelete={deleteTask}
+                          handleEditClick={handleEditClick}
+                          onToggleReminders={toggleReminders}
+                          onToggleCompleted={toggleCompleted}
                         />
                       }>
                       <div>

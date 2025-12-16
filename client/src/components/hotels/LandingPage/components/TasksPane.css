@@ -62,3 +62,7 @@
 .task-event-actions button {
   z-index: 10;
 }
+
+.completed-task .accordion-button.collapsed {
+  background-color: var(--bs-success-bg-subtle);
+}

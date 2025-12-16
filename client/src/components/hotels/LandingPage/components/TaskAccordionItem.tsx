@@ -103,11 +103,20 @@ export default function TaskAccordionItem({
     : dayjs(task.dueDate).local().format("MMM D - h:mm a");
   return (
     <AccordionItem key={task.id}>
-      <AccordionHeader targetId={task.id.toString()}>
+      <AccordionHeader
+        targetId={task.id.toString()}
+        className={classNames({
+          "completed-task": task.isCompleted,
+        })}>
         <div className="w-90">
           <Row>
             <Col xs={12} className="mb-2 text-truncate">
-              <span className="fw-bold text-dark">{task.title}</span>
+              <span
+                className={classNames("fw-bold text-dark", {
+                  "text-decoration-line-through opacity-75": task.isCompleted,
+                })}>
+                {task.title}
+              </span>
             </Col>
             <Col xs={12} md={6} className="mb-2">
               <span

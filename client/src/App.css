@@ -84,3 +84,7 @@ td {
 .grecaptcha-badge {
   visibility: hidden;
 }
+
+.swal2-container {
+  z-index: 3000;
+}

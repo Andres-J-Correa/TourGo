@@ -90,7 +90,7 @@ const TaskCalendarEvent: React.FC<TaskCalendarEventProps> = ({
         {title}
       </div>
 
-      <div className="d-flex gap-1 justify-content-end task-event-actions">
+      <div className="gap-1 justify-content-end task-event-actions d-none d-md-flex">
         {!task.isCompleted && (
           <Button
             color="light"
