@@ -24,6 +24,8 @@ export default defineConfig({
       services: path.resolve(__dirname, "./src/services"),
       constants: path.resolve(__dirname, "./src/constants"),
       locales: path.resolve(__dirname, "./src/locales"),
+      assets: path.resolve(__dirname, "./src/assets"),
+      providers: path.resolve(__dirname, "./src/providers"),
     },
   },
   build: {
