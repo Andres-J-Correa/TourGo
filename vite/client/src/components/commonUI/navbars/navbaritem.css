@@ -1,0 +1,28 @@
+.item-long-text {
+  min-width: 200px;
+  word-break: break-word;
+  display: block !important;
+  overflow-wrap: anywhere;
+  white-space: normal !important;
+}
+
+.navbar-dropdown-menu {
+  border: solid 1px var(--bs-border-color-translucent) !important;
+  box-shadow: var(--bs-box-shadow);
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  min-width: auto;
+  min-height: fit-content;
+}
+
+@media (max-width: 768px) {
+  .navbar-dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+  }
+}
