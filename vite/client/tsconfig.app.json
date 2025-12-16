@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "esModuleInterop": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2022",
     "useDefineForClassFields": true,
@@ -7,6 +8,8 @@
     "module": "ESNext",
     "types": ["vite/client"],
     "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -23,6 +26,10 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+
+    "allowJs": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
 
     "baseUrl": "./src"
   },
