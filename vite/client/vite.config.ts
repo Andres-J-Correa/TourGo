@@ -31,6 +31,7 @@ export default defineConfig({
       locales: path.resolve(__dirname, "./src/locales"),
       assets: path.resolve(__dirname, "./src/assets"),
       providers: path.resolve(__dirname, "./src/providers"),
+      types: path.resolve(__dirname, "./src/types"),
     },
   },
   build: {

@@ -12,6 +12,7 @@
     "cov": "jest --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.16",
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^3.1.1",
@@ -27,8 +28,10 @@
     "dompurify": "^3.3.1",
     "formik": "^2.4.9",
     "i18next": "^25.7.3",
+    "libphonenumber-js": "^1.12.31",
     "prop-types": "^15.8.1",
     "react": "^19.2.0",
+    "react-big-calendar": "^1.19.4",
     "react-datepicker": "^9.0.0",
     "react-dom": "^19.2.0",
     "react-google-recaptcha-v3": "^1.11.0",
@@ -57,6 +60,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^25.0.2",
     "@types/react": "^19.2.5",
+    "@types/react-big-calendar": "^1.16.3",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "babel-jest": "^30.2.0",
