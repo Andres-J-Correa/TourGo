@@ -11,11 +11,11 @@ const hotelRoutes = [
     path: "/hotels/:hotelId",
     component: lazy(() => import("components/hotels/LandingPage")),
   },
-  //   {
-  //     name: "hotelSettings",
-  //     path: "/hotels/:hotelId/settings",
-  //     component: lazy(() => import("components/hotels/HotelSettings")),
-  //   },
+  {
+    name: "hotelSettings",
+    path: "/hotels/:hotelId/settings",
+    component: lazy(() => import("components/hotels/HotelSettings")),
+  },
   //   {
   //     name: "hotelAdd",
   //     path: "/hotels/add",
