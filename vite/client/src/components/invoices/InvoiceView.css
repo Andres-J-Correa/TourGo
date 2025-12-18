@@ -1,0 +1,43 @@
+.line-item {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  padding: 2px 0;
+}
+
+.line-label {
+  white-space: nowrap;
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+.line-fill {
+  flex-grow: 1;
+  border-bottom: 1px dotted #999;
+  height: 1px;
+  margin: 0 0.5rem;
+}
+
+.line-amount {
+  white-space: nowrap;
+  margin-left: 0.5rem;
+}
+
+.line-total {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: underline;
+  text-underline-position: under;
+}
+
+@media print {
+  .booking-card-header-print {
+    color: var(--bs-dark) !important;
+  }
+
+  .booking-card-content {
+    break-inside: avoid; /* Prevents the card from being split across pages */
+    page-break-inside: avoid; /* Fallback for older browsers */
+    margin-bottom: 1rem; /* Ensure spacing between cards */
+  }
+}

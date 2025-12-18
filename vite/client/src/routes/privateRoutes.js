@@ -135,24 +135,24 @@ const finances = [
       import("components/transactions/transactions-view/TransactionsView")
     ),
   },
-  //   {
-  //     name: "invoiceView",
-  //     path: "/hotels/:hotelId/invoices/:invoiceId",
-  //     component: lazy(() => import("components/invoices/InvoiceView")),
-  //   },
-  // ];
-
-  // const transactionSubCategories = [
-  //   {
-  //     name: "transactionSubCategoriesView",
-  //     path: "/hotels/:hotelId/transaction-subcategories",
-  //     component: lazy(() =>
-  //       import(
-  //         "components/transactions/subcategories/TransactionSubcategoriesView"
-  //       )
-  //     ),
-  //   },
+  {
+    name: "invoiceView",
+    path: "/hotels/:hotelId/invoices/:invoiceId",
+    component: lazy(() => import("components/invoices/InvoiceView")),
+  },
 ];
+
+// const transactionSubCategories = [
+//   {
+//     name: "transactionSubCategoriesView",
+//     path: "/hotels/:hotelId/transaction-subcategories",
+//     component: lazy(() =>
+//       import(
+//         "components/transactions/subcategories/TransactionSubcategoriesView"
+//       )
+//     ),
+//   },
+// ];
 
 // const userRoutes = [
 //   {
