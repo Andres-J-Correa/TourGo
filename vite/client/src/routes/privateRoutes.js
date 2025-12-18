@@ -99,13 +99,13 @@ const bookings = [
       import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
     ),
   },
-  //   {
-  //     name: "newBooking",
-  //     path: "/hotels/:hotelId/bookings/newV2",
-  //     component: lazy(() =>
-  //       import("components/bookings/booking-add-edit-view-v2/BookingAddEditView")
-  //     ),
-  //   },
+  {
+    name: "newBooking",
+    path: "/hotels/:hotelId/bookings/newV2",
+    component: lazy(() =>
+      import("components/bookings/booking-add-edit-view-v2/BookingAddEditView")
+    ),
+  },
   //   {
   //     name: "quoteBooking",
   //     path: "/hotels/:hotelId/bookings/quote",
