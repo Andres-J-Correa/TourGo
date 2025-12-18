@@ -1,0 +1,90 @@
+body {
+  color: var(--default-color);
+  background-color: var(--background-color);
+  font-family: var(--default-font);
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+a:hover {
+  color: color-mix(in srgb, var(--accent-color), transparent 25%);
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--heading-color);
+  font-family: var(--heading-font);
+}
+
+.light-background {
+  --background-color: #f8fbfc;
+  --surface-color: #ffffff;
+}
+
+.dark-background {
+  --background-color: #060606;
+  --default-color: #ffffff;
+  --heading-color: #ffffff;
+  --surface-color: #252525;
+  --contrast-color: #ffffff;
+}
+
+@media (min-width: 1200px) {
+  .main-container {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    padding-right: calc(var(--bs-gutter-x) * 2) !important;
+    padding-left: calc(var(--bs-gutter-x) * 2) !important;
+  }
+}
+
+@media print {
+  .main-container {
+    max-width: 100% !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Target the FontAwesome question mark icon */
+.question-icon {
+  transition: transform 1s ease-in-out; /* Smooth transition for all transforms */
+}
+
+.question-icon:hover {
+  transform: rotateY(360deg); /* Scale up and rotate on X-axis */
+}
+
+.question-icon-container {
+  padding: 0.25rem;
+  display: inline;
+  cursor: pointer;
+}
+
+.table-sm {
+  font-size: 0.85rem;
+}
+
+.table-sm th,
+td {
+  padding: 0.25rem 0.5rem;
+}
+
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
+.swal2-container {
+  z-index: 3000;
+}
