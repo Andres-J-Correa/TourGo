@@ -85,20 +85,20 @@ const bookings = [
       import("components/bookings/bookings-view/BookingsViewV2")
     ),
   },
-  //   {
-  //     name: "newBooking",
-  //     path: "/hotels/:hotelId/bookings/new",
-  //     component: lazy(() =>
-  //       import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
-  //     ),
-  //   },
-  //   {
-  //     name: "editBooking",
-  //     path: "/hotels/:hotelId/bookings/:bookingId/edit",
-  //     component: lazy(() =>
-  //       import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
-  //     ),
-  //   },
+  {
+    name: "newBooking",
+    path: "/hotels/:hotelId/bookings/new",
+    component: lazy(() =>
+      import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
+    ),
+  },
+  {
+    name: "editBooking",
+    path: "/hotels/:hotelId/bookings/:bookingId/edit",
+    component: lazy(() =>
+      import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
+    ),
+  },
   //   {
   //     name: "newBooking",
   //     path: "/hotels/:hotelId/bookings/newV2",

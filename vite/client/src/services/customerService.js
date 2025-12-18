@@ -1,0 +1,64 @@
+import {
+  onGlobalError,
+  onGlobalSuccess,
+  replaceEmptyStringsWithNull,
+} from "../services/serviceHelpers";
+import axiosClient from "services/axiosClient";
+
+const api = `/customers`;
+
+export const getByDocumentNumber = async (hotelId, documentNumber) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    url: `${api}/hotel/${hotelId}/dn`,
+    data: {
+      id: documentNumber,
+    },
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const add = async (payload, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    url: `${api}/hotel/${hotelId}`,
+    data: replaceEmptyStringsWithNull(payload),
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const update = async (payload, hotelId, customerId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PUT",
+    url: `${api}/${customerId}/hotel/${hotelId}`,
+    data: payload,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
