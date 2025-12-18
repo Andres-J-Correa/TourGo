@@ -28,18 +28,18 @@ const hotelRoutes = [
       import("components/bookings/calendarV2/CalendarView")
     ),
   },
-  //   {
-  //     name: "customer",
-  //     path: "/hotels/:hotelId/customers",
-  //     component: lazy(() =>
-  //       import("components/commonUI/fallback/SiteUnderConstruction")
-  //     ),
-  //   },
-  //   {
-  //     name: "staff",
-  //     path: "/hotels/:hotelId/staff",
-  //     component: lazy(() => import("components/staff/StaffView")),
-  //   },
+  {
+    name: "customer",
+    path: "/hotels/:hotelId/customers",
+    component: lazy(() =>
+      import("components/commonUI/fallback/SiteUnderConstruction")
+    ),
+  },
+  {
+    name: "staff",
+    path: "/hotels/:hotelId/staff",
+    component: lazy(() => import("components/staff/StaffView")),
+  },
   //   {
   //     name: "paymentMethods",
   //     path: "/hotels/:hotelId/payment-methods",

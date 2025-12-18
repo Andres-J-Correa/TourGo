@@ -65,4 +65,5 @@ export const HOTEL_RESOURCES_BY_ID = {
   12: "hotels.resources.staffInvites",
   13: "hotels.resources.financialReports",
   14: "hotels.resources.roomAvailability",
+  15: "hotels.resources.tasks",
 };

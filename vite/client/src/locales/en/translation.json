@@ -1001,7 +1001,8 @@
       "financePartners": "Finance Partners",
       "staffInvites": "Staff Invitations",
       "financialReports": "Financial Reports",
-      "roomAvailability": "Room Availability"
+      "roomAvailability": "Room Availability",
+      "tasks": "Tasks"
     },
     "validation": {
       "nameRequired": "Name is required",
