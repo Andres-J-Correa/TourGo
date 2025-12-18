@@ -106,13 +106,13 @@ const bookings = [
       import("components/bookings/booking-add-edit-view-v2/BookingAddEditView")
     ),
   },
-  //   {
-  //     name: "quoteBooking",
-  //     path: "/hotels/:hotelId/bookings/quote",
-  //     component: lazy(() =>
-  //       import("components/bookings/booking-quote-view/BookingQuoteView")
-  //     ),
-  //   },
+  {
+    name: "quoteBooking",
+    path: "/hotels/:hotelId/bookings/quote",
+    component: lazy(() =>
+      import("components/bookings/booking-quote-view/BookingQuoteView")
+    ),
+  },
   //   {
   //     name: "viewBooking",
   //     path: "/hotels/:hotelId/bookings/:bookingId",
