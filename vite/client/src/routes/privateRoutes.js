@@ -47,13 +47,13 @@ const hotelRoutes = [
       import("components/transactions/payment-methods/PaymentMethodsView")
     ),
   },
-  //   {
-  //     name: "financePartners",
-  //     path: "/hotels/:hotelId/finance-partners",
-  //     component: lazy(() =>
-  //       import("components/transactions/finance-partners/FinancePartnersView")
-  //     ),
-  //   },
+  {
+    name: "financePartners",
+    path: "/hotels/:hotelId/finance-partners",
+    component: lazy(() =>
+      import("components/transactions/finance-partners/FinancePartnersView")
+    ),
+  },
   //   {
   //     name: "bookingProviders",
   //     path: "/hotels/:hotelId/booking-providers",
