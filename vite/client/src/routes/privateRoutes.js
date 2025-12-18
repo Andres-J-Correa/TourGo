@@ -54,11 +54,11 @@ const hotelRoutes = [
       import("components/transactions/finance-partners/FinancePartnersView")
     ),
   },
-  //   {
-  //     name: "bookingProviders",
-  //     path: "/hotels/:hotelId/booking-providers",
-  //     component: lazy(() => import("components/bookings/BookingProvidersView")),
-  //   },
+  {
+    name: "bookingProviders",
+    path: "/hotels/:hotelId/booking-providers",
+    component: lazy(() => import("components/bookings/BookingProvidersView")),
+  },
 ];
 
 // const roomRoutes = [
