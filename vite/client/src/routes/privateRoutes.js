@@ -120,39 +120,39 @@ const bookings = [
   },
 ];
 
-// const finances = [
-//   {
-//     name: "financeDashboard",
-//     path: "/hotels/:hotelId/finance-dashboard",
-//     component: lazy(() =>
-//       import("components/financial-reports/FinanceDashboard")
-//     ),
-//   },
-//   {
-//     name: "transactionsView",
-//     path: "/hotels/:hotelId/transactions",
-//     component: lazy(() =>
-//       import("components/transactions/transactions-view/TransactionsView")
-//     ),
-//   },
-//   {
-//     name: "invoiceView",
-//     path: "/hotels/:hotelId/invoices/:invoiceId",
-//     component: lazy(() => import("components/invoices/InvoiceView")),
-//   },
-// ];
+const finances = [
+  {
+    name: "financeDashboard",
+    path: "/hotels/:hotelId/finance-dashboard",
+    component: lazy(() =>
+      import("components/financial-reports/FinanceDashboard")
+    ),
+  },
+  //   {
+  //     name: "transactionsView",
+  //     path: "/hotels/:hotelId/transactions",
+  //     component: lazy(() =>
+  //       import("components/transactions/transactions-view/TransactionsView")
+  //     ),
+  //   },
+  //   {
+  //     name: "invoiceView",
+  //     path: "/hotels/:hotelId/invoices/:invoiceId",
+  //     component: lazy(() => import("components/invoices/InvoiceView")),
+  //   },
+  // ];
 
-// const transactionSubCategories = [
-//   {
-//     name: "transactionSubCategoriesView",
-//     path: "/hotels/:hotelId/transaction-subcategories",
-//     component: lazy(() =>
-//       import(
-//         "components/transactions/subcategories/TransactionSubcategoriesView"
-//       )
-//     ),
-//   },
-// ];
+  // const transactionSubCategories = [
+  //   {
+  //     name: "transactionSubCategoriesView",
+  //     path: "/hotels/:hotelId/transaction-subcategories",
+  //     component: lazy(() =>
+  //       import(
+  //         "components/transactions/subcategories/TransactionSubcategoriesView"
+  //       )
+  //     ),
+  //   },
+];
 
 // const userRoutes = [
 //   {
@@ -182,4 +182,5 @@ export const privateRoutes = [
   ...roomRoutes,
   ...extraCharges,
   ...bookings,
+  ...finances,
 ];
