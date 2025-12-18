@@ -113,11 +113,11 @@ const bookings = [
       import("components/bookings/booking-quote-view/BookingQuoteView")
     ),
   },
-  //   {
-  //     name: "viewBooking",
-  //     path: "/hotels/:hotelId/bookings/:bookingId",
-  //     component: lazy(() => import("components/bookings/BookingView")),
-  //   },
+  {
+    name: "viewBooking",
+    path: "/hotels/:hotelId/bookings/:bookingId",
+    component: lazy(() => import("components/bookings/BookingView")),
+  },
 ];
 
 // const finances = [
