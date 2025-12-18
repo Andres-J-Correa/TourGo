@@ -2,7 +2,7 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 
 const axiosClient = axios.create({
-  baseURL: "/api",
+  baseURL: import.meta.env.VITE_API_HOST_PREFIX,
   headers: {
     "Content-Type": "application/json",
   },

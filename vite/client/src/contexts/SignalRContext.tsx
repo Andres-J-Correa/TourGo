@@ -9,7 +9,7 @@ import * as signalR from "@microsoft/signalr";
 
 const _logger = require("debug")("SignalRContext");
 
-const baseUrl = "/hubs";
+const baseUrl = import.meta.env.VITE_HUBS_HOST_PREFIX;
 const HUB_CONFIG = {
   taskReminders: `${baseUrl}/task-reminders`,
 };

@@ -2,7 +2,7 @@ import axios, { type AxiosInstance, type AxiosError } from "axios";
 import axiosRetry, { type IAxiosRetryConfig } from "axios-retry";
 
 const axiosClient: AxiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL: import.meta.env.VITE_API_HOST_PREFIX,
   headers: {
     "Content-Type": "application/json",
   },

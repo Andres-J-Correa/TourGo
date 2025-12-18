@@ -30,20 +30,20 @@ jobs:
             git reset --hard origin/stage || { echo "Failed to reset to origin/stage"; exit 1; }
 
             # --- CLIENT DEPLOYMENT ---
-            cd client
+            cd vite/client
             yarn install || { echo "yarn install failed"; exit 1; }
             yarn build:stage || { echo "yarn build:stage failed"; exit 1; }
 
-            if [ -d "./build" ] && [ "$(ls -A ./build)" ]; then
+            if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
                 sudo mkdir -p /var/www/html-stage/app
-                sudo rsync -avz --delete ./build/ /var/www/html-stage/app/
+                sudo rsync -avz --delete ./dist/ /var/www/html-stage/app/
             else
                 echo "Build directory is missing or empty"
                 exit 1
             fi
 
             # --- LEGAL PAGES DEPLOYMENT ---
-            cd ..
+            cd ../..
             if [ -d "./legal" ] && [ "$(ls -A ./legal)" ]; then
                 echo "Deploying legal pages..."
                 sudo mkdir -p /var/www/html-stage/legal
