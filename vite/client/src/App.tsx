@@ -43,7 +43,7 @@ function App() {
   );
 
   const RoutesComp = useMemo(
-    () => (import.meta.env.VITE_ENV === "development" ? Routes : FaroRoutes),
+    () => (import.meta.env.VITE_ENV !== "development" ? FaroRoutes : Routes),
     []
   );
 
