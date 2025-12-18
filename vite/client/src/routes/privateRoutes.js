@@ -154,28 +154,18 @@ const transactionSubCategories = [
   },
 ];
 
-// const userRoutes = [
-//   {
-//     name: "userSettings",
-//     path: "/profile/settings",
-//     component: lazy(() => import("components/users/UserSettings")),
-//   },
-//   {
-//     name: "userProfile",
-//     path: "/profile",
-//     component: lazy(() => import("components/users/UserProfile")),
-//   },
-// ];
-
-// export const privateRoutes = [
-//   ...userRoutes,
-//   ...hotelRoutes,
-//   ...roomRoutes,
-//   ...extraCharges,
-//   ...bookings,
-//   ...finances,
-//   ...transactionSubCategories,
-// ];
+const userRoutes = [
+  {
+    name: "userSettings",
+    path: "/profile/settings",
+    component: lazy(() => import("components/users/UserSettings")),
+  },
+  {
+    name: "userProfile",
+    path: "/profile",
+    component: lazy(() => import("components/users/UserProfile")),
+  },
+];
 
 export const privateRoutes = [
   ...hotelRoutes,
@@ -184,4 +174,5 @@ export const privateRoutes = [
   ...bookings,
   ...finances,
   ...transactionSubCategories,
+  ...userRoutes,
 ];
