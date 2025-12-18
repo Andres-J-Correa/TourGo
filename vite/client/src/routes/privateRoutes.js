@@ -142,17 +142,17 @@ const finances = [
   },
 ];
 
-// const transactionSubCategories = [
-//   {
-//     name: "transactionSubCategoriesView",
-//     path: "/hotels/:hotelId/transaction-subcategories",
-//     component: lazy(() =>
-//       import(
-//         "components/transactions/subcategories/TransactionSubcategoriesView"
-//       )
-//     ),
-//   },
-// ];
+const transactionSubCategories = [
+  {
+    name: "transactionSubCategoriesView",
+    path: "/hotels/:hotelId/transaction-subcategories",
+    component: lazy(() =>
+      import(
+        "components/transactions/subcategories/TransactionSubcategoriesView"
+      )
+    ),
+  },
+];
 
 // const userRoutes = [
 //   {
@@ -183,4 +183,5 @@ export const privateRoutes = [
   ...extraCharges,
   ...bookings,
   ...finances,
+  ...transactionSubCategories,
 ];
