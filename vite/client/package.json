@@ -55,6 +55,7 @@
     "sweetalert2": "^11.26.10",
     "use-sound": "^5.0.0",
     "vite-plugin-commonjs": "^0.10.4",
+    "xlsx": "^0.18.5",
     "yup": "^1.7.1"
   },
   "devDependencies": {

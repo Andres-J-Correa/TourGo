@@ -77,48 +77,48 @@ const extraCharges = [
   },
 ];
 
-// const bookings = [
-//   {
-//     name: "bookingsView",
-//     path: "/hotels/:hotelId/bookings",
-//     component: lazy(() =>
-//       import("components/bookings/bookings-view/BookingsViewV2")
-//     ),
-//   },
-//   {
-//     name: "newBooking",
-//     path: "/hotels/:hotelId/bookings/new",
-//     component: lazy(() =>
-//       import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
-//     ),
-//   },
-//   {
-//     name: "editBooking",
-//     path: "/hotels/:hotelId/bookings/:bookingId/edit",
-//     component: lazy(() =>
-//       import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
-//     ),
-//   },
-//   {
-//     name: "newBooking",
-//     path: "/hotels/:hotelId/bookings/newV2",
-//     component: lazy(() =>
-//       import("components/bookings/booking-add-edit-view-v2/BookingAddEditView")
-//     ),
-//   },
-//   {
-//     name: "quoteBooking",
-//     path: "/hotels/:hotelId/bookings/quote",
-//     component: lazy(() =>
-//       import("components/bookings/booking-quote-view/BookingQuoteView")
-//     ),
-//   },
-//   {
-//     name: "viewBooking",
-//     path: "/hotels/:hotelId/bookings/:bookingId",
-//     component: lazy(() => import("components/bookings/BookingView")),
-//   },
-// ];
+const bookings = [
+  {
+    name: "bookingsView",
+    path: "/hotels/:hotelId/bookings",
+    component: lazy(() =>
+      import("components/bookings/bookings-view/BookingsViewV2")
+    ),
+  },
+  //   {
+  //     name: "newBooking",
+  //     path: "/hotels/:hotelId/bookings/new",
+  //     component: lazy(() =>
+  //       import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
+  //     ),
+  //   },
+  //   {
+  //     name: "editBooking",
+  //     path: "/hotels/:hotelId/bookings/:bookingId/edit",
+  //     component: lazy(() =>
+  //       import("components/bookings/booking-add-edit-view/BookingAddUpdateView")
+  //     ),
+  //   },
+  //   {
+  //     name: "newBooking",
+  //     path: "/hotels/:hotelId/bookings/newV2",
+  //     component: lazy(() =>
+  //       import("components/bookings/booking-add-edit-view-v2/BookingAddEditView")
+  //     ),
+  //   },
+  //   {
+  //     name: "quoteBooking",
+  //     path: "/hotels/:hotelId/bookings/quote",
+  //     component: lazy(() =>
+  //       import("components/bookings/booking-quote-view/BookingQuoteView")
+  //     ),
+  //   },
+  //   {
+  //     name: "viewBooking",
+  //     path: "/hotels/:hotelId/bookings/:bookingId",
+  //     component: lazy(() => import("components/bookings/BookingView")),
+  //   },
+];
 
 // const finances = [
 //   {
@@ -177,4 +177,9 @@ const extraCharges = [
 //   ...transactionSubCategories,
 // ];
 
-export const privateRoutes = [...hotelRoutes, ...roomRoutes, ...extraCharges];
+export const privateRoutes = [
+  ...hotelRoutes,
+  ...roomRoutes,
+  ...extraCharges,
+  ...bookings,
+];
