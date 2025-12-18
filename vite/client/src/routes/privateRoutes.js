@@ -61,13 +61,13 @@ const hotelRoutes = [
   },
 ];
 
-// const roomRoutes = [
-//   {
-//     name: "roomsView",
-//     path: "/hotels/:hotelId/rooms",
-//     component: lazy(() => import("components/rooms/RoomsView")),
-//   },
-// ];
+const roomRoutes = [
+  {
+    name: "roomsView",
+    path: "/hotels/:hotelId/rooms",
+    component: lazy(() => import("components/rooms/RoomsView")),
+  },
+];
 
 // const extraCharges = [
 //   {
@@ -177,4 +177,4 @@ const hotelRoutes = [
 //   ...transactionSubCategories,
 // ];
 
-export const privateRoutes = [...hotelRoutes];
+export const privateRoutes = [...hotelRoutes, ...roomRoutes];
