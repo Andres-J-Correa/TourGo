@@ -1,0 +1,16 @@
+.transaction-versions-offcanvas {
+  padding: 0.5rem;
+  width: 70% !important;
+}
+
+@media (max-width: 1200px) {
+  .transaction-versions-offcanvas {
+    width: 90% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .transaction-versions-offcanvas {
+    width: 100% !important;
+  }
+}

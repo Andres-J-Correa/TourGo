@@ -1,0 +1,10 @@
+.extra-charge-card {
+  transition: transform 0.3s ease; /* Smooth transition */
+}
+
+.extra-charge-card:hover {
+  background-color: var(
+    --bs-info-bg-subtle
+  ); /* Change background color on hover */
+  transform: scale(1.1); /* Scales child to 1.1 on parent hover */
+}

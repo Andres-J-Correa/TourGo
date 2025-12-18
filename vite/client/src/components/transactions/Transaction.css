@@ -1,0 +1,9 @@
+.transaction-card-header {
+  text-align: center;
+  cursor: pointer;
+}
+
+.transaction-card-header:hover {
+  color: var(--bs-dark);
+  text-decoration: none;
+}
