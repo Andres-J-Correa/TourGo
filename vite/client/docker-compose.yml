@@ -8,6 +8,6 @@ services:
     container_name: react-staging-app
     restart: always
     ports:
-      - "3000:80"
+      - "3001:80"
     extra_hosts:
       - "host.docker.internal:host-gateway"
