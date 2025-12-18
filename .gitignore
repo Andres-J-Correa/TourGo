@@ -319,29 +319,3 @@ package-lock.json
 
 server/publish/
 client/build/
-
-##Vite
-# Logs
-vite/client/logs
-vite/client/*.log
-vite/client/npm-debug.log*
-vite/client/yarn-debug.log*
-vite/client/yarn-error.log*
-vite/client/pnpm-debug.log*
-vite/client/lerna-debug.log*
-
-vite/client/node_modules
-vite/client/dist
-vite/client/dist-ssr
-vite/client/*.local
-
-# Editor directories and files
-vite/client/.vscode/*
-vite/client/!.vscode/extensions.json
-vite/client/.idea
-vite/client/.DS_Store
-vite/client/*.suo
-vite/client/*.ntvs*
-vite/client/*.njsproj
-vite/client/*.sln
-vite/client/*.sw?

@@ -1,7 +1,0 @@
-.hotel-card {
-  transition: transform 0.2s ease-in-out;
-}
-
-.hotel-card:hover {
-  transform: translateY(-5px); /* Raises the card by 5px */
-}

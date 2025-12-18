@@ -9,7 +9,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import classNames from "classnames";
-import { utils, writeFileXLSX } from "xlsx";
+import { utils, writeFile } from "xlsx";
 
 //components
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
@@ -124,7 +124,7 @@ function BookingsViewV2(): JSX.Element {
       worksheet,
       t("booking.bookingsView.title")
     );
-    writeFileXLSX(workbook, `${t("booking.bookingsView.title")}.xlsx`, {
+    writeFile(workbook, `${t("booking.bookingsView.title")}.xlsx`, {
       compression: true,
     });
   };
