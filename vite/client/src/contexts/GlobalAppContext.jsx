@@ -158,6 +158,7 @@ export const AppContextProvider = ({ children }) => {
       current: hotel,
       isLoading: isLoadingHotel,
       setHotelId,
+      refresh: () => fetchHotel(hotel.id),
     },
     toggleUserSignInModal: toggleModal("login"),
     toggleUserSignUpModal: toggleModal("register"),
@@ -196,6 +197,25 @@ export const AppContextProvider = ({ children }) => {
     },
     [currentUser, t, isAuthError]
   );
+
+  const fetchHotel = useCallback((hotelId) => {
+    setIsLoadingHotel(true);
+    getMinimalWithUserRoleById(hotelId)
+      .then((res) => {
+        if (res.isSuccessful) {
+          setHotel(res.item);
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.status !== 404) {
+          toast.error(t("globalAppContext.hotelLoadError"));
+        }
+        setHotel({ ...defaultHotel });
+      })
+      .finally(() => {
+        setIsLoadingHotel(false);
+      });
+  }, []);
 
   useEffect(() => {
     if (
@@ -239,26 +259,11 @@ export const AppContextProvider = ({ children }) => {
       hotel.id !== hotelIdParam &&
       currentUser.isAuthenticated
     ) {
-      setIsLoadingHotel(true);
-      getMinimalWithUserRoleById(hotelIdParam)
-        .then((res) => {
-          if (res.isSuccessful) {
-            setHotel(res.item);
-          }
-        })
-        .catch((error) => {
-          if (error?.response?.status !== 404) {
-            toast.error(t("globalAppContext.hotelLoadError"));
-          }
-          setHotel({ ...defaultHotel });
-        })
-        .finally(() => {
-          setIsLoadingHotel(false);
-        });
+      fetchHotel(hotelIdParam);
     } else if (hotel.id !== 0 && !currentUser.isAuthenticated) {
       setHotel({ ...defaultHotel });
     }
-  }, [hotelIdParam, hotel.id, currentUser, t]);
+  }, [hotelIdParam, hotel.id, currentUser, t, fetchHotel]);
 
   useEffect(() => {
     const interceptor = axiosClient.interceptors.response.use(
