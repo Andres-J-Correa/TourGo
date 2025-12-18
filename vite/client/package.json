@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build --mode production",
-    "build:stage": "tsx -b && vite build --mode staging",
+    "build": "tsc && vite build --mode production",
+    "build:stage": "tsc && vite build --mode staging",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest --watchAll",

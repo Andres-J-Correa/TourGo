@@ -1,0 +1,13 @@
+services:
+  client-stage:
+    profiles: ["stage"]
+    image: tourgo-client:stage
+    build:
+      context: .
+      dockerfile: Dockerfile.stage
+    container_name: react-staging-app
+    restart: always
+    ports:
+      - "3000:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
