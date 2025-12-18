@@ -47,7 +47,7 @@ import {
 import { flattenObject } from "utils/objectHelper";
 import dayjs from "dayjs";
 import { getDateString } from "utils/dateHelper";
-import { utils, writeFileXLSX } from "xlsx";
+import { utils, writeFile } from "xlsx";
 
 import "./TransactionsView.css";
 import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
@@ -214,7 +214,7 @@ function TransactionsView() {
     const worksheet = utils.json_to_sheet(rowData);
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, t("transactions.view.title"));
-    writeFileXLSX(workbook, `${t("transactions.view.title")}.xlsx`, {
+    writeFile(workbook, `${t("transactions.view.title")}.xlsx`, {
       compression: true,
     });
   };
