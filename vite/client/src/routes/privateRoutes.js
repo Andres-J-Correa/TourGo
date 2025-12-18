@@ -40,13 +40,13 @@ const hotelRoutes = [
     path: "/hotels/:hotelId/staff",
     component: lazy(() => import("components/staff/StaffView")),
   },
-  //   {
-  //     name: "paymentMethods",
-  //     path: "/hotels/:hotelId/payment-methods",
-  //     component: lazy(() =>
-  //       import("components/transactions/payment-methods/PaymentMethodsView")
-  //     ),
-  //   },
+  {
+    name: "paymentMethods",
+    path: "/hotels/:hotelId/payment-methods",
+    component: lazy(() =>
+      import("components/transactions/payment-methods/PaymentMethodsView")
+    ),
+  },
   //   {
   //     name: "financePartners",
   //     path: "/hotels/:hotelId/finance-partners",
