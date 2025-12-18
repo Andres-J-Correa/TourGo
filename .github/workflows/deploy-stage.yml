@@ -31,7 +31,15 @@ jobs:
 
             # --- CLIENT DEPLOYMENT ---
             cd vite/client
-            docker-compose --profile stage up -d --build
+
+            echo "Building client image..."
+            if docker compose --profile stage build; then
+                echo "Build successful. Deploying..."
+                docker compose --profile stage up -d
+            else
+                echo "Client build failed. Aborting deployment to keep existing service running."
+                exit 1
+            fi
 
             # --- LEGAL PAGES DEPLOYMENT ---
             cd ../..
