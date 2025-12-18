@@ -468,8 +468,8 @@
       "reservation": "Reserva",
       "price": "Precio",
       "closed": "Cerrado",
-      "bookingMode": "Modo de Reservas",
-      "cleaningMode": "Modo de Limpieza"
+      "bookingMode": "Reservas",
+      "cleaningMode": "Limpieza"
     },
     "arrival": {
       "reservationNumber": "Reserva #:",

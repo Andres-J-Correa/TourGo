@@ -21,13 +21,13 @@ const hotelRoutes = [
     path: "/hotels/add",
     component: lazy(() => import("components/hotels/HotelAdd")),
   },
-  //   {
-  //     name: "calendar",
-  //     path: "/hotels/:hotelId/calendar",
-  //     component: lazy(() =>
-  //       import("components/bookings/calendarV2/CalendarView")
-  //     ),
-  //   },
+  {
+    name: "calendar",
+    path: "/hotels/:hotelId/calendar",
+    component: lazy(() =>
+      import("components/bookings/calendarV2/CalendarView")
+    ),
+  },
   //   {
   //     name: "customer",
   //     path: "/hotels/:hotelId/customers",

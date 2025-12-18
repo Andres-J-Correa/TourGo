@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --bs-blue: #63b3ed;
   --bs-indigo: #596cff;

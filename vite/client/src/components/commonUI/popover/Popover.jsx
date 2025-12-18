@@ -21,6 +21,7 @@ const Popover = ({
   content,
   placement = "bottom",
   action = "click",
+  restMs = 300,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -38,7 +39,7 @@ const Popover = ({
 
   const hover = useHover(context, {
     enabled: action === "hover",
-    restMs: 300,
+    restMs,
     mouseOnly: true,
     handleClose: safePolygon({ buffer: 4 }), // buffer prevents flicker
   });
