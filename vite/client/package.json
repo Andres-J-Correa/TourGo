@@ -57,6 +57,7 @@
     "react-number-format": "^5.4.4",
     "react-phone-number-input": "^3.4.14",
     "react-router-dom": "^7.10.1",
+    "react-select": "^5.10.2",
     "react-toastify": "^11.0.5",
     "reactstrap": "^9.2.3",
     "sweetalert2": "^11.26.10",

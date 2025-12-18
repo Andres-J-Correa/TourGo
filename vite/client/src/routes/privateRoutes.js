@@ -128,13 +128,13 @@ const finances = [
       import("components/financial-reports/FinanceDashboard")
     ),
   },
-  //   {
-  //     name: "transactionsView",
-  //     path: "/hotels/:hotelId/transactions",
-  //     component: lazy(() =>
-  //       import("components/transactions/transactions-view/TransactionsView")
-  //     ),
-  //   },
+  {
+    name: "transactionsView",
+    path: "/hotels/:hotelId/transactions",
+    component: lazy(() =>
+      import("components/transactions/transactions-view/TransactionsView")
+    ),
+  },
   //   {
   //     name: "invoiceView",
   //     path: "/hotels/:hotelId/invoices/:invoiceId",
