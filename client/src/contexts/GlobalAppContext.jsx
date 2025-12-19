@@ -103,7 +103,7 @@ export const AppContextProvider = ({ children }) => {
   );
 
   const handleLogout = useCallback(async () => {
-    const Swal = await import("sweetalert2");
+    const { default: Swal } = await import("sweetalert2");
 
     const result = await Swal.fire({
       title: t("globalAppContext.logoutTitle"),
