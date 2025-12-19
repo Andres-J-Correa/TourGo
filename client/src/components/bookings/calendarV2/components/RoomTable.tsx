@@ -1,7 +1,8 @@
 //types
 import type { RoomBooking } from "types/entities/booking.types";
 import type { Room } from "types/entities/room.types";
-import type { RoomAvailability } from "types/entities/roomAvailability.types";
+import type { RoomAvailabilityByDateAndRoom } from "types/entities/roomAvailability.types";
+import type { RoomBookingsByDateAndRoom } from "../hooks/useCalendarTableData";
 import type { Dayjs } from "dayjs";
 import type { JSX } from "react";
 
@@ -29,8 +30,8 @@ function RoomTable({
 }: {
   room: Room;
   datesArray: Dayjs[];
-  datesWithBookingsByRoom: Record<string, Record<string, RoomBooking>>;
-  datesWithAvailabilityByRoom: Record<string, Record<string, RoomAvailability>>;
+  datesWithBookingsByRoom: RoomBookingsByDateAndRoom;
+  datesWithAvailabilityByRoom: RoomAvailabilityByDateAndRoom;
   handleBookingCellClick: (
     date: string,
     roomId: number,
@@ -133,7 +134,6 @@ function RoomTable({
         key={`booking-${room.id}-${date}`}
         {...options}
         hotelId={hotelId}
-        isHidden={isCleaningMode}
       />
     );
 
@@ -155,11 +155,14 @@ function RoomTable({
         const isSameAsPrevious =
           previousRoomBooking?.bookingId === roomBooking.bookingId;
 
+        const isSameAsNext =
+          nextRoomBooking?.bookingId === roomBooking.bookingId;
+
         cleaningCells.push(
           createCleaningCell(date, roomBooking, !isSameAsPrevious)
         );
 
-        if (nextRoomBooking?.bookingId === roomBooking.bookingId) {
+        if (isSameAsNext) {
           colSpan++;
           continue;
         }
@@ -224,8 +227,7 @@ function RoomTable({
             <td className="first-column text-center align-content-center bg-light text-dark fw-bold">
               {t("booking.calendar.reservation")}
             </td>
-            {components.bookings}
-            {isCleaningMode && components.cleaningCells}
+            {isCleaningMode ? components.cleaningCells : components.bookings}
           </tr>
           <tr>
             <td className="first-column text-center align-content-center bg-light text-dark fw-bold">

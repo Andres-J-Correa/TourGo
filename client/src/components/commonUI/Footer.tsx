@@ -104,16 +104,20 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
 const FooterInfo = () => {
   const { t } = useLanguage();
 
-  const publicUrl = process.env.REACT_APP_PUBLIC_URL || "";
+  const publicUrl = import.meta.env.VITE_PUBLIC_URL || "";
   return (
     <Row className="w-100 no-print py-3 d-none d-md-flex">
       <footer className="text-center mt-2">
         &copy; 2025 Tourgo. {t("commonUI.footer.rightsReserved")}
         <div></div>
-        <Link to={`${publicUrl}/legal/privacy-policy.html`} className="footer-link mx-2">
+        <Link
+          to={`${publicUrl}/legal/privacy-policy.html`}
+          className="footer-link mx-2">
           {t("commonUI.footer.privacyPolicy")}
         </Link>
-        <Link to={`${publicUrl}/legal/terms-of-service.html`} className="footer-link mx-2">
+        <Link
+          to={`${publicUrl}/legal/terms-of-service.html`}
+          className="footer-link mx-2">
           {t("commonUI.footer.termsOfService")}
         </Link>
       </footer>

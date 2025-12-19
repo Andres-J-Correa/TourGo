@@ -79,7 +79,7 @@ class BreadcrumbBuilder {
       React.createElement(
         Helmet,
         null,
-        React.createElement("title", null, `${this.activeLabel}`)
+        React.createElement("title", null, `${this.activeLabel} - TourGo`)
       ),
       React.createElement(Breadcrumbs, {
         breadcrumbs: this.breadcrumbs,

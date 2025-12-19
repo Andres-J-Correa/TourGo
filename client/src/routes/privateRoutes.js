@@ -168,11 +168,11 @@ const userRoutes = [
 ];
 
 export const privateRoutes = [
-  ...userRoutes,
   ...hotelRoutes,
   ...roomRoutes,
   ...extraCharges,
   ...bookings,
   ...finances,
   ...transactionSubCategories,
+  ...userRoutes,
 ];

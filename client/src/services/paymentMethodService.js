@@ -1,11 +1,7 @@
-import {
-  onGlobalError,
-  onGlobalSuccess,
-  API_HOST_PREFIX,
-} from "../services/serviceHelpers";
+import { onGlobalError, onGlobalSuccess } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-const api = `${API_HOST_PREFIX}/hotel/{hotelId}/payment-methods`;
+const api = `/hotel/{hotelId}/payment-methods`;
 
 export const getPaymentMethodsMinimalByHotelId = async (hotelId) => {
   const config = {

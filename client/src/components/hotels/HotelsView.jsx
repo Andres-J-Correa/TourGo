@@ -6,16 +6,17 @@ import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
 import { toast } from "react-toastify";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import HotelDefaultImage from "assets/images/default-hotel.jpg"; // Adjust the path as necessary
-import "./hotelsview.css";
-import { useLanguage } from "contexts/LanguageContext"; // added
+import HotelDefaultImage from "assets/images/default-hotel.jpg";
+import { useLanguage } from "contexts/LanguageContext";
 import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
+
+import "./hotelsview.css";
 
 const HotelsView = () => {
   const [hotels, setHotels] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { t } = useLanguage(); // added
+  const { t } = useLanguage();
 
   const breadcrumbs = useMemo(
     () =>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Button, Accordion, Row, Col, ButtonGroup } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList, faCalendar } from "@fortawesome/free-solid-svg-icons";
@@ -156,12 +156,14 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
     setCalendarView(view);
   };
 
-  useEffect(() => {
+  const handleViewModeChange = useCallback((viewMode: ViewMode) => {
     if (viewMode === "calendar") {
       setStartDate((prev) => dayjs(prev).startOf("month").format("YYYY-MM-DD"));
       setEndDate((prev) => dayjs(prev).endOf("month").format("YYYY-MM-DD"));
     }
-  }, [viewMode]);
+
+    setViewMode(viewMode);
+  }, []);
 
   return (
     <div>
@@ -183,13 +185,13 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
             <ButtonGroup>
               <Button
                 color={viewMode === "calendar" ? "dark" : "outline-dark"}
-                onClick={() => setViewMode("calendar")}
+                onClick={() => handleViewModeChange("calendar")}
                 active={viewMode === "calendar"}>
                 <FontAwesomeIcon icon={faCalendar} />
               </Button>
               <Button
                 color={viewMode === "list" ? "dark" : "outline-dark"}
-                onClick={() => setViewMode("list")}
+                onClick={() => handleViewModeChange("list")}
                 active={viewMode === "list"}>
                 <FontAwesomeIcon icon={faList} />
               </Button>

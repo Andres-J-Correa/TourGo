@@ -53,10 +53,12 @@ function CleaningCell({
           "cursor-not-allowed": isLoading,
         }
       )}>
-      <span className="cleaning-cell-booking-name text-muted">
-        {showBookingName
-          ? `${roomBooking?.firstName} ${roomBooking?.lastName}`
-          : ""}
+      <span
+        className={classNames("cleaning-cell-booking-name text-muted", {
+          "d-none": !showBookingName,
+        })}
+        title={`${roomBooking?.firstName} ${roomBooking?.lastName}`}>
+        {roomBooking?.firstName} {roomBooking?.lastName}
       </span>
       {isLoading ? (
         <Spinner size="sm" className="text-muted" />

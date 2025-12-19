@@ -1,8 +1,8 @@
 import type { AxiosRequestConfig } from "axios";
-import { API_HOST_PREFIX, handleGlobalError } from "./serviceHelpersV2";
+import { handleGlobalError } from "./serviceHelpersV2";
 import axiosClientV2 from "services/axiosClientV2";
 
-const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/invoices`;
+const apiV2: string = `/hotel/{hotelId}/invoices`;
 
 /**
  * Downloads a PDF invoice by ID and triggers a file download in the browser.

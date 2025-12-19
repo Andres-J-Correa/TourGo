@@ -57,7 +57,7 @@ const EntityTransactionsView = ({
             ...copyOfReversed,
             id: newId,
             parentId: reversedId,
-            amount: -copyOfReversed.amount,
+            amount: -Number(copyOfReversed.amount),
             description: "Reversal",
             dateCreated: dayjs().toDate(),
             dateModified: dayjs().toDate(),
@@ -121,7 +121,10 @@ const EntityTransactionsView = ({
         const transactions = prev.transactions || [];
         return {
           ...prev,
-          transactions: [newTransaction, ...transactions],
+          transactions: [
+            { ...newTransaction, amount: Number(newTransaction.amount) },
+            ...transactions,
+          ],
         };
       });
     },
@@ -175,7 +178,10 @@ const EntityTransactionsView = ({
       setEntity((prev) => {
         const newTransactions = prev.transactions.map((txn) => {
           if (txn.id === updatedTransaction.id) {
-            return { ...txn, ...updatedTransaction };
+            return {
+              ...txn,
+              ...updatedTransaction,
+            };
           }
           return txn;
         });

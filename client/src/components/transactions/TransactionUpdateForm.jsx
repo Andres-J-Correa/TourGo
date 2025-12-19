@@ -22,7 +22,7 @@ import { Button, Col, InputGroup, InputGroupText, Row } from "reactstrap";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
-import { isEqual } from "lodash";
+import isEqual from "lodash.isequal";
 import { useNumericFormat } from "react-number-format";
 
 function TransactionUpdateForm({

@@ -14,13 +14,12 @@ import type {
 } from "types/apiResponse.types";
 
 import {
-  API_HOST_PREFIX,
   handleGlobalError,
   //   replaceEmptyStringsWithNull,
 } from "./serviceHelpersV2";
 import axiosClientV2 from "services/axiosClientV2";
 
-const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/bookings`;
+const apiV2: string = `/hotel/{hotelId}/bookings`;
 
 export const getBookingById = async (
   bookingId: string,

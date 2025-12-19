@@ -2,14 +2,10 @@ import type { AxiosRequestConfig } from "axios";
 import type { ApiResponse, ItemsResponse } from "types/apiResponse.types";
 import type { BookingProviderMinimal } from "types/entities/bookingProviders.types";
 
-import {
-  API_HOST_PREFIX,
-  handleGlobalError,
-  handleGlobalSuccess,
-} from "./serviceHelpersV2";
+import { handleGlobalError, handleGlobalSuccess } from "./serviceHelpersV2";
 import axiosClientV2 from "services/axiosClientV2";
 
-const api = `${API_HOST_PREFIX}/hotel/{hotelId}/booking-providers`;
+const api = `/hotel/{hotelId}/booking-providers`;
 
 export const getBookingProvidersMinimalByHotelId = async (
   hotelId: string

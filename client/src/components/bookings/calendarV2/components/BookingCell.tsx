@@ -22,7 +22,6 @@ function BookingCell({
   isFirst = false,
   isAvailable = true,
   onClick,
-  isHidden = false,
 }: {
   roomBooking?: RoomBooking;
   colSpan?: number;
@@ -30,7 +29,6 @@ function BookingCell({
   isFirst?: boolean;
   isAvailable?: boolean;
   onClick?: () => Promise<void>;
-  isHidden?: boolean;
 }): JSX.Element {
   const [showBookingOffCanvas, setShowBookingOffCanvas] =
     useState<boolean>(false);
@@ -75,7 +73,6 @@ function BookingCell({
           "border-end-0": isFirst,
           "border-start-0 border-end-0": !isFirst,
           "ps-3 text-start": !isLoading,
-          "d-none": isHidden,
           "cursor-not-allowed": isLoading,
         })}
         colSpan={colSpan}>
@@ -99,12 +96,11 @@ function BookingCell({
 
   return (
     <td
-      className={classNames("data-cell align-content-center table-danger", {
-        "d-none": isHidden,
-      })}
+      className={"data-cell align-content-center table-danger"}
       colSpan={colSpan}>
       <Popover
         action="hover"
+        restMs={500}
         content={
           <BookingMinimalCard
             bookingId={roomBooking.bookingId}

@@ -9,7 +9,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import classNames from "classnames";
-import { utils, writeFileXLSX } from "xlsx";
 
 //components
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
@@ -81,8 +80,11 @@ function BookingsViewV2(): JSX.Element {
     { id: "status", label: t("booking.minimalCard.status") },
   ];
 
-  const exportExcel = () => {
+  const exportExcel = async () => {
     if (!hotelId || data.items.length === 0) return;
+
+    const { utils, writeFile } = await import("xlsx");
+
     const copyOfItems = data.items.map(
       (
         item
@@ -124,7 +126,7 @@ function BookingsViewV2(): JSX.Element {
       worksheet,
       t("booking.bookingsView.title")
     );
-    writeFileXLSX(workbook, `${t("booking.bookingsView.title")}.xlsx`, {
+    writeFile(workbook, `${t("booking.bookingsView.title")}.xlsx`, {
       compression: true,
     });
   };

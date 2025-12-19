@@ -1,12 +1,11 @@
 import {
   onGlobalError,
   onGlobalSuccess,
-  API_HOST_PREFIX,
   replaceEmptyStringsWithNull,
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-const apiV2 = `${API_HOST_PREFIX}/hotel/{hotelId}/transactions`;
+const apiV2 = `/hotel/{hotelId}/transactions`;
 
 export const add = async (payload, hotelId) => {
   const config = {

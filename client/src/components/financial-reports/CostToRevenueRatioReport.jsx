@@ -95,7 +95,7 @@ function CostToRevenueRatioReport({ hotelId }) {
     ["Label", "Ratio"],
     [
       t("financialReports.costToRevenueRatioReport.gaugeLabel"),
-      data?.costToRevenueRatio * 100 ?? 0,
+      data?.costToRevenueRatio ? data.costToRevenueRatio * 100 : 0,
     ],
   ];
 

@@ -109,7 +109,7 @@ const HotelLandingPage = (): JSX.Element => {
                 <Nav tabs className="mt-3">
                   <NavItem>
                     <NavLink
-                      className={classnames("cursor-pointer", {
+                      className={classnames("cursor-pointer user-select-none", {
                         active: activeTab === "arrivals",
                       })}
                       onClick={() => toggleTab("arrivals")}>
@@ -118,7 +118,7 @@ const HotelLandingPage = (): JSX.Element => {
                   </NavItem>
                   <NavItem>
                     <NavLink
-                      className={classnames("cursor-pointer", {
+                      className={classnames("cursor-pointer user-select-none", {
                         active: activeTab === "departures",
                       })}
                       onClick={() => toggleTab("departures")}>
@@ -127,7 +127,7 @@ const HotelLandingPage = (): JSX.Element => {
                   </NavItem>
                   <NavItem>
                     <NavLink
-                      className={classnames("cursor-pointer", {
+                      className={classnames("cursor-pointer user-select-none", {
                         active: activeTab === "stays",
                       })}
                       onClick={() => toggleTab("stays")}>
@@ -136,7 +136,7 @@ const HotelLandingPage = (): JSX.Element => {
                   </NavItem>
                   <NavItem>
                     <NavLink
-                      className={classnames("cursor-pointer", {
+                      className={classnames("cursor-pointer user-select-none", {
                         active: activeTab === "rooms",
                       })}
                       onClick={() => toggleTab("rooms")}>
@@ -145,7 +145,7 @@ const HotelLandingPage = (): JSX.Element => {
                   </NavItem>
                   <NavItem>
                     <NavLink
-                      className={classnames("cursor-pointer", {
+                      className={classnames("cursor-pointer user-select-none", {
                         active: activeTab === "tasks",
                       })}
                       onClick={() => toggleTab("tasks")}>

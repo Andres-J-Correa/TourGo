@@ -1,6 +1,6 @@
 import axiosClient from "./axiosClientV2";
 import type { AxiosRequestConfig } from "axios";
-import { API_HOST_PREFIX, handleGlobalError } from "./serviceHelpersV2";
+import { handleGlobalError } from "./serviceHelpersV2";
 import type {
   ItemsResponse,
   ItemResponse,
@@ -35,8 +35,7 @@ export interface TaskUpdateRequest extends TaskAddRequest {
   id: number;
 }
 
-const endpoint = (hotelId: string) =>
-  `${API_HOST_PREFIX}/hotel/${hotelId}/tasks`;
+const endpoint = (hotelId: string) => `/hotel/${hotelId}/tasks`;
 
 // Get tasks by date range
 const getTasks = async (

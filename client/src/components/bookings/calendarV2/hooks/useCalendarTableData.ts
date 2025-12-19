@@ -1,7 +1,11 @@
 //types
 import type { RoomBooking } from "types/entities/booking.types";
 import type { Room } from "types/entities/room.types";
-import type { RoomAvailability } from "types/entities/roomAvailability.types";
+import type {
+  RoomAvailability,
+  RoomAvailabilityRequest,
+  RoomAvailabilityByDateAndRoom,
+} from "types/entities/roomAvailability.types";
 
 //libs
 import { useState, useEffect } from "react";
@@ -11,8 +15,16 @@ import { toast } from "react-toastify";
 //services & utils
 import { getByHotelId as getRoomsByHotelId } from "services/roomServiceV2";
 import { getRoomBookingsByDateRange } from "services/bookingServiceV2";
-import { getRoomAvailabilityByDateRange } from "services/roomAvailabilityService";
+import {
+  getRoomAvailabilityByDateRange,
+  upsertRoomAvailability,
+} from "services/roomAvailabilityService";
 import { useLanguage } from "contexts/LanguageContext";
+
+export type RoomBookingsByDateAndRoom = Record<
+  string,
+  Record<string, RoomBooking>
+>;
 
 export const useCalendarTableData = (
   startDate: Date | null,
@@ -20,23 +32,83 @@ export const useCalendarTableData = (
   hotelId?: string
 ): {
   rooms: Room[];
-  roomBookings: RoomBooking[];
+  roomBookings: RoomBookingsByDateAndRoom;
   loadingRooms: boolean;
   loadingBookings: boolean;
   loadingAvailability: boolean;
-  roomAvailability: RoomAvailability[];
+  roomAvailability: RoomAvailabilityByDateAndRoom;
+  handleUpsertRoomAvailability: (
+    hotel: string,
+    availability: RoomAvailabilityRequest
+  ) => Promise<void>;
 } => {
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [roomBookings, setRoomBookings] = useState<RoomBooking[]>([]);
-  const [roomAvailability, setRoomAvailability] = useState<RoomAvailability[]>(
-    []
+  const [roomBookings, setRoomBookings] = useState<RoomBookingsByDateAndRoom>(
+    {}
   );
+  const [roomAvailability, setRoomAvailability] =
+    useState<RoomAvailabilityByDateAndRoom>({});
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
   const [loadingBookings, setLoadingBookings] = useState<boolean>(false);
   const [loadingAvailability, setLoadingAvailability] =
     useState<boolean>(false);
 
   const { t } = useLanguage();
+
+  const mapRoomAvailabilityByDateAndRoom = (
+    roomAvailability: RoomAvailability[]
+  ): RoomAvailabilityByDateAndRoom => {
+    const roomAvailabilityByDate: Record<
+      string,
+      Record<string, RoomAvailability>
+    > = {};
+
+    roomAvailability.forEach((availability) => {
+      if (availability.roomId && availability.date) {
+        //check if the date exists in the roomAvailabilityByDate
+        if (!roomAvailabilityByDate[availability.date]) {
+          //if not, create it and initialize with the room id and availability
+          roomAvailabilityByDate[availability.date] = {
+            [availability.roomId]: availability,
+          };
+          return;
+        }
+
+        //if the date exists, check if the room id exists
+        if (!roomAvailabilityByDate[availability.date]![availability.roomId]) {
+          //if not, create it and initialize with the availability
+          roomAvailabilityByDate[availability.date]![availability.roomId] =
+            availability;
+        }
+      }
+    });
+
+    return roomAvailabilityByDate;
+  };
+
+  const handleUpsertRoomAvailability = async (
+    hotelId: string,
+    availability: RoomAvailabilityRequest
+  ): Promise<void> => {
+    const response = await upsertRoomAvailability(hotelId, availability);
+    if (response.isSuccessful) {
+      setRoomAvailability((prev) => {
+        const copy = { ...prev };
+        for (const roomAvailability of availability.requests) {
+          copy[roomAvailability.date] = {
+            ...copy[roomAvailability.date],
+            [roomAvailability.roomId]: {
+              ...roomAvailability,
+              isOpen: availability.isOpen,
+            },
+          };
+        }
+        return copy;
+      });
+    } else {
+      toast.error(t("booking.calendar.errors.upsertAvailability"));
+    }
+  };
 
   useEffect(() => {
     if (!hotelId) return;
@@ -71,12 +143,34 @@ export const useCalendarTableData = (
       const response = await getRoomBookingsByDateRange(hotelId, start, end);
 
       if (response.isSuccessful) {
-        setRoomBookings(response.items);
+        const roomBookingsByDateAndRoom: RoomBookingsByDateAndRoom = {};
+
+        response.items.forEach((booking) => {
+          if (booking.room?.id && booking.date) {
+            //check if the date exists in the result
+            if (!roomBookingsByDateAndRoom[booking.date]) {
+              //if not, create it and initialize with the room id and booking
+              roomBookingsByDateAndRoom[booking.date] = {
+                [booking.room.id]: booking,
+              };
+              return;
+            }
+
+            //if the date exists, check if the room id exists
+            if (!roomBookingsByDateAndRoom[booking.date]![booking.room.id]) {
+              //if not, create it and initialize with the booking
+              roomBookingsByDateAndRoom[booking.date]![booking.room.id] =
+                booking;
+            }
+          }
+        });
+
+        setRoomBookings(roomBookingsByDateAndRoom);
       } else {
         if (response.error?.response?.status !== 404) {
           toast.error(t("booking.calendar.errors.loadBookings"));
         }
-        setRoomBookings([]);
+        setRoomBookings({});
       }
       setLoadingBookings(false);
     };
@@ -90,12 +184,12 @@ export const useCalendarTableData = (
       );
 
       if (response.isSuccessful) {
-        setRoomAvailability(response.items);
+        setRoomAvailability(mapRoomAvailabilityByDateAndRoom(response.items));
       } else {
         if (response.error?.response?.status !== 404) {
           toast.error(t("booking.calendar.errors.loadAvailability"));
         }
-        setRoomAvailability([]);
+        setRoomAvailability({});
       }
       setLoadingAvailability(false);
     };
@@ -111,5 +205,6 @@ export const useCalendarTableData = (
     loadingBookings,
     loadingAvailability,
     roomAvailability,
+    handleUpsertRoomAvailability,
   };
 };

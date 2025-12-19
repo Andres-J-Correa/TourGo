@@ -87,4 +87,9 @@
   .data-cell-spinner {
     scale: 0.8;
   }
+
+  .first-column {
+    min-width: 60px;
+    max-width: 60px;
+  }
 }

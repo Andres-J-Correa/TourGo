@@ -9,10 +9,12 @@ import * as signalR from "@microsoft/signalr";
 
 const _logger = require("debug")("SignalRContext");
 
-const baseUrl = process.env.REACT_APP_HUBS_HOST_PREFIX;
+const baseUrl = import.meta.env.VITE_HUBS_HOST_PREFIX;
 const HUB_CONFIG = {
   taskReminders: `${baseUrl}/task-reminders`,
 };
+
+_logger(HUB_CONFIG);
 
 export type HubKey = keyof typeof HUB_CONFIG;
 
@@ -58,7 +60,7 @@ export const SignalRProvider: React.FC<SignalRProviderProps> = ({
       const startPromise = connection
         .start()
         .then(() => _logger(`Connected to ${key} hub`))
-        .catch((err) => _logger(`Failed to connect to ${key} hub`, err));
+        .catch((err: any) => _logger(`Failed to connect to ${key} hub`, err));
 
       connectionPromises.push(startPromise);
     });

@@ -19,8 +19,6 @@ const onGlobalError = (err) => {
   return Promise.reject(err);
 };
 
-const API_HOST_PREFIX = process.env.REACT_APP_API_HOST_PREFIX;
-
 function replaceEmptyStringsWithNull(data) {
   // Handle null or non-object inputs
   if (data === null || typeof data !== "object") {
@@ -47,9 +45,4 @@ function replaceEmptyStringsWithNull(data) {
   return result;
 }
 
-export {
-  onGlobalError,
-  onGlobalSuccess,
-  API_HOST_PREFIX,
-  replaceEmptyStringsWithNull,
-};
+export { onGlobalError, onGlobalSuccess, replaceEmptyStringsWithNull };

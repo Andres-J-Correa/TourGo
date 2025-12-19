@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, Fragment } from "react";
 
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 
@@ -358,7 +358,7 @@ function TransactionsTableFilters({
   }, [hotelId]);
 
   return (
-    <div>
+    <Fragment>
       <Row>
         <Col lg={12} xl={3}>
           <DatePickersV2
@@ -607,7 +607,7 @@ function TransactionsTableFilters({
           </Button>
         </Col>
       </Row>
-    </div>
+    </Fragment>
   );
 }
 

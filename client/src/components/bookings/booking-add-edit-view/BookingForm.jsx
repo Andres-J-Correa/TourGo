@@ -31,9 +31,6 @@ import {
   deepCompareBooking,
   bookingKeysToCompare,
   currentFormKeysToCompare,
-} from "components/bookings/booking-add-edit-view/constants";
-
-import {
   bookingDefaultInitialValues,
   sanitizeBooking,
 } from "components/bookings/booking-add-edit-view/constants";

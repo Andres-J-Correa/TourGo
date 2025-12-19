@@ -25,7 +25,7 @@ import useHotelFormData from "components/transactions/hooks/useHotelFormData";
 import { useLanguage } from "contexts/LanguageContext";
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 
-import { Button, Col, Label, Row, Spinner } from "reactstrap";
+import { Button, Col, Label, Row, Spinner, Collapse } from "reactstrap";
 import classNames from "classnames";
 import {
   useReactTable,
@@ -47,7 +47,6 @@ import {
 import { flattenObject } from "utils/objectHelper";
 import dayjs from "dayjs";
 import { getDateString } from "utils/dateHelper";
-import { utils, writeFileXLSX } from "xlsx";
 
 import "./TransactionsView.css";
 import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
@@ -195,7 +194,9 @@ function TransactionsView() {
     getRowCanExpand: () => true,
   });
 
-  const exportExcel = (rows) => {
+  const exportExcel = async (rows) => {
+    const { utils, writeFile } = await import("xlsx");
+
     let rowData = rows.map((row) => {
       let copy = { ...row.original };
       copy = flattenObject(copy);
@@ -214,7 +215,7 @@ function TransactionsView() {
     const worksheet = utils.json_to_sheet(rowData);
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, t("transactions.view.title"));
-    writeFileXLSX(workbook, `${t("transactions.view.title")}.xlsx`, {
+    writeFile(workbook, `${t("transactions.view.title")}.xlsx`, {
       compression: true,
     });
   };
@@ -543,17 +544,15 @@ function TransactionsView() {
       <ErrorBoundary>
         <div>
           {isUserAdmin ? (
-            <div
-              className="text-dark cursor-pointer fw-bold fs-4 mb-2 ms-auto"
-              style={{ maxWidth: "max-content" }}
-              onClick={handleToggleFilters}>
-              {t("transactions.view.filters")}
-              <span className="ms-2">
+            <div className="d-flex justify-content-end mb-2">
+              <button className="btn btn-dark" onClick={handleToggleFilters}>
+                {t("transactions.view.filters")}
                 <FontAwesomeIcon
+                  className="ms-2"
                   size="lg"
                   icon={showFilters ? faSquareMinus : faSquarePlus}
                 />
-              </span>
+              </button>
             </div>
           ) : (
             <Row>
@@ -570,34 +569,30 @@ function TransactionsView() {
               </Col>
             </Row>
           )}
-          <div
-            className={classNames(
-              "mb-3 p-3 border shadow-sm rounded-3 bg-light",
-              {
-                "d-none": !showFilters,
-              }
-            )}>
-            <TransactionsTableFilters
-              hotelId={hotelId}
-              paginationData={paginationData}
-              loading={loading}
-              handleDateChange={handleDateChange}
-              onPageSizeChange={onPageSizeChange}
-              handleCategoryChange={handleCategoryChange}
-              handleStatusChange={handleStatusChange}
-              handleSubcategoryChange={handleSubcategoryChange}
-              handleFinancePartnerChange={handleFinancePartnerChange}
-              handlePaymentMethodChange={handlePaymentMethodChange}
-              handleTransactionIdInputChange={handleTransactionIdInputChange}
-              handleReferenceNumberInputChange={
-                handleReferenceNumberInputChange
-              }
-              handleDescriptionInputChange={handleDescriptionInputChange}
-              handleEntityIdInputChange={handleEntityIdInputChange}
-              handleHasDocumentUrlChange={handleHasDocumentUrlChange}
-              handleClearAllFilters={handleClearAllFilters}
-            />
-          </div>
+          <Collapse isOpen={showFilters}>
+            <div className="mb-3 p-3 border shadow-sm rounded-3 bg-light">
+              <TransactionsTableFilters
+                hotelId={hotelId}
+                paginationData={paginationData}
+                loading={loading}
+                handleDateChange={handleDateChange}
+                onPageSizeChange={onPageSizeChange}
+                handleCategoryChange={handleCategoryChange}
+                handleStatusChange={handleStatusChange}
+                handleSubcategoryChange={handleSubcategoryChange}
+                handleFinancePartnerChange={handleFinancePartnerChange}
+                handlePaymentMethodChange={handlePaymentMethodChange}
+                handleTransactionIdInputChange={handleTransactionIdInputChange}
+                handleReferenceNumberInputChange={
+                  handleReferenceNumberInputChange
+                }
+                handleDescriptionInputChange={handleDescriptionInputChange}
+                handleEntityIdInputChange={handleEntityIdInputChange}
+                handleHasDocumentUrlChange={handleHasDocumentUrlChange}
+                handleClearAllFilters={handleClearAllFilters}
+              />
+            </div>
+          </Collapse>
         </div>
         <Row className="mb-3">
           <Col md="auto" className="align-content-end">

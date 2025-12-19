@@ -7,14 +7,13 @@ import type {
 import type { Customer, CustomerPayload } from "types/customer.types";
 
 import {
-  API_HOST_PREFIX,
   handleGlobalError,
   handleGlobalSuccess,
   replaceEmptyStringsWithNull,
 } from "./serviceHelpersV2";
 import axiosClientV2 from "services/axiosClientV2";
 
-const api = `${API_HOST_PREFIX}/customers`;
+const api = `/customers`;
 
 export const getByDocumentNumber = async (
   hotelId: string,

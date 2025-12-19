@@ -46,7 +46,10 @@ const HotelEdit = ({ hotelId }) => {
       .catch(() => {
         toast.error(t("hotels.edit.updateError"));
       })
-      .finally(() => setIsUploading(false));
+      .finally(() => {
+        setIsUploading(false);
+        currentHotel.refresh();
+      });
   };
 
   const handleSubmit = (values) => {

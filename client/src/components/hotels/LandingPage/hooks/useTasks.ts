@@ -129,14 +129,16 @@ export const useTasks = (
     try {
       await updateRemindersService(hotelId, task.id, !task.remindersEnabled);
       toast.success(t("tasks.notifications.reminderSuccess"));
-      setTasks((prev) =>
-        prev.map((t) => {
+      setTasks((prev) => {
+        return prev.map((t) => {
           if (t.id === task.id) {
-            t.remindersEnabled = !task.remindersEnabled;
+            const newTask = { ...t };
+            newTask.remindersEnabled = !task.remindersEnabled;
+            return newTask;
           }
           return t;
-        })
-      );
+        });
+      });
     } catch (error) {
       toast.error(t("tasks.notifications.reminderError"));
     }
@@ -161,7 +163,9 @@ export const useTasks = (
       setTasks((prev) =>
         prev.map((t) => {
           if (t.id === task.id) {
-            t.isCompleted = !task.isCompleted;
+            const newTask = { ...t };
+            newTask.isCompleted = !task.isCompleted;
+            return newTask;
           }
           return t;
         })

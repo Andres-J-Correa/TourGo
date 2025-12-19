@@ -4,8 +4,6 @@ import type { ErrorResponse } from "types/apiResponse.types";
 
 import { ERROR_CODES } from "constants/errorCodes";
 
-const API_HOST_PREFIX = process.env.REACT_APP_API_HOST_PREFIX;
-
 const isErrorResponse = (data: unknown): data is ErrorResponse => {
   return (
     typeof data === "object" &&
@@ -88,4 +86,4 @@ function replaceEmptyStringsWithNull<T>(data: T): ReplaceEmptyWithNull<T> {
   return result;
 }
 
-export { API_HOST_PREFIX, replaceEmptyStringsWithNull };
+export { replaceEmptyStringsWithNull };

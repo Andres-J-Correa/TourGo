@@ -2,14 +2,10 @@ import type { AxiosRequestConfig } from "axios";
 import type { ApiResponse, ItemsResponse } from "types/apiResponse.types";
 import type { ExtraCharge } from "types/entities/extraCharge.types";
 
-import {
-  API_HOST_PREFIX,
-  handleGlobalError,
-  handleGlobalSuccess,
-} from "./serviceHelpersV2";
+import { handleGlobalError, handleGlobalSuccess } from "./serviceHelpersV2";
 import axiosClientV2 from "services/axiosClientV2";
 
-const api = `${API_HOST_PREFIX}/hotel/{hotelId}/extra-charges`;
+const api = `/hotel/{hotelId}/extra-charges`;
 
 export const getByHotelId = async (
   hotelId: string,

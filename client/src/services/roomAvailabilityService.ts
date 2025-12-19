@@ -10,10 +10,10 @@ import type {
   ItemsResponse,
 } from "types/apiResponse.types";
 
-import { API_HOST_PREFIX, handleGlobalError } from "./serviceHelpersV2";
+import { handleGlobalError } from "./serviceHelpersV2";
 import axiosClientV2 from "services/axiosClientV2";
 
-const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/room-availability`;
+const apiV2: string = `/hotel/{hotelId}/room-availability`;
 
 export const upsertRoomAvailability = async (
   hotelId: string,

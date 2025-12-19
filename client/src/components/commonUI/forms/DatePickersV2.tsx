@@ -9,6 +9,7 @@ import { Row, Col } from "reactstrap";
 //services & utils
 import { getDate } from "utils/dateHelper";
 import { useLanguage } from "contexts/LanguageContext";
+import { useIsMobile } from "hooks/useIsMobile";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "./DatePickers.css";
@@ -39,6 +40,7 @@ function DatePickersV2({
   minDate,
 }: DatePickersV2Props): JSX.Element {
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
 
   const startLabel: string =
     startDateLabel || t("commonUI.datePickers.startDate");
@@ -80,6 +82,8 @@ function DatePickersV2({
             showMonthDropdown
             isClearable={dateStart !== null && !disabled}
             minDate={dateMin || undefined}
+            withPortal={isMobile}
+            onFocus={(e) => e.target.blur()}
           />
         </Col>
         <Col>
@@ -106,6 +110,8 @@ function DatePickersV2({
             scrollableYearDropdown
             showMonthDropdown
             isClearable={dateEnd !== null && !disabled}
+            withPortal={isMobile}
+            onFocus={(e) => e.target.blur()}
           />
         </Col>
       </Row>

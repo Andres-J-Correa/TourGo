@@ -1,12 +1,11 @@
 import {
   onGlobalError,
   onGlobalSuccess,
-  API_HOST_PREFIX,
   replaceEmptyStringsWithNull,
 } from "../services/serviceHelpers";
 import axiosClient from "services/axiosClient";
 
-const api = `${API_HOST_PREFIX}/customers`;
+const api = `/customers`;
 
 export const getByDocumentNumber = async (hotelId, documentNumber) => {
   const config = {

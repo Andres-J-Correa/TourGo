@@ -16,7 +16,7 @@ class ErrorBoundary extends React.Component {
   // Catch errors from child components
   componentDidCatch(error, info) {
     // Log the error to an external service (e.g., Sentry, LogRocket, etc.)
-    if (process.env.NODE_ENV === "production") {
+    if (import.meta.env.VITE_ENV === "production") {
       // You could add custom error logging here, like:
       // logErrorToService(error, info);
     }

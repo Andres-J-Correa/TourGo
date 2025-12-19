@@ -2,10 +2,10 @@ import type { AxiosRequestConfig } from "axios";
 import type { ApiResponse, ItemsResponse } from "types/apiResponse.types";
 import type { Room } from "types/entities/room.types";
 
-import { API_HOST_PREFIX, handleGlobalError } from "./serviceHelpersV2";
+import { handleGlobalError } from "./serviceHelpersV2";
 import axiosClientV2 from "services/axiosClientV2";
 
-const apiV2: string = `${API_HOST_PREFIX}/hotel/{hotelId}/rooms`;
+const apiV2: string = `/hotel/{hotelId}/rooms`;
 
 export const getByHotelId = async (
   hotelId: string,

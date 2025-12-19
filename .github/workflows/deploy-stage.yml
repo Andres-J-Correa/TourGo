@@ -30,7 +30,7 @@ jobs:
             git reset --hard origin/stage || { echo "Failed to reset to origin/stage"; exit 1; }
 
             # --- CLIENT DEPLOYMENT ---
-            cd vite/client
+            cd client
 
             echo "Building client image..."
             if docker compose --profile stage build; then
@@ -42,7 +42,7 @@ jobs:
             fi
 
             # --- LEGAL PAGES DEPLOYMENT ---
-            cd ../..
+            cd ..
             if [ -d "./legal" ] && [ "$(ls -A ./legal)" ]; then
                 echo "Deploying legal pages..."
                 sudo mkdir -p /var/www/html-stage/legal

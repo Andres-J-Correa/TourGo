@@ -468,8 +468,8 @@
       "reservation": "Reserva",
       "price": "Precio",
       "closed": "Cerrado",
-      "bookingMode": "Modo de Reservas",
-      "cleaningMode": "Modo de Limpieza"
+      "bookingMode": "Reservas",
+      "cleaningMode": "Limpieza"
     },
     "arrival": {
       "reservationNumber": "Reserva #:",
@@ -1001,7 +1001,8 @@
       "financePartners": "Socios financieros",
       "staffInvites": "Invitaciones de Personal",
       "financialReports": "Reportes financieros",
-      "roomAvailability": "Disponibilidad de Habitaciones"
+      "roomAvailability": "Disponibilidad de Habitaciones",
+      "tasks": "Tareas"
     },
     "validation": {
       "nameRequired": "El nombre es obligatorio",

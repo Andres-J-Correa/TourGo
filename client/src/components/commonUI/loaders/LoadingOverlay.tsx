@@ -1,6 +1,6 @@
 import { Spinner } from "reactstrap";
-import "./LoadingOverlay.css"; // We'll style it here
-import { useLanguage } from "contexts/LanguageContext"; // added
+import "./LoadingOverlay.css";
+import { useLanguage } from "contexts/LanguageContext";
 
 interface LoadingOverlayProps {
   isVisible: boolean;
@@ -8,7 +8,7 @@ interface LoadingOverlayProps {
 }
 
 const LoadingOverlay = ({ isVisible, message }: LoadingOverlayProps) => {
-  const { t } = useLanguage(); // added
+  const { t } = useLanguage();
 
   if (!isVisible) return null;
 

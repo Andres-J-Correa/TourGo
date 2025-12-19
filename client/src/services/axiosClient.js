@@ -1,13 +1,12 @@
 import axios from "axios";
 import axiosRetry from "axios-retry";
 
-const axiosClient = axios.create();
-
-axiosClient.defaults.withCredentials = true;
-// Add a request interceptor
-axios.interceptors.request.use(function (config) {
-  config.withCredentials = true;
-  return config;
+const axiosClient = axios.create({
+  baseURL: import.meta.env.VITE_API_HOST_PREFIX,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
 });
 
 axiosRetry(axiosClient, {
