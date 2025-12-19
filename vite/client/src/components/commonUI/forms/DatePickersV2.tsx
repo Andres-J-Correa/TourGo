@@ -83,6 +83,7 @@ function DatePickersV2({
             isClearable={dateStart !== null && !disabled}
             minDate={dateMin || undefined}
             withPortal={isMobile}
+            onFocus={(e) => e.target.blur()}
           />
         </Col>
         <Col>
@@ -110,6 +111,7 @@ function DatePickersV2({
             showMonthDropdown
             isClearable={dateEnd !== null && !disabled}
             withPortal={isMobile}
+            onFocus={(e) => e.target.blur()}
           />
         </Col>
       </Row>
