@@ -17,7 +17,7 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-import { isEqual } from "lodash";
+import isEqual from "lodash.isequal";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 

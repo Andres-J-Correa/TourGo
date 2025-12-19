@@ -47,7 +47,6 @@ import {
 import { flattenObject } from "utils/objectHelper";
 import dayjs from "dayjs";
 import { getDateString } from "utils/dateHelper";
-import { utils, writeFile } from "xlsx";
 
 import "./TransactionsView.css";
 import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
@@ -195,7 +194,9 @@ function TransactionsView() {
     getRowCanExpand: () => true,
   });
 
-  const exportExcel = (rows) => {
+  const exportExcel = async (rows) => {
+    const { utils, writeFile } = await import("xlsx");
+
     let rowData = rows.map((row) => {
       let copy = { ...row.original };
       copy = flattenObject(copy);
