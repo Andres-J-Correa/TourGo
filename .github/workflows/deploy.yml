@@ -31,14 +31,13 @@ jobs:
 
             # --- CLIENT DEPLOYMENT ---
             cd client
-            yarn install || { echo "yarn install failed"; exit 1; }
-            yarn build || { echo "yarn build failed"; exit 1; }
 
-            if [ -d "./build" ] && [ "$(ls -A ./build)" ]; then
-                sudo mkdir -p /var/www/html/app
-                sudo rsync -avz --delete ./build/ /var/www/html/app/
+            echo "Building client image..."
+            if docker compose --profile prod build; then
+                echo "Build successful. Deploying..."
+                docker compose --profile prod up -d
             else
-                echo "Build directory is missing or empty"
+                echo "Client build failed. Aborting deployment to keep existing service running."
                 exit 1
             fi
 

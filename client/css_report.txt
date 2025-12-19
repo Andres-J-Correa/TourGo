@@ -1,0 +1,299 @@
+CSS ANALYSIS REPORT
+
+Analyzing CSS with Node.js...
+Found 259 classes in index.css
+Found 2027 classes in bootstrap.css
+
+========================================
+REDUNDANT CLASSES (Present in both index.css and Bootstrap)
+========================================
+.active
+.align-items-center
+.badge
+.bg-transparent
+.btn
+.btn-dark
+.btn-outline-dark
+.collapse
+.container
+.container-fluid
+.d-block
+.d-flex
+.d-lg-block
+.d-lg-flex
+.d-lg-none
+.d-md-block
+.d-md-flex
+.d-md-none
+.d-none
+.dropdown
+.dropdown-header
+.dropdown-item
+.dropdown-menu
+.dropdown-menu-end
+.end-0
+.flex-column
+.flex-row
+.form-check-input
+.g-0
+.h-100
+.justify-content-between
+.justify-content-center
+.justify-content-start
+.lead
+.list-group
+.list-group-item
+.mb-0
+.mb-1
+.mb-2
+.mb-3
+.mb-4
+.mb-lg-0
+.me-1
+.me-2
+.me-auto
+.me-lg-auto
+.me-md-auto
+.ms-1
+.ms-2
+.ms-auto
+.ms-lg-0
+.ms-lg-5
+.ms-md-auto
+.ms-sm-3
+.mt-0
+.mt-2
+.mt-3
+.mt-4
+.mt-5
+.mt-lg-0
+.mt-lg-3
+.mt-md-0
+.mt-sm-5
+.mx-1
+.mx-2
+.mx-3
+.mx-4
+.mx-auto
+.mx-md-0
+.mx-md-4
+.my-0
+.my-3
+.my-4
+.my-5
+.my-auto
+.my-lg-auto
+.my-sm-3
+.my-sm-5
+.nav
+.nav-item
+.nav-link
+.nav-pills
+.navbar
+.navbar-brand
+.navbar-collapse
+.navbar-expand-lg
+.navbar-nav
+.navbar-toggler
+.opacity-0
+.overflow-hidden
+.p-0
+.p-1
+.p-3
+.p-4
+.p-lg-4
+.pagination
+.pb-2
+.pb-3
+.pb-4
+.pb-lg-5
+.pe-0
+.pe-1
+.pe-3
+.pe-5
+.position-absolute
+.position-relative
+.position-sticky
+.ps-0
+.ps-2
+.ps-3
+.ps-5
+.ps-md-3
+.pt-3
+.pt-4
+.pt-5
+.px-0
+.px-1
+.px-2
+.px-4
+.px-5
+.px-lg-1
+.px-sm-5
+.py-2
+.py-3
+.py-5
+.py-lg-0
+.py-md-5
+.row
+.show
+.start-0
+.text-center
+.text-dark
+.text-lg-end
+.text-secondary
+.text-sm-start
+.text-success
+.text-white
+.top-0
+
+========================================
+POTENTIALLY UNUSED CLASSES (In index.css but not found in JS/TS/HTML)
+========================================
+.badge-lg
+.badge-md
+.badge-success
+.badge-white
+.bg-gray-100
+.bg-gray-200
+.border-radius-md
+.container (Also Redundant)
+.container-fluid (Also Redundant)
+.d-block (Also Redundant)
+.d-lg-block (Also Redundant)
+.d-lg-flex (Also Redundant)
+.d-lg-none (Also Redundant)
+.dropdown-header (Also Redundant)
+.dropdown-md
+.dropdown-menu (Also Redundant)
+.dropdown-menu-end (Also Redundant)
+.dropdown-subitem
+.dropdown-xl
+.eot
+.fa
+.fa-2x
+.fa-arrow-right
+.fa-cc-amex
+.fa-cc-mastercard
+.fa-cc-paypal
+.fa-cc-visa
+.fa-clock
+.fa-dribbble
+.fa-facebook
+.fa-facebook-square
+.fa-github
+.fa-lock
+.fa-pinterest
+.fa-star
+.fa-twitter
+.fa-youtube
+.fab
+.far
+.fas
+.flex-row (Also Redundant)
+.font-weight-normal
+.fontawesome
+.footer-logo
+.form-check-input (Also Redundant)
+.g-0 (Also Redundant)
+.gstatic
+.info-horizontal
+.justify-content-start (Also Redundant)
+.list-group (Also Redundant)
+.list-group-item (Also Redundant)
+.material-icons
+.max-vh-50
+.max-width-500
+.mb-lg-0 (Also Redundant)
+.me-lg-auto (Also Redundant)
+.me-md-auto (Also Redundant)
+.min-height-160
+.min-vh-75
+.min-width-auto
+.modal-open
+.move-on-hover
+.ms-1 (Also Redundant)
+.ms-lg-0 (Also Redundant)
+.ms-lg-5 (Also Redundant)
+.ms-md-auto (Also Redundant)
+.ms-n3
+.mt-6
+.mt-lg-0 (Also Redundant)
+.mt-lg-10
+.mt-lg-3 (Also Redundant)
+.mt-lg-n8
+.mt-md-n10
+.mt-md-n8
+.mt-n1
+.mt-n10
+.mt-n11
+.mt-n12
+.mt-n2
+.mt-n3
+.mt-n6
+.mt-n7
+.mt-n8
+.mt-n9
+.mt-sm-5 (Also Redundant)
+.mt-sm-n4
+.mx-4 (Also Redundant)
+.mx-md-0 (Also Redundant)
+.mx-md-4 (Also Redundant)
+.mx-n3
+.mx-n5
+.my-0 (Also Redundant)
+.my-lg-auto (Also Redundant)
+.my-sm-3 (Also Redundant)
+.my-sm-5 (Also Redundant)
+.nav-item (Also Redundant)
+.nav-pills (Also Redundant)
+.navbar-collapse (Also Redundant)
+.navbar-expand-lg (Also Redundant)
+.navbar-nav (Also Redundant)
+.navbar-toggler (Also Redundant)
+.opacity-0 (Also Redundant)
+.opacity-1
+.opacity-2
+.opacity-3
+.opacity-5
+.opacity-6
+.opacity-7
+.opacity-8
+.opacity-9
+.overflow-hidden (Also Redundant)
+.p-lg-4 (Also Redundant)
+.pb-4 (Also Redundant)
+.pb-7
+.pb-lg-5 (Also Redundant)
+.pb-lg-8
+.pe-0 (Also Redundant)
+.pe-5 (Also Redundant)
+.position-sticky (Also Redundant)
+.ps-0 (Also Redundant)
+.ps-5 (Also Redundant)
+.ps-md-3 (Also Redundant)
+.pt-4 (Also Redundant)
+.pt-5 (Also Redundant)
+.pt-7
+.pt-lg-6
+.px-4 (Also Redundant)
+.px-lg-1 (Also Redundant)
+.py-6
+.py-7
+.py-md-5 (Also Redundant)
+.py-sm-7
+.rating
+.shadow-blur
+.start-0 (Also Redundant)
+.text-3xl
+.text-4xl
+.text-lg
+.text-lg-end (Also Redundant)
+.text-md
+.text-sm-start (Also Redundant)
+.ttf
+.w-20
+.woff
+.woff2
+.z-index-3
+.z-index-n1
+.z-index-sticky

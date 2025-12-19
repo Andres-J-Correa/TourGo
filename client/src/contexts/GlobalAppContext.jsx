@@ -1,21 +1,32 @@
-import React, {
+import {
   createContext,
   useState,
   useEffect,
   useContext,
   useCallback,
+  lazy,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUser, usersLogout } from "services/userAuthService";
-import { getMinimalWithUserRoleById } from "services/hotelService";
-import { UserSignInFormModal } from "components/users/UserSignInForm";
-import { SignUpFormModal } from "components/users/SignUpForm";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
-import Swal from "sweetalert2";
+
+import { getCurrentUser, usersLogout } from "services/userAuthService";
+import { getMinimalWithUserRoleById } from "services/hotelService";
 import axiosClient from "services/axiosClient";
 import axiosClientV2 from "services/axiosClientV2";
 import { useLanguage } from "contexts/LanguageContext";
+
+const SignUpFormModal = lazy(() =>
+  import("components/users/SignUpForm").then((module) => ({
+    default: module.SignUpFormModal,
+  }))
+);
+
+const UserSignInFormModal = lazy(() =>
+  import("components/users/UserSignInForm").then((module) => ({
+    default: module.UserSignInFormModal,
+  }))
+);
 
 const defaultUser = {
   id: 0,
@@ -92,6 +103,8 @@ export const AppContextProvider = ({ children }) => {
   );
 
   const handleLogout = useCallback(async () => {
+    const Swal = await import("sweetalert2");
+
     const result = await Swal.fire({
       title: t("globalAppContext.logoutTitle"),
       text: t("globalAppContext.logoutText"),

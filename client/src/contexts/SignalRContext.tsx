@@ -14,8 +14,6 @@ const HUB_CONFIG = {
   taskReminders: `${baseUrl}/task-reminders`,
 };
 
-_logger(HUB_CONFIG);
-
 export type HubKey = keyof typeof HUB_CONFIG;
 
 interface SignalRContextType {

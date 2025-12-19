@@ -1,5 +1,3 @@
-import React from "react";
-
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import NavbarItem from "components/commonUI/navbars/NavbarItem";
 

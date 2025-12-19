@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useSignalR } from "contexts/SignalRContext";
-import TaskRemindersModal, { type TaskReminder } from "./TaskRemindersModal";
+import { type TaskReminder } from "./TaskRemindersModal";
 import useSound from "use-sound";
+
+const TaskRemindersModal = lazy(() => import("./TaskRemindersModal"));
 
 const notificationSound = require("assets/sounds/task-reminder-notification.mp3");
 
@@ -38,11 +40,13 @@ export default function TaskRemindersListener() {
   return (
     <>
       {modalOpen && (
-        <TaskRemindersModal
-          isOpen={modalOpen}
-          toggle={toggleModal}
-          tasks={reminders}
-        />
+        <Suspense>
+          <TaskRemindersModal
+            isOpen={modalOpen}
+            toggle={toggleModal}
+            tasks={reminders}
+          />
+        </Suspense>
       )}
     </>
   );
