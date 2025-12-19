@@ -78,6 +78,7 @@ export default defineConfig({
       assets: path.resolve(__dirname, "./src/assets"),
       providers: path.resolve(__dirname, "./src/providers"),
       types: path.resolve(__dirname, "./src/types"),
+      hooks: path.resolve(__dirname, "./src/hooks"),
     },
   },
   build: {
