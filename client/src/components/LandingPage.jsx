@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import LoadingOverlay from "./commonUI/loaders/LoadingOverlay";
@@ -53,7 +53,7 @@ const LandingPage = () => {
   const renderGoToHotels = () => {
     return (
       <div className="text-center">
-        <Link to="/hotels" className="btn btn-dark btn-lg">
+        <Link prefetch="intent" to="/hotels" className="btn btn-dark btn-lg">
           {t("landingPage.goToHotels")}
         </Link>
       </div>

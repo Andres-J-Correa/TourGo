@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Swal from "sweetalert2";
 
 import { toast } from "react-toastify";
@@ -23,9 +23,7 @@ function HotelInvites() {
   const [invites, setInvites] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const userSignInToggleCount = useRef(0);
-
-  const { user, toggleUserSignInModal } = useAppContext();
+  const { user } = useAppContext();
   const { t } = useLanguage();
 
   const breadcrumbs = useMemo(
@@ -38,43 +36,25 @@ function HotelInvites() {
   );
 
   useEffect(() => {
-    if (user.current.isAuthenticated && user.current.hasFetched) {
-      setLoading(true);
-      getUserInvites()
-        .then((res) => {
-          if (res.isSuccessful) {
-            setInvites(res.items);
-          }
-        })
-        .catch((error) => {
-          if (
-            error?.response?.status !== 404 &&
-            error?.response?.status !== 403
-          ) {
-            toast.error(t("hotels.invites.loadError"));
-          }
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [user, t]);
-
-  useEffect(() => {
-    if (
-      !user.current.isAuthenticated &&
-      user.current.hasFetched &&
-      userSignInToggleCount.current === 0
-    ) {
-      userSignInToggleCount.current += 1;
-      toggleUserSignInModal({
-        backdrop: "static",
-        keyboard: false,
-        onSignUp: false,
-        redirect: false,
+    setLoading(true);
+    getUserInvites()
+      .then((res) => {
+        if (res.isSuccessful) {
+          setInvites(res.items);
+        }
+      })
+      .catch((error) => {
+        if (
+          error?.response?.status !== 404 &&
+          error?.response?.status !== 403
+        ) {
+          toast.error(t("hotels.invites.loadError"));
+        }
+      })
+      .finally(() => {
+        setLoading(false);
       });
-    }
-  }, [user, toggleUserSignInModal]);
+  }, [t]);
 
   const handleAccept = async (inviteId) => {
     const result = await Swal.fire({

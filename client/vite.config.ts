@@ -7,13 +7,13 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/app/",
+  base: "/app",
   plugins: [
     react(),
     commonjs(),
     VitePWA({
       registerType: "autoUpdate",
-      base: "/app/",
+      base: "/app",
       manifest: {
         short_name: "TourGo",
         name: "TourGo",

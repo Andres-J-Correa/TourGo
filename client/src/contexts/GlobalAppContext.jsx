@@ -4,9 +4,8 @@ import {
   useEffect,
   useContext,
   useCallback,
-  lazy,
 } from "react";
-import { useNavigate } from "react-router-dom";
+
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 
@@ -15,18 +14,6 @@ import { getMinimalWithUserRoleById } from "services/hotelService";
 import axiosClient from "services/axiosClient";
 import axiosClientV2 from "services/axiosClientV2";
 import { useLanguage } from "contexts/LanguageContext";
-
-const SignUpFormModal = lazy(() =>
-  import("components/users/SignUpForm").then((module) => ({
-    default: module.SignUpFormModal,
-  }))
-);
-
-const UserSignInFormModal = lazy(() =>
-  import("components/users/UserSignInForm").then((module) => ({
-    default: module.UserSignInFormModal,
-  }))
-);
 
 const defaultUser = {
   id: 0,
@@ -37,32 +24,12 @@ const defaultUser = {
   roles: [],
   isAuthenticated: false,
   isVerified: false,
-  hasFetched: false,
 };
 
 const defaultHotel = {
   id: "",
   name: "",
   roleId: 0,
-};
-
-const defaultModals = {
-  login: {
-    isOpen: false,
-    options: {
-      backdrop: true,
-      keyboard: true,
-      onSignUp: true,
-      redirect: true,
-    },
-  },
-  register: {
-    isOpen: false,
-    options: {
-      backdrop: true,
-      keyboard: true,
-    },
-  },
 };
 
 const AppContext = createContext();
@@ -73,34 +40,11 @@ export const AppContextProvider = ({ children }) => {
   const [hotelIdParam, setHotelIdParam] = useState(null);
   const [isLoadingHotel, setIsLoadingHotel] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
-  const [modals, setModals] = useState({ ...defaultModals });
   const [isAuthError, setIsAuthError] = useState(false);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [isResponseIntercepted, setIsResponseIntercepted] = useState(false);
 
   const { t } = useLanguage();
-
-  const navigate = useNavigate();
-
-  const toggleModal = useCallback(
-    (key) =>
-      (options = {}) => {
-        setModals((prev) => {
-          const isOptionsEmpty = Object.keys(options).length === 0;
-          return {
-            ...defaultModals,
-            [key]: {
-              ...prev[key],
-              isOpen: !prev[key].isOpen,
-              options: isOptionsEmpty
-                ? { ...prev[key].options }
-                : { ...prev[key].options, ...options },
-            },
-          };
-        });
-      },
-    [setModals]
-  );
 
   const handleLogout = useCallback(async () => {
     const { default: Swal } = await import("sweetalert2");
@@ -140,7 +84,6 @@ export const AppContextProvider = ({ children }) => {
       });
 
       setCurrentUser({ ...defaultUser });
-      navigate("/");
     } catch (error) {
       Swal.close();
       Swal.fire({
@@ -149,7 +92,7 @@ export const AppContextProvider = ({ children }) => {
         icon: "error",
       });
     }
-  }, [navigate, t]);
+  }, [t]);
 
   const setHotelId = useCallback(
     (hotelId) => {
@@ -173,8 +116,6 @@ export const AppContextProvider = ({ children }) => {
       setHotelId,
       refresh: () => fetchHotel(hotel.id),
     },
-    toggleUserSignInModal: toggleModal("login"),
-    toggleUserSignUpModal: toggleModal("register"),
     maintenanceMode,
   };
 
@@ -185,22 +126,12 @@ export const AppContextProvider = ({ children }) => {
         currentUser.isAuthenticated &&
         !isAuthError
       ) {
-        setModals((prev) => ({
-          ...prev,
-          login: {
-            ...prev.login,
-            isOpen: true,
-            options: {
-              ...prev.login.options,
-              backdrop: "static",
-              keyboard: false,
-              onSignUp: false,
-              redirect: false,
-            },
-          },
-        }));
+        setCurrentUser({ ...defaultUser });
         setIsAuthError(true);
-        toast.error(t("common.sessionExpired"));
+        toast.error(t("common.sessionExpired"), {
+          autoClose: 5000,
+          theme: "colored",
+        });
       }
 
       if (error.code === "ERR_NETWORK" || error.response?.status === 503) {
@@ -231,11 +162,7 @@ export const AppContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (
-      currentUser.id === 0 &&
-      !currentUser.hasFetched &&
-      isResponseIntercepted
-    ) {
+    if (currentUser.id === 0 && isResponseIntercepted) {
       getCurrentUser()
         .then((data) => {
           const { item } = data;
@@ -247,24 +174,17 @@ export const AppContextProvider = ({ children }) => {
             ...prev,
             ...data.item,
             isAuthenticated: true,
-            hasFetched: true,
           }));
           setIsAuthError(false);
         })
         .catch(() => {
-          setCurrentUser({ ...defaultUser, hasFetched: true });
+          setCurrentUser({ ...defaultUser });
         })
         .finally(() => {
           setIsLoadingUser(false);
         });
     }
-  }, [
-    currentUser.id,
-    currentUser.isAuthenticated,
-    navigate,
-    currentUser.hasFetched,
-    isResponseIntercepted,
-  ]);
+  }, [currentUser.id, currentUser.isAuthenticated, isResponseIntercepted]);
 
   useEffect(() => {
     if (
@@ -316,26 +236,7 @@ export const AppContextProvider = ({ children }) => {
   }, [handleGlobalError, maintenanceMode]);
 
   return (
-    <AppContext.Provider value={contextValue}>
-      <UserSignInFormModal
-        isOpen={modals.login.isOpen}
-        toggle={toggleModal("login")}
-        onSignUp={
-          modals.login.options.onSignUp ? toggleModal("register") : null
-        }
-        backdrop={modals.login.options.backdrop}
-        keyboard={modals.login.options.keyboard}
-        redirect={modals.login.options.redirect}
-      />
-      <SignUpFormModal
-        isOpen={modals.register.isOpen}
-        toggle={toggleModal("register")}
-        onSignIn={toggleModal("login")}
-        backdrop={modals.register.options.backdrop}
-        keyboard={modals.register.options.keyboard}
-      />
-      {children}
-    </AppContext.Provider>
+    <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
   );
 };
 

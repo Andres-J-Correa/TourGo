@@ -9,6 +9,7 @@ import {
   Routes,
   useLocation,
   useNavigationType,
+  RouterProvider,
 } from "react-router-dom";
 import {
   createReactRouterV6Options,
@@ -18,9 +19,8 @@ import {
 } from "@grafana/faro-react";
 import { TracingInstrumentation } from "@grafana/faro-web-tracing";
 
-import App from "./App.tsx";
-
 import { AppProviders } from "./providers/AppProvider.tsx";
+import { router } from "./routes/index";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
@@ -64,7 +64,7 @@ if (env !== "development") {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AppProviders>
-      <App />
+      <RouterProvider router={router} />
     </AppProviders>
   </StrictMode>
 );

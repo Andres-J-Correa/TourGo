@@ -1,4 +1,3 @@
-import React from "react";
 import { useField, useFormikContext } from "formik";
 import DatePicker from "react-datepicker";
 import CustomErrorMessage from "./CustomErrorMessage";
@@ -8,12 +7,15 @@ import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
 import "./DatePickers.css"; // Custom styles for the date picker
 import "./forms.css"; // Custom styles for the form elements
-import { useLanguage } from "contexts/LanguageContext"; // added
+import { useLanguage } from "contexts/LanguageContext";
+
+import { useIsMobile } from "hooks/useIsMobile";
 
 const CustomDateTimePicker = ({ isRequired, ...props }) => {
   const [field, , helpers] = useField(props.name);
   const { setFieldValue } = useFormikContext();
-  const { t } = useLanguage(); // added
+  const { t } = useLanguage();
+  const isMobile = useIsMobile();
 
   const handleChange = (date) => {
     setFieldValue(field.name, dayjs(date).format("YYYY-MM-DDTHH:mm:ss"));
@@ -40,6 +42,7 @@ const CustomDateTimePicker = ({ isRequired, ...props }) => {
         popperClassName="custom-datepicker"
         style={{ height: "58px" }}
         timeCaption={t("commonUI.dateTimePicker.time")}
+        withPortal={isMobile}
       />
       {isRequired && (
         <div

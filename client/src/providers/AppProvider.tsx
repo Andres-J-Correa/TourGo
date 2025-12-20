@@ -10,18 +10,19 @@ import i18n from "../locales/i18n";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
-    <BrowserRouter basename="/app">
+    // <BrowserRouter basename="/app">
+
+    <GoogleReCaptchaProvider
+      reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? ""}
+      language={i18n.language}>
       <LanguageProvider>
-        <GoogleReCaptchaProvider
-          reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? ""}
-          language={i18n.language}>
-          <AppContextProvider>
-            <SignalRProvider>
-              <HelmetProvider>{children}</HelmetProvider>
-            </SignalRProvider>
-          </AppContextProvider>
-        </GoogleReCaptchaProvider>
+        <AppContextProvider>
+          <SignalRProvider>
+            <HelmetProvider>{children}</HelmetProvider>
+          </SignalRProvider>
+        </AppContextProvider>
       </LanguageProvider>
-    </BrowserRouter>
+    </GoogleReCaptchaProvider>
+    // </BrowserRouter>
   );
 }

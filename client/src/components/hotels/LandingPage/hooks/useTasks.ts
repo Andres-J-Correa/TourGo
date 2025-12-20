@@ -96,7 +96,12 @@ export const useTasks = (
     if (!hotelId) return;
     setCreating(true);
     try {
-      await addTaskService(hotelId, task);
+      const res = await addTaskService(hotelId, task);
+
+      if (!res.isSuccessful) {
+        throw res.error;
+      }
+
       toast.success(t("tasks.notifications.addSuccess"));
       await fetchTasks();
       return true;
@@ -112,7 +117,12 @@ export const useTasks = (
     if (!hotelId) return;
     setUpdating(true);
     try {
-      await updateTaskService(hotelId, task);
+      const res = await updateTaskService(hotelId, task);
+
+      if (!res.isSuccessful) {
+        throw res.error;
+      }
+
       toast.success(t("tasks.notifications.updateSuccess"));
       await fetchTasks();
       return true;
@@ -127,7 +137,16 @@ export const useTasks = (
   const toggleReminders = async (task: Task) => {
     if (!hotelId) return;
     try {
-      await updateRemindersService(hotelId, task.id, !task.remindersEnabled);
+      const res = await updateRemindersService(
+        hotelId,
+        task.id,
+        !task.remindersEnabled
+      );
+
+      if (!res.isSuccessful) {
+        throw res.error;
+      }
+
       toast.success(t("tasks.notifications.reminderSuccess"));
       setTasks((prev) => {
         return prev.map((t) => {
@@ -147,7 +166,12 @@ export const useTasks = (
   const deleteTask = async (id: number) => {
     if (!hotelId) return;
     try {
-      await deleteTaskService(hotelId, id);
+      const res = await deleteTaskService(hotelId, id);
+
+      if (!res.isSuccessful) {
+        throw res.error;
+      }
+
       toast.success(t("tasks.notifications.deleteSuccess"));
       setTasks((prev) => prev.filter((t) => t.id !== id));
     } catch (error) {
@@ -158,7 +182,16 @@ export const useTasks = (
   const toggleCompleted = async (task: Task) => {
     if (!hotelId) return;
     try {
-      await updateCompletedService(hotelId, task.id, !task.isCompleted);
+      const res = await updateCompletedService(
+        hotelId,
+        task.id,
+        !task.isCompleted
+      );
+
+      if (!res.isSuccessful) {
+        throw res.error;
+      }
+
       toast.success(t("tasks.notifications.updateSuccess"));
       setTasks((prev) =>
         prev.map((t) => {

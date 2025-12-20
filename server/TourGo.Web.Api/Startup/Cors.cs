@@ -13,7 +13,8 @@ namespace TourGo.Web.StartUp
                     builder
                         .WithOrigins(
                             "http://localhost:3000",          // React dev server
-                            "http://localhost:5173/",      //React Vite dev server
+                            "http://localhost:5173",      //React Vite dev server
+                            "http://localhost:4173",      //React Vite dev server
                             "https://tourgo.site",        // Production frontend
                             "https://tourgo.space"        // Stage frontend
                         )
