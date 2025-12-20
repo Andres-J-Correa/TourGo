@@ -1,5 +1,5 @@
 import { Suspense, Fragment, useEffect } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams, useNavigation } from "react-router-dom";
 
 import { Container } from "reactstrap";
 import { ToastContainer } from "react-toastify";
@@ -9,6 +9,7 @@ import NavbarContainer from "components/commonUI/navbars/NavbarContainer";
 import SiteUnderMaintenance from "components/commonUI/fallback/SiteUnderMaintenance";
 import Footer from "components/commonUI/Footer";
 import TaskRemindersListener from "components/hotels/LandingPage/components/TaskRemindersListener";
+import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
 import { useAppContext } from "./contexts/GlobalAppContext";
 
@@ -26,10 +27,6 @@ function App() {
     }
   }, [hotelId]);
 
-  if (user.isLoading) {
-    return <LoadingScreen />;
-  }
-
   if (maintenanceMode) {
     return <SiteUnderMaintenance />;
   }
@@ -38,6 +35,7 @@ function App() {
     <Fragment>
       <Suspense fallback={<LoadingScreen />}>
         <NavbarContainer />
+        <LoadingOverlay isVisible={user.isLoading} />
         <Container className="my-4 main-container" fluid>
           <Outlet />
         </Container>
