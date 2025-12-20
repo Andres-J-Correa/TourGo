@@ -53,7 +53,7 @@ const LandingPage = () => {
   const renderGoToHotels = () => {
     return (
       <div className="text-center">
-        <Link prefetch="intent" to="/hotels" className="btn btn-dark btn-lg">
+        <Link to="/hotels" className="btn btn-dark btn-lg">
           {t("landingPage.goToHotels")}
         </Link>
       </div>

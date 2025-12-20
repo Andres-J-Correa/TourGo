@@ -5,8 +5,9 @@ import App from "../App";
 import NoRecords404 from "components/commonUI/errors/NoRecords404";
 import { privateRoutes } from "./privateRoutes";
 import { publicRoutes } from "./publicRoutes";
+import { withFaroRouterInstrumentation } from "@grafana/faro-react";
 
-export const router = createBrowserRouter(
+const browserRouter = createBrowserRouter(
   [
     {
       path: "/",
@@ -25,3 +26,5 @@ export const router = createBrowserRouter(
     basename: "/app",
   }
 );
+
+export const router = withFaroRouterInstrumentation(browserRouter);

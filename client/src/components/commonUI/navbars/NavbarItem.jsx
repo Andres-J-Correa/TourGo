@@ -20,7 +20,6 @@ import "./navbaritem.css";
 const NavbarLink = ({ navItem, isInnerItem }) => (
   <NavLink
     end
-    prefetch="render"
     to={navItem.path}
     target={navItem.newTab ? "_blank" : undefined}
     className={classNames("mx-1 px-2", {
