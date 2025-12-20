@@ -17,7 +17,7 @@ COPY . .
 
 # 4. Execute build using yarn to ensure it uses local node_modules/.bin
 # If this still fails, we will try the "npx" fallback below
-RUN yarn build:prod
+RUN yarn build
 
 # ----------------------------
 # Stage 2: Serve with Nginx
