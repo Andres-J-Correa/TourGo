@@ -64,7 +64,7 @@ jobs:
             # --- INJECT SECRETS INTO appsettings.Staging.json ---
             cd /var/www/server-stage
             jq --arg json_token_secret "${{ secrets.SERVER_JSON_WEB_TOKEN_SECRET }}" \
-               --arg mysql_conn_string "${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_PROD }}" \
+               --arg mysql_conn_string "${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_STAGE }}" \
                --arg brevo_api_key "${{ secrets.SERVER_BREVO_API_KEY }}" \
                --arg awss3_access_key "${{ secrets.SERVER_AWS_S3_ACCESS_KEY }}" \
                --arg awss3_secret_key "${{ secrets.SERVER_AWS_S3_SECRET_KEY }}" \
