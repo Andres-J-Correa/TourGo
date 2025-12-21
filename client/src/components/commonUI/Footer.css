@@ -1,0 +1,3 @@
+.footer-dropdown:has(+ .footer-dropdown-menu .active) {
+  color: var(--bs-link-hover-color);
+}

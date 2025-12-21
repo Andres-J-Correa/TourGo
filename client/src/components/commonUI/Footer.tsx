@@ -18,6 +18,7 @@ import {
   faCalendarDays,
   faCashRegister,
 } from "@fortawesome/free-solid-svg-icons";
+import "./Footer.css";
 
 interface FooterNavigationProps {
   hotelId?: string;
@@ -42,7 +43,7 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
           <Row className="d-flex align-items-center">
             <Col>
               <Row className="d-flex align-items-center">
-                <NavLink to={`/hotels/${hotelId}`}>
+                <NavLink to={`/hotels/${hotelId}`} end>
                   <FontAwesomeIcon icon={faHome} />
                 </NavLink>
               </Row>
@@ -51,7 +52,7 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
         </Col>
         <Col>
           <Row className="d-flex align-items-center">
-            <NavLink to={`/hotels/${hotelId}/bookings`}>
+            <NavLink to={`/hotels/${hotelId}/bookings`} end>
               <FontAwesomeIcon icon={faCalendarCheck} />
             </NavLink>
           </Row>
@@ -63,18 +64,18 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
               toggle={toggleBookingsDropdown}
               inNavbar
               direction="up">
-              <DropdownToggle nav color="dark">
+              <DropdownToggle nav color="dark" className="footer-dropdown">
                 <FontAwesomeIcon icon={faCalendarPlus} size="lg" />
               </DropdownToggle>
-              <DropdownMenu>
+              <DropdownMenu className="footer-dropdown-menu">
                 <DropdownItem>
-                  <NavLink to={`/hotels/${hotelId}/bookings/new`}>
+                  <NavLink to={`/hotels/${hotelId}/bookings/new`} end>
                     {t("commonUI.footer.newBooking")}
                   </NavLink>
                 </DropdownItem>
                 <DropdownItem divider />
                 <DropdownItem>
-                  <NavLink to={`/hotels/${hotelId}/bookings/quote`}>
+                  <NavLink to={`/hotels/${hotelId}/bookings/quote`} end>
                     {t("commonUI.footer.newQuote")}
                   </NavLink>
                 </DropdownItem>
@@ -84,14 +85,14 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
         </Col>
         <Col>
           <Row className="d-flex align-items-center">
-            <NavLink to={`/hotels/${hotelId}/calendar`}>
+            <NavLink to={`/hotels/${hotelId}/calendar`} end>
               <FontAwesomeIcon icon={faCalendarDays} />
             </NavLink>
           </Row>
         </Col>
         <Col>
           <Row className="d-flex align-items-center">
-            <NavLink to={`/hotels/${hotelId}/transactions`}>
+            <NavLink to={`/hotels/${hotelId}/transactions`} end>
               <FontAwesomeIcon icon={faCashRegister} />
             </NavLink>
           </Row>

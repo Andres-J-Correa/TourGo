@@ -131,6 +131,10 @@ a:hover {
   color: var(--bs-link-hover-color);
   text-decoration: none;
 }
+
+a.active {
+  color: var(--bs-link-hover-color);
+}
 img {
   vertical-align: middle;
 }
