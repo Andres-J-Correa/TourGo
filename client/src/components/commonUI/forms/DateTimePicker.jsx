@@ -43,6 +43,7 @@ const CustomDateTimePicker = ({ isRequired, ...props }) => {
         style={{ height: "58px" }}
         timeCaption={t("commonUI.dateTimePicker.time")}
         withPortal={isMobile}
+        onFocus={(e) => e.target.blur()}
       />
       {isRequired && (
         <div

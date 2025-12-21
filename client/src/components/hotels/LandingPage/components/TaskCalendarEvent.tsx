@@ -3,7 +3,7 @@ import { Button, Spinner } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
-  faTimes,
+  faCalendarXmark,
   faBell,
   faBellSlash,
   faTrash,
@@ -142,7 +142,9 @@ const TaskCalendarEvent: React.FC<TaskCalendarEventProps> = ({
           {loadingAction === "completing" ? (
             <Spinner size="sm" />
           ) : (
-            <FontAwesomeIcon icon={!task.isCompleted ? faCheck : faTimes} />
+            <FontAwesomeIcon
+              icon={!task.isCompleted ? faCheck : faCalendarXmark}
+            />
           )}
         </Button>
 

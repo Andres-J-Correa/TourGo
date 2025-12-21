@@ -18,7 +18,7 @@ import {
   faBell,
   faBellSlash,
   faCheck,
-  faTimes,
+  faCalendarXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useLanguage } from "contexts/LanguageContext";
 import type { Task } from "services/taskService";
@@ -202,7 +202,7 @@ export default function TaskAccordionItem({
             ) : (
               <>
                 <FontAwesomeIcon
-                  icon={!task.isCompleted ? faCheck : faTimes}
+                  icon={!task.isCompleted ? faCheck : faCalendarXmark}
                   className={task.isCompleted ? "me-2" : ""}
                 />
                 {task.isCompleted && t("tasks.actions.markIncomplete")}

@@ -6,7 +6,7 @@ import {
   faUser,
   faClock,
   faCheck,
-  faTimes,
+  faCalendarXmark,
   faBell,
   faBellSlash,
   faTrash,
@@ -146,7 +146,9 @@ export default function TaskCalendarEventDetailsCard({
               {loadingAction === "completing" ? (
                 <Spinner size="sm" />
               ) : (
-                <FontAwesomeIcon icon={!task.isCompleted ? faCheck : faTimes} />
+                <FontAwesomeIcon
+                  icon={!task.isCompleted ? faCheck : faCalendarXmark}
+                />
               )}
             </Button>
 

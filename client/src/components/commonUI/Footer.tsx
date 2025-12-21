@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import {
   Row,
   Col,
@@ -42,18 +42,18 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
           <Row className="d-flex align-items-center">
             <Col>
               <Row className="d-flex align-items-center">
-                <Link to={`/hotels/${hotelId}`}>
+                <NavLink to={`/hotels/${hotelId}`}>
                   <FontAwesomeIcon icon={faHome} />
-                </Link>
+                </NavLink>
               </Row>
             </Col>
           </Row>
         </Col>
         <Col>
           <Row className="d-flex align-items-center">
-            <Link to={`/hotels/${hotelId}/bookings`}>
+            <NavLink to={`/hotels/${hotelId}/bookings`}>
               <FontAwesomeIcon icon={faCalendarCheck} />
-            </Link>
+            </NavLink>
           </Row>
         </Col>
         <Col>
@@ -68,15 +68,15 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
               </DropdownToggle>
               <DropdownMenu>
                 <DropdownItem>
-                  <Link to={`/hotels/${hotelId}/bookings/new`}>
+                  <NavLink to={`/hotels/${hotelId}/bookings/new`}>
                     {t("commonUI.footer.newBooking")}
-                  </Link>
+                  </NavLink>
                 </DropdownItem>
                 <DropdownItem divider />
                 <DropdownItem>
-                  <Link to={`/hotels/${hotelId}/bookings/quote`}>
+                  <NavLink to={`/hotels/${hotelId}/bookings/quote`}>
                     {t("commonUI.footer.newQuote")}
-                  </Link>
+                  </NavLink>
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -84,16 +84,16 @@ const FooterNavigation = ({ hotelId }: FooterNavigationProps) => {
         </Col>
         <Col>
           <Row className="d-flex align-items-center">
-            <Link to={`/hotels/${hotelId}/calendar`}>
+            <NavLink to={`/hotels/${hotelId}/calendar`}>
               <FontAwesomeIcon icon={faCalendarDays} />
-            </Link>
+            </NavLink>
           </Row>
         </Col>
         <Col>
           <Row className="d-flex align-items-center">
-            <Link to={`/hotels/${hotelId}/transactions`}>
+            <NavLink to={`/hotels/${hotelId}/transactions`}>
               <FontAwesomeIcon icon={faCashRegister} />
-            </Link>
+            </NavLink>
           </Row>
         </Col>
       </Row>
