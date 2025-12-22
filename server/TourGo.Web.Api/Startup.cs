@@ -1,4 +1,5 @@
 ﻿using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Quartz;
 using System.Globalization;
@@ -64,6 +65,22 @@ namespace TourGo.Web.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (!env.IsDevelopment())
+            {
+                var forwardOptions = new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                };
+
+                // Clear the default "KnownNetworks" and "KnownProxies" 
+                // This allows the headers to be accepted from the Docker bridge
+                forwardOptions.KnownNetworks.Clear();
+                forwardOptions.KnownProxies.Clear();
+
+                app.UseForwardedHeaders(forwardOptions);
+                app.UseHsts();
+            }
+
             app.UseRequestLocalization(new RequestLocalizationOptions
             {
                 DefaultRequestCulture = new RequestCulture("en"),
@@ -92,13 +109,6 @@ namespace TourGo.Web.Api
                 endpoints.MapControllers();
                 endpoints.MapHub<TaskRemindersHub>("/hubs/task-reminders");
             });
-
-            if (!env.IsDevelopment())
-            {
-                app.UseHttpsRedirection();
-                app.UseDeveloperExceptionPage();
-                app.UseHsts();
-            }
 
             MVC.Configure(app, env);
 
