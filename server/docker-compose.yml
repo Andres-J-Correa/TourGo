@@ -1,0 +1,12 @@
+services:
+  TourGoApi:
+    profiles: ["stage"]
+    image: tourgo-api
+    build:
+      context: .
+      dockerfile: TourGo.Web.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ASPNETCORE_URLS=http://+:50002
+    ports:
+      - "50002:50002"
