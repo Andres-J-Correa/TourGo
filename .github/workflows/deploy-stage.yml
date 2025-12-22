@@ -15,11 +15,14 @@ jobs:
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.2
+        env:
+          SQL_PASS: ${{ secrets.SERVER_MY_SQL_DATABASE_PASSWORD_STAGE }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          envs: SQL_PASS
           script: |
             # --- CHANGE TO REPO DIRECTORY ---
             cd ~/TourGo-Stage || { echo "Directory ~/TourGo-Stage does not exist"; exit 1; }
@@ -55,7 +58,7 @@ jobs:
             cd server
             # Create .env file with secrets
             echo "Creating .env file with secrets..."
-            printf "SQL_CONN=${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_STAGE }}\n" > .env
+            printf "SQL_CONN='%s'\n" "$SQL_PASS" > .env
             printf "JWT_SECRET=${{ secrets.SERVER_JSON_WEB_TOKEN_SECRET }}\n" >> .env
             printf "BREVO_KEY=${{ secrets.SERVER_BREVO_API_KEY }}\n" >> .env
             printf "S3_ACCESS=${{ secrets.SERVER_AWS_S3_ACCESS_KEY }}\n" >> .env
