@@ -1,5 +1,15 @@
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy AS base
+
+# Install wkhtmltopdf dependencies and wkhtmltopdf
+RUN apt update
+RUN apt install -y libgdiplus
+RUN ln -s /usr/lib/libgdiplus.so /lib/x86_64-linux-gnu/libgdiplus.so
+RUN apt-get install -y --no-install-recommends zlib1g fontconfig libfreetype6 libx11-6 libxext6 libxrender1 wget gdebi
+RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+RUN gdebi --n wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+RUN ln -s /usr/local/lib/libwkhtmltox.so /usr/lib/libwkhtmltox.so
+
 WORKDIR /app
 EXPOSE 50002
 

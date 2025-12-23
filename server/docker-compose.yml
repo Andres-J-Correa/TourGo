@@ -1,7 +1,7 @@
 services:
-  TourGoApi:
+  TourGoApiStage:
     profiles: ["stage"]
-    image: tourgo-api
+    image: tourgo-api-stage
     network_mode: "host"
     build:
       context: .
@@ -18,4 +18,16 @@ services:
       - GoogleRecaptchaConfig__SecretKey=${RECAPTCHA_KEY}
     ports:
       - "50002:50002"
+    restart: always
+  TourGoApiDev:
+    profiles: ["dev"]
+    image: tourgo-api-dev
+    build:
+      context: .
+      dockerfile: TourGo.Web.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:50002
+    ports:
+      - "50001:50002"
     restart: always
