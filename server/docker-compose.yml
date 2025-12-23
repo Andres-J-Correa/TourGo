@@ -1,4 +1,24 @@
 services:
+  TourGoApiProd:
+    profiles: ["prod"]
+    image: tourgo-api-prod
+    network_mode: "host"
+    build:
+      context: .
+      dockerfile: TourGo.Web.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ASPNETCORE_URLS=http://+:50002
+      - ConnectionStrings__MySql=${SQL_CONN}
+      - JsonWebTokenConfig__Secret=${JWT_SECRET}
+      - BrevoConfig__ApiKey=${BREVO_KEY}
+      - AWSS3Config__AccessKey=${S3_ACCESS}
+      - AWSS3Config__SecretKey=${S3_SECRET}
+      - EncryptionConfig__UserPIIKey=${PII_KEY}
+      - GoogleRecaptchaConfig__SecretKey=${RECAPTCHA_KEY}
+    ports:
+      - "50001:50002"
+    restart: always
   TourGoApiStage:
     profiles: ["stage"]
     image: tourgo-api-stage

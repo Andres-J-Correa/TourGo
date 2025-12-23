@@ -15,11 +15,14 @@ jobs:
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.2
+        env:
+          SQL_CONN_STRING: ${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_PROD }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          envs: SQL_CONN_STRING
           script: |
             # --- CHANGE TO REPO DIRECTORY ---
             cd ~/TourGo || { echo "Directory ~/TourGo does not exist"; exit 1; }
@@ -52,32 +55,26 @@ jobs:
             fi
 
             # --- SERVER DEPLOYMENT ---
-            dotnet publish server/TourGo.Web.Api/TourGo.Web.Api.csproj -c Release -o ./server/publish || { echo "dotnet publish failed"; exit 1; }
+            cd server
+            # Create .env file with secrets
+            echo "Creating .env file with secrets..."
+            printf "SQL_CONN='%s'\n" "$SQL_CONN_STRING" > .env
+            printf "JWT_SECRET=${{ secrets.SERVER_JSON_WEB_TOKEN_SECRET }}\n" >> .env
+            printf "BREVO_KEY=${{ secrets.SERVER_BREVO_API_KEY }}\n" >> .env
+            printf "S3_ACCESS=${{ secrets.SERVER_AWS_S3_ACCESS_KEY }}\n" >> .env
+            printf "S3_SECRET=${{ secrets.SERVER_AWS_S3_SECRET_KEY }}\n" >> .env
+            printf "PII_KEY=${{ secrets.SERVER_USER_PII_ENCRYPTION_KEY }}\n" >> .env
+            printf "RECAPTCHA_KEY=${{ secrets.SERVER_GOOGLE_RECAPTCHA_SECRET_KEY }}\n" >> .env
 
-            if [ -d "./server/publish" ] && [ "$(ls -A ./server/publish)" ]; then
-                sudo rsync -avz --delete ./server/publish/ /var/www/server/
+            # --- DOCKER PROD ---
+            echo "Building server image..."
+            if docker compose --profile prod build; then
+                echo "Build successful. Deploying..."
+                docker compose --profile prod up -d
             else
-                echo "Publish directory is missing or empty"
+                echo "Server build failed. Aborting deployment to keep existing service running."
                 exit 1
             fi
 
-            # --- INJECT SECRETS ---
-            cd /var/www/server
-            jq --arg json_token_secret "${{ secrets.SERVER_JSON_WEB_TOKEN_SECRET }}" \
-               --arg mysql_conn_string "${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_PROD }}" \
-               --arg brevo_api_key "${{ secrets.SERVER_BREVO_API_KEY }}" \
-               --arg awss3_access_key "${{ secrets.SERVER_AWS_S3_ACCESS_KEY }}" \
-               --arg awss3_secret_key "${{ secrets.SERVER_AWS_S3_SECRET_KEY }}" \
-               --arg user_pii_encrypt_key "${{ secrets.SERVER_USER_PII_ENCRYPTION_KEY }}" \
-               --arg google_recaptcha_v3_secret_key "${{ secrets.SERVER_GOOGLE_RECAPTCHA_SECRET_KEY }}" \
-               '.JsonWebTokenConfig.Secret = $json_token_secret |
-                .ConnectionStrings.MySql = $mysql_conn_string |
-                .BrevoConfig.ApiKey = $brevo_api_key |
-                .AWSS3Config.AccessKey = $awss3_access_key |
-                .AWSS3Config.SecretKey = $awss3_secret_key |
-                .EncryptionConfig.UserPIIKey = $user_pii_encrypt_key |
-                .GoogleRecaptchaConfig.SecretKey = $google_recaptcha_v3_secret_key' \
-               appsettings.Production.json > appsettings.Production.tmp && mv appsettings.Production.tmp appsettings.Production.json
-
-            # --- RESTART SERVER ---
-            sudo systemctl restart kestrel-tourgo
+            # --- CLEANUP ---
+            docker image prune -f
