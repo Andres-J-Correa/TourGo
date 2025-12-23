@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: TourGo.Web.Api/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Staging
+      - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:50001
       - ConnectionStrings__MySql=${SQL_CONN}
       - JsonWebTokenConfig__Secret=${JWT_SECRET}
