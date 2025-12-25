@@ -35,6 +35,8 @@ services:
       - EncryptionConfig__UserPIIKey=${PII_KEY}
       - GoogleRecaptchaConfig__SecretKey=${RECAPTCHA_KEY}
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   TourGoApiDev:
     profiles: ["dev"]
     image: tourgo-api-dev
