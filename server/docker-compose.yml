@@ -2,7 +2,6 @@ services:
   TourGoApiProd:
     profiles: ["prod"]
     image: tourgo-api-prod
-    network_mode: "host"
     build:
       context: .
       dockerfile: TourGo.Web.Api/Dockerfile
@@ -17,6 +16,10 @@ services:
       - EncryptionConfig__UserPIIKey=${PII_KEY}
       - GoogleRecaptchaConfig__SecretKey=${RECAPTCHA_KEY}
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "50001:50002"
   TourGoApiStage:
     profiles: ["stage"]
     image: tourgo-api-stage
@@ -36,6 +39,8 @@ services:
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    ports:
+      - "50002:50002"
   TourGoApiDev:
     profiles: ["dev"]
     image: tourgo-api-dev
