@@ -20,7 +20,6 @@ services:
   TourGoApiStage:
     profiles: ["stage"]
     image: tourgo-api-stage
-    network_mode: "host"
     build:
       context: .
       dockerfile: TourGo.Web.Api/Dockerfile
