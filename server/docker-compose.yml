@@ -54,11 +54,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:50002
-      - OTEL_RESOURCE_ATTRIBUTES="service.name=TourGoWebApi" \
-      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-      - OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-2.grafana.net/otlp
-      - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic MTMzODcwMjpnbGNfZXlKdklqb2lNVFV3TVRReU1pSXNJbTRpT2lKemRHRmpheTB4TXpNNE56QXlMVzkwYkhBdGQzSnBkR1V0ZEc5MWNtZHZMV1J2ZEc1bGRDMXZkR3h3SWl3aWF5STZJakJ2Ym5ZNU4xSnNlVGh5Y0daRFZ6bHNiRE16TjFvNE5DSXNJbTBpT25zaWNpSTZJbkJ5YjJRdGRYTXRaV0Z6ZEMwd0luMTk=
-      - OTEL_LOG_LEVEL=debug
     ports:
       - "50001:50002"
     restart: always
