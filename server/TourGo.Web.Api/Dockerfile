@@ -39,4 +39,5 @@ RUN dotnet publish "TourGo.Web.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=build /src/TourGo.Web.Api/OTEL_DIAGNOSTICS.json .
 ENTRYPOINT ["dotnet", "TourGo.Web.Api.dll"]

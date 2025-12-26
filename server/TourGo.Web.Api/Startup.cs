@@ -51,18 +51,20 @@ namespace TourGo.Web.Api
             });
             services.AddSignalR();
             services.AddOpenTelemetry()
-                .ConfigureResource(resource => resource.AddService("TourGoWebApi"))
                 .WithMetrics(metrics =>
                 {
                     metrics.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddOtlpExporter();                  
+                    .UseGrafana();                  
                 })
                 .WithTracing(tracing =>
                 {
                     tracing.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddOtlpExporter();
+                    .UseGrafana(options =>
+                    {
+                        options.Instrumentations.Remove(Instrumentation.MySqlData);
+                    });
                 });
         }
 

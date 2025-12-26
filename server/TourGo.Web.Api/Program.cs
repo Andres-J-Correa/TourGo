@@ -1,9 +1,7 @@
 using Grafana.OpenTelemetry;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging.Console;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
-using TourGo.Models.Domain.Config;
+using OpenTelemetry.Resources;
 
 namespace TourGo.Web.Api
 {
@@ -36,9 +34,10 @@ namespace TourGo.Web.Api
 
             logging.AddOpenTelemetry(options => 
             {
-                options.AddOtlpExporter();
+                options.UseGrafana();
             });
 
+            logging.AddSimpleConsole();
             logging.AddDebug();
         }
 
