@@ -1,5 +1,8 @@
+using Grafana.OpenTelemetry;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging.Console;
+using OpenTelemetry;
+using OpenTelemetry.Logs;
 using TourGo.Models.Domain.Config;
 
 namespace TourGo.Web.Api
@@ -30,10 +33,10 @@ namespace TourGo.Web.Api
         {
             logging.AddConfiguration(context.Configuration.GetSection("Logging"));
 
-            logging.AddSimpleConsole(options => {
-                options.IncludeScopes = true;
-                options.ColorBehavior = LoggerColorBehavior.Enabled;
-                options.TimestampFormat = "[HH:mm:ss] ";
+
+            logging.AddOpenTelemetry(options => 
+            {
+                options.AddOtlpExporter();
             });
 
             logging.AddDebug();

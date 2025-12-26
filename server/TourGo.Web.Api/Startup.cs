@@ -1,6 +1,12 @@
 ﻿using AspNetCoreRateLimit;
+using Grafana.OpenTelemetry;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using Org.BouncyCastle.Crypto.Operators;
 using Quartz;
 using System.Globalization;
 using TourGo.Models.Domain.Config;
@@ -44,6 +50,20 @@ namespace TourGo.Web.Api
                 options.WaitForJobsToComplete = true;
             });
             services.AddSignalR();
+            services.AddOpenTelemetry()
+                .ConfigureResource(resource => resource.AddService("TourGoWebApi"))
+                .WithMetrics(metrics =>
+                {
+                    metrics.AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddOtlpExporter();                  
+                })
+                .WithTracing(tracing =>
+                {
+                    tracing.AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddOtlpExporter();
+                });
         }
 
         private void ConfigureAppSettings(IServiceCollection services)
