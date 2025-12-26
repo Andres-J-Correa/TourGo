@@ -65,6 +65,7 @@ jobs:
             printf "S3_SECRET=${{ secrets.SERVER_AWS_S3_SECRET_KEY }}\n" >> .env
             printf "PII_KEY=${{ secrets.SERVER_USER_PII_ENCRYPTION_KEY }}\n" >> .env
             printf "RECAPTCHA_KEY=${{ secrets.SERVER_GOOGLE_RECAPTCHA_SECRET_KEY }}\n" >> .env
+            printf "GRAFANA_OTLP_AUTH=${{ secrets.SERVER_GRAFANA_OTLP_AUTH }}\n" >> .env
 
             # --- DOCKER PROD ---
             echo "Building server image..."

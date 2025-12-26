@@ -15,6 +15,10 @@ services:
       - AWSS3Config__SecretKey=${S3_SECRET}
       - EncryptionConfig__UserPIIKey=${PII_KEY}
       - GoogleRecaptchaConfig__SecretKey=${RECAPTCHA_KEY}
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=TourGo.Web.Api,service.environment=production
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-2.grafana.net/otlp
+      - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic ${GRAFANA_OTLP_AUTH}
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -36,7 +40,7 @@ services:
       - AWSS3Config__SecretKey=${S3_SECRET}
       - EncryptionConfig__UserPIIKey=${PII_KEY}
       - GoogleRecaptchaConfig__SecretKey=${RECAPTCHA_KEY}
-      - OTEL_RESOURCE_ATTRIBUTES="service.name=TourGoWebApiStage" \
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=TourGo.Web.Api,service.environment=staging
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-us-east-2.grafana.net/otlp
       - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic ${GRAFANA_OTLP_AUTH}
