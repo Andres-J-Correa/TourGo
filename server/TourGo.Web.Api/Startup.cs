@@ -51,7 +51,11 @@ namespace TourGo.Web.Api
             });
             services.AddSignalR();
 
-            services.AddOpenTelemetry()
+            bool isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+            
+            if (!isDevelopment)
+            {
+                services.AddOpenTelemetry()
                         .WithMetrics(metrics =>
                         {
                             metrics.AddAspNetCoreInstrumentation()
@@ -67,6 +71,7 @@ namespace TourGo.Web.Api
                                 options.Instrumentations.Remove(Instrumentation.MySqlData);
                             });
                         });
+            }
             
         }
 
