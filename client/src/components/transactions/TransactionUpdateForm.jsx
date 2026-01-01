@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import CustomField from "components/commonUI/forms/CustomField";
 import ErrorAlert from "components/commonUI/errors/ErrorAlert";
@@ -46,22 +46,93 @@ function TransactionUpdateForm({
     decimalSeparator: ",",
   });
 
+  const reactSelectOptions = useMemo(() => {
+    const incomeCategories = [];
+    const expenseCategories = [];
+    const subcategories = [];
+
+    TRANSACTION_CATEGORIES.forEach((category) => {
+      const option = {
+        value: category.id,
+        label: t(category.name),
+        typeId: category.typeId,
+      };
+
+      const subcategory = {
+        options: [],
+        label: t(category.name),
+        categoryId: category.id,
+        description: category.description,
+      };
+
+      subcategories.push(subcategory);
+
+      if (category.typeId === TRANSACTION_CATEGORY_TYPES_IDS.INCOME) {
+        incomeCategories.push(option);
+      }
+
+      if (category.typeId === TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE) {
+        expenseCategories.push(option);
+      }
+    });
+
+    const categories = [
+      {
+        label: t("transactions.filters.incomeCategories"),
+        options: incomeCategories,
+        id: TRANSACTION_CATEGORY_TYPES_IDS.INCOME,
+      },
+      {
+        label: t("transactions.filters.expenseCategories"),
+        options: expenseCategories,
+        id: TRANSACTION_CATEGORY_TYPES_IDS.EXPENSE,
+      },
+    ];
+
+    transactionSubcategories.forEach((subcategory) => {
+      subcategories
+        .find((group) => group.categoryId === subcategory.categoryId)
+        ?.options.push({
+          value: subcategory.id,
+          label: subcategory.name,
+          categoryId: subcategory.categoryId,
+        });
+    });
+
+    const paymentMethodOptions = paymentMethods.map((pm) => ({
+      value: pm.id,
+      label: pm.name,
+    }));
+
+    const financePartnersOptions = financePartners.map((fp) => ({
+      value: fp.id,
+      label: fp.name,
+    }));
+
+    return {
+      categories,
+      subcategories,
+      paymentMethodOptions,
+      financePartnersOptions,
+    };
+  }, [t, transactionSubcategories, paymentMethods, financePartners]);
+
   const initialValues = {
     amount: transaction?.amount || 0,
     transactionDate: transaction?.transactionDate
       ? dayjs(transaction.transactionDate).format("YYYY-MM-DD")
       : dayjs().format("YYYY-MM-DD"),
-    paymentMethodId: transaction?.paymentMethod?.id?.toString() || "",
-    categoryId: transaction?.categoryId?.toString() || "",
+    paymentMethodId: transaction?.paymentMethod?.id || "",
+    categoryId: transaction?.categoryId || "",
     categoryTypeId:
       TRANSACTION_CATEGORIES.find(
         (cat) => cat.id === Number(transaction?.categoryId)
-      )?.typeId?.toString() || "",
-    subcategoryId: transaction?.subcategory?.id?.toString() || "",
+      )?.typeId || "",
+    subcategoryId: transaction?.subcategory?.id || "",
     referenceNumber: transaction?.referenceNumber || "",
     description: transaction?.description || "",
     currencyCode: transaction?.currencyCode || "COP",
-    financePartnerId: transaction?.financePartner?.id?.toString() || "",
+    financePartnerId: transaction?.financePartner?.id || "",
   };
 
   const confirmProceedWithMismatchedCategoryAmount = (
@@ -200,14 +271,14 @@ function TransactionUpdateForm({
           setFieldValue("transactionDate", getDateString(date));
         };
 
-        const handleSubcategoryChange = (e) => {
-          const selectedSubcategoryId = e.target.value;
-          const subcategoryCategoryId =
-            e.target.options[e.target.selectedIndex].dataset.category;
+        const handleSubcategoryChange = (option) => {
+          const selectedSubcategoryId = option ? option.value : "";
+          const subcategoryCategoryId = option ? option.categoryId : "";
+
           const subcategoryTypeId =
             TRANSACTION_CATEGORIES.find(
               (cat) => cat.id === Number(subcategoryCategoryId)
-            )?.typeId?.toString() || "";
+            )?.typeId || "";
 
           setFieldValue("subcategoryId", selectedSubcategoryId);
           if (subcategoryCategoryId) {
@@ -216,10 +287,9 @@ function TransactionUpdateForm({
           }
         };
 
-        const handleCategoryChange = (e) => {
-          const selectedCategoryId = e.target.value;
-          const categoryTypeId =
-            e.target.options[e.target.selectedIndex].dataset.type;
+        const handleCategoryChange = (option) => {
+          const selectedCategoryId = option ? option.value : "";
+          const categoryTypeId = option ? option.typeId : "";
           setFieldValue("categoryId", selectedCategoryId);
           setFieldValue("categoryTypeId", categoryTypeId);
           setFieldValue("subcategoryId", "");
@@ -281,85 +351,58 @@ function TransactionUpdateForm({
               <Col md={3}>
                 <CustomField
                   name="paymentMethodId"
-                  as="select"
-                  className="form-control"
-                  placeholder={t("transactions.table.paymentMethod")}
-                  isRequired={true}>
-                  <option value="">
-                    {isLoadingHotelData
+                  useReactSelect={true}
+                  options={reactSelectOptions.paymentMethodOptions}
+                  placeholder={
+                    isLoadingHotelData
                       ? t("transactions.filters.loading")
-                      : t("transactions.filters.select")}
-                  </option>
-                  {paymentMethods.map((pm) => (
-                    <option key={pm.id} value={pm.id}>
-                      {pm.name}
-                    </option>
-                  ))}
-                </CustomField>
+                      : t("transactions.table.paymentMethod")
+                  }
+                  isRequired={true}
+                  isClearable={true}
+                />
               </Col>
               <Col md={3}>
                 <CustomField
                   name="subcategoryId"
-                  as="select"
-                  className="form-control"
-                  placeholder={t("transactions.table.subcategory")}
-                  onChange={handleSubcategoryChange}>
-                  <option value="">
-                    {isLoadingHotelData
+                  useReactSelect={true}
+                  options={reactSelectOptions.subcategories}
+                  placeholder={
+                    isLoadingHotelData
                       ? t("transactions.filters.loading")
-                      : t("transactions.updateForm.optional")}
-                  </option>
-                  {transactionSubcategories.map((sub) => (
-                    <option
-                      key={sub.id}
-                      value={sub.id}
-                      data-category={sub.categoryId}>
-                      {sub.name}
-                    </option>
-                  ))}
-                </CustomField>
+                      : t("transactions.table.subcategory")
+                  }
+                  onChange={handleSubcategoryChange}
+                />
               </Col>
               <Col md={3}>
-                <InputGroup>
-                  <CustomField
-                    name="categoryId"
-                    as="select"
-                    className="form-control"
-                    placeholder={t("transactions.table.category")}
-                    onChange={handleCategoryChange}
-                    isRequired={true}>
-                    <option value="">{t("transactions.filters.select")}</option>
-                    {TRANSACTION_CATEGORIES.map((cat) => (
-                      <option
-                        key={cat.id}
-                        value={cat.id}
-                        data-type={cat.typeId}>
-                        {t(cat.name)}
-                      </option>
-                    ))}
-                  </CustomField>
-                  <InputGroupText className="mb-3">
-                    <TransactionCategoriesExplanationIcon />
-                  </InputGroupText>
-                </InputGroup>
+                <CustomField
+                  name="categoryId"
+                  useReactSelect={true}
+                  options={reactSelectOptions.categories}
+                  label={
+                    <>
+                      {t("transactions.table.category")}{" "}
+                      <TransactionCategoriesExplanationIcon />
+                    </>
+                  }
+                  placeholder={t("transactions.table.category")}
+                  onChange={handleCategoryChange}
+                  isRequired={true}
+                />
               </Col>
               <Col md={3}>
                 <CustomField
                   name="financePartnerId"
-                  as="select"
-                  className="form-control"
-                  placeholder={t("transactions.table.financePartner")}>
-                  <option value="">
-                    {isLoadingHotelData
+                  useReactSelect={true}
+                  options={reactSelectOptions.financePartnersOptions}
+                  placeholder={
+                    isLoadingHotelData
                       ? t("transactions.filters.loading")
-                      : t("transactions.updateForm.optional")}
-                  </option>
-                  {financePartners.map((fp) => (
-                    <option key={fp.id} value={fp.id}>
-                      {fp.name}
-                    </option>
-                  ))}
-                </CustomField>
+                      : t("transactions.table.financePartner")
+                  }
+                  isClearable={true}
+                />
               </Col>
             </Row>
 
