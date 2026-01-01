@@ -59,20 +59,28 @@ const Popover = ({
     ...getReferenceProps(),
   });
 
+  const popoverContent = (
+    <div
+      ref={refs.setFloating}
+      style={{ ...floatingStyles, zIndex: 9999 }}
+      {...getFloatingProps()}
+      className="popover-content">
+      {content}
+    </div>
+  );
+
   return (
     <>
       {trigger}
       {isOpen && (
         <FloatingPortal>
-          <FloatingFocusManager context={context}>
-            <div
-              ref={refs.setFloating}
-              style={{ ...floatingStyles, zIndex: 2000 }}
-              {...getFloatingProps()}
-              className="popover-content">
-              {content}
-            </div>
-          </FloatingFocusManager>
+          {action === "click" ? (
+            <FloatingFocusManager context={context} modal={true}>
+              {popoverContent}
+            </FloatingFocusManager>
+          ) : (
+            popoverContent
+          )}
         </FloatingPortal>
       )}
     </>

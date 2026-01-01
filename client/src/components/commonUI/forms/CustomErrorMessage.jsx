@@ -22,7 +22,6 @@ const CustomErrorMessage = ({ name }) => {
               color="tomato"
               icon={faCircleExclamation}
               size="sm"
-              className=""
             />
           </div>
           <Tooltip

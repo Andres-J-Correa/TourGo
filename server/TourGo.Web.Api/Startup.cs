@@ -50,22 +50,29 @@ namespace TourGo.Web.Api
                 options.WaitForJobsToComplete = true;
             });
             services.AddSignalR();
-            services.AddOpenTelemetry()
-                .WithMetrics(metrics =>
-                {
-                    metrics.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .UseGrafana();                  
-                })
-                .WithTracing(tracing =>
-                {
-                    tracing.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .UseGrafana(options =>
-                    {
-                        options.Instrumentations.Remove(Instrumentation.MySqlData);
-                    });
-                });
+
+            bool isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+            
+            if (!isDevelopment)
+            {
+                services.AddOpenTelemetry()
+                        .WithMetrics(metrics =>
+                        {
+                            metrics.AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation()
+                            .UseGrafana();
+                        })
+                        .WithTracing(tracing =>
+                        {
+                            tracing.AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation()
+                            .UseGrafana(options =>
+                            {
+                                options.Instrumentations.Remove(Instrumentation.MySqlData);
+                            });
+                        });
+            }
+            
         }
 
         private void ConfigureAppSettings(IServiceCollection services)
@@ -125,6 +132,7 @@ namespace TourGo.Web.Api
 
             Cors.Configure(app, env);
             Authentication.Configure(app, env);
+            app.UseMiddleware<UserTelemetryMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

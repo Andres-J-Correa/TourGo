@@ -210,79 +210,79 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
         </Row>
       </div>
 
-      {loading ? (
-        <div className="text-center py-4">{t("tasks.loading")}</div>
-      ) : (
+      {viewMode === "list" ? (
         <>
-          {viewMode === "list" ? (
-            tasks.length === 0 ? (
-              <div className="text-center py-4 text-muted">
-                {t("tasks.noTasks")}
-              </div>
-            ) : (
-              <div className="tasks-accordion">
-                <Accordion open={openAccordion} toggle={toggleAccordion}>
-                  {tasks.map((task) => (
-                    <TaskAccordionItem
-                      key={task.id}
-                      task={task}
-                      toggleReminders={toggleReminders}
-                      toggleCompleted={toggleCompleted}
-                      deleteTask={deleteTask}
-                      handleEditClick={handleEditClick}
-                    />
-                  ))}
-                </Accordion>
-              </div>
-            )
-          ) : (
-            <div
-              style={{ height: "600px" }}
-              className="mt-3 tasks-calendar-wrapper">
-              <Calendar
-                localizer={localizer}
-                events={events}
-                startAccessor="start"
-                endAccessor="end"
-                style={{ height: "100%" }}
-                view={calendarView}
-                onView={handleCalendarViewChange}
-                date={calendarDate}
-                onNavigate={handleCalendarNavigate}
-                selectable
-                popup
-                messages={calendarMessages}
-                views={["month"]}
-                components={{
-                  event: (props: EventProps<CalendarEvent>) => (
-                    <Popover
-                      action="click"
-                      content={
-                        <TaskCalendarEventDetailsCard
-                          task={props.event.resource}
-                          onDelete={deleteTask}
-                          handleEditClick={handleEditClick}
-                          onToggleReminders={toggleReminders}
-                          onToggleCompleted={toggleCompleted}
-                        />
-                      }>
-                      <div>
-                        <TaskCalendarEvent
-                          {...props}
-                          onDelete={deleteTask}
-                          handleEditClick={handleEditClick}
-                          onToggleReminders={toggleReminders}
-                          onToggleCompleted={toggleCompleted}
-                        />
-                      </div>
-                    </Popover>
-                  ),
-                }}
-                eventPropGetter={eventPropGetter}
-              />
+          {loading && (
+            <div className="text-center py-4">{t("tasks.loading")}</div>
+          )}
+          {!loading && tasks.length === 0 && (
+            <div className="text-center py-4 text-muted">
+              {t("tasks.noTasks")}
+            </div>
+          )}
+          {!loading && tasks.length > 0 && (
+            <div className="tasks-accordion">
+              <Accordion open={openAccordion} toggle={toggleAccordion}>
+                {tasks.map((task) => (
+                  <TaskAccordionItem
+                    key={task.id}
+                    task={task}
+                    toggleReminders={toggleReminders}
+                    toggleCompleted={toggleCompleted}
+                    deleteTask={deleteTask}
+                    handleEditClick={handleEditClick}
+                  />
+                ))}
+              </Accordion>
             </div>
           )}
         </>
+      ) : (
+        <div
+          style={{ height: "600px" }}
+          className="mt-3 tasks-calendar-wrapper">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: "100%" }}
+            view={calendarView}
+            onView={handleCalendarViewChange}
+            date={calendarDate}
+            onNavigate={handleCalendarNavigate}
+            selectable={!loading}
+            popup
+            messages={calendarMessages}
+            views={["month"]}
+            components={{
+              event: (props: EventProps<CalendarEvent>) => (
+                <Popover
+                  action="click"
+                  content={
+                    <TaskCalendarEventDetailsCard
+                      task={props.event.resource}
+                      onDelete={deleteTask}
+                      handleEditClick={handleEditClick}
+                      onToggleReminders={toggleReminders}
+                      onToggleCompleted={toggleCompleted}
+                    />
+                  }>
+                  <div>
+                    <TaskCalendarEvent
+                      {...props}
+                      onDelete={deleteTask}
+                      handleEditClick={handleEditClick}
+                      onToggleReminders={toggleReminders}
+                      onToggleCompleted={toggleCompleted}
+                    />
+                  </div>
+                </Popover>
+              ),
+            }}
+            eventPropGetter={eventPropGetter}
+          />
+        </div>
       )}
 
       <TaskModal

@@ -8,15 +8,18 @@ import {
   InputGroupText,
 } from "reactstrap";
 import PropTypes from "prop-types";
+import { useIsMobile } from "hooks/useIsMobile";
 
 const PaginationComponent = ({
   pageIndex,
   totalPages,
-  hasPreviousPage,
-  hasNextPage,
   onPageChange,
-  maxPageNumbersToShow = 3,
+  maxPageNumbersToShow,
 }) => {
+  const isMobile = useIsMobile();
+
+  maxPageNumbersToShow = isMobile ? 3 : 10;
+
   const [inputValue, setInputValue] = useState(pageIndex + 1);
 
   const handleInputChange = (e) => {
@@ -37,17 +40,19 @@ const PaginationComponent = ({
 
   const getPageNumbers = () => {
     const pages = [];
-    let startPage = Math.max(0, pageIndex - 1);
-    let endPage = hasPreviousPage
-      ? Math.min(
-          totalPages - 1,
-          pageIndex + 2,
-          pageIndex + Math.floor(maxPageNumbersToShow / 2)
-        )
-      : Math.min(totalPages - 1, pageIndex + maxPageNumbersToShow - 1);
+    const maxPages = Math.min(maxPageNumbersToShow, totalPages);
 
-    if (endPage - startPage + 1 < maxPageNumbersToShow) {
-      startPage = Math.max(0, endPage - maxPageNumbersToShow + 1);
+    let startPage = pageIndex - Math.floor((maxPages - 1) / 2);
+    let endPage = pageIndex + Math.ceil((maxPages - 1) / 2);
+
+    if (startPage < 0) {
+      endPage = Math.min(totalPages - 1, endPage + Math.abs(startPage));
+      startPage = 0;
+    }
+
+    if (endPage >= totalPages) {
+      startPage = Math.max(0, startPage - (endPage - totalPages + 1));
+      endPage = totalPages - 1;
     }
 
     for (let i = startPage; i <= endPage; i++) {

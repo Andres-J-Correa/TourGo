@@ -68,7 +68,6 @@
 
   .dropdown .dropdown-menu:before {
     font-family: "FontAwesome";
-    content: "\f0d8";
     position: absolute;
     top: -1.25rem;
     left: 28px;
