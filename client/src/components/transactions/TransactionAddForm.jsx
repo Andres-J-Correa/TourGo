@@ -65,6 +65,7 @@ function TransactionAddForm({
         options: [],
         label: t(category.name),
         categoryId: category.id,
+        description: category.description,
       };
 
       subcategories.push(subcategory);
@@ -115,6 +116,7 @@ function TransactionAddForm({
       categories,
       subcategories,
       paymentMethodOptions,
+      financePartnersOptions,
     };
   }, [t, transactionSubcategories, paymentMethods]);
 
@@ -434,6 +436,7 @@ function TransactionAddForm({
             <Row>
               <Col md={3}>
                 <CustomField
+                  isClearable={true}
                   name="paymentMethodId"
                   useReactSelect={true}
                   options={reactSelectOptions.paymentMethodOptions}
@@ -473,8 +476,9 @@ function TransactionAddForm({
               <Col md={3}>
                 <CustomField
                   name="financePartnerId"
+                  isClearable={true}
                   useReactSelect={true}
-                  options={reactSelectOptions.financePartners}
+                  options={reactSelectOptions.financePartnersOptions}
                   placeholder={
                     isLoadingHotelData
                       ? t("transactions.filters.loading")
