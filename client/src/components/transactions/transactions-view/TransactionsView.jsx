@@ -621,17 +621,11 @@ function TransactionsView() {
                 }
                 disabled={loading}
                 onChange={onPageSizeChange}>
-                {[5, 10, 20, 50]
-                  .concat(
-                    Boolean(data.totalCount) && data.totalCount > 50
-                      ? [data.totalCount]
-                      : []
-                  )
-                  .map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
+                {[5, 10, 20, 50, 100, 500].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
               </select>
             </div>
           </Col>
@@ -655,7 +649,16 @@ function TransactionsView() {
             </Button>
           </div>
         </Row>
-        <div className="table-responsive mt-3">
+        <Row className="mt-3">
+          <Col>
+            <Pagination
+              pageIndex={paginationData.pageIndex}
+              totalPages={data.totalPages}
+              onPageChange={gotoPage}
+            />
+          </Col>
+        </Row>
+        <div className="table-responsive">
           <span
             className={classNames("float-end", {
               invisible: data.items.length === 0 || loading,
@@ -805,8 +808,6 @@ function TransactionsView() {
             <Pagination
               pageIndex={paginationData.pageIndex}
               totalPages={data.totalPages}
-              hasPreviousPage={data.hasPreviousPage}
-              hasNextPage={data.hasNextPage}
               onPageChange={gotoPage}
             />
           </Col>
