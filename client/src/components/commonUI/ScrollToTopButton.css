@@ -1,0 +1,36 @@
+.scroll-to-top {
+  position: fixed;
+  right: 20px;
+  z-index: 1030; /* Higher than fixed navbar/footer usually */
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.3s ease-in-out, visibility 0.3s;
+  opacity: 0;
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.scroll-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Desktop positioning */
+@media (min-width: 768px) {
+  .scroll-to-top {
+    bottom: 30px;
+  }
+}
+
+/* Mobile positioning - avoid overlap with fixed bottom footer */
+@media (max-width: 767.98px) {
+  .scroll-to-top {
+    bottom: 80px; /* Adjust based on footer height ~60px */
+  }
+}

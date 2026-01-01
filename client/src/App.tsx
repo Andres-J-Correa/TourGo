@@ -11,6 +11,7 @@ import Footer from "components/commonUI/Footer";
 import TaskRemindersListener from "components/hotels/LandingPage/components/TaskRemindersListener";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 
+import ScrollToTopButton from "components/commonUI/ScrollToTopButton";
 import { useAppContext } from "./contexts/GlobalAppContext";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -54,6 +55,7 @@ function App() {
       />
 
       <TaskRemindersListener />
+      <ScrollToTopButton />
     </Fragment>
   );
 }
