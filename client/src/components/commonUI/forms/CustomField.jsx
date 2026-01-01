@@ -125,6 +125,7 @@ const CustomField = ({
         <Select
           {...field}
           {...props}
+          noOptionsMessage={() => t("common.noOptions")}
           placeholder={props.placeholder}
           options={options}
           isMulti={isMulti}
@@ -133,7 +134,7 @@ const CustomField = ({
             if (props.onChange) {
               props.onChange(val, meta);
             } else {
-              helpers.setValue(val);
+              helpers.setValue(val.value);
             }
             helpers.setTouched(true);
           }}

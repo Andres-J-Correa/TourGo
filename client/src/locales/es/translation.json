@@ -24,7 +24,8 @@
       "hotel": "Hotel"
     },
     "downloading": "Descargando",
-    "recaptchaError": "Error de reCAPTCHA, por favor avisale al administrador del sitio"
+    "recaptchaError": "Error de reCAPTCHA, por favor avisale al administrador del sitio",
+    "noOptions": "Sin opciones"
   },
   "yup": {
     "required": "{{label}} es obligatorio",

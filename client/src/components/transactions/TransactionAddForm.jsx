@@ -101,11 +101,22 @@ function TransactionAddForm({
         });
     });
 
+    const paymentMethodOptions = paymentMethods.map((pm) => ({
+      value: pm.id,
+      label: pm.name,
+    }));
+
+    const financePartnersOptions = financePartners.map((fp) => ({
+      value: fp.id,
+      label: fp.name,
+    }));
+
     return {
       categories,
       subcategories,
+      paymentMethodOptions,
     };
-  }, [t, transactionSubcategories]);
+  }, [t, transactionSubcategories, paymentMethods]);
 
   const handleCancelClick = () => {
     setShowForm(false);
@@ -424,21 +435,15 @@ function TransactionAddForm({
               <Col md={3}>
                 <CustomField
                   name="paymentMethodId"
-                  as="select"
-                  className="form-control"
-                  placeholder={t("transactions.table.paymentMethod")}
-                  isRequired={true}>
-                  <option value="">
-                    {isLoadingHotelData
+                  useReactSelect={true}
+                  options={reactSelectOptions.paymentMethodOptions}
+                  placeholder={
+                    isLoadingHotelData
                       ? t("transactions.filters.loading")
-                      : t("transactions.filters.select")}
-                  </option>
-                  {paymentMethods.map((pm) => (
-                    <option key={pm.id} value={pm.id}>
-                      {pm.name}
-                    </option>
-                  ))}
-                </CustomField>
+                      : t("transactions.table.paymentMethod")
+                  }
+                  isRequired={true}
+                />
               </Col>
               <Col md={3}>
                 <CustomField
@@ -468,20 +473,14 @@ function TransactionAddForm({
               <Col md={3}>
                 <CustomField
                   name="financePartnerId"
-                  as="select"
-                  className="form-control"
-                  placeholder={t("transactions.table.financePartner")}>
-                  <option value="">
-                    {isLoadingHotelData
+                  useReactSelect={true}
+                  options={reactSelectOptions.financePartners}
+                  placeholder={
+                    isLoadingHotelData
                       ? t("transactions.filters.loading")
-                      : t("transactions.addForm.optional")}
-                  </option>
-                  {financePartners.map((fp) => (
-                    <option key={fp.id} value={fp.id}>
-                      {fp.name}
-                    </option>
-                  ))}
-                </CustomField>
+                      : t("transactions.table.financePartner")
+                  }
+                />
               </Col>
             </Row>
 
