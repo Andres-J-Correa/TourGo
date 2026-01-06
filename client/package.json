@@ -60,7 +60,7 @@
     "react-phone-number-input": "^3.4.14",
     "react-router-dom": "^7.11.0",
     "react-select": "^5.10.2",
-    "react-to-pdf": "^2.0.3",
+    "react-to-pdf": "^3.0.0",
     "react-toastify": "^11.0.5",
     "reactstrap": "^9.2.3",
     "sweetalert2": "^11.26.10",

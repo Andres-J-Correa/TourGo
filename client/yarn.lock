@@ -5599,10 +5599,10 @@ jsonpointer@^5.0.0:
   resolved "https://registry.yarnpkg.com/jsonpointer/-/jsonpointer-5.0.1.tgz#2110e0af0900fd37467b5907ecd13a7884a1b559"
   integrity sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==
 
-jspdf@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/jspdf/-/jspdf-3.0.4.tgz#f9ad24751eaf3c8a758eccab6f621d723d4b32b6"
-  integrity sha512-dc6oQ8y37rRcHn316s4ngz/nOjayLF/FFxBF4V9zamQKRqXxyiH1zagkCdktdWhtoQId5K20xt1lB90XzkB+hQ==
+jspdf@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/jspdf/-/jspdf-4.0.0.tgz#3731c0a1a7d8afe28c681891236f8ad4a662d893"
+  integrity sha512-w12U97Z6edKd2tXDn3LzTLg7C7QLJlx0BPfM3ecjK2BckUl9/81vZ+r5gK4/3KQdhAcEZhENUxRhtgYBj75MqQ==
   dependencies:
     "@babel/runtime" "^7.28.4"
     fast-png "^6.2.0"
@@ -6632,13 +6632,13 @@ react-select@^5.10.2:
     react-transition-group "^4.3.0"
     use-isomorphic-layout-effect "^1.2.0"
 
-react-to-pdf@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/react-to-pdf/-/react-to-pdf-2.0.3.tgz#f5a53be2f6ac88ebfbdf7cfb2a0238eaf2a63540"
-  integrity sha512-T7BguvKiiftKx83w5roFetoNiO/QLdokEDnw3OpHKh3eaQnwki6HxNN9uObcFAv6MQs2GQ647bEe/Pq2Ow5IgA==
+react-to-pdf@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-to-pdf/-/react-to-pdf-3.0.0.tgz#566f13870151805222befc6f03f13f8a7815e0fe"
+  integrity sha512-aYYyrKDX2Bp4BFdX77CHGzbOWRyD+iz2O5G9DKPhez6ZKh3SfBDuIiVG+XoYp3HQ3XVsL/nOv1Lny5mrjZ4skw==
   dependencies:
     html2canvas "^1.4.1"
-    jspdf "^3.0.4"
+    jspdf "^4.0.0"
 
 react-toastify@^11.0.5:
   version "11.0.5"
