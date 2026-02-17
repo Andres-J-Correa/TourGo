@@ -17,7 +17,7 @@ namespace TourGo.Web.Core.Filters
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
                 if (context.HttpContext.User.Identity != null && context.HttpContext.User.Identity.IsAuthenticated &&
-                    context.HttpContext.User.Claims.Any(c => c.Type == "https://tourgo.site/claims/isverified" && string.Equals(c.Value, "true", StringComparison.OrdinalIgnoreCase)))
+                    context.HttpContext.User.Claims.Any(c => c.Type == "https://tourgo.cloud/claims/isverified" && string.Equals(c.Value, "true", StringComparison.OrdinalIgnoreCase)))
                 {
                     await next();
                 }

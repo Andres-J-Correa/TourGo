@@ -487,7 +487,7 @@ namespace TourGo.Web.Api.Controllers.Users
                 }
 
                 _userService.UpdateIsVerified(user.Id, true);
-                Claim verified = new Claim("https://tourgo.site/claims/isverified", "True", ClaimValueTypes.Boolean);
+                Claim verified = new Claim("https://tourgo.cloud/claims/isverified", "True", ClaimValueTypes.Boolean);
                 _webAuthService.LogInAsync(user, [verified]);
 
                 return Ok200(new SuccessResponse());

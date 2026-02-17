@@ -66,7 +66,7 @@ namespace TourGo.Web.Core.Services
                 ClaimsIdentity.DefaultRoleClaimType);
 
             // Only store non-PII claims
-            identity.AddClaim(new Claim("https://tourgo.site/claims/isverified", user.IsVerified.ToString(), ClaimValueTypes.Boolean, _title, originalIssuer));
+            identity.AddClaim(new Claim("https://tourgo.cloud/claims/isverified", user.IsVerified.ToString(), ClaimValueTypes.Boolean, _title, originalIssuer));
             identity.AddClaim(new Claim(ClaimTypes.Sid, user.Id, ClaimValueTypes.String, _title, originalIssuer));
 
             if (user.Roles != null && user.Roles.Any())
@@ -168,7 +168,7 @@ namespace TourGo.Web.Core.Services
 
                         break;
 
-                    case "https://tourgo.site/claims/isverified":
+                    case "https://tourgo.cloud/claims/isverified":
                         bool isVerified;
                         if (Boolean.TryParse(claim.Value, out isVerified))
                         {
