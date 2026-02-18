@@ -30,24 +30,20 @@ namespace TourGo.Web.Api
         private static void ConfigureLogging(WebHostBuilderContext context, ILoggingBuilder logging)
         {
             logging.AddConfiguration(context.Configuration.GetSection("Logging"));
-            logging.AddOpenTelemetry(options =>
+
+            bool isProduction = !context.HostingEnvironment.IsDevelopment();
+
+            if (isProduction)
             {
-                options.UseGrafana();
-                options.IncludeScopes = true;
-
-                if(context.HostingEnvironment.IsDevelopment())
+                logging.AddOpenTelemetry(options =>
                 {
-                    options.AddConsoleExporter();
-                }
-
-            });
-
-            if (!context.HostingEnvironment.IsDevelopment())
+                    options.UseGrafana();
+                    options.IncludeScopes = true;
+                });
+            } else
             {
                 logging.AddSimpleConsole();
             }
-
-                logging.AddDebug();
         }
 
         private static void ConfigConfiguration(WebHostBuilderContext context, IConfigurationBuilder config)

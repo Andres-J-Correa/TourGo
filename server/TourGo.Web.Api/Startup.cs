@@ -51,11 +51,27 @@ namespace TourGo.Web.Api
             });
             services.AddSignalR();
 
-            bool isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
-            if (!isDevelopment)
+            bool isProduction = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development";
+
+            if (isProduction)
             {
-                services.AddOpenTelemetry();
+                services.AddOpenTelemetry()
+                        .WithMetrics(metrics =>
+                        {
+                            metrics.AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation()
+                            .UseGrafana();
+                        })
+                        .WithTracing(tracing =>
+                        {
+                            tracing.AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation()
+                            .UseGrafana(options =>
+                            {
+                                options.Instrumentations.Remove(Instrumentation.MySqlData);
+                            });
+                        });
             }
         }
 
