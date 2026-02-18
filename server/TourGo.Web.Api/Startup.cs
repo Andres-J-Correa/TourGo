@@ -50,6 +50,13 @@ namespace TourGo.Web.Api
                 options.WaitForJobsToComplete = true;
             });
             services.AddSignalR();
+
+            bool isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+            if (!isDevelopment)
+            {
+                services.AddOpenTelemetry();
+            }
         }
 
         private void ConfigureAppSettings(IServiceCollection services)
