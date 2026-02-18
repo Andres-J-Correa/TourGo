@@ -31,7 +31,7 @@ registerLocale("es", es);
 
 const env = import.meta.env.VITE_ENV;
 
-if (env !== "development") {
+if (env === "production") {
   initializeFaro({
     url: "https://faro-collector-prod-us-east-3.grafana.net/collect/a01b84bfd13405b8a2779b2d5a80106d",
     app: {
