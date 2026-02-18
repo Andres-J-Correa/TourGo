@@ -52,7 +52,7 @@ namespace TourGo.Web.Api
             services.AddSignalR();
 
 
-            bool isProduction = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development";
+            bool isProduction = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production";
 
             if (isProduction)
             {

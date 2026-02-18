@@ -31,7 +31,7 @@ namespace TourGo.Web.Api
         {
             logging.AddConfiguration(context.Configuration.GetSection("Logging"));
 
-            bool isProduction = !context.HostingEnvironment.IsDevelopment();
+            bool isProduction = context.HostingEnvironment.IsProduction();
 
             if (isProduction)
             {
@@ -40,10 +40,10 @@ namespace TourGo.Web.Api
                     options.UseGrafana();
                     options.IncludeScopes = true;
                 });
-            } else
-            {
-                logging.AddSimpleConsole();
-            }
+            } 
+            
+            logging.AddSimpleConsole();
+            logging.AddDebug();
         }
 
         private static void ConfigConfiguration(WebHostBuilderContext context, IConfigurationBuilder config)
