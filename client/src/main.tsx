@@ -33,7 +33,7 @@ const env = import.meta.env.VITE_ENV;
 
 if (env !== "development") {
   initializeFaro({
-    url: "https://faro-collector-prod-us-east-2.grafana.net/collect/b7ceccb90a4d2a84d177f764ab670090",
+    url: "https://faro-collector-prod-us-east-3.grafana.net/collect/a01b84bfd13405b8a2779b2d5a80106d",
     app: {
       name: "TourGo_Prod",
       version: "0.1.0",
@@ -66,5 +66,5 @@ createRoot(document.getElementById("root")!).render(
     <AppProviders>
       <RouterProvider router={router} />
     </AppProviders>
-  </StrictMode>
+  </StrictMode>,
 );

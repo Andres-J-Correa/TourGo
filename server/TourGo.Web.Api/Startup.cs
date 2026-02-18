@@ -50,29 +50,6 @@ namespace TourGo.Web.Api
                 options.WaitForJobsToComplete = true;
             });
             services.AddSignalR();
-
-            bool isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
-            
-            if (!isDevelopment)
-            {
-                services.AddOpenTelemetry()
-                        .WithMetrics(metrics =>
-                        {
-                            metrics.AddAspNetCoreInstrumentation()
-                            .AddHttpClientInstrumentation()
-                            .UseGrafana();
-                        })
-                        .WithTracing(tracing =>
-                        {
-                            tracing.AddAspNetCoreInstrumentation()
-                            .AddHttpClientInstrumentation()
-                            .UseGrafana(options =>
-                            {
-                                options.Instrumentations.Remove(Instrumentation.MySqlData);
-                            });
-                        });
-            }
-            
         }
 
         private void ConfigureAppSettings(IServiceCollection services)

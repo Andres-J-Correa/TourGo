@@ -18,10 +18,10 @@ jobs:
         env:
           SQL_CONN_STRING: ${{ secrets.SERVER_MY_SQL_DATABASE_CONN_STRING_STAGE }}
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
+          host: ${{ secrets.VPS_HOST_CLOUD }}
+          username: ${{ secrets.VPS_USER_CLOUD }}
+          key: ${{ secrets.SSH_KEY_CLOUD }}
+          port: ${{ secrets.SSH_PORT_CLOUD }}
           envs: SQL_CONN_STRING
           script: |
             # --- CHANGE TO REPO DIRECTORY ---
@@ -65,7 +65,7 @@ jobs:
             printf "S3_SECRET=${{ secrets.SERVER_AWS_S3_SECRET_KEY }}\n" >> .env
             printf "PII_KEY=${{ secrets.SERVER_USER_PII_ENCRYPTION_KEY }}\n" >> .env
             printf "RECAPTCHA_KEY=${{ secrets.SERVER_GOOGLE_RECAPTCHA_SECRET_KEY }}\n" >> .env
-            printf "GRAFANA_OTLP_AUTH=${{ secrets.SERVER_GRAFANA_OTLP_AUTH }}\n" >> .env
+            printf "GRAFANA_OTLP_AUTH=${{ secrets.SERVER_GRAFANA_OTLP_AUTH_CLOUD }}\n" >> .env
 
             # --- DOCKER STAGE ---
             echo "Building server image..."
