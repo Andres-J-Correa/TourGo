@@ -126,26 +126,23 @@ function RoomOccupancyReport({ hotelId }) {
           <label className="form-label">
             {t("financialReports.roomOccupancyReport.roomLabel")}
           </label>
-          <InputGroup>
-            <Input
-              type="select"
-              value={roomId}
-              onChange={handleRoomChange}
-              disabled={loading}>
-              <option value="">
-                {loadingRooms
-                  ? t("financialReports.roomOccupancyReport.loadingRooms")
-                  : t("financialReports.roomOccupancyReport.selectRoom")}
-              </option>
-              {rooms.length > 0 &&
-                rooms.map((room) => (
-                  <option key={room.id} value={room.id}>
-                    {room.name}
-                  </option>
-                ))}
-            </Input>
-            <InputGroupText>🛏️</InputGroupText>
-          </InputGroup>
+          <Input
+            type="select"
+            value={roomId}
+            onChange={handleRoomChange}
+            disabled={loading}>
+            <option value="">
+              {loadingRooms
+                ? t("financialReports.roomOccupancyReport.loadingRooms")
+                : t("financialReports.roomOccupancyReport.selectRoom")}
+            </option>
+            {rooms.length > 0 &&
+              rooms.map((room) => (
+                <option key={room.id} value={room.id}>
+                  {room.name}
+                </option>
+              ))}
+          </Input>
         </Col>
       </Row>
       <SimpleLoader isVisible={loading} />
