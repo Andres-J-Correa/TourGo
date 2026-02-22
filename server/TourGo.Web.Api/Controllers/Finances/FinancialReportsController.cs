@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TourGo.Models.Enums;
 using TourGo.Models.Enums.Transactions;
+using TourGo.Models.Requests.Finances;
 using TourGo.Models.Responses.Finance;
 using TourGo.Services.Interfaces.Finances;
 using TourGo.Web.Controllers;
@@ -116,7 +117,7 @@ namespace TourGo.Web.Api.Controllers.Finances
 
         [HttpGet("payment-methods-totals")]
         [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
-        public ActionResult<ItemsResponse<PaymentMethodTotalsResponse>> GetPaymentMethodsTotalsByHotelId(string hotelId, 
+        public ActionResult<ItemsResponse<PaymentMethodTotalsResponse>> GetPaymentMethodsTotalsByHotelId(string hotelId,
             [FromQuery] string currencyCode,
             [FromQuery] DateOnly? startDate,
             [FromQuery] DateOnly? endDate
@@ -329,6 +330,33 @@ namespace TourGo.Web.Api.Controllers.Finances
             {
                 var occupancy = _financialReportService.GetRoomOccupancyByDateRange(startDate, endDate, roomId);
                 result = Ok200(new ItemResponse<decimal> { Item = occupancy });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                result = StatusCode(500, new ErrorResponse());
+            }
+            return result;
+        }
+
+        [HttpPost("rooms-collected-vs-occupancy")]
+        [EntityAuth(EntityTypeEnum.FinancialReports, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemsResponse<RoomCollectedVSOccupancyResponse>> GetRoomsCollectedVSOccupancy(
+            string hotelId, [FromBody] RoomsCollectedVSOccupancyRequest request)
+        {
+            ObjectResult result;
+            try
+            {
+                List<RoomCollectedVSOccupancyResponse>? roomsResponse = _financialReportService.GetRoomsCollectedVSOccupancy(hotelId, request.StartDate, request.EndDate, request.RoomIds);
+                
+                if (roomsResponse == null)
+                {
+                    result = NotFound404(new ErrorResponse("No data found"));
+                }
+                else
+                {
+                    result = Ok200(new ItemsResponse<RoomCollectedVSOccupancyResponse> { Items = roomsResponse });
+                }
             }
             catch (Exception ex)
             {
