@@ -13,7 +13,10 @@ import {
 } from "reactstrap";
 import { useParams, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPersonWalkingLuggage } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHourglassEnd,
+  faPersonWalkingLuggage,
+} from "@fortawesome/free-solid-svg-icons";
 import classnames from "classnames";
 
 import { useAppContext } from "contexts/GlobalAppContext";
@@ -36,6 +39,8 @@ import TasksPane from "./components/TasksPane";
 
 const HotelLandingPage = (): JSX.Element => {
   const [date, setDate] = useState(dateOptions.today);
+  const [isTaskOverdue, setIsTaskOverdue] = useState(false);
+
   const { activeTab, setActiveTab } = useHotelNavigation();
 
   const navigate = useNavigate();
@@ -47,7 +52,7 @@ const HotelLandingPage = (): JSX.Element => {
   const { handleCheckIn, handleComplete, handleLeaveHotel } = useHotelActions(
     hotelId,
     t,
-    setData
+    setData,
   );
 
   const breadcrumbs = useMemo(
@@ -55,10 +60,10 @@ const HotelLandingPage = (): JSX.Element => {
       new BreadcrumbBuilder(t)
         .addHotels()
         .addActive(
-          `${hotel.current.name} - ${t(`hotels.landing.${activeTab}`)}`
+          `${hotel.current.name} - ${t(`hotels.landing.${activeTab}`)}`,
         )
         .build(),
-    [t, hotel, activeTab]
+    [t, hotel, activeTab],
   );
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,6 +76,10 @@ const HotelLandingPage = (): JSX.Element => {
 
   const toggleTab = (tab: string) => {
     setActiveTab(tab);
+  };
+
+  const updateTaskOverdueStatus = (isOverdue: boolean) => {
+    setIsTaskOverdue(isOverdue);
   };
 
   return (
@@ -150,6 +159,13 @@ const HotelLandingPage = (): JSX.Element => {
                       })}
                       onClick={() => toggleTab("tasks")}>
                       {t("hotels.landing.tasks")}
+                      <FontAwesomeIcon
+                        icon={faHourglassEnd}
+                        color="tomato"
+                        className={classnames("ms-1 fa-bounce", {
+                          "d-none": !isTaskOverdue,
+                        })}
+                      />
                     </NavLink>
                   </NavItem>
                 </Nav>
@@ -181,7 +197,11 @@ const HotelLandingPage = (): JSX.Element => {
                     />
                   </TabPane>
                   <TabPane tabId="tasks">
-                    <TasksPane hotelId={hotelId} initialDate={date} />
+                    <TasksPane
+                      hotelId={hotelId}
+                      initialDate={date}
+                      updateTaskOverdueStatus={updateTaskOverdueStatus}
+                    />
                   </TabPane>
                 </TabContent>
               </CardBody>
