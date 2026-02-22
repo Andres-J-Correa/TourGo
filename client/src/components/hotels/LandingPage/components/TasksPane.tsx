@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Button, Accordion, Row, Col, ButtonGroup } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList, faCalendar } from "@fortawesome/free-solid-svg-icons";
@@ -29,6 +29,7 @@ const localizer = dayjsLocalizer(dayjs);
 interface TasksPaneProps {
   hotelId: string | undefined;
   initialDate: string;
+  updateTaskOverdueStatus?: (isOverdue: boolean) => void;
 }
 
 type ViewMode = "list" | "calendar";
@@ -53,13 +54,17 @@ const eventPropGetter = (event: CalendarEvent) => {
   return { className };
 };
 
-const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
+const TasksPane: React.FC<TasksPaneProps> = ({
+  hotelId,
+  initialDate,
+  updateTaskOverdueStatus,
+}) => {
   const { t } = useLanguage();
   const [startDate, setStartDate] = useState<string | null>(
-    dayjs(initialDate).startOf("month").format("YYYY-MM-DD")
+    dayjs(initialDate).startOf("month").format("YYYY-MM-DD"),
   );
   const [endDate, setEndDate] = useState<string | null>(
-    dayjs(initialDate).endOf("month").format("YYYY-MM-DD")
+    dayjs(initialDate).endOf("month").format("YYYY-MM-DD"),
   );
 
   const {
@@ -95,7 +100,7 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
         allDay: true,
         resource: task,
       })),
-    [tasks]
+    [tasks],
   );
 
   const calendarMessages = useMemo(() => {
@@ -164,6 +169,15 @@ const TasksPane: React.FC<TasksPaneProps> = ({ hotelId, initialDate }) => {
 
     setViewMode(viewMode);
   }, []);
+
+  useEffect(() => {
+    if (updateTaskOverdueStatus) {
+      const hasOverdue = tasks.some(
+        (task) => dayjs(task.dueDate).isBefore(dayjs()) && !task.isCompleted,
+      );
+      updateTaskOverdueStatus(hasOverdue);
+    }
+  }, [tasks, updateTaskOverdueStatus]);
 
   return (
     <div>
