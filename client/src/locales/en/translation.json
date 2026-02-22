@@ -946,17 +946,20 @@
       "chartTitle": "RevPAR and Total Rooms by Month"
     },
     "roomOccupancyReport": {
-      "title": "Room Occupancy",
-      "description": "Shows the occupancy percentage of a specific room over a date range.",
-      "roomLabel": "Room",
-      "selectRoom": "Select a room",
-      "loadingRooms": "Loading...",
+      "title": "Room Occupancy vs Revenue",
+      "description": "Shows the occupancy percentage vs the revenue of the rooms over a date range.",
+      "roomLabel": "Rooms",
+      "selectRoom": "Select the rooms",
       "selectDatesPrompt": "Please select a date range to view occupancy.",
-      "selectRoomPrompt": "Select a room and a date range to view occupancy.",
+      "selectRoomPrompt": "Select at least one room and a date range to view occupancy.",
       "noData": "No data for the selected combination and date range.",
       "occupancy": "Occupancy",
       "gaugeLabel": "Occupancy",
-      "loadRoomsError": "An error occurred while retrieving the hotel's rooms."
+      "loadRoomsError": "An error occurred while retrieving the hotel's rooms.",
+      "activeRooms": "Active Rooms",
+      "inactiveRooms": "Inactive Rooms",
+      "chartTitle": "Room Occupancy vs Revenue",
+      "revenue": "Revenue"
     },
     "subcategoryAnalysisReport": {
       "title": "Subcategory Analysis",

@@ -369,6 +369,14 @@ export const getRoomOccupancyByDateRange = async (
   }
 };
 
+/** * Gets occupancy vs collected data for multiple rooms.
+ * @param {number} hotelId - The hotel ID.
+ * @param {string} startDate - Start date (YYYY-MM-DD).
+ * @param {string} endDate - End date (YYYY-MM-DD).
+ * @param {number[]} roomIds - Array of room IDs.
+ * @returns {Promise<Object>} API response with items array.
+ */
+
 export const getRoomsCollectedVSOccupancy = async (
   hotelId,
   startDate,

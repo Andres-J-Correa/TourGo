@@ -946,17 +946,20 @@
       "chartTitle": "RevPAR y Habitaciones Totales por Mes"
     },
     "roomOccupancyReport": {
-      "title": "Ocupación de Habitación",
-      "description": "Muestra el porcentaje de ocupación de una habitación específica en un rango de fechas.",
-      "roomLabel": "Habitación",
-      "selectRoom": "Selecciona una habitación",
-      "loadingRooms": "Cargando...",
+      "title": "Ocupación de Habitación vs Ingresos",
+      "description": "Muestra el porcentaje de ocupación vs los ingresos de las habitaciones en un rango de fechas.",
+      "roomLabel": "Habitaciones",
+      "selectRoom": "Seleccione las habitaciones",
       "selectDatesPrompt": "Por favor selecciona un rango de fechas para ver la ocupación.",
-      "selectRoomPrompt": "Selecciona una habitación y un rango de fechas para ver la ocupación.",
+      "selectRoomPrompt": "Selecciona al menos una habitación y un rango de fechas para ver la ocupación.",
       "noData": "No hay datos para la combinación y rango de fechas seleccionados.",
       "occupancy": "Ocupación",
       "gaugeLabel": "Ocupación",
-      "loadRoomsError": "Ocurrió un error al obtener las habitaciones del hotel."
+      "loadRoomsError": "Ocurrió un error al obtener las habitaciones del hotel.",
+      "activeRooms": "Habitaciones activas",
+      "inactiveRooms": "Habitaciones inactivas",
+      "chartTitle": "Ocupación de habitación vs ingresos",
+      "revenue": "Ingresos"
     },
     "subcategoryAnalysisReport": {
       "title": "Análisis de Subcategorías",

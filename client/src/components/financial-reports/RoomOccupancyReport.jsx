@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Row, Col, Input, InputGroup, InputGroupText } from "reactstrap";
+import React, { useState, useEffect, useMemo } from "react";
+import { Row, Col } from "reactstrap";
 import { Chart } from "react-google-charts";
+import Select from "react-select";
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
-import { getRoomOccupancyByDateRange } from "services/financialReportService";
+import { getRoomsCollectedVSOccupancy } from "services/financialReportService";
 import dayjs from "dayjs";
 import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { toast } from "react-toastify";
@@ -19,7 +20,7 @@ const getMonthRange = () => ({
 function RoomOccupancyReport({ hotelId }) {
   const [rooms, setRooms] = useState([]);
   const [dates, setDates] = useState(getMonthRange());
-  const [roomId, setRoomId] = useState("");
+  const [selectedRooms, setSelectedRooms] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingRooms, setLoadingRooms] = useState(false);
@@ -34,46 +35,127 @@ function RoomOccupancyReport({ hotelId }) {
     }));
   };
 
-  const handleRoomChange = (e) => {
-    setRoomId(e.target.value);
-    setShowPrompt(!(e.target.value && dates.start && dates.end));
+  const roomSelectOptions = useMemo(() => {
+    const activeRooms = [];
+    const inactiveRooms = [];
+
+    rooms.forEach((room) => {
+      const option = {
+        value: room.id,
+        label: room.name,
+      };
+
+      if (room.isActive) {
+        activeRooms.push(option);
+      } else {
+        inactiveRooms.push(option);
+      }
+    });
+
+    const options = [];
+
+    if (activeRooms.length > 0) {
+      options.push({
+        label: t("financialReports.roomOccupancyReport.activeRooms"),
+        options: activeRooms,
+      });
+    }
+
+    if (inactiveRooms.length > 0) {
+      options.push({
+        label: t("financialReports.roomOccupancyReport.inactiveRooms"),
+        options: inactiveRooms,
+      });
+    }
+
+    return options;
+  }, [rooms, t]);
+
+  const handleRoomChange = (selectedOptions) => {
+    setSelectedRooms(selectedOptions);
+    setShowPrompt(
+      !(
+        selectedOptions &&
+        selectedOptions.length > 0 &&
+        dates.start &&
+        dates.end
+      ),
+    );
     setData(null);
   };
 
-  const gaugeData = [
-    [
-      t("financialReports.roomOccupancyReport.gaugeLabel"),
-      t("financialReports.roomOccupancyReport.occupancy"),
-    ],
-    [
-      t("financialReports.roomOccupancyReport.occupancy"),
-      data !== null ? data * 100 : 0,
-    ],
-  ];
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0) return null;
 
-  const gaugeOptions = {
-    width: 400,
-    height: 220,
-    min: 0,
-    max: 100,
-    greenFrom: 70,
-    greenTo: 100,
-    yellowFrom: 40,
-    yellowTo: 70,
-    redFrom: 0,
-    redTo: 40,
+    const rows = data.map((room) => [
+      room.roomName,
+      {
+        v: room.collectedAmount,
+        f: new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(room.collectedAmount),
+      },
+      {
+        v: room.occupancyRate,
+        f: `${(room.occupancyRate * 100).toFixed(0)}%`,
+      },
+    ]);
+
+    return [
+      [
+        t("financialReports.roomOccupancyReport.roomLabel"),
+        t("financialReports.roomOccupancyReport.revenue"),
+        t("financialReports.roomOccupancyReport.occupancy"),
+      ],
+      ...rows,
+    ];
+  }, [data, t]);
+
+  const chartOptions = {
+    title: t("financialReports.roomOccupancyReport.chartTitle"),
+    vAxes: {
+      0: {
+        title: t("financialReports.roomOccupancyReport.revenue"),
+        format: "currency",
+      },
+      1: {
+        title: t("financialReports.roomOccupancyReport.occupancy"),
+        format: "#%",
+        minValue: 0,
+        maxValue: 1,
+      },
+    },
+    hAxis: {
+      title: t("financialReports.roomOccupancyReport.roomLabel"),
+    },
+    seriesType: "bars",
+    series: {
+      1: {
+        type: "line",
+        targetAxisIndex: 1,
+      },
+    },
     animation: { duration: 1000, easing: "out" },
-    majorTicks: ["0", "20", "40", "60", "80", "100"],
   };
 
   useEffect(() => {
-    if (hotelId && roomId && dates.start && dates.end) {
+    if (
+      hotelId &&
+      selectedRooms &&
+      selectedRooms.length > 0 &&
+      dates.start &&
+      dates.end
+    ) {
       setLoading(true);
       setShowPrompt(false);
-      getRoomOccupancyByDateRange(hotelId, roomId, dates.start, dates.end)
+
+      const roomIds = selectedRooms.map((room) => room.value);
+
+      getRoomsCollectedVSOccupancy(hotelId, dates.start, dates.end, roomIds)
         .then((res) => {
-          if (res?.isSuccessful && typeof res.item === "number") {
-            setData(res.item);
+          if (res?.isSuccessful && Array.isArray(res.items)) {
+            setData(res.items);
           } else {
             setData(null);
           }
@@ -84,7 +166,7 @@ function RoomOccupancyReport({ hotelId }) {
       setShowPrompt(true);
       setData(null);
     }
-  }, [hotelId, roomId, dates.start, dates.end]);
+  }, [hotelId, selectedRooms, dates.start, dates.end]);
 
   useEffect(() => {
     if (!hotelId) return;
@@ -126,23 +208,19 @@ function RoomOccupancyReport({ hotelId }) {
           <label className="form-label">
             {t("financialReports.roomOccupancyReport.roomLabel")}
           </label>
-          <Input
-            type="select"
-            value={roomId}
+          <Select
+            isMulti
+            options={roomSelectOptions}
+            value={selectedRooms}
             onChange={handleRoomChange}
-            disabled={loading}>
-            <option value="">
-              {loadingRooms
-                ? t("financialReports.roomOccupancyReport.loadingRooms")
-                : t("financialReports.roomOccupancyReport.selectRoom")}
-            </option>
-            {rooms.length > 0 &&
-              rooms.map((room) => (
-                <option key={room.id} value={room.id}>
-                  {room.name}
-                </option>
-              ))}
-          </Input>
+            isDisabled={loading || loadingRooms}
+            placeholder={
+              loadingRooms
+                ? t("financialReports.common.loading")
+                : t("financialReports.roomOccupancyReport.selectRoom")
+            }
+            isClearable
+          />
         </Col>
       </Row>
       <SimpleLoader isVisible={loading} />
@@ -162,22 +240,16 @@ function RoomOccupancyReport({ hotelId }) {
           message={t("financialReports.roomOccupancyReport.noData")}
         />
       )}
-      {!showPrompt && !loading && data !== null && (
-        <div className="d-flex flex-column align-items-center">
+      {!showPrompt && !loading && chartData && (
+        <div className="d-flex flex-column align-items-center w-100">
           <Chart
-            chartType="Gauge"
-            width="400px"
-            height="220px"
-            data={gaugeData}
-            options={gaugeOptions}
-            className="d-flex justify-content-center mb-3"
+            chartType="ComboChart"
+            width="100%"
+            height="400px"
+            data={chartData}
+            options={chartOptions}
+            className="mb-3"
           />
-          <div>
-            <strong>
-              {t("financialReports.roomOccupancyReport.occupancy")}:
-            </strong>{" "}
-            {(data * 100).toFixed(1)}%
-          </div>
         </div>
       )}
     </div>
