@@ -22,16 +22,12 @@ const TABS = [
   { key: "revenue", labelKey: "financialReports.dashboard.tabs.revenue" },
   { key: "expenses", labelKey: "financialReports.dashboard.tabs.expenses" },
   {
-    key: "revPAROverTime",
-    labelKey: "financialReports.dashboard.tabs.revPAROverTime",
-  },
-  {
-    key: "hotelOccupancyOverTime",
-    labelKey: "financialReports.dashboard.tabs.hotelOccupancyOverTime",
-  },
-  {
     key: "roomOccupancy",
     labelKey: "financialReports.dashboard.tabs.roomOccupancy",
+  },
+  {
+    key: "revPAROverTime",
+    labelKey: "financialReports.dashboard.tabs.revPAROverTime",
   },
   {
     key: "categoryPerformance",

@@ -17,7 +17,7 @@ export const getCategoryPerformanceOverTime = async (
   categoryId,
   startDate,
   endDate,
-  currencyCode = "COP"
+  currencyCode = "COP",
 ) => {
   const queryParams = new URLSearchParams({
     categoryId,
@@ -55,7 +55,7 @@ export const getCostToRevenueRatio = async (
   expenseCategoryId,
   startDate,
   endDate,
-  currencyCode = "COP"
+  currencyCode = "COP",
 ) => {
   const queryParams = new URLSearchParams({
     revenueCategoryId,
@@ -90,7 +90,7 @@ export const getExpenseBreakdown = async (
   hotelId,
   startDate,
   endDate,
-  currencyCode = "COP"
+  currencyCode = "COP",
 ) => {
   const queryParams = new URLSearchParams({
     startDate,
@@ -123,7 +123,7 @@ export const getPaymentMethodsTotalsByHotelId = async (
   hotelId,
   startDate,
   endDate,
-  currencyCode = "COP"
+  currencyCode = "COP",
 ) => {
   const queryParams = new URLSearchParams({
     currencyCode,
@@ -158,7 +158,7 @@ export const getProfitAndLossSummary = async (
   hotelId,
   startDate,
   endDate,
-  currencyCode = "COP"
+  currencyCode = "COP",
 ) => {
   const queryParams = new URLSearchParams({
     startDate,
@@ -191,7 +191,7 @@ export const getRevenueBreakdown = async (
   hotelId,
   startDate,
   endDate,
-  currencyCode = "COP"
+  currencyCode = "COP",
 ) => {
   const queryParams = new URLSearchParams({
     startDate,
@@ -226,7 +226,7 @@ export const getSubcategoryAnalysis = async (
   categoryId,
   startDate,
   endDate,
-  currencyCode = "COP"
+  currencyCode = "COP",
 ) => {
   const queryParams = new URLSearchParams({
     categoryId,
@@ -260,7 +260,7 @@ export const getUtilityCostAnalysis = async (
   hotelId,
   startDate,
   endDate,
-  currencyCode = "COP"
+  currencyCode = "COP",
 ) => {
   const queryParams = new URLSearchParams({
     startDate,
@@ -317,7 +317,7 @@ export const getRevPAROverTime = async (hotelId, startDate, endDate) => {
 export const getHotelOccupancyOverTime = async (
   hotelId,
   startDate,
-  endDate
+  endDate,
 ) => {
   const queryParams = new URLSearchParams({
     startDate,
@@ -349,7 +349,7 @@ export const getRoomOccupancyByDateRange = async (
   hotelId,
   roomId,
   startDate,
-  endDate
+  endDate,
 ) => {
   const queryParams = new URLSearchParams({
     startDate,
@@ -360,6 +360,36 @@ export const getRoomOccupancyByDateRange = async (
     method: "GET",
     url: `${api}/${hotelId}/occupancy/room/${roomId}?${queryParams}`,
   };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+/** * Gets occupancy vs collected data for multiple rooms.
+ * @param {number} hotelId - The hotel ID.
+ * @param {string} startDate - Start date (YYYY-MM-DD).
+ * @param {string} endDate - End date (YYYY-MM-DD).
+ * @param {number[]} roomIds - Array of room IDs.
+ * @returns {Promise<Object>} API response with items array.
+ */
+
+export const getRoomsCollectedVSOccupancy = async (
+  hotelId,
+  startDate,
+  endDate,
+  roomIds,
+) => {
+  const config = {
+    headers: { "Content-Type": "application/json" },
+    method: "POST",
+    url: `${api}/${hotelId}/rooms-collected-vs-occupancy`,
+    data: { roomIds, startDate, endDate },
+  };
+
   try {
     const response = await axiosClient(config);
     onGlobalSuccess(response);

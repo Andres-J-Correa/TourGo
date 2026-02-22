@@ -15,5 +15,6 @@ namespace TourGo.Services.Interfaces.Finances
         List<RevPAROverTimeResponse>? GetRevPAROverTime(string hotelId, DateOnly startDate, DateOnly endDate);
         List<HotelOccupancyOverTimeResponse>? GetHotelOccupancyOverTime(string hotelId, DateOnly startDate, DateOnly endDate);
         decimal GetRoomOccupancyByDateRange(DateOnly start, DateOnly end, int roomId);
+        List<RoomCollectedVSOccupancyResponse>? GetRoomsCollectedVSOccupancy(string hotelId, DateOnly startDate, DateOnly endDate, List<int> roomIds);
     }
 }

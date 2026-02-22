@@ -4,6 +4,7 @@ using TourGo.Data.Providers;
 using TourGo.Models.Responses.Finance;
 using TourGo.Data;
 using TourGo.Services.Interfaces.Finances;
+using Newtonsoft.Json;
 
 namespace TourGo.Services.Finances
 {
@@ -304,6 +305,36 @@ namespace TourGo.Services.Finances
             });
 
             return occupancyRate;
+        }
+
+        public List<RoomCollectedVSOccupancyResponse>? GetRoomsCollectedVSOccupancy (string hotelId, DateOnly startDate, DateOnly endDate, List<int> roomIds)
+        {
+            string proc = "financial_reports_get_rooms_collected_vs_occupancy_by_date_range";
+
+            List<RoomCollectedVSOccupancyResponse>? list = null;
+
+            _mySqlDataProvider.ExecuteCmd(proc, (param) =>
+            {
+                param.AddWithValue("p_hotelId", hotelId);
+                param.Add("p_start", MySqlDbType.Date).Value = startDate;
+                param.Add("p_end", MySqlDbType.Date).Value = endDate;
+                param.AddWithValue("p_rooms_json", JsonConvert.SerializeObject(roomIds));
+
+            }, (reader, set) =>
+            {
+                int index = 0;
+                var item = new RoomCollectedVSOccupancyResponse
+                {
+                    RoomId = reader.GetSafeInt32(index++),
+                    RoomName = reader.GetSafeString(index++),
+                    OccupancyRate = reader.GetSafeDecimal(index++),
+                    CollectedAmount = reader.GetSafeDecimal(index++)
+                };
+                list ??= new List<RoomCollectedVSOccupancyResponse>();
+                list.Add(item);
+            });
+
+            return list;
         }
     }
 }
