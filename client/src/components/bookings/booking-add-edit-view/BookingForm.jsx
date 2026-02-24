@@ -141,7 +141,7 @@ function BookingForm({
       }
 
       for (const availability of roomAvailability) {
-        if (availability.isOpen) {
+        if (!availability.isOpen) {
           roomAvailabilitySet.add(
             `${availability.roomId}-${availability.date}`,
           );
