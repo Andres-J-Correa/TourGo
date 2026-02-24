@@ -141,7 +141,11 @@ function BookingForm({
       }
 
       for (const availability of roomAvailability) {
-        roomAvailabilitySet.add(`${availability.roomId}-${availability.date}`);
+        if (availability.isOpen) {
+          roomAvailabilitySet.add(
+            `${availability.roomId}-${availability.date}`,
+          );
+        }
       }
 
       for (let i = 0; i < currentRoomBookings.length; ) {
