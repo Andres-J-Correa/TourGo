@@ -100,7 +100,7 @@ function BookingForm({
     values,
     selectedRoomBookings,
     selectedCharges,
-    personalizedCharges
+    personalizedCharges,
   );
 
   const isLoading =
@@ -136,7 +136,7 @@ function BookingForm({
       for (const roomBooking of roomBookings) {
         roomBookingsMap.set(
           `${roomBooking.roomId}-${roomBooking.date}`,
-          roomBooking.bookingId
+          roomBooking.bookingId,
         );
       }
 
@@ -168,7 +168,7 @@ function BookingForm({
 
       return currentRoomBookings;
     },
-    [bookingId, t]
+    [bookingId, t],
   );
 
   const resetFormToPrevious = () => {
@@ -224,7 +224,7 @@ function BookingForm({
 
       setCustomer(formData.customer);
     },
-    [setCustomer, setValues]
+    [setCustomer, setValues],
   );
 
   const handleDateChange = (field) => (value) => {
@@ -304,26 +304,26 @@ function BookingForm({
         existingRoomBookings?.length > 0
           ? existingRoomBookings
           : bookingRoomBookings?.length > 0
-          ? bookingRoomBookings
-          : [];
+            ? bookingRoomBookings
+            : [];
 
       if (isSameDates && currentRoomBookings.length > 0) {
         setSelectedRoomBookings(currentRoomBookings);
       }
 
-      const currentExtraCharges =
+      let currentExtraCharges =
         initialValues.extraCharges?.length > 0
           ? initialValues.extraCharges
           : bookingCharges?.length > 0
-          ? bookingCharges
-          : [];
+            ? bookingCharges
+            : [];
 
       const currentPersonalizedCharges =
         initialValues.personalizedCharges?.length > 0
           ? initialValues.personalizedCharges
           : bookingPersonalizedCharges?.length > 0
-          ? bookingPersonalizedCharges
-          : [];
+            ? bookingPersonalizedCharges
+            : [];
 
       setLocalStorageForm(LOCAL_STORAGE_FORM_KEYS.PREVIOUS, {
         ...sanitizeBooking(booking),
@@ -349,8 +349,12 @@ function BookingForm({
       customerId: customer?.id,
       arrivalDate: dates.start,
       departureDate: dates.end,
-      roomBookings: [...selectedRoomBookings],
-      extraCharges: [...selectedCharges],
+      roomBookings: selectedRoomBookings.filter((rb) =>
+        rooms.some((room) => room.id === rb.roomId),
+      ),
+      extraCharges: selectedCharges.filter(
+        (charge) => charge.isActive === true,
+      ),
       personalizedCharges: [...personalizedCharges],
       subtotal: totals.subtotal,
       charges: totals.charges,
@@ -366,18 +370,18 @@ function BookingForm({
     const isDifferentFromPrevious = !deepCompareBooking(
       previousForm,
       newFormData,
-      currentFormKeysToCompare
+      currentFormKeysToCompare,
     );
     const isNotEmpty = !deepCompareBooking(
       newFormData,
       emptyFormData,
-      currentFormKeysToCompare
+      currentFormKeysToCompare,
     );
 
     const isDifferentFromCurrentFormik = !deepCompareBooking(
       { ...values },
       newFormData,
-      currentFormKeysToCompare
+      currentFormKeysToCompare,
     );
 
     const shouldUpdateCurrentForm =
@@ -442,7 +446,7 @@ function BookingForm({
       const isNotEmptyBooking = !deepCompareBooking(
         emptyBooking,
         currentForm,
-        bookingKeysToCompare
+        bookingKeysToCompare,
       );
 
       if (currentForm && !currentForm.id && isNotEmptyBooking) {
@@ -491,7 +495,7 @@ function BookingForm({
   useEffect(() => {
     if (roomBookings.length) {
       setSelectedRoomBookings((prev) =>
-        removeBookedRoomBookings(prev, roomBookings, roomAvailability)
+        removeBookedRoomBookings(prev, roomBookings, roomAvailability),
       );
     }
   }, [roomBookings, roomAvailability, removeBookedRoomBookings]);
@@ -641,7 +645,7 @@ export default withFormik({
       if (values.id) {
         res = await updateBooking(
           { ...values, statusId: booking.status.id },
-          hotelId
+          hotelId,
         );
       } else {
         const statusId = isQuote
@@ -653,7 +657,7 @@ export default withFormik({
             ...values,
             statusId,
           },
-          hotelId
+          hotelId,
         );
       }
 
@@ -668,7 +672,7 @@ export default withFormik({
           extraCharges: [...values.extraCharges],
           nights: dayjs(values.departureDate).diff(
             dayjs(values.arrivalDate),
-            "day"
+            "day",
           ),
           bookingProvider: {
             id: values.bookingProviderId,
@@ -717,7 +721,7 @@ export default withFormik({
       ) {
         setFieldError(
           "externalId",
-          t(`errors.custom.${ERROR_CODES.EXTERNAL_BOOKING_ID_CONFLICT}`)
+          t(`errors.custom.${ERROR_CODES.EXTERNAL_BOOKING_ID_CONFLICT}`),
         );
       }
 

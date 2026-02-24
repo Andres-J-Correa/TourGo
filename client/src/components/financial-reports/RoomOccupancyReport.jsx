@@ -216,7 +216,7 @@ function RoomOccupancyReport({ hotelId }) {
             isDisabled={loading || loadingRooms}
             placeholder={
               loadingRooms
-                ? t("financialReports.common.loading")
+                ? t("common.loading")
                 : t("financialReports.roomOccupancyReport.selectRoom")
             }
             isClearable
