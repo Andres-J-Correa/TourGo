@@ -155,8 +155,11 @@ function BookingForm({
 
         const isBooked = existingBookingId && existingBookingId !== bookingId;
         const isClosed = roomAvailabilitySet.has(key);
+        const isRoomDeleted = !rooms.some(
+          (room) => room.id === roomBooking.roomId,
+        );
 
-        if (isBooked || isClosed) {
+        if (isBooked || isClosed || isRoomDeleted) {
           currentRoomBookings.splice(i, 1);
           continue;
         }
@@ -172,8 +175,12 @@ function BookingForm({
 
       return currentRoomBookings;
     },
-    [bookingId, t],
+    [bookingId, t, rooms],
   );
+
+  const removeInactiveExtraCharges = useCallback((chargesToCheck) => {
+    return chargesToCheck.filter((charge) => charge.isActive);
+  }, []);
 
   const resetFormToPrevious = () => {
     resetForm();
@@ -353,12 +360,8 @@ function BookingForm({
       customerId: customer?.id,
       arrivalDate: dates.start,
       departureDate: dates.end,
-      roomBookings: selectedRoomBookings.filter((rb) =>
-        rooms.some((room) => room.id === rb.roomId),
-      ),
-      extraCharges: selectedCharges.filter(
-        (charge) => charge.isActive === true,
-      ),
+      roomBookings: [...selectedRoomBookings],
+      extraCharges: [...selectedCharges],
       personalizedCharges: [...personalizedCharges],
       subtotal: totals.subtotal,
       charges: totals.charges,
@@ -503,6 +506,12 @@ function BookingForm({
       );
     }
   }, [roomBookings, roomAvailability, removeBookedRoomBookings]);
+
+  useEffect(() => {
+    if (bookingCharges.length) {
+      setSelectedCharges((prev) => removeInactiveExtraCharges(prev));
+    }
+  }, [bookingCharges, removeInactiveExtraCharges]);
 
   return (
     <>
