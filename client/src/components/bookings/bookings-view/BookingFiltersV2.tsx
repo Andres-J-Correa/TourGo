@@ -11,7 +11,7 @@ import {
   faPlaneArrival,
   faPlaneDeparture,
   faArrowUpShortWide,
-  faArrowDownShortWide,
+  faArrowDownWideShort,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
@@ -394,7 +394,7 @@ function BookingFiltersV2({
                 icon={
                   paginationData.sortDirection === "ASC"
                     ? faArrowUpShortWide
-                    : faArrowDownShortWide
+                    : faArrowDownWideShort
                 }
               />
             </Button>
