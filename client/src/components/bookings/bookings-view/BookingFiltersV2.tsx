@@ -15,6 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
+import Select from "react-select";
 
 //components
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
@@ -57,7 +58,7 @@ function BookingFiltersV2({
   const pageSizeOptions: number[] = [5, 10, 20, 50, 100, 200, 500];
 
   const handleBookingIdChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const { value }: { value: string } = e.target;
     setBookingIdInput(value.trim());
@@ -70,7 +71,7 @@ function BookingFiltersV2({
   };
 
   const handleBookingIdFilterSubmit = (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ): void => {
     e.preventDefault();
     if (!bookingIdInput) return;
@@ -78,7 +79,7 @@ function BookingFiltersV2({
   };
 
   const handleCustomerNameChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const { name, value }: { name: string; value: string } = e.target;
     setCustomerNameInputs((prev) => ({
@@ -94,7 +95,7 @@ function BookingFiltersV2({
   };
 
   const handleExternalBookingIdChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const { value }: { value: string } = e.target;
     setExternalBookingIdInput(value.trim());
@@ -107,7 +108,7 @@ function BookingFiltersV2({
   };
 
   const handleCustomerNameFilterSubmit = (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ): void => {
     e.preventDefault();
     const { firstName, lastName } = customerNameInputs;
@@ -116,7 +117,7 @@ function BookingFiltersV2({
   };
 
   const handleExternalBookingIdFilterSubmit = (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ): void => {
     e.preventDefault();
     if (!externalBookingIdInput) return;
@@ -124,7 +125,7 @@ function BookingFiltersV2({
   };
 
   const handlePageSizeChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
+    e: React.ChangeEvent<HTMLSelectElement>,
   ): void => {
     const { value }: { value: string } = e.target;
     const newPageSize: number = Number(value);
@@ -132,11 +133,53 @@ function BookingFiltersV2({
     onPageSizeChange(newPageSize);
   };
 
-  const handleSortcolumnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const { value }: { value: string } = e.target;
-    onSortColumnChange(value as keyof typeof BOOKING_VIEW_SORT_OPTIONS);
+  const statusOptions = BOOKING_STATUSES.map((status) => ({
+    value: status.id.toString(),
+    label: t(status.name),
+  }));
+
+  const handleStatusChange = (
+    selectedOption: { value: string; label: string } | null,
+  ) => {
+    if (selectedOption) {
+      handleFilterByStatusId(selectedOption.value);
+    } else {
+      handleFilterByStatusId("");
+    }
   };
+
+  const selectedStatusOption = paginationData.statusId
+    ? statusOptions.find(
+        (opt) => opt.value === paginationData.statusId?.toString(),
+      ) || null
+    : null;
+
+  const handleSortcolumnChange = (
+    selectedOption: { value: string; label: string } | null,
+  ) => {
+    if (selectedOption) {
+      onSortColumnChange(
+        selectedOption.value as keyof typeof BOOKING_VIEW_SORT_OPTIONS,
+      );
+    } else {
+      onSortColumnChange(
+        "" as unknown as keyof typeof BOOKING_VIEW_SORT_OPTIONS,
+      );
+    }
+  };
+
+  const sortOptions = Object.keys(BOOKING_VIEW_SORT_OPTIONS).map((option) => ({
+    value: option,
+    label: t(
+      BOOKING_VIEW_SORT_OPTIONS[
+        option as keyof typeof BOOKING_VIEW_SORT_OPTIONS
+      ],
+    ),
+  }));
+
+  const selectedSortOption = paginationData.sortColumn
+    ? sortOptions.find((opt) => opt.value === paginationData.sortColumn) || null
+    : null;
 
   return (
     <>
@@ -290,39 +333,20 @@ function BookingFiltersV2({
           <Label for="statusId" className="text-dark">
             {t("booking.filters.filterByStatus")}
           </Label>
-          <select
-            id="statusId"
-            className={classNames("form-select", {
-              "bg-success-subtle": paginationData.statusId,
-            })}
-            disabled={loading}
-            value={paginationData.statusId}
-            onChange={(e) => {
-              const { value } = e.target;
-              handleFilterByStatusId(value);
-            }}>
-            <option
-              className={classNames("form-select", {
-                "bg-dark-subtle": paginationData.statusId,
-              })}
-              value="">
-              {paginationData.statusId
-                ? t("booking.filters.removeFilter")
-                : t("booking.filters.select")}
-            </option>
-            {BOOKING_STATUSES.map((status) => (
-              <option
-                key={`${status.id}`}
-                className={classNames({
-                  "bg-success-subtle":
-                    Number(paginationData.statusId) === status.id,
-                  "bg-white": Number(paginationData.statusId) !== status.id,
-                })}
-                value={status.id}>
-                {t(status.name)}
-              </option>
-            ))}
-          </select>
+          <div style={{ minWidth: "180px" }}>
+            <Select
+              id="statusId"
+              options={statusOptions}
+              value={selectedStatusOption}
+              onChange={handleStatusChange}
+              isDisabled={loading}
+              placeholder={t("booking.filters.select")}
+              isClearable
+              styles={{
+                menu: (provided) => ({ ...provided, zIndex: 3 }),
+              }}
+            />
+          </div>
         </Col>
       </Row>
       <Row>
@@ -331,39 +355,31 @@ function BookingFiltersV2({
             {t("booking.filters.sortBy")}
           </Label>
           <InputGroup>
-            <Input
-              id="sortColumn"
-              type="select"
-              value={paginationData.sortColumn}
-              className={classNames("form-select", {
-                "bg-success-subtle": paginationData.sortColumn,
-              })}
-              onChange={handleSortcolumnChange}>
-              <option
-                value=""
-                className={classNames({
-                  "bg-dark-subtle": !!paginationData.sortColumn,
-                })}>
-                {t("booking.filters.selectSortOption")}
-              </option>
-              {Object.keys(BOOKING_VIEW_SORT_OPTIONS).map((option) => {
-                const optionName =
-                  BOOKING_VIEW_SORT_OPTIONS[
-                    option as keyof typeof BOOKING_VIEW_SORT_OPTIONS
-                  ];
-                return (
-                  <option
-                    key={option}
-                    value={option}
-                    className={classNames({
-                      "bg-success-subtle": paginationData.sortColumn === option,
-                      "bg-white": paginationData.sortColumn !== option,
-                    })}>
-                    {t(optionName)}
-                  </option>
-                );
-              })}
-            </Input>
+            <div className="flex-grow-1">
+              <Select
+                id="sortColumn"
+                options={sortOptions}
+                value={selectedSortOption}
+                onChange={handleSortcolumnChange}
+                isDisabled={loading}
+                placeholder={t("booking.filters.selectSortOption")}
+                isClearable
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    height: "100%",
+                    minHeight: "38px",
+                    borderTopRightRadius: 0,
+                    borderBottomRightRadius: 0,
+                  }),
+                  menu: (provided) => ({ ...provided, zIndex: 3 }),
+                }}
+                components={{
+                  DropdownIndicator: () => null,
+                  IndicatorSeparator: () => null,
+                }}
+              />
+            </div>
             <Button
               color="outline-dark"
               type="button"

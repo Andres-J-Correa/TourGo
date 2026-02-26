@@ -10,15 +10,10 @@ import {
 import PropTypes from "prop-types";
 import { useIsMobile } from "hooks/useIsMobile";
 
-const PaginationComponent = ({
-  pageIndex,
-  totalPages,
-  onPageChange,
-  maxPageNumbersToShow,
-}) => {
+const PaginationComponent = ({ pageIndex, totalPages, onPageChange }) => {
   const isMobile = useIsMobile();
 
-  maxPageNumbersToShow = isMobile ? 3 : 10;
+  const maxPageNumbersToShow = isMobile ? 3 : 10;
 
   const [inputValue, setInputValue] = useState(pageIndex + 1);
 
@@ -61,7 +56,7 @@ const PaginationComponent = ({
           <PaginationLink onClick={() => onPageChange(i)}>
             {i + 1}
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem>,
       );
     }
 

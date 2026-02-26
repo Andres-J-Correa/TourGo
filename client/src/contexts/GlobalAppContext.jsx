@@ -100,7 +100,7 @@ export const AppContextProvider = ({ children }) => {
         setHotelIdParam(hotelId);
       }
     },
-    [hotelIdParam]
+    [hotelIdParam],
   );
 
   const contextValue = {
@@ -119,6 +119,8 @@ export const AppContextProvider = ({ children }) => {
     maintenanceMode,
   };
 
+  let isSessionExpiredHandled = false;
+
   const handleGlobalError = useCallback(
     (error) => {
       if (
@@ -128,10 +130,13 @@ export const AppContextProvider = ({ children }) => {
       ) {
         setCurrentUser({ ...defaultUser });
         setIsAuthError(true);
-        toast.error(t("common.sessionExpired"), {
-          autoClose: 5000,
-          theme: "colored",
-        });
+        if (!isSessionExpiredHandled) {
+          toast.error(t("common.sessionExpired"), {
+            autoClose: 5000,
+            theme: "colored",
+          });
+          isSessionExpiredHandled = true;
+        }
       }
 
       if (error.code === "ERR_NETWORK" || error.response?.status === 503) {
@@ -139,7 +144,7 @@ export const AppContextProvider = ({ children }) => {
       }
       return Promise.reject(error);
     },
-    [currentUser, t, isAuthError]
+    [currentUser, t, isAuthError],
   );
 
   const fetchHotel = useCallback((hotelId) => {
@@ -176,6 +181,7 @@ export const AppContextProvider = ({ children }) => {
             isAuthenticated: true,
           }));
           setIsAuthError(false);
+          isSessionExpiredHandled = false;
         })
         .catch(() => {
           setCurrentUser({ ...defaultUser });
@@ -209,7 +215,7 @@ export const AppContextProvider = ({ children }) => {
           setMaintenanceMode(false);
         }
         return handleGlobalError(error);
-      }
+      },
     );
 
     // Set the axiosClientV2 interceptor
@@ -223,7 +229,7 @@ export const AppContextProvider = ({ children }) => {
           setMaintenanceMode(false);
         }
         return handleGlobalError(error);
-      }
+      },
     );
 
     setIsResponseIntercepted(true);

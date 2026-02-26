@@ -26,6 +26,7 @@ import { BOOKING_STATUS_BY_ID } from "components/bookings/constants";
 import { Button, Col, Row } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import Alert from "components/commonUI/Alert";
 
 const defaultData: BookingData = {
   items: [],
@@ -54,7 +55,7 @@ function BookingsViewV2(): JSX.Element {
   const { hotelId } = useParams<{ hotelId?: string }>();
   const [data, setData] = useState<BookingData>(defaultData);
   const [paginationData, setPaginationData] = useState<PaginationData>(
-    defaultPaginationData
+    defaultPaginationData,
   );
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -87,7 +88,7 @@ function BookingsViewV2(): JSX.Element {
 
     const copyOfItems = data.items.map(
       (
-        item
+        item,
       ): Pick<
         BookingMinimal,
         "id" | "externalBookingId" | "total" | "balanceDue"
@@ -106,25 +107,28 @@ function BookingsViewV2(): JSX.Element {
         status: t(
           BOOKING_STATUS_BY_ID[
             item.statusId as keyof typeof BOOKING_STATUS_BY_ID
-          ]
+          ],
         ),
         name: `${item.firstName} ${item.lastName}`,
-      })
+      }),
     );
 
     const dataToExport = copyOfItems.map((row) =>
-      columnOrderTranslated.reduce((acc, obj) => {
-        acc[obj.label as keyof typeof acc] =
-          row[obj.id as keyof typeof row] ?? "";
-        return acc;
-      }, {} as Record<string, string | number>)
+      columnOrderTranslated.reduce(
+        (acc, obj) => {
+          acc[obj.label as keyof typeof acc] =
+            row[obj.id as keyof typeof row] ?? "";
+          return acc;
+        },
+        {} as Record<string, string | number>,
+      ),
     );
     const worksheet = utils.json_to_sheet(dataToExport);
     const workbook = utils.book_new();
     utils.book_append_sheet(
       workbook,
       worksheet,
-      t("booking.bookingsView.title")
+      t("booking.bookingsView.title"),
     );
     writeFile(workbook, `${t("booking.bookingsView.title")}.xlsx`, {
       compression: true,
@@ -321,44 +325,46 @@ function BookingsViewV2(): JSX.Element {
           </span>
         </div>
 
-        <Row>
-          <Col>
-            <Pagination
-              pageIndex={paginationData.pageIndex}
-              totalPages={data.totalPages}
-              hasPreviousPage={data.hasPreviousPage}
-              hasNextPage={data.hasNextPage}
-              onPageChange={gotoPage}
-            />
-          </Col>
-        </Row>
-
-        <div className="w-100">
+        <div>
           {hotelId && data.items.length > 0 ? (
-            data.items.map((booking) => (
-              <BookingCard
-                key={booking.id}
-                booking={booking}
-                hotelId={hotelId}
-              />
-            ))
+            <>
+              <Row>
+                <Col>
+                  <Pagination
+                    pageIndex={paginationData.pageIndex}
+                    totalPages={data.totalPages}
+                    onPageChange={gotoPage}
+                  />
+                </Col>
+              </Row>
+
+              <Row>
+                {data.items.map((booking) => (
+                  <BookingCard
+                    key={booking.id}
+                    booking={booking}
+                    hotelId={hotelId}
+                  />
+                ))}
+              </Row>
+              <Row>
+                <Col>
+                  <Pagination
+                    pageIndex={paginationData.pageIndex}
+                    totalPages={data.totalPages}
+                    onPageChange={gotoPage}
+                  />
+                </Col>
+              </Row>
+            </>
           ) : (
-            <p className="fw-bold text-center">
-              {t("booking.bookingsView.noBookings")}
-            </p>
+            <Alert
+              type="warning"
+              className="text-center"
+              message={t("booking.bookingsView.noBookings")}
+            />
           )}
         </div>
-        <Row>
-          <Col>
-            <Pagination
-              pageIndex={paginationData.pageIndex}
-              totalPages={data.totalPages}
-              hasPreviousPage={data.hasPreviousPage}
-              hasNextPage={data.hasNextPage}
-              onPageChange={gotoPage}
-            />
-          </Col>
-        </Row>
       </ErrorBoundary>
     </>
   );
