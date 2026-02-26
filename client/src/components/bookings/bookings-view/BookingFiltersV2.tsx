@@ -34,7 +34,7 @@ function BookingFiltersV2({
   handleClearCustomerNameFilter,
   handleClearExternalBookingIdFilter,
   toggleDateType,
-  handleFilterByStatusId,
+  handleFilterByStatusIds,
   onPageSizeChange,
   handleFilterByBookingId,
   handleClearBookingIdFilter,
@@ -139,20 +139,21 @@ function BookingFiltersV2({
   }));
 
   const handleStatusChange = (
-    selectedOption: { value: string; label: string } | null,
+    selectedOptions: readonly { value: string; label: string }[] | null,
   ) => {
-    if (selectedOption) {
-      handleFilterByStatusId(selectedOption.value);
+    if (selectedOptions) {
+      handleFilterByStatusIds(selectedOptions.map((opt) => Number(opt.value)));
     } else {
-      handleFilterByStatusId("");
+      handleFilterByStatusIds([]);
     }
   };
 
-  const selectedStatusOption = paginationData.statusId
-    ? statusOptions.find(
-        (opt) => opt.value === paginationData.statusId?.toString(),
-      ) || null
-    : null;
+  const selectedStatusOptions =
+    paginationData.statusIds && paginationData.statusIds.length > 0
+      ? statusOptions.filter((opt) =>
+          paginationData.statusIds?.includes(Number(opt.value)),
+        )
+      : null;
 
   const handleSortcolumnChange = (
     selectedOption: { value: string; label: string } | null,
@@ -336,8 +337,9 @@ function BookingFiltersV2({
           <div style={{ minWidth: "180px" }}>
             <Select
               id="statusId"
+              isMulti
               options={statusOptions}
-              value={selectedStatusOption}
+              value={selectedStatusOptions}
               onChange={handleStatusChange}
               isDisabled={loading}
               placeholder={t("booking.filters.select")}

@@ -58,7 +58,7 @@ export interface GetPagedMinimalBookingsByDateRangeParams {
   firstName?: string;
   lastName?: string;
   externalBookingId?: string;
-  statusId?: string;
+  statusIds?: number[];
   bookingId?: string;
 }
 // #endregion

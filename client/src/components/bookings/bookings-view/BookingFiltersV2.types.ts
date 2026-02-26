@@ -4,7 +4,7 @@ export interface BookingFiltersProps {
   paginationData: PaginationData;
   loading: boolean;
   handleDateChange: (
-    field: "startDate" | "endDate"
+    field: "startDate" | "endDate",
   ) => (date: Date | null) => void;
   handleFilterByCustomerName: (values: {
     firstName: string;
@@ -14,7 +14,7 @@ export interface BookingFiltersProps {
   handleClearCustomerNameFilter: () => void;
   handleClearExternalBookingIdFilter: () => void;
   toggleDateType: () => void;
-  handleFilterByStatusId: (statusId: string) => void;
+  handleFilterByStatusIds: (statusIds: number[]) => void;
   onPageSizeChange: (pageSize: number) => void;
   handleFilterByBookingId: (value: string) => void;
   handleClearBookingIdFilter: () => void;

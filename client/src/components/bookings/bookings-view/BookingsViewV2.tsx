@@ -47,7 +47,7 @@ const defaultPaginationData: PaginationData = {
   firstName: "",
   lastName: "",
   externalBookingId: "",
-  statusId: "",
+  statusIds: [],
   bookingId: "",
 };
 
@@ -198,11 +198,11 @@ function BookingsViewV2(): JSX.Element {
     }));
   };
 
-  const handleFilterByStatusId = (value: string): void => {
+  const handleFilterByStatusIds = (values: number[]): void => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      statusId: value,
+      statusIds: [...values],
     }));
   };
 
@@ -292,7 +292,7 @@ function BookingsViewV2(): JSX.Element {
           handleClearExternalBookingIdFilter={
             handleClearExternalBookingIdFilter
           }
-          handleFilterByStatusId={handleFilterByStatusId}
+          handleFilterByStatusIds={handleFilterByStatusIds}
           toggleDateType={toggleDateType}
           onPageSizeChange={onPageSizeChange}
           handleFilterByBookingId={handleFilterByBookingId}

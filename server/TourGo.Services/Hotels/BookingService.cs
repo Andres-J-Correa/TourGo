@@ -103,10 +103,10 @@ namespace TourGo.Services.Hotels
 
         public Paged<BookingMinimal>? GetPaginatedByDateRange(string hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
                                                             string? sortColumn, string? sortDirection, DateOnly? startDate, DateOnly? endDate,
-                                                            string? firstName, string? lastName, string? bookingExternalId, int? statusId,
-                                                            string? bookingId)
+                                                            string? firstName, string? lastName, string? bookingExternalId,
+                                                            string? bookingId, List<int>? statusIds)
         {
-            string proc = "bookings_select_minimal_by_date_range_paginated_v6";
+            string proc = "bookings_select_minimal_by_date_range_paginated_v7";
             Paged<BookingMinimal>? paged = null;
             List<BookingMinimal>? bookings = null;
             int totalCount = 0;
@@ -130,7 +130,7 @@ namespace TourGo.Services.Hotels
                 param.AddWithNullableString("p_lastName", lastName);
                 param.AddWithNullableString("p_externalBookingId", bookingExternalId);
 
-                param.AddWithNullableInt("p_statusId", statusId);
+                param.AddWithValue("p_status_ids_json", statusIds != null ? JsonConvert.SerializeObject(statusIds) : DBNull.Value);
                 param.AddWithNullableString("p_bookingId", bookingId);
             }, (reader, set) =>
             {
