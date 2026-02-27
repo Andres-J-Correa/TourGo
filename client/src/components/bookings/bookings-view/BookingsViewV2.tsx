@@ -25,7 +25,10 @@ import { useHotelRooms } from "./hooks/useHotelRooms";
 import { BOOKING_STATUS_BY_ID } from "components/bookings/constants";
 import { Button, Col, Row } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFileExcel,
+  faMagnifyingGlass,
+} from "@fortawesome/free-solid-svg-icons";
 import Alert from "components/commonUI/Alert";
 
 const defaultPaginationData: PaginationData = {
@@ -48,7 +51,16 @@ function BookingsViewV2(): JSX.Element {
   const [paginationData, setPaginationData] = useState<PaginationData>(
     defaultPaginationData,
   );
-  const { data, loading } = usePagedMinimalBookings(hotelId, paginationData);
+  const [appliedPaginationData, setAppliedPaginationData] =
+    useState<PaginationData>(defaultPaginationData);
+  const { data, loading } = usePagedMinimalBookings(
+    hotelId,
+    appliedPaginationData,
+  );
+
+  const handleSearch = () => {
+    setAppliedPaginationData(paginationData);
+  };
   const { rooms, loadingRooms } = useHotelRooms(hotelId);
 
   const { t } = useLanguage();
@@ -213,30 +225,49 @@ function BookingsViewV2(): JSX.Element {
       isArrivalDate: !prev.isArrivalDate,
     }));
 
-  const toggleSortDirection = () =>
+  const toggleSortDirection = () => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
       sortDirection: prev.sortDirection === "ASC" ? "DESC" : "ASC",
     }));
+    setAppliedPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      sortDirection: prev.sortDirection === "ASC" ? "DESC" : "ASC",
+    }));
+  };
 
-  const onSortColumnChange = (column: PaginationData["sortColumn"]) =>
+  const onSortColumnChange = (column: PaginationData["sortColumn"]) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
       sortColumn: column,
     }));
+    setAppliedPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      sortColumn: column,
+    }));
+  };
 
-  const onPageSizeChange = (page: number) =>
+  const onPageSizeChange = (page: number) => {
     setPaginationData((prev) => ({
       ...prev,
       pageSize: page,
       pageIndex: 0,
     }));
+    setAppliedPaginationData((prev) => ({
+      ...prev,
+      pageSize: page,
+      pageIndex: 0,
+    }));
+  };
 
   const gotoPage = (pageIndex: number) => {
     if (pageIndex < 0 || pageIndex >= data.totalPages) return;
     setPaginationData((prev) => ({ ...prev, pageIndex }));
+    setAppliedPaginationData((prev) => ({ ...prev, pageIndex }));
   };
 
   return (
@@ -266,7 +297,11 @@ function BookingsViewV2(): JSX.Element {
           onSortColumnChange={onSortColumnChange}
           handleFilterByRoomIds={handleFilterByRoomIds}
         />
-        <div className="w-100 mb-3 d-flex justify-content-end">
+        <div className="w-100 mb-3 d-flex justify-content-between">
+          <Button color="dark" onClick={handleSearch} disabled={loading}>
+            <FontAwesomeIcon icon={faMagnifyingGlass} className="me-2" />
+            {t("booking.filters.filter")}
+          </Button>
           <Button
             color="success"
             onClick={() => exportExcel()}

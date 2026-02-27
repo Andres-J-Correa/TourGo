@@ -3,11 +3,18 @@ import type { JSX } from "react";
 import type { BookingFiltersProps } from "./BookingFiltersV2.types";
 
 //libs
-import { useState, useMemo } from "react";
-import { Row, Col, Label, Input, InputGroup, Button, Form } from "reactstrap";
+import { useMemo } from "react";
+import {
+  Row,
+  Col,
+  Label,
+  Input,
+  InputGroup,
+  Button,
+  ButtonGroup,
+} from "reactstrap";
 import {
   faBroom,
-  faMagnifyingGlass,
   faPlaneArrival,
   faPlaneDeparture,
   faArrowUpShortWide,
@@ -44,18 +51,6 @@ function BookingFiltersV2({
   loadingRooms = false,
   handleFilterByRoomIds,
 }: BookingFiltersProps): JSX.Element {
-  const [customerNameInputs, setCustomerNameInputs] = useState<{
-    firstName: string;
-    lastName: string;
-  }>({
-    firstName: "",
-    lastName: "",
-  });
-  const [externalBookingIdInput, setExternalBookingIdInput] =
-    useState<string>("");
-
-  const [bookingIdInput, setBookingIdInput] = useState<string>("");
-
   const { t } = useLanguage();
 
   const pageSizeOptions: number[] = [5, 10, 20, 50, 100, 200, 500];
@@ -120,36 +115,24 @@ function BookingFiltersV2({
     e: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const { value }: { value: string } = e.target;
-    setBookingIdInput(value.trim());
+    handleFilterByBookingId(value);
   };
 
   const onClearBookingIdFilter = (): void => {
-    setBookingIdInput("");
-    if (!paginationData.bookingId) return;
     handleClearBookingIdFilter();
-  };
-
-  const handleBookingIdFilterSubmit = (
-    e: React.FormEvent<HTMLFormElement>,
-  ): void => {
-    e.preventDefault();
-    if (!bookingIdInput) return;
-    handleFilterByBookingId(bookingIdInput);
   };
 
   const handleCustomerNameChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const { name, value }: { name: string; value: string } = e.target;
-    setCustomerNameInputs((prev) => ({
-      ...prev,
-      [name]: value.trim(),
-    }));
+    handleFilterByCustomerName({
+      firstName: name === "firstName" ? value : paginationData.firstName!,
+      lastName: name === "lastName" ? value : paginationData.lastName!,
+    });
   };
 
   const onClearCustomerNameFilter = (): void => {
-    setCustomerNameInputs({ firstName: "", lastName: "" });
-    if (!paginationData.firstName && !paginationData.lastName) return;
     handleClearCustomerNameFilter();
   };
 
@@ -157,30 +140,11 @@ function BookingFiltersV2({
     e: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const { value }: { value: string } = e.target;
-    setExternalBookingIdInput(value.trim());
+    handleFilterByExternalBookingId(value);
   };
 
   const onClearExternalBookingIdFilter = (): void => {
-    setExternalBookingIdInput("");
-    if (!paginationData.externalBookingId) return;
     handleClearExternalBookingIdFilter();
-  };
-
-  const handleCustomerNameFilterSubmit = (
-    e: React.FormEvent<HTMLFormElement>,
-  ): void => {
-    e.preventDefault();
-    const { firstName, lastName } = customerNameInputs;
-    if (!firstName && !lastName) return;
-    handleFilterByCustomerName(customerNameInputs);
-  };
-
-  const handleExternalBookingIdFilterSubmit = (
-    e: React.FormEvent<HTMLFormElement>,
-  ): void => {
-    e.preventDefault();
-    if (!externalBookingIdInput) return;
-    handleFilterByExternalBookingId(externalBookingIdInput);
   };
 
   const handlePageSizeChange = (
@@ -282,7 +246,7 @@ function BookingFiltersV2({
           )}
         </Col>
         <Col md={6} xl={4} className="mb-3">
-          <Form onSubmit={handleCustomerNameFilterSubmit}>
+          <div>
             <Label for="firstName" className="text-dark">
               {t("booking.filters.filterByCustomerName")}
             </Label>
@@ -294,7 +258,7 @@ function BookingFiltersV2({
                 placeholder={t("booking.filters.firstName")}
                 name="firstName"
                 onChange={handleCustomerNameChange}
-                value={customerNameInputs?.firstName}
+                value={paginationData.firstName}
               />
               <Input
                 type="text"
@@ -302,15 +266,8 @@ function BookingFiltersV2({
                 placeholder={t("booking.filters.lastName")}
                 name="lastName"
                 onChange={handleCustomerNameChange}
-                value={customerNameInputs?.lastName}
+                value={paginationData.lastName}
               />
-              <Button
-                title={t("booking.filters.filter")}
-                color="dark"
-                type="submit"
-                disabled={loading}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </Button>
               <Button
                 color="outline-secondary"
                 type="button"
@@ -318,16 +275,15 @@ function BookingFiltersV2({
                 onClick={onClearCustomerNameFilter}
                 disabled={
                   loading ||
-                  (!customerNameInputs.firstName &&
-                    !customerNameInputs.lastName)
+                  (!paginationData.firstName && !paginationData.lastName)
                 }>
                 <FontAwesomeIcon icon={faBroom} />
               </Button>
             </InputGroup>
-          </Form>
+          </div>
         </Col>
         <Col md={6} xl="auto" className="mb-3">
-          <Form onSubmit={handleBookingIdFilterSubmit}>
+          <div>
             <Label for="bookingId" className="text-dark">
               {t("booking.filters.filterByBookingId")}
             </Label>
@@ -337,29 +293,22 @@ function BookingFiltersV2({
                 type="text"
                 maxLength={12}
                 placeholder={t("booking.filters.bookingIdPlaceholder")}
-                value={bookingIdInput}
+                value={paginationData.bookingId}
                 onChange={handleBookingIdChange}
               />
-              <Button
-                title={t("booking.filters.filter")}
-                color="dark"
-                type="submit"
-                disabled={loading}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </Button>
               <Button
                 color="outline-secondary"
                 type="button"
                 title={t("booking.filters.clear")}
                 onClick={onClearBookingIdFilter}
-                disabled={loading || !bookingIdInput}>
+                disabled={loading || !paginationData.bookingId}>
                 <FontAwesomeIcon icon={faBroom} />
               </Button>
             </InputGroup>
-          </Form>
+          </div>
         </Col>
         <Col md={6} xl="auto" className="mb-3">
-          <Form onSubmit={handleExternalBookingIdFilterSubmit}>
+          <div>
             <Label for="externalBookingId" className="text-dark">
               {t("booking.filters.filterByExternalId")}
             </Label>
@@ -368,26 +317,19 @@ function BookingFiltersV2({
                 id="externalBookingId"
                 type="text"
                 placeholder={t("booking.filters.externalIdPlaceholder")}
-                value={externalBookingIdInput}
+                value={paginationData.externalBookingId}
                 onChange={handleExternalBookingIdChange}
               />
-              <Button
-                title={t("booking.filters.filter")}
-                color="dark"
-                type="submit"
-                disabled={loading}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </Button>
               <Button
                 color="outline-secondary"
                 type="button"
                 title={t("booking.filters.clear")}
                 onClick={onClearExternalBookingIdFilter}
-                disabled={loading || !externalBookingIdInput}>
+                disabled={loading || !paginationData.externalBookingId}>
                 <FontAwesomeIcon icon={faBroom} />
               </Button>
             </InputGroup>
-          </Form>
+          </div>
         </Col>
         <Col lg="auto" xl="auto" className="mb-3">
           <Label for="statusId" className="text-dark">
@@ -404,7 +346,7 @@ function BookingFiltersV2({
               placeholder={t("booking.filters.select")}
               isClearable
               styles={{
-                menu: (provided) => ({ ...provided, zIndex: 3 }),
+                menu: (provided) => ({ ...provided, zIndex: 4 }),
               }}
             />
           </div>
@@ -428,7 +370,7 @@ function BookingFiltersV2({
               }
               isClearable
               styles={{
-                menu: (provided) => ({ ...provided, zIndex: 3 }),
+                menu: (provided) => ({ ...provided, zIndex: 4 }),
               }}
             />
           </div>

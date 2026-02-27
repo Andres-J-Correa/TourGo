@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { getByHotelId as getRoomsByHotelId } from "services/roomService";
+import { getByHotelId as getRoomsByHotelId } from "services/roomServiceV2";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
+import type { Room } from "types/entities/room.types";
 
 export function useHotelRooms(hotelId: string | undefined) {
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
   const { t } = useLanguage();
 
@@ -13,14 +14,13 @@ export function useHotelRooms(hotelId: string | undefined) {
 
     setLoadingRooms(true);
     getRoomsByHotelId(hotelId)
-      .then((res: any) => {
+      .then((res) => {
         if (res.isSuccessful) {
           setRooms(res.items);
-        }
-      })
-      .catch((error: any) => {
-        if (error?.response?.status !== 404) {
-          toast.error(t("financialReports.roomOccupancyReport.loadRoomsError"));
+        } else {
+          if (res.error.status !== 404) {
+            toast.error(res.error.message);
+          }
         }
       })
       .finally(() => {
