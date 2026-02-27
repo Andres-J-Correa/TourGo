@@ -3,6 +3,8 @@ import type { PaginationData } from "components/bookings/bookings-view/BookingsV
 export interface BookingFiltersProps {
   paginationData: PaginationData;
   loading: boolean;
+  rooms?: any[];
+  loadingRooms?: boolean;
   handleDateChange: (
     field: "startDate" | "endDate",
   ) => (date: Date | null) => void;
@@ -20,4 +22,5 @@ export interface BookingFiltersProps {
   handleClearBookingIdFilter: () => void;
   toggleSortDirection: () => void;
   onSortColumnChange: (column: PaginationData["sortColumn"]) => void;
+  handleFilterByRoomIds: (roomIds: number[]) => void;
 }

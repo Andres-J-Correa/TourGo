@@ -58,6 +58,7 @@ export const getPagedMinimalBookingsByDateRange = async (
     externalBookingId,
     statusIds,
     bookingId,
+    roomIds,
   } = params;
   const queryParams = new URLSearchParams({
     pageIndex: pageIndex.toString(),
@@ -90,7 +91,11 @@ export const getPagedMinimalBookingsByDateRange = async (
     url: url,
     data: {
       statusIds:
-        statusIds !== undefined && statusIds.length > 0 ? statusIds : undefined,
+        Array.isArray(statusIds) && statusIds.length > 0
+          ? statusIds
+          : undefined,
+      roomIds:
+        Array.isArray(roomIds) && roomIds.length > 0 ? roomIds : undefined,
     },
   };
   try {

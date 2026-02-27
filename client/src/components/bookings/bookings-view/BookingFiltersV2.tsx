@@ -3,7 +3,7 @@ import type { JSX } from "react";
 import type { BookingFiltersProps } from "./BookingFiltersV2.types";
 
 //libs
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Row, Col, Label, Input, InputGroup, Button, Form } from "reactstrap";
 import {
   faBroom,
@@ -40,6 +40,9 @@ function BookingFiltersV2({
   handleClearBookingIdFilter,
   toggleSortDirection,
   onSortColumnChange,
+  rooms = [],
+  loadingRooms = false,
+  handleFilterByRoomIds,
 }: BookingFiltersProps): JSX.Element {
   const [customerNameInputs, setCustomerNameInputs] = useState<{
     firstName: string;
@@ -56,6 +59,62 @@ function BookingFiltersV2({
   const { t } = useLanguage();
 
   const pageSizeOptions: number[] = [5, 10, 20, 50, 100, 200, 500];
+
+  const roomSelectOptions = useMemo(() => {
+    const activeRooms: any[] = [];
+    const inactiveRooms: any[] = [];
+
+    rooms.forEach((room) => {
+      const option = {
+        value: room.id,
+        label: room.name,
+      };
+
+      if (room.isActive) {
+        activeRooms.push(option);
+      } else {
+        inactiveRooms.push(option);
+      }
+    });
+
+    const options = [];
+
+    if (activeRooms.length > 0) {
+      options.push({
+        label: t("financialReports.roomOccupancyReport.activeRooms"),
+        options: activeRooms,
+      });
+    }
+
+    if (inactiveRooms.length > 0) {
+      options.push({
+        label: t("financialReports.roomOccupancyReport.inactiveRooms"),
+        options: inactiveRooms,
+      });
+    }
+
+    return options;
+  }, [rooms, t]);
+
+  const handleRoomChange = (
+    selectedOptions: readonly { value: number; label: string }[] | null,
+  ) => {
+    if (selectedOptions) {
+      handleFilterByRoomIds(selectedOptions.map((opt) => opt.value));
+    } else {
+      handleFilterByRoomIds([]);
+    }
+  };
+
+  const selectedRoomOptions = useMemo(() => {
+    if (!paginationData.roomIds || paginationData.roomIds.length === 0)
+      return null;
+
+    const allRoomOptions = roomSelectOptions.flatMap((group) => group.options);
+    return allRoomOptions.filter((opt) =>
+      paginationData.roomIds?.includes(opt.value),
+    );
+  }, [paginationData.roomIds, roomSelectOptions]);
 
   const handleBookingIdChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -343,6 +402,30 @@ function BookingFiltersV2({
               onChange={handleStatusChange}
               isDisabled={loading}
               placeholder={t("booking.filters.select")}
+              isClearable
+              styles={{
+                menu: (provided) => ({ ...provided, zIndex: 3 }),
+              }}
+            />
+          </div>
+        </Col>
+        <Col lg="auto" xl="auto" className="mb-3">
+          <Label for="roomId" className="text-dark">
+            {t("financialReports.roomOccupancyReport.roomLabel")}
+          </Label>
+          <div style={{ minWidth: "180px" }}>
+            <Select
+              id="roomId"
+              isMulti
+              options={roomSelectOptions}
+              value={selectedRoomOptions}
+              onChange={handleRoomChange}
+              isDisabled={loading || loadingRooms}
+              placeholder={
+                loadingRooms
+                  ? t("common.loading")
+                  : t("financialReports.roomOccupancyReport.selectRoom")
+              }
               isClearable
               styles={{
                 menu: (provided) => ({ ...provided, zIndex: 3 }),

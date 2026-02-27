@@ -132,7 +132,7 @@ namespace TourGo.Services.Hotels
 
                 param.AddWithValue("p_status_ids_json", statusIds != null ? JsonConvert.SerializeObject(statusIds) : DBNull.Value);
                 param.AddWithNullableString("p_bookingId", bookingId);
-                param.AddWithValue("p_room_ids_json", statusIds != null ? JsonConvert.SerializeObject(statusIds) : DBNull.Value);
+                param.AddWithValue("p_room_ids_json", roomIds != null ? JsonConvert.SerializeObject(roomIds) : DBNull.Value);
             }, (reader, set) =>
             {
                 int index = 0;
