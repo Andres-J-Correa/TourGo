@@ -376,7 +376,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 Paged<BookingMinimal>? bookings = _bookingService.GetPaginatedByDateRange(
                     hotelId, pageIndex, pageSize, isArrivalDate, sortColumn, sortDirection, startDate, endDate,
-                    firstName, lastName, externalBookingId, bookingId, request.StatusIds);
+                    firstName, lastName, externalBookingId, bookingId, request.StatusIds, request.RoomIds);
 
 
                 if (bookings == null)

@@ -9,5 +9,6 @@ namespace TourGo.Models.Requests.Bookings
     public class GetBookingsPaginatedRequest
     {
         public List<int>? StatusIds { get; set; }
+        public List<int>? RoomIds { get; set; }
     }
 }
