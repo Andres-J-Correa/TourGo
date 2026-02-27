@@ -15,7 +15,7 @@ export interface BookingFiltersProps {
   handleFilterByExternalBookingId: (value: string) => void;
   handleClearCustomerNameFilter: () => void;
   handleClearExternalBookingIdFilter: () => void;
-  toggleDateType: () => void;
+  toggleDateType: (isArrivalDate: boolean) => void;
   handleFilterByStatusIds: (statusIds: number[]) => void;
   onPageSizeChange: (pageSize: number) => void;
   handleFilterByBookingId: (value: string) => void;

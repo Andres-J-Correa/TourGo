@@ -218,11 +218,11 @@ function BookingsViewV2(): JSX.Element {
     }));
   };
 
-  const toggleDateType = () =>
+  const toggleDateType = (isArrivalDate: boolean) =>
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      isArrivalDate: !prev.isArrivalDate,
+      isArrivalDate,
     }));
 
   const toggleSortDirection = () => {

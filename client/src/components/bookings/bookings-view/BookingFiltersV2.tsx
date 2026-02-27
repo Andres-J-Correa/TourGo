@@ -220,29 +220,22 @@ function BookingFiltersV2({
         </Col>
         <Col className="align-content-end mb-3" xs="auto">
           {(paginationData.startDate || paginationData.endDate) && (
-            <div>
-              <button
-                className={classNames("btn", {
-                  "btn-dark": paginationData.isArrivalDate,
-                  "btn-info": !paginationData.isArrivalDate,
-                })}
-                type="button"
-                onClick={toggleDateType}
+            <ButtonGroup>
+              <Button
+                color={paginationData.isArrivalDate ? "dark" : "outline-dark"}
+                onClick={() => toggleDateType(true)}
                 disabled={loading}
-                title={`${t("booking.filters.filteringBy")} ${
-                  paginationData.isArrivalDate
-                    ? t("booking.filters.arrival")
-                    : t("booking.filters.departure")
-                }`}>
-                <FontAwesomeIcon
-                  icon={
-                    paginationData.isArrivalDate
-                      ? faPlaneArrival
-                      : faPlaneDeparture
-                  }
-                />
-              </button>
-            </div>
+                title={`${t("booking.filters.filteringBy")} ${t("booking.filters.arrival")}`}>
+                <FontAwesomeIcon icon={faPlaneArrival} />
+              </Button>
+              <Button
+                color={!paginationData.isArrivalDate ? "dark" : "outline-dark"}
+                onClick={() => toggleDateType(false)}
+                disabled={loading}
+                title={`${t("booking.filters.filteringBy")} ${t("booking.filters.departure")}`}>
+                <FontAwesomeIcon icon={faPlaneDeparture} />
+              </Button>
+            </ButtonGroup>
           )}
         </Col>
         <Col md={6} xl={4} className="mb-3">
