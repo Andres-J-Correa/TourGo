@@ -332,6 +332,7 @@ function BookingFiltersV2({
             <Select
               id="statusId"
               isMulti
+              closeMenuOnSelect={false}
               options={statusOptions}
               value={selectedStatusOptions}
               onChange={handleStatusChange}
@@ -352,6 +353,7 @@ function BookingFiltersV2({
             <Select
               id="roomId"
               isMulti
+              closeMenuOnSelect={false}
               options={roomSelectOptions}
               value={selectedRoomOptions}
               onChange={handleRoomChange}
@@ -392,7 +394,7 @@ function BookingFiltersV2({
                     borderTopRightRadius: 0,
                     borderBottomRightRadius: 0,
                   }),
-                  menu: (provided) => ({ ...provided, zIndex: 3 }),
+                  menu: (provided) => ({ ...provided, zIndex: 4 }),
                 }}
                 components={{
                   DropdownIndicator: () => null,

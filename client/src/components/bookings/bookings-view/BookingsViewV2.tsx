@@ -4,10 +4,11 @@ import type { BookingMinimal } from "types/entities/booking.types";
 import type { BookingData, PaginationData } from "./BookingsViewV2.types";
 
 //libs
-import { useState, useMemo } from "react";
+import { useState, useMemo, use } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import classNames from "classnames";
+import isEqual from "lodash.isequal";
 
 //components
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
@@ -56,6 +57,11 @@ function BookingsViewV2(): JSX.Element {
   const { data, loading } = usePagedMinimalBookings(
     hotelId,
     appliedPaginationData,
+  );
+
+  const hasPaginationDataChanged = useMemo(
+    () => !isEqual(paginationData, appliedPaginationData),
+    [paginationData, appliedPaginationData],
   );
 
   const handleSearch = () => {
@@ -298,7 +304,10 @@ function BookingsViewV2(): JSX.Element {
           handleFilterByRoomIds={handleFilterByRoomIds}
         />
         <div className="w-100 mb-3 d-flex justify-content-between">
-          <Button color="dark" onClick={handleSearch} disabled={loading}>
+          <Button
+            color="dark"
+            onClick={handleSearch}
+            disabled={loading || !hasPaginationDataChanged}>
             <FontAwesomeIcon icon={faMagnifyingGlass} className="me-2" />
             {t("booking.filters.filter")}
           </Button>

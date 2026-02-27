@@ -18,7 +18,7 @@ export function useHotelRooms(hotelId: string | undefined) {
         if (res.isSuccessful) {
           setRooms(res.items);
         } else {
-          if (res.error.status !== 404) {
+          if (res.error.status !== 404 && res.error.status !== 401) {
             toast.error(res.error.message);
           }
         }

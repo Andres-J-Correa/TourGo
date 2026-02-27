@@ -51,7 +51,9 @@ export function usePagedMinimalBookings(
         });
       } else {
         setData({ ...defaultData });
-        toast.error(res.error.message);
+        if (res.error.status !== 404 && res.error.status !== 401) {
+          toast.error(res.error.message);
+        }
       }
       setLoading(false);
     };
