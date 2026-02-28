@@ -104,7 +104,8 @@ namespace TourGo.Services.Hotels
         public Paged<BookingMinimal>? GetPaginatedByDateRange(string hotelId, int pageIndex, int pageSize, bool? isArrivalDate,
                                                             string? sortColumn, string? sortDirection, DateOnly? startDate, DateOnly? endDate,
                                                             string? firstName, string? lastName, string? bookingExternalId,
-                                                            string? bookingId, List<int>? statusIds, List<int>? roomIds)
+                                                            string? bookingId, List<int>? statusIds, List<int>? roomIds, string? phone,
+                                                            string? documentNumber)
         {
             string proc = "bookings_select_minimal_by_date_range_paginated_v7";
             Paged<BookingMinimal>? paged = null;
@@ -119,20 +120,22 @@ namespace TourGo.Services.Hotels
                 param.AddWithValue("p_pageIndex", pageIndex);
                 param.AddWithValue("p_pageSize", pageSize);
 
-                param.AddWithNullableString("p_sortColumn", mappedColumn);
-                param.AddWithNullableString("p_sortDirection", sortDirection);
+                param.AddWithNullableValue("p_sortColumn", mappedColumn);
+                param.AddWithNullableValue("p_sortDirection", sortDirection);
                 param.AddWithNullableDateOnly("p_startDate", startDate);
                 param.AddWithNullableDateOnly("p_endDate", endDate);
 
                 param.AddWithNullableObject("p_isArrivalDate", isArrivalDate);
 
-                param.AddWithNullableString("p_firstName", firstName);
-                param.AddWithNullableString("p_lastName", lastName);
-                param.AddWithNullableString("p_externalBookingId", bookingExternalId);
+                param.AddWithNullableValue("p_firstName", firstName);
+                param.AddWithNullableValue("p_lastName", lastName);
+                param.AddWithNullableValue("p_externalBookingId", bookingExternalId);
 
                 param.AddWithValue("p_status_ids_json", statusIds != null ? JsonConvert.SerializeObject(statusIds) : DBNull.Value);
-                param.AddWithNullableString("p_bookingId", bookingId);
+                param.AddWithNullableValue("p_bookingId", bookingId);
                 param.AddWithValue("p_room_ids_json", roomIds != null ? JsonConvert.SerializeObject(roomIds) : DBNull.Value);
+                param.AddWithNullableValue("p_phone", phone);
+                param.AddWithNullableValue("p_document_number", documentNumber);
             }, (reader, set) =>
             {
                 int index = 0;

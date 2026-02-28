@@ -59,6 +59,8 @@ export const getPagedMinimalBookingsByDateRange = async (
     statusIds,
     bookingId,
     roomIds,
+    phone,
+    documentNumber,
   } = params;
   const queryParams = new URLSearchParams({
     pageIndex: pageIndex.toString(),
@@ -72,8 +74,6 @@ export const getPagedMinimalBookingsByDateRange = async (
   if (endDate) queryParams.append("endDate", endDate);
   if (isArrivalDate)
     queryParams.append("isArrivalDate", isArrivalDate.toString());
-  if (firstName) queryParams.append("firstName", firstName);
-  if (lastName) queryParams.append("lastName", lastName);
   if (externalBookingId)
     queryParams.append("externalBookingId", externalBookingId);
   if (bookingId) queryParams.append("bookingId", bookingId);
@@ -96,6 +96,10 @@ export const getPagedMinimalBookingsByDateRange = async (
           : undefined,
       roomIds:
         Array.isArray(roomIds) && roomIds.length > 0 ? roomIds : undefined,
+      firstName,
+      lastName,
+      phone,
+      documentNumber,
     },
   };
   try {

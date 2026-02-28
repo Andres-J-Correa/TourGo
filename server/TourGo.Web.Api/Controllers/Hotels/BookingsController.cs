@@ -355,9 +355,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
         public ActionResult<ItemResponse<Paged<BookingMinimal>>> GetPaginatedByDateRange(string hotelId, [FromQuery] int pageIndex, [FromQuery] int pageSize, [FromQuery] bool isArrivalDate,
                                                                                         [FromQuery] string? sortColumn, [FromQuery] string? sortDirection,
                                                                                         [FromQuery] DateOnly? startDate, [FromQuery] DateOnly? endDate,
-                                                                                        [FromQuery] string? firstName, [FromQuery] string? lastName,
-                                                                                        [FromQuery] string? externalBookingId,
-                                                                                        [FromQuery] string? bookingId,
+                                                                                        [FromQuery] string? externalBookingId, [FromQuery] string? bookingId,
                                                                                         GetBookingsPaginatedRequest request)
         {
             ObjectResult result = null;
@@ -376,7 +374,8 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 Paged<BookingMinimal>? bookings = _bookingService.GetPaginatedByDateRange(
                     hotelId, pageIndex, pageSize, isArrivalDate, sortColumn, sortDirection, startDate, endDate,
-                    firstName, lastName, externalBookingId, bookingId, request.StatusIds, request.RoomIds);
+                    request.FirstName, request.LastName, externalBookingId, bookingId, request.StatusIds, request.RoomIds,
+                    request.Phone, request.DocumentNumber);
 
 
                 if (bookings == null)

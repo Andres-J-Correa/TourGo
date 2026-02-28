@@ -13,14 +13,15 @@ export interface BookingFiltersProps {
     lastName: string;
   }) => void;
   handleFilterByExternalBookingId: (value: string) => void;
-  handleClearCustomerNameFilter: () => void;
-  handleClearExternalBookingIdFilter: () => void;
   toggleDateType: (isArrivalDate: boolean) => void;
   handleFilterByStatusIds: (statusIds: number[]) => void;
   onPageSizeChange: (pageSize: number) => void;
   handleFilterByBookingId: (value: string) => void;
-  handleClearBookingIdFilter: () => void;
   toggleSortDirection: () => void;
   onSortColumnChange: (column: PaginationData["sortColumn"]) => void;
   handleFilterByRoomIds: (roomIds: number[]) => void;
+  handleFilterByPhone: (value: string) => void;
+  handleFilterByDocumentNumber: (value: string) => void;
+  handleSearch: () => void;
+  hasPaginationDataChanged: boolean;
 }

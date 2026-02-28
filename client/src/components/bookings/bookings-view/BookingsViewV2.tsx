@@ -47,6 +47,8 @@ const defaultPaginationData: PaginationData = {
   externalBookingId: "",
   statusIds: [],
   bookingId: "",
+  phone: "",
+  documentNumber: "",
 };
 
 function BookingsViewV2(): JSX.Element {
@@ -155,11 +157,19 @@ function BookingsViewV2(): JSX.Element {
     }));
   };
 
-  const handleClearBookingIdFilter = (): void => {
+  const handleFilterByPhone = (value: string): void => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      bookingId: "",
+      phone: value,
+    }));
+  };
+
+  const handleFilterByDocumentNumber = (value: string): void => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      documentNumber: value,
     }));
   };
 
@@ -172,15 +182,6 @@ function BookingsViewV2(): JSX.Element {
       pageIndex: 0,
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
-    }));
-  };
-
-  const handleClearCustomerNameFilter = (): void => {
-    setPaginationData((prev) => ({
-      ...prev,
-      pageIndex: 0,
-      firstName: "",
-      lastName: "",
     }));
   };
 
@@ -199,14 +200,6 @@ function BookingsViewV2(): JSX.Element {
       ...prev,
       pageIndex: 0,
       externalBookingId: value,
-    }));
-  };
-
-  const handleClearExternalBookingIdFilter = (): void => {
-    setPaginationData((prev) => ({
-      ...prev,
-      pageIndex: 0,
-      externalBookingId: "",
     }));
   };
 
@@ -291,38 +284,23 @@ function BookingsViewV2(): JSX.Element {
           loadingRooms={loadingRooms}
           handleDateChange={handleDateChange}
           handleFilterByCustomerName={handleFilterByCustomerName}
-          handleClearCustomerNameFilter={handleClearCustomerNameFilter}
           handleFilterByExternalBookingId={handleFilterByExternalBookingId}
-          handleClearExternalBookingIdFilter={
-            handleClearExternalBookingIdFilter
-          }
           handleFilterByStatusIds={handleFilterByStatusIds}
           toggleDateType={toggleDateType}
           onPageSizeChange={onPageSizeChange}
           handleFilterByBookingId={handleFilterByBookingId}
-          handleClearBookingIdFilter={handleClearBookingIdFilter}
           toggleSortDirection={toggleSortDirection}
           onSortColumnChange={onSortColumnChange}
           handleFilterByRoomIds={handleFilterByRoomIds}
+          handleFilterByPhone={handleFilterByPhone}
+          handleFilterByDocumentNumber={handleFilterByDocumentNumber}
+          handleSearch={handleSearch}
+          hasPaginationDataChanged={hasPaginationDataChanged}
         />
-        <div className="w-100 mb-3 d-flex justify-content-between">
-          <Button
-            color="dark"
-            onClick={handleSearch}
-            disabled={loading || !hasPaginationDataChanged}
-            className={classNames({
-              "filter-btn-glow": hasPaginationDataChanged,
-            })}>
-            <FontAwesomeIcon
-              icon={faMagnifyingGlass}
-              className={classNames("me-2", {
-                "fa-bounce": hasPaginationDataChanged,
-              })}
-            />
-            {t("booking.filters.filter")}
-          </Button>
+        <div className="w-100 d-flex justify-content-end mb-2">
           <Button
             color="success"
+            className="text-end"
             onClick={() => exportExcel()}
             disabled={loading || data.items.length === 0}>
             <FontAwesomeIcon icon={faFileExcel} className="me-2" />
