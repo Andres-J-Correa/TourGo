@@ -58,6 +58,7 @@ function BookingsViewV2(): JSX.Element {
   );
   const [appliedPaginationData, setAppliedPaginationData] =
     useState<PaginationData>(defaultPaginationData);
+
   const { data, loading } = usePagedMinimalBookings(
     hotelId,
     appliedPaginationData,
@@ -71,6 +72,7 @@ function BookingsViewV2(): JSX.Element {
   const handleSearch = () => {
     setAppliedPaginationData(paginationData);
   };
+
   const { rooms, loadingRooms } = useHotelRooms(hotelId);
 
   const { t } = useLanguage();

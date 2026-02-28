@@ -25,7 +25,8 @@
     },
     "downloading": "Downloading",
     "recaptchaError": "reCAPTCHA error, please notify the site administrator",
-    "noOptions": "No options available"
+    "noOptions": "No options available",
+    "search": "Search"
   },
   "yup": {
     "required": "{{label}} is required",
