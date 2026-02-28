@@ -4,7 +4,7 @@ import type { BookingMinimal } from "types/entities/booking.types";
 import type { BookingData, PaginationData } from "./BookingsViewV2.types";
 
 //libs
-import { useState, useMemo, use } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import classNames from "classnames";
@@ -31,6 +31,8 @@ import {
   faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import Alert from "components/commonUI/Alert";
+
+import "./BookingsViewV2.css";
 
 const defaultPaginationData: PaginationData = {
   pageIndex: 0,
@@ -307,8 +309,16 @@ function BookingsViewV2(): JSX.Element {
           <Button
             color="dark"
             onClick={handleSearch}
-            disabled={loading || !hasPaginationDataChanged}>
-            <FontAwesomeIcon icon={faMagnifyingGlass} className="me-2" />
+            disabled={loading || !hasPaginationDataChanged}
+            className={classNames({
+              "filter-btn-glow": hasPaginationDataChanged,
+            })}>
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className={classNames("me-2", {
+                "fa-bounce": hasPaginationDataChanged,
+              })}
+            />
             {t("booking.filters.filter")}
           </Button>
           <Button
