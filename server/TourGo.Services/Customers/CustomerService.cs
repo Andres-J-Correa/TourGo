@@ -26,7 +26,7 @@ namespace TourGo.Services.Customers
 
         public int Add(CustomerAddRequest model, string userId, string hotelId)
         {
-            string proc = "customers_insert_v3";
+            string proc = "customers_insert_v4";
             int newId = 0;
 
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
@@ -73,7 +73,7 @@ namespace TourGo.Services.Customers
 
         public void Update(CustomerUpdateRequest model, string userId, string hotelId)
         {
-            string proc = "customers_update";
+            string proc = "customers_update_v2";
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_id", model.Id);

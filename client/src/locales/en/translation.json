@@ -431,7 +431,11 @@
       "ascending": "Ascending",
       "descending": "Descending",
       "selectSortOption": "No Sort Option",
-      "selectSortDirection": "No Sort Direction"
+      "selectSortDirection": "No Sort Direction",
+      "phone": "Phone Last 4 Digits",
+      "phonePlaceholder": "eg. 1234",
+      "documentNumber": "Filter by Document Number",
+      "documentNumberPlaceholder": "Identity Document"
     },
     "bookingsTable": {
       "loading": "Loading...",

@@ -23,7 +23,7 @@ const apiV2: string = `/hotel/{hotelId}/bookings`;
 
 export const getBookingById = async (
   bookingId: string,
-  hotelId: string
+  hotelId: string,
 ): Promise<ApiResponse<ItemResponse<Booking>>> => {
   const config: AxiosRequestConfig = {
     headers: {
@@ -42,7 +42,7 @@ export const getBookingById = async (
 
 // Update the function to use the new type
 export const getPagedMinimalBookingsByDateRange = async (
-  params: GetPagedMinimalBookingsByDateRangeParams
+  params: GetPagedMinimalBookingsByDateRangeParams,
 ): Promise<ApiResponse<PagedResponse<BookingMinimal>>> => {
   const {
     hotelId,
@@ -56,8 +56,11 @@ export const getPagedMinimalBookingsByDateRange = async (
     firstName,
     lastName,
     externalBookingId,
-    statusId,
+    statusIds,
     bookingId,
+    roomIds,
+    phone,
+    documentNumber,
   } = params;
   const queryParams = new URLSearchParams({
     pageIndex: pageIndex.toString(),
@@ -71,24 +74,33 @@ export const getPagedMinimalBookingsByDateRange = async (
   if (endDate) queryParams.append("endDate", endDate);
   if (isArrivalDate)
     queryParams.append("isArrivalDate", isArrivalDate.toString());
-  if (firstName) queryParams.append("firstName", firstName);
-  if (lastName) queryParams.append("lastName", lastName);
   if (externalBookingId)
     queryParams.append("externalBookingId", externalBookingId);
-  if (statusId) queryParams.append("statusId", statusId);
   if (bookingId) queryParams.append("bookingId", bookingId);
 
   const url = `${apiV2.replace(
     /{hotelId}/,
-    hotelId
+    hotelId,
   )}/date-range?${queryParams.toString()}`;
 
   const config: AxiosRequestConfig = {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "GET",
+    method: "POST",
     url: url,
+    data: {
+      statusIds:
+        Array.isArray(statusIds) && statusIds.length > 0
+          ? statusIds
+          : undefined,
+      roomIds:
+        Array.isArray(roomIds) && roomIds.length > 0 ? roomIds : undefined,
+      firstName,
+      lastName,
+      phone,
+      documentNumber,
+    },
   };
   try {
     const response = await axiosClientV2<PagedResponse<BookingMinimal>>(config);
@@ -102,7 +114,7 @@ export const getPagedMinimalBookingsByDateRange = async (
 export const getRoomBookingsByDateRange = async (
   hotelId: string,
   startDate: string,
-  endDate: string
+  endDate: string,
 ): Promise<ApiResponse<ItemsResponse<RoomBooking>>> => {
   const config: AxiosRequestConfig = {
     headers: {
@@ -111,7 +123,7 @@ export const getRoomBookingsByDateRange = async (
     method: "GET",
     url: `${apiV2.replace(
       /{hotelId}/,
-      hotelId
+      hotelId,
     )}/room-bookings?startDate=${startDate}&endDate=${endDate}`,
   };
   try {
@@ -124,7 +136,7 @@ export const getRoomBookingsByDateRange = async (
 
 export const toggleRoomBookingShouldClean = async (
   roomBooking: Pick<RoomBooking, "bookingId" | "date" | "room">,
-  hotelId: string
+  hotelId: string,
 ): Promise<ApiResponse<SuccessfulResponse>> => {
   const config: AxiosRequestConfig = {
     headers: {
@@ -133,7 +145,7 @@ export const toggleRoomBookingShouldClean = async (
     method: "PATCH",
     url: `${apiV2.replace(
       /{hotelId}/,
-      hotelId
+      hotelId,
     )}/room-booking/toggle-should-clean`,
     data: {
       ...roomBooking,

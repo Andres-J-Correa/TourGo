@@ -43,9 +43,9 @@ function BookingCard({ booking, hotelId }: BookingCardProps): JSX.Element {
         bookingId={booking.id}
         hotelId={hotelId}
       />
-      <Card className="pb-1 mb-3 text-dark">
-        <CardHeader className="pt-3 px-3 bg-dark text-white">
-          <span className="mb-2 fs-5">
+      <Card className="pb-1 mb-3 text-dark px-0">
+        <CardHeader className="pb-0 px-3 bg-dark text-white">
+          <span className="mb-2 fs-6">
             <strong>{t("booking.minimalCard.reservationNumber")}</strong>{" "}
             {booking.id}
             <BookingStatusBadge
@@ -57,6 +57,7 @@ function BookingCard({ booking, hotelId }: BookingCardProps): JSX.Element {
             <Button
               color="outline-light"
               className="me-2"
+              size="sm"
               title={t("booking.minimalCard.auditable")}
               onClick={() => setIsAuditableInfoOpen((prev) => !prev)}>
               {t("booking.minimalCard.auditButton")}
@@ -66,7 +67,7 @@ function BookingCard({ booking, hotelId }: BookingCardProps): JSX.Element {
               <Link
                 to={`/hotels/${hotelId}/bookings/${booking.id}/edit`}
                 title={t("booking.minimalCard.edit")}
-                className="btn btn-outline-light me-2">
+                className="btn btn-outline-light btn-sm me-2">
                 {t("booking.minimalCard.editButton")}
                 <FontAwesomeIcon className="ms-2" icon={faPenToSquare} />
               </Link>
@@ -74,13 +75,14 @@ function BookingCard({ booking, hotelId }: BookingCardProps): JSX.Element {
             <Button
               onClick={toggleOffCanvas}
               color="outline-light"
+              size="sm"
               title={t("booking.minimalCard.viewDetails")}>
               {t("booking.minimalCard.viewButton")}
               <FontAwesomeIcon className="ms-2" icon={faClipboardList} />
             </Button>
           </div>
         </CardHeader>
-        <CardBody className="px-3">
+        <CardBody className="px-3 py-1">
           <Row>
             <Col md={4}>
               <strong>{t("booking.minimalCard.name")}</strong>{" "}
@@ -106,7 +108,7 @@ function BookingCard({ booking, hotelId }: BookingCardProps): JSX.Element {
             </Col>
           </Row>
           {isAuditableInfoOpen && (
-            <div className="py-2 px-3 mt-3 border-top bg-light rounded">
+            <div className="py-1 px-3 mt-1 border-top bg-light rounded fs-7">
               <BookingAuditableInfo booking={booking} />
             </div>
           )}

@@ -1,14 +1,14 @@
 //types
 import type { JSX } from "react";
 import type { BookingMinimal } from "types/entities/booking.types";
-import type { ErrorResponse, PagedResponse } from "types/apiResponse.types";
 import type { BookingData, PaginationData } from "./BookingsViewV2.types";
 
 //libs
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import classNames from "classnames";
+import isEqual from "lodash.isequal";
 
 //components
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
@@ -20,21 +20,19 @@ import Pagination from "components/commonUI/Pagination";
 
 //services & utils
 import { useLanguage } from "contexts/LanguageContext";
-import { getPagedMinimalBookingsByDateRange } from "services/bookingServiceV2";
 import { getDateString } from "utils/dateHelper";
+import { usePagedMinimalBookings } from "./hooks/usePagedMinimalBookings";
+import { useHotelRooms } from "./hooks/useHotelRooms";
 import { BOOKING_STATUS_BY_ID } from "components/bookings/constants";
 import { Button, Col, Row } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFileExcel,
+  faMagnifyingGlass,
+} from "@fortawesome/free-solid-svg-icons";
 import Alert from "components/commonUI/Alert";
 
-const defaultData: BookingData = {
-  items: [],
-  totalCount: 0,
-  totalPages: 0,
-  hasPreviousPage: false,
-  hasNextPage: false,
-};
+import "./BookingsViewV2.css";
 
 const defaultPaginationData: PaginationData = {
   pageIndex: 0,
@@ -47,17 +45,33 @@ const defaultPaginationData: PaginationData = {
   firstName: "",
   lastName: "",
   externalBookingId: "",
-  statusId: "",
+  statusIds: [],
   bookingId: "",
+  phone: "",
+  documentNumber: "",
 };
 
 function BookingsViewV2(): JSX.Element {
   const { hotelId } = useParams<{ hotelId?: string }>();
-  const [data, setData] = useState<BookingData>(defaultData);
   const [paginationData, setPaginationData] = useState<PaginationData>(
     defaultPaginationData,
   );
-  const [loading, setLoading] = useState<boolean>(false);
+  const [appliedPaginationData, setAppliedPaginationData] =
+    useState<PaginationData>(defaultPaginationData);
+  const { data, loading } = usePagedMinimalBookings(
+    hotelId,
+    appliedPaginationData,
+  );
+
+  const hasPaginationDataChanged = useMemo(
+    () => !isEqual(paginationData, appliedPaginationData),
+    [paginationData, appliedPaginationData],
+  );
+
+  const handleSearch = () => {
+    setAppliedPaginationData(paginationData);
+  };
+  const { rooms, loadingRooms } = useHotelRooms(hotelId);
 
   const { t } = useLanguage();
 
@@ -143,11 +157,19 @@ function BookingsViewV2(): JSX.Element {
     }));
   };
 
-  const handleClearBookingIdFilter = (): void => {
+  const handleFilterByPhone = (value: string): void => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      bookingId: "",
+      phone: value,
+    }));
+  };
+
+  const handleFilterByDocumentNumber = (value: string): void => {
+    setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      documentNumber: value,
     }));
   };
 
@@ -160,15 +182,6 @@ function BookingsViewV2(): JSX.Element {
       pageIndex: 0,
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
-    }));
-  };
-
-  const handleClearCustomerNameFilter = (): void => {
-    setPaginationData((prev) => ({
-      ...prev,
-      pageIndex: 0,
-      firstName: "",
-      lastName: "",
     }));
   };
 
@@ -190,91 +203,73 @@ function BookingsViewV2(): JSX.Element {
     }));
   };
 
-  const handleClearExternalBookingIdFilter = (): void => {
+  const handleFilterByStatusIds = (values: number[]): void => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      externalBookingId: "",
+      statusIds: [...values],
     }));
   };
 
-  const handleFilterByStatusId = (value: string): void => {
+  const handleFilterByRoomIds = (values: number[]): void => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      statusId: value,
+      roomIds: [...values],
     }));
   };
 
-  const toggleDateType = () =>
+  const toggleDateType = (isArrivalDate: boolean) =>
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      isArrivalDate: !prev.isArrivalDate,
+      isArrivalDate,
     }));
 
-  const toggleSortDirection = () =>
+  const toggleSortDirection = () => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
       sortDirection: prev.sortDirection === "ASC" ? "DESC" : "ASC",
     }));
+    setAppliedPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      sortDirection: prev.sortDirection === "ASC" ? "DESC" : "ASC",
+    }));
+  };
 
-  const onSortColumnChange = (column: PaginationData["sortColumn"]) =>
+  const onSortColumnChange = (column: PaginationData["sortColumn"]) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
       sortColumn: column,
     }));
+    setAppliedPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+      sortColumn: column,
+    }));
+  };
 
-  const onPageSizeChange = (page: number) =>
+  const onPageSizeChange = (page: number) => {
     setPaginationData((prev) => ({
       ...prev,
       pageSize: page,
       pageIndex: 0,
     }));
+    setAppliedPaginationData((prev) => ({
+      ...prev,
+      pageSize: page,
+      pageIndex: 0,
+    }));
+  };
 
   const gotoPage = (pageIndex: number) => {
     if (pageIndex < 0 || pageIndex >= data.totalPages) return;
     setPaginationData((prev) => ({ ...prev, pageIndex }));
+    setAppliedPaginationData((prev) => ({ ...prev, pageIndex }));
   };
-
-  useEffect(() => {
-    if (!hotelId) return;
-
-    const fetchData = async () => {
-      setLoading(true);
-      const startDate = paginationData.startDate
-        ? dayjs(paginationData.startDate).format("YYYY-MM-DD")
-        : undefined;
-      const endDate = paginationData.endDate
-        ? dayjs(paginationData.endDate).format("YYYY-MM-DD")
-        : undefined;
-
-      const res: PagedResponse<BookingMinimal> | ErrorResponse =
-        await getPagedMinimalBookingsByDateRange({
-          ...paginationData,
-          hotelId,
-          startDate,
-          endDate,
-        });
-
-      if (res.isSuccessful) {
-        setData({
-          items: res.item.pagedItems,
-          totalCount: res.item.totalCount,
-          totalPages: res.item.totalPages,
-          hasPreviousPage: res.item.hasPreviousPage,
-          hasNextPage: res.item.hasNextPage,
-        });
-      } else {
-        setData({ ...defaultData });
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [hotelId, paginationData]);
 
   return (
     <>
@@ -285,24 +280,27 @@ function BookingsViewV2(): JSX.Element {
         <BookingFiltersV2
           paginationData={paginationData}
           loading={loading}
+          rooms={rooms}
+          loadingRooms={loadingRooms}
           handleDateChange={handleDateChange}
           handleFilterByCustomerName={handleFilterByCustomerName}
-          handleClearCustomerNameFilter={handleClearCustomerNameFilter}
           handleFilterByExternalBookingId={handleFilterByExternalBookingId}
-          handleClearExternalBookingIdFilter={
-            handleClearExternalBookingIdFilter
-          }
-          handleFilterByStatusId={handleFilterByStatusId}
+          handleFilterByStatusIds={handleFilterByStatusIds}
           toggleDateType={toggleDateType}
           onPageSizeChange={onPageSizeChange}
           handleFilterByBookingId={handleFilterByBookingId}
-          handleClearBookingIdFilter={handleClearBookingIdFilter}
           toggleSortDirection={toggleSortDirection}
           onSortColumnChange={onSortColumnChange}
+          handleFilterByRoomIds={handleFilterByRoomIds}
+          handleFilterByPhone={handleFilterByPhone}
+          handleFilterByDocumentNumber={handleFilterByDocumentNumber}
+          handleSearch={handleSearch}
+          hasPaginationDataChanged={hasPaginationDataChanged}
         />
-        <div className="w-100 mb-3 d-flex justify-content-end">
+        <div className="w-100 d-flex justify-content-end mb-2">
           <Button
             color="success"
+            className="text-end"
             onClick={() => exportExcel()}
             disabled={loading || data.items.length === 0}>
             <FontAwesomeIcon icon={faFileExcel} className="me-2" />

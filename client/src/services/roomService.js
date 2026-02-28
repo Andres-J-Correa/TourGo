@@ -9,7 +9,7 @@ const api = `/hotel/{hotelId}/rooms`;
 
 /**
  *
- * @param {number} hotelId
+ * @param {string} hotelId
  * @param {boolean} isActive nullable
  * @returns {Promise<{id: number, name: string, description: string, capacity: number}[]>}
  */
