@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Row, Col } from "reactstrap";
+import { Row, Col, Button } from "reactstrap";
 import { Chart } from "react-google-charts";
 import Select from "react-select";
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
@@ -11,6 +11,10 @@ import { getByHotelId as getRoomsByHotelId } from "services/roomService";
 import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
 import { getDateString } from "utils/dateHelper";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import isEqual from "lodash.isequal";
+import classNames from "classnames";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -25,6 +29,10 @@ function RoomOccupancyReport({ hotelId }) {
   const [loading, setLoading] = useState(false);
   const [loadingRooms, setLoadingRooms] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
+  const [appliedFilters, setAppliedFilters] = useState({
+    dates: getMonthRange(),
+    selectedRooms: null,
+  });
 
   const { t } = useLanguage();
 
@@ -34,6 +42,16 @@ function RoomOccupancyReport({ hotelId }) {
       [type]: getDateString(date),
     }));
   };
+
+  const isSearchDisabled = useMemo(
+    () => !hotelId || !dates.start || !dates.end,
+    [dates, hotelId],
+  );
+
+  const haveFiltersChanged = useMemo(
+    () => !isEqual({ dates, selectedRooms }, appliedFilters),
+    [dates, selectedRooms, appliedFilters],
+  );
 
   const roomSelectOptions = useMemo(() => {
     const activeRooms = [];
@@ -73,15 +91,43 @@ function RoomOccupancyReport({ hotelId }) {
 
   const handleRoomChange = (selectedOptions) => {
     setSelectedRooms(selectedOptions);
-    setShowPrompt(
-      !(
-        selectedOptions &&
-        selectedOptions.length > 0 &&
-        dates.start &&
-        dates.end
-      ),
-    );
-    setData(null);
+  };
+
+  const handleSearch = async () => {
+    if (isSearchDisabled || selectedRooms?.length === 0) {
+      setShowPrompt(true);
+      setData(null);
+      setAppliedFilters((prev) => ({ ...prev, selectedRooms: [] }));
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setShowPrompt(false);
+      setAppliedFilters({
+        dates: { ...dates },
+        selectedRooms: [...selectedRooms],
+      });
+
+      const roomIds = selectedRooms.map((room) => room.value);
+
+      const res = await getRoomsCollectedVSOccupancy(
+        hotelId,
+        dates.start,
+        dates.end,
+        roomIds,
+      );
+
+      if (res?.isSuccessful && Array.isArray(res.items)) {
+        setData(res.items);
+      } else {
+        setData(null);
+      }
+    } catch {
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const chartData = useMemo(() => {
@@ -140,35 +186,6 @@ function RoomOccupancyReport({ hotelId }) {
   };
 
   useEffect(() => {
-    if (
-      hotelId &&
-      selectedRooms &&
-      selectedRooms.length > 0 &&
-      dates.start &&
-      dates.end
-    ) {
-      setLoading(true);
-      setShowPrompt(false);
-
-      const roomIds = selectedRooms.map((room) => room.value);
-
-      getRoomsCollectedVSOccupancy(hotelId, dates.start, dates.end, roomIds)
-        .then((res) => {
-          if (res?.isSuccessful && Array.isArray(res.items)) {
-            setData(res.items);
-          } else {
-            setData(null);
-          }
-        })
-        .catch(() => setData(null))
-        .finally(() => setLoading(false));
-    } else {
-      setShowPrompt(true);
-      setData(null);
-    }
-  }, [hotelId, selectedRooms, dates.start, dates.end]);
-
-  useEffect(() => {
     if (!hotelId) return;
     setLoadingRooms(true);
     getRoomsByHotelId(hotelId)
@@ -213,6 +230,7 @@ function RoomOccupancyReport({ hotelId }) {
             options={roomSelectOptions}
             value={selectedRooms}
             onChange={handleRoomChange}
+            closeMenuOnSelect={false}
             isDisabled={loading || loadingRooms}
             placeholder={
               loadingRooms
@@ -220,9 +238,31 @@ function RoomOccupancyReport({ hotelId }) {
                 : t("financialReports.roomOccupancyReport.selectRoom")
             }
             isClearable
+            styles={{
+              menu: (provided) => ({ ...provided, zIndex: 4 }),
+            }}
           />
         </Col>
       </Row>
+
+      <Row className="mb-3">
+        <Col>
+          <Button
+            color="dark"
+            type="submit"
+            disabled={isSearchDisabled || loading || !haveFiltersChanged}
+            onClick={handleSearch}>
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className={classNames("me-2", {
+                "fa-bounce": haveFiltersChanged && !isSearchDisabled,
+              })}
+            />
+            {t("common.search")}
+          </Button>
+        </Col>
+      </Row>
+
       <SimpleLoader isVisible={loading} />
       {showPrompt && (
         <Alert
