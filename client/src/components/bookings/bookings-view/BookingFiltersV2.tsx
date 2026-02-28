@@ -192,9 +192,7 @@ function BookingFiltersV2({
         selectedOption.value as keyof typeof BOOKING_VIEW_SORT_OPTIONS,
       );
     } else {
-      onSortColumnChange(
-        "" as unknown as keyof typeof BOOKING_VIEW_SORT_OPTIONS,
-      );
+      onSortColumnChange(undefined);
     }
   };
 

@@ -108,7 +108,7 @@ function BookingCard({ booking, hotelId }: BookingCardProps): JSX.Element {
             </Col>
           </Row>
           {isAuditableInfoOpen && (
-            <div className="py-1 px-3 mt-1 border-top bg-light rounded fs-7">
+            <div className="py-2 px-3 mt-1 border-top bg-light rounded fs-7">
               <BookingAuditableInfo booking={booking} />
             </div>
           )}
