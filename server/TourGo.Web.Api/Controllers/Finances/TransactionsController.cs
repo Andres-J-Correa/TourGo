@@ -355,6 +355,79 @@ namespace TourGo.Web.Api.Controllers.Finances
             return result;
         }
 
+        [HttpPost("paginated_v2")]
+        [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk: true)]
+        public ActionResult<ItemResponse<Paged<Transaction>>> GetPaginated(
+            string hotelId,
+            [FromQuery] int pageIndex,
+            [FromQuery] int pageSize,
+            [FromQuery] string? sortColumn,
+            [FromQuery] string? sortDirection,
+            [FromQuery] DateOnly? startDate,
+            [FromQuery] DateOnly? endDate,
+            [FromQuery] string? txnId,
+            [FromQuery] string? parentId,
+            [FromQuery] string? entityId,
+            [FromQuery] string? referenceNumber,
+            [FromQuery] string? description,
+            [FromQuery] bool? hasDocumentUrl,
+            [FromBody] TransactionsGetPaginatedRequest request)
+        {
+            ObjectResult result;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(sortColumn) && !_transactionService.IsValidSortColumn(sortColumn))
+                {
+                    return BadRequest(new ErrorResponse($"Invalid sort column: {sortColumn}"));
+                }
+
+                if (!string.IsNullOrEmpty(sortDirection) && !_transactionService.IsValidSortDirection(sortDirection))
+                {
+                    return BadRequest(new ErrorResponse($"Invalid sort direction: {sortDirection}"));
+                }
+
+                Paged<Transaction>? transactions = _transactionService.GetPaginated(
+                    hotelId,
+                    pageIndex,
+                    pageSize,
+                    sortColumn,
+                    sortDirection,
+                    startDate,
+                    endDate,
+                    txnId,
+                    parentId,
+                    entityId,
+                    referenceNumber,
+                    description,
+                    hasDocumentUrl,
+                    request.CategoryIds,
+                    request.SubcategoryIds,
+                    request.StatusIds,
+                    request.PaymentMethodIds,
+                    request.FinancePartnerIds);
+
+                if (transactions == null)
+                {
+                    ErrorResponse response = new ErrorResponse("No transactions found for the specified criteria.");
+                    result = NotFound404(response);
+                }
+                else
+                {
+                    ItemResponse<Paged<Transaction>> response = new ItemResponse<Paged<Transaction>> { Item = transactions };
+                    result = Ok200(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
         [HttpGet("pagination")]
         [EntityAuth(EntityTypeEnum.Transactions, EntityActionTypeEnum.Read, isBulk: true)]
         public ActionResult<ItemResponse<Paged<Transaction>>> GetPaginated(
