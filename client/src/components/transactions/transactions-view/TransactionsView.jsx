@@ -22,6 +22,7 @@ import { Button, Col, Row, Collapse } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquarePlus, faSquareMinus } from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
+import isEqual from "lodash.isequal";
 import { getDateString } from "utils/dateHelper";
 
 import "./TransactionsView.css";
@@ -60,7 +61,13 @@ function TransactionsView() {
   const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [transactionToUpdate, setTransactionToUpdate] = useState(null);
+
   const [paginationData, setPaginationData] = useState({
+    pageSize: 5,
+    sortBy: [],
+    ...defaultPaginationFilters,
+  });
+  const [appliedPaginationData, setAppliedPaginationData] = useState({
     pageSize: 5,
     sortBy: [],
     ...defaultPaginationFilters,
@@ -103,22 +110,31 @@ function TransactionsView() {
   }, [hotelId, t]);
 
   const handleDateChange = (field) => (date) => {
-    setPaginationData((prev) => ({
+    const updater = (prev) => ({
       ...prev,
       pageIndex: 0,
       dates: { ...prev.dates, [field]: getDateString(date) },
-    }));
+    });
+
+    setPaginationData(updater);
+    if (!isUserAdmin) {
+      setAppliedPaginationData(updater);
+    }
   };
 
   const handleFixedStartDateChange = (date) => {
     if (dayjs(date).isBefore(dayjs(getDateString(minDate)))) {
       return;
     }
-    setPaginationData((prev) => ({
+    const updater = (prev) => ({
       ...prev,
       pageIndex: 0,
       dates: { ...prev.dates, start: getDateString(date) },
-    }));
+    });
+    setPaginationData(updater);
+    if (!isUserAdmin) {
+      setAppliedPaginationData(updater);
+    }
   };
 
   const handleCategoryChange = (categoryIds) => {
@@ -216,6 +232,10 @@ function TransactionsView() {
 
   const onTransactionAdded = useCallback(() => {
     setPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+    }));
+    setAppliedPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
     }));
@@ -362,19 +382,34 @@ function TransactionsView() {
   );
 
   useEffect(() => {
-    const hasDates =
-      Boolean(paginationData.dates.start) || Boolean(paginationData.dates.end);
+    const start = appliedPaginationData.dates.start;
+    const end = appliedPaginationData.dates.end;
 
     const isValidDateRange =
-      dayjs(paginationData.dates.start).isValid() &&
-      dayjs(paginationData.dates.end).isValid();
+      !!start && !!end
+        ? dayjs(start).isValid() &&
+          dayjs(end).isValid() &&
+          dayjs(start).isBefore(dayjs(end))
+        : true;
 
-    const shouldFetchData = (hasDates && isValidDateRange) || !hasDates;
-
-    if (hotelId && shouldFetchData && hotel.current.roleId !== 0) {
-      fetchData(hotelId, paginationData);
+    if (hotelId && isValidDateRange && hotel.current.roleId !== 0) {
+      fetchData(hotelId, appliedPaginationData);
     }
-  }, [hotelId, paginationData, fetchData, hotel]);
+  }, [hotelId, appliedPaginationData, fetchData, hotel]);
+
+  const handleSearch = () => {
+    setAppliedPaginationData(paginationData);
+  };
+
+  const hasPaginationDataChanged = useMemo(
+    () => !isEqual(paginationData, appliedPaginationData),
+    [paginationData, appliedPaginationData],
+  );
+
+  const updateBoth = (updater) => {
+    setPaginationData(updater);
+    setAppliedPaginationData(updater);
+  };
 
   return (
     <>
@@ -429,12 +464,14 @@ function TransactionsView() {
                 handleEntityIdInputChange={handleEntityIdInputChange}
                 handleHasDocumentUrlChange={handleHasDocumentUrlChange}
                 handleClearAllFilters={handleClearAllFilters}
+                handleSearch={handleSearch}
+                hasPaginationDataChanged={hasPaginationDataChanged}
               />
             </div>
           </Collapse>
         </div>
 
-        <Row>
+        <Row className="mb-2">
           {!showForm && (
             <div className="text-center">
               <Button color="primary" onClick={handleAddTransactionClick}>
@@ -447,8 +484,8 @@ function TransactionsView() {
         <TransactionsTable
           data={data}
           loading={loading}
-          paginationData={paginationData}
-          setPaginationData={setPaginationData}
+          paginationData={appliedPaginationData}
+          setPaginationData={updateBoth}
           onEditTransaction={onEditTransaction}
           updateHasDocumentUrl={updateHasDocumentUrl}
           onReverseSuccess={onReverseSuccess}

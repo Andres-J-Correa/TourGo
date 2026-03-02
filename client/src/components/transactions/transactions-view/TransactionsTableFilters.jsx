@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, Fragment } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 
@@ -6,6 +6,7 @@ import { Row, Col, Label, Input, InputGroup, Button, Form } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import Select, { components } from "react-select";
+import classNames from "classnames";
 
 import {
   TRANSACTION_CATEGORIES,
@@ -35,6 +36,8 @@ function TransactionsTableFilters({
   handleEntityIdInputChange,
   handleHasDocumentUrlChange,
   handleClearAllFilters,
+  handleSearch,
+  hasPaginationDataChanged,
 }) {
   const { t } = useLanguage();
   const [selectData, setSelectData] = useState({
@@ -43,10 +46,6 @@ function TransactionsTableFilters({
     financePartners: [],
   });
 
-  const [transactionIdInput, setTransactionIdInput] = useState("");
-  const [referenceNumberInput, setReferenceNumberInput] = useState("");
-  const [descriptionInput, setDescriptionInput] = useState("");
-  const [entityIdInput, setEntityIdInput] = useState("");
   const [selectedCategories, setSelectedCategories] = useState(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState(null);
   const [selectedPaymentMethods, setSelectedPaymentMethods] = useState(null);
@@ -177,48 +176,20 @@ function TransactionsTableFilters({
     </components.GroupHeading>
   );
 
-  const onTransactionInputChange = (e) => {
-    const { value } = e.target;
-    setTransactionIdInput(value);
+  const handleTransactionIdChange = (e) => {
+    handleTransactionIdInputChange(e.target.value);
   };
 
-  const handleTransactionIdFilterSubmit = (e) => {
-    e.preventDefault();
-    if (!transactionIdInput && !paginationData.txnId) return;
-    handleTransactionIdInputChange(transactionIdInput.trim());
+  const handleReferenceNumberChange = (e) => {
+    handleReferenceNumberInputChange(e.target.value);
   };
 
-  const onReferenceNumberInputChange = (e) => {
-    const { value } = e.target;
-    setReferenceNumberInput(value);
+  const handleDescriptionChange = (e) => {
+    handleDescriptionInputChange(e.target.value);
   };
 
-  const handleReferenceNumberFilterSubmit = (e) => {
-    e.preventDefault();
-    if (!referenceNumberInput && !paginationData.referenceNumber) return;
-    handleReferenceNumberInputChange(referenceNumberInput.trim());
-  };
-
-  const onDescriptionInputChange = (e) => {
-    const { value } = e.target;
-    setDescriptionInput(value);
-  };
-
-  const handleDescriptionFilterSubmit = (e) => {
-    e.preventDefault();
-    if (!descriptionInput && !paginationData.description) return;
-    handleDescriptionInputChange(descriptionInput.trim());
-  };
-
-  const onEntityIdInputChange = (e) => {
-    const { value } = e.target;
-    setEntityIdInput(value);
-  };
-
-  const handleEntityIdFilterSubmit = (e) => {
-    e.preventDefault();
-    if (!entityIdInput && !paginationData.entityId) return;
-    handleEntityIdInputChange(entityIdInput.trim());
+  const handleEntityIdChange = (e) => {
+    handleEntityIdInputChange(e.target.value);
   };
 
   const onCategoryChange = (selectedOptions) => {
@@ -252,50 +223,26 @@ function TransactionsTableFilters({
   };
 
   const onClearTransactionId = () => {
-    setTransactionIdInput("");
     if (!paginationData.txnId) return;
     handleTransactionIdInputChange("");
   };
 
   const onClearReferenceNumber = () => {
-    setReferenceNumberInput("");
     if (!paginationData.referenceNumber) return;
     handleReferenceNumberInputChange("");
   };
 
   const onClearDescription = () => {
-    setDescriptionInput("");
     if (!paginationData.description) return;
     handleDescriptionInputChange("");
   };
 
   const onClearEntityId = () => {
-    setEntityIdInput("");
     if (!paginationData.entityId) return;
     handleEntityIdInputChange("");
   };
 
   const onClearAllFilters = () => {
-    if (
-      !paginationData.dates?.start &&
-      !paginationData.dates?.end &&
-      !paginationData.categoryIds?.length &&
-      !paginationData.subcategoryIds?.length &&
-      !paginationData.paymentMethodIds?.length &&
-      !paginationData.financePartnerIds?.length &&
-      !paginationData.statusIds?.length &&
-      !paginationData.hasDocumentUrl &&
-      !paginationData.txnId &&
-      !paginationData.referenceNumber &&
-      !paginationData.description &&
-      !paginationData.entityId
-    )
-      return;
-
-    setTransactionIdInput("");
-    setReferenceNumberInput("");
-    setDescriptionInput("");
-    setEntityIdInput("");
     handleClearAllFilters();
     setSelectedCategories(null);
     setSelectedSubcategories(null);
@@ -358,7 +305,7 @@ function TransactionsTableFilters({
   }, [hotelId]);
 
   return (
-    <Fragment>
+    <Form onSubmit={handleSearch}>
       <Row>
         <Col lg={12} xl={3}>
           <DatePickersV2
@@ -371,134 +318,96 @@ function TransactionsTableFilters({
           />
         </Col>
         <Col md={6} xl={3} className="mb-3">
-          <Form onSubmit={handleTransactionIdFilterSubmit}>
-            <Label for="transactionId" className="text-dark">
-              {t("transactions.filters.transactionId")}
-            </Label>
-            <InputGroup>
-              <Input
-                id="transactionId"
-                type="text"
-                placeholder={t("transactions.filters.transactionIdPlaceholder")}
-                value={transactionIdInput}
-                onChange={onTransactionInputChange}
-                disabled={loading}
-              />
-              <Button
-                title={t("transactions.filters.filter")}
-                color="dark"
-                type="submit"
-                disabled={loading}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </Button>
-              <Button
-                color="outline-secondary"
-                type="button"
-                title={t("transactions.filters.clear")}
-                onClick={onClearTransactionId}
-                disabled={loading || !transactionIdInput}>
-                <FontAwesomeIcon icon={faBroom} />
-              </Button>
-            </InputGroup>
-          </Form>
+          <Label for="transactionId" className="text-dark">
+            {t("transactions.filters.transactionId")}
+          </Label>
+          <InputGroup>
+            <Input
+              id="transactionId"
+              type="text"
+              placeholder={t("transactions.filters.transactionIdPlaceholder")}
+              value={paginationData.txnId}
+              onChange={handleTransactionIdChange}
+              disabled={loading}
+            />
+            <Button
+              color="outline-secondary"
+              type="button"
+              title={t("transactions.filters.clear")}
+              onClick={onClearTransactionId}
+              disabled={loading || !paginationData.txnId}>
+              <FontAwesomeIcon icon={faBroom} />
+            </Button>
+          </InputGroup>
         </Col>
         <Col md={6} xl={3} className="mb-3">
-          <Form onSubmit={handleReferenceNumberFilterSubmit}>
-            <Label for="referenceNumber" className="text-dark">
-              {t("transactions.filters.referenceNumber")}
-            </Label>
-            <InputGroup>
-              <Input
-                id="referenceNumber"
-                type="text"
-                placeholder={t(
-                  "transactions.filters.referenceNumberPlaceholder",
-                )}
-                value={referenceNumberInput}
-                disabled={loading}
-                onChange={onReferenceNumberInputChange}
-              />
-              <Button
-                title={t("transactions.filters.filter")}
-                color="dark"
-                type="submit"
-                disabled={loading}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </Button>
-              <Button
-                color="outline-secondary"
-                type="button"
-                title={t("transactions.filters.clear")}
-                onClick={onClearReferenceNumber}
-                disabled={loading || !referenceNumberInput}>
-                <FontAwesomeIcon icon={faBroom} />
-              </Button>
-            </InputGroup>
-          </Form>
+          <Label for="referenceNumber" className="text-dark">
+            {t("transactions.filters.referenceNumber")}
+          </Label>
+          <InputGroup>
+            <Input
+              id="referenceNumber"
+              type="text"
+              placeholder={t("transactions.filters.referenceNumberPlaceholder")}
+              value={paginationData.referenceNumber}
+              disabled={loading}
+              onChange={handleReferenceNumberChange}
+            />
+            <Button
+              color="outline-secondary"
+              type="button"
+              title={t("transactions.filters.clear")}
+              onClick={onClearReferenceNumber}
+              disabled={loading || !paginationData.referenceNumber}>
+              <FontAwesomeIcon icon={faBroom} />
+            </Button>
+          </InputGroup>
         </Col>
         <Col md={6} xl={3} className="mb-3">
-          <Form onSubmit={handleEntityIdFilterSubmit}>
-            <Label for="entityId" className="text-dark">
-              {t("transactions.filters.entityId")}
-            </Label>
-            <InputGroup>
-              <Input
-                id="entityId"
-                type="text"
-                placeholder={t("transactions.filters.entityIdPlaceholder")}
-                value={entityIdInput}
-                onChange={onEntityIdInputChange}
-                disabled={loading}
-              />
-              <Button
-                title={t("transactions.filters.filter")}
-                color="dark"
-                type="submit"
-                disabled={loading}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </Button>
-              <Button
-                color="outline-secondary"
-                type="button"
-                title={t("transactions.filters.clear")}
-                onClick={onClearEntityId}
-                disabled={loading || !entityIdInput}>
-                <FontAwesomeIcon icon={faBroom} />
-              </Button>
-            </InputGroup>
-          </Form>
+          <Label for="entityId" className="text-dark">
+            {t("transactions.filters.entityId")}
+          </Label>
+          <InputGroup>
+            <Input
+              id="entityId"
+              type="text"
+              placeholder={t("transactions.filters.entityIdPlaceholder")}
+              value={paginationData.entityId}
+              onChange={handleEntityIdChange}
+              disabled={loading}
+            />
+            <Button
+              color="outline-secondary"
+              type="button"
+              title={t("transactions.filters.clear")}
+              onClick={onClearEntityId}
+              disabled={loading || !paginationData.entityId}>
+              <FontAwesomeIcon icon={faBroom} />
+            </Button>
+          </InputGroup>
         </Col>
         <Col md={6} xl={3} className="mb-3">
-          <Form onSubmit={handleDescriptionFilterSubmit}>
-            <Label for="description" className="text-dark">
-              {t("transactions.filters.description")}
-            </Label>
-            <InputGroup>
-              <Input
-                id="description"
-                type="text"
-                placeholder={t("transactions.filters.descriptionPlaceholder")}
-                value={descriptionInput}
-                onChange={onDescriptionInputChange}
-                disabled={loading}
-              />
-              <Button
-                title={t("transactions.filters.filter")}
-                color="dark"
-                type="submit"
-                disabled={loading}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </Button>
-              <Button
-                color="outline-secondary"
-                type="button"
-                title={t("transactions.filters.clear")}
-                onClick={onClearDescription}
-                disabled={loading || !descriptionInput}>
-                <FontAwesomeIcon icon={faBroom} />
-              </Button>
-            </InputGroup>
-          </Form>
+          <Label for="description" className="text-dark">
+            {t("transactions.filters.description")}
+          </Label>
+          <InputGroup>
+            <Input
+              id="description"
+              type="text"
+              placeholder={t("transactions.filters.descriptionPlaceholder")}
+              value={paginationData.description}
+              onChange={handleDescriptionChange}
+              disabled={loading}
+            />
+            <Button
+              color="outline-secondary"
+              type="button"
+              title={t("transactions.filters.clear")}
+              onClick={onClearDescription}
+              disabled={loading || !paginationData.description}>
+              <FontAwesomeIcon icon={faBroom} />
+            </Button>
+          </InputGroup>
         </Col>
 
         <Col md={6} xl={3} className="mb-3">
@@ -522,6 +431,7 @@ function TransactionsTableFilters({
             {t("transactions.filters.categories")}
           </Label>
           <Select
+            closeMenuOnSelect={false}
             id="transaction-category"
             isMulti
             options={reactSelectOptions.categories}
@@ -538,6 +448,7 @@ function TransactionsTableFilters({
             {t("transactions.filters.subcategories")}
           </Label>
           <Select
+            closeMenuOnSelect={false}
             id="transaction-subcategory"
             options={reactSelectOptions.subcategories}
             isClearable
@@ -553,6 +464,7 @@ function TransactionsTableFilters({
             {t("transactions.filters.paymentMethods")}
           </Label>
           <Select
+            closeMenuOnSelect={false}
             id="payment-method"
             options={reactSelectOptions.paymentMethods}
             isClearable
@@ -569,6 +481,7 @@ function TransactionsTableFilters({
           </Label>
 
           <Select
+            closeMenuOnSelect={false}
             id="finance-partner"
             options={reactSelectOptions.financePartners}
             isMulti
@@ -584,6 +497,7 @@ function TransactionsTableFilters({
             {t("transactions.filters.statuses")}
           </Label>
           <Select
+            closeMenuOnSelect={false}
             id="statusId"
             isMulti
             options={reactSelectOptions.statuses}
@@ -596,6 +510,24 @@ function TransactionsTableFilters({
         </Col>
       </Row>
       <Row>
+        <Col>
+          <Button
+            color="dark"
+            type="button"
+            onClick={handleSearch}
+            disabled={loading || !hasPaginationDataChanged}
+            className={classNames({
+              "filter-btn-glow": hasPaginationDataChanged,
+            })}>
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className={classNames("me-2", {
+                "fa-bounce": hasPaginationDataChanged,
+              })}
+            />
+            {t("transactions.filters.filter")}
+          </Button>
+        </Col>
         <Col className="align-content-end">
           <Button
             color="dark"
@@ -607,7 +539,7 @@ function TransactionsTableFilters({
           </Button>
         </Col>
       </Row>
-    </Fragment>
+    </Form>
   );
 }
 
