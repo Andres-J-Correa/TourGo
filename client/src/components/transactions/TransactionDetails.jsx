@@ -70,7 +70,7 @@ const TransactionDetails = ({
       Swal.fire(
         t("common.error"),
         t("transactions.details.loadDocumentError"),
-        "error"
+        "error",
       );
     } finally {
       setIsLoading(false);
@@ -110,7 +110,7 @@ const TransactionDetails = ({
         file,
         txn.id,
         txn.amount,
-        hotelId
+        hotelId,
       );
 
       if (uploadResponse.isSuccessful) {
@@ -118,7 +118,7 @@ const TransactionDetails = ({
         Swal.fire(
           t("common.success"),
           t("transactions.details.uploadSuccess"),
-          "success"
+          "success",
         );
         setShowUploader(false);
       } else {
@@ -128,7 +128,7 @@ const TransactionDetails = ({
       Swal.fire(
         t("common.error"),
         t("transactions.details.uploadError"),
-        "error"
+        "error",
       );
     } finally {
       setSubmitting(false);
@@ -226,13 +226,13 @@ const TransactionDetails = ({
         const response = await updateDescription(
           txn.id,
           newDescription,
-          hotelId
+          hotelId,
         );
         if (response.isSuccessful) {
           Swal.fire(
             t("common.success"),
             t("transactions.details.editDescriptionSuccess"),
-            "success"
+            "success",
           ).then(() => {
             onEditDescriptionSuccess(txn.id, newDescription);
           });
@@ -243,7 +243,7 @@ const TransactionDetails = ({
         Swal.fire(
           t("common.error"),
           t("transactions.details.editDescriptionError"),
-          "error"
+          "error",
         );
       }
     }
@@ -353,34 +353,34 @@ const TransactionDetails = ({
           </Col>
         </Row>
       )}
-      <Row className="mt-3">
-        <Col className="text-center">
-          {Boolean(txn.parentId) && Boolean(onEditDescriptionSuccess) && (
-            <Button
-              size="sm"
-              color="secondary"
-              onClick={handleEditDescription}
-              className="mx-1 mb-2">
+      <Row className="mt-3 justify-content-center">
+        {Boolean(txn.parentId) && Boolean(onEditDescriptionSuccess) && (
+          <Col md="auto" xs={12} className="mb-2">
+            <Button size="sm" color="secondary" onClick={handleEditDescription}>
               {t("transactions.details.editDescription")}
             </Button>
-          )}
-          {Boolean(onEditTransaction) &&
-            txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED &&
-            !Boolean(txn.parentId) && (
+          </Col>
+        )}
+
+        {Boolean(onEditTransaction) &&
+          txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED &&
+          !Boolean(txn.parentId) && (
+            <Col md="auto" xs={12} className="mb-2">
               <Button
                 size="sm"
                 color="outline-danger"
-                onClick={() => onEditTransaction(txn)}
-                className="mx-1 mb-2">
+                onClick={() => onEditTransaction(txn)}>
                 {t("transactions.details.editTransaction")}
               </Button>
-            )}
-          {updateHasDocumentUrl &&
-            txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
+            </Col>
+          )}
+
+        {updateHasDocumentUrl &&
+          txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
+            <Col md="auto" xs={12} className="mb-2">
               <Button
                 size="sm"
                 color={showUploader ? "warning" : "outline-dark"}
-                className="mx-1 mb-2"
                 onClick={() => {
                   setFiles([]);
                   setShowUploader((prev) => !prev);
@@ -388,39 +388,45 @@ const TransactionDetails = ({
                 {showUploader
                   ? t("common.cancel")
                   : txn.hasDocumentUrl
-                  ? t("transactions.details.changeDocument")
-                  : t("transactions.details.attachDocument")}
+                    ? t("transactions.details.changeDocument")
+                    : t("transactions.details.attachDocument")}
               </Button>
-            )}
-          {txn.hasDocumentUrl && (
+            </Col>
+          )}
+
+        {txn.hasDocumentUrl && (
+          <Col md="auto" xs={12} className="mb-2">
             <Button
               size="sm"
               color="outline-success"
-              onClick={handleViewDocument}
-              className="mx-1 mb-2">
+              onClick={handleViewDocument}>
               {t("transactions.details.viewDocument")}
             </Button>
-          )}
-          {!txn.parentId && (
+          </Col>
+        )}
+
+        {!txn.parentId && (
+          <Col md="auto" xs={12} className="mb-2">
             <Button
               size="sm"
               color="outline-secondary"
-              className="mx-1 mb-2"
               onClick={handleToggleOffcanvas}>
               {t("transactions.details.viewHistory")}
             </Button>
-          )}
-          {onReverseSuccess &&
-            txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
+          </Col>
+        )}
+
+        {onReverseSuccess &&
+          txn.statusId !== TRANSACTION_STATUS_IDS.REVERSED && (
+            <Col md="auto" xs={12} className="mb-2">
               <Button
                 size="sm"
                 color="outline-danger"
-                className="mx-1 mb-2"
                 onClick={handleReverseTransaction}>
                 {t("transactions.details.reverse")}
               </Button>
-            )}
-        </Col>
+            </Col>
+          )}
       </Row>
 
       {showUploader && (
