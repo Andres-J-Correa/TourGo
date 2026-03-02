@@ -24,9 +24,12 @@ import { faSquarePlus, faSquareMinus } from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
 import isEqual from "lodash.isequal";
 import { getDateString } from "utils/dateHelper";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
 import "./TransactionsView.css";
 import BreadcrumbBuilder from "components/commonUI/BreadcrumbsBuilder";
+
+dayjs.extend(isSameOrBefore);
 
 const defaultData = {
   items: [],
@@ -389,7 +392,7 @@ function TransactionsView() {
       !!start && !!end
         ? dayjs(start).isValid() &&
           dayjs(end).isValid() &&
-          dayjs(start).isBefore(dayjs(end))
+          dayjs(start).isSameOrBefore(dayjs(end))
         : true;
 
     if (hotelId && isValidDateRange && hotel.current.roleId !== 0) {
