@@ -150,11 +150,7 @@ const TransactionsTable = ({
             <select
               id="pageSize"
               className="form-select"
-              value={
-                paginationData.pageSize > data.totalCount
-                  ? data.totalCount
-                  : paginationData.pageSize
-              }
+              value={paginationData.pageSize}
               disabled={loading}
               onChange={onPageSizeChange}>
               {[5, 10, 20, 50, 100, 200, 500].map((size) => (
