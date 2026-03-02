@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 
@@ -13,11 +13,9 @@ import {
   TRANSACTION_STATUSES,
   TRANSACTION_CATEGORY_TYPES_IDS,
 } from "components/transactions/constants";
-import { getPaymentMethodsByHotelId } from "services/paymentMethodService";
-import { getFinancePartnersByHotelId } from "services/financePartnerService";
-import { getTransactionSubcategories } from "services/transactionsSubcategoryService";
+// data-fetching moved into custom hook
+import useTransactionFiltersData from "./hooks/useTransactionFiltersData";
 
-import { toast } from "react-toastify";
 import { useLanguage } from "contexts/LanguageContext";
 
 function TransactionsTableFilters({
@@ -40,11 +38,8 @@ function TransactionsTableFilters({
   hasPaginationDataChanged,
 }) {
   const { t } = useLanguage();
-  const [selectData, setSelectData] = useState({
-    paymentMethods: [],
-    transactionSubcategories: [],
-    financePartners: [],
-  });
+
+  const selectData = useTransactionFiltersData(hotelId);
 
   const [selectedCategories, setSelectedCategories] = useState(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState(null);
@@ -251,58 +246,6 @@ function TransactionsTableFilters({
     setSelectedStatuses(null);
     setSelectedHasDocument(null);
   };
-
-  useEffect(() => {
-    if (hotelId) {
-      Promise.allSettled([
-        getPaymentMethodsByHotelId(hotelId),
-        getFinancePartnersByHotelId(hotelId),
-        getTransactionSubcategories(hotelId),
-      ]).then(
-        ([
-          paymentMethodsResult,
-          financePartnersResult,
-          transactionSubcategoriesResult,
-        ]) => {
-          const errors = [];
-
-          if (paymentMethodsResult.status === "fulfilled") {
-            setSelectData((prev) => ({
-              ...prev,
-              paymentMethods: paymentMethodsResult.value.items,
-            }));
-          } else if (paymentMethodsResult.reason?.response?.status !== 404) {
-            errors.push("Error al cargar los métodos de pago");
-          }
-
-          if (financePartnersResult.status === "fulfilled") {
-            setSelectData((prev) => ({
-              ...prev,
-              financePartners: financePartnersResult.value.items,
-            }));
-          } else if (financePartnersResult.reason?.response?.status !== 404) {
-            errors.push("Error al cargar los socios financieros");
-          }
-
-          if (transactionSubcategoriesResult.status === "fulfilled") {
-            setSelectData((prev) => ({
-              ...prev,
-              transactionSubcategories:
-                transactionSubcategoriesResult.value.items,
-            }));
-          } else if (
-            transactionSubcategoriesResult.reason?.response?.status !== 404
-          ) {
-            errors.push("Error al cargar las subcategorías de transacción");
-          }
-
-          if (errors.length > 0) {
-            toast.error(errors.join(" | "));
-          }
-        },
-      );
-    }
-  }, [hotelId]);
 
   return (
     <Form onSubmit={handleSearch}>
