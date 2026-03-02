@@ -468,6 +468,8 @@ namespace TourGo.Web.Api.Controllers.Finances
                     endDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 }
 
+                string? toPreventAmbigity = null; // This is here to prevent ambiguity between this method and the other GetPaginated method when called without txnId, parentId, etc.
+
                 Paged<Transaction>? transactions = _transactionService.GetPaginated(
                     hotelId,
                     pageIndex,
@@ -486,7 +488,7 @@ namespace TourGo.Web.Api.Controllers.Finances
                     null,
                     null,
                     null,
-                    null);
+                    toPreventAmbigity);
 
                 if (transactions == null)
                 {

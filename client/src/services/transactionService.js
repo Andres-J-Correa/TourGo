@@ -47,7 +47,7 @@ export const updateDocumentUrl = async (
   file,
   transactionId,
   amount,
-  hotelId
+  hotelId,
 ) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -88,7 +88,7 @@ export const reverse = (txnId, hotelId) => {
 export const updateDescription = async (
   transactionId,
   description,
-  hotelId
+  hotelId,
 ) => {
   const config = {
     headers: {
@@ -132,17 +132,17 @@ export const getPagedTransactions = async (
   sortDirection,
   startDate,
   endDate,
-  categoryId,
-  statusId,
-  subcategoryId,
-  financePartnerId,
-  paymentMethodId,
+  categoryIds,
+  statusIds,
+  subcategoryIds,
+  financePartnerIds,
+  paymentMethodIds,
   txnId,
   referenceNumber,
   description,
   entityId,
   hasDocumentUrl,
-  parentId
+  parentId,
 ) => {
   const queryParams = new URLSearchParams({
     pageIndex,
@@ -156,27 +156,30 @@ export const getPagedTransactions = async (
   if (txnId) queryParams.append("txnId", txnId);
   if (parentId) queryParams.append("parentId", parentId);
   if (entityId) queryParams.append("entityId", entityId);
-  if (categoryId) queryParams.append("categoryId", categoryId);
-  if (statusId) queryParams.append("statusId", statusId);
   if (referenceNumber) queryParams.append("referenceNumber", referenceNumber);
   if (description) queryParams.append("description", description);
   if (hasDocumentUrl) queryParams.append("hasDocumentUrl", hasDocumentUrl);
-  if (paymentMethodId) queryParams.append("paymentMethodId", paymentMethodId);
-  if (subcategoryId) queryParams.append("subcategoryId", subcategoryId);
-  if (financePartnerId)
-    queryParams.append("financePartnerId", financePartnerId);
 
   const url = `${apiV2.replace(
     /{hotelId}/,
-    hotelId
-  )}/paginated?${queryParams.toString()}`;
+    hotelId,
+  )}/paginated_v2?${queryParams.toString()}`;
 
   const config = {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "GET",
-    url: url,
+    method: "POST",
+    url,
+    data: {
+      categoryIds: categoryIds?.length > 0 ? categoryIds : undefined,
+      subcategoryIds: subcategoryIds?.length > 0 ? subcategoryIds : undefined,
+      statusIds: statusIds?.length > 0 ? statusIds : undefined,
+      paymentMethodIds:
+        paymentMethodIds?.length > 0 ? paymentMethodIds : undefined,
+      financePartnerIds:
+        financePartnerIds?.length > 0 ? financePartnerIds : undefined,
+    },
   };
   try {
     const response = await axiosClient(config);
@@ -194,7 +197,7 @@ export const getFixedPagination = async (
   sortColumn,
   sortDirection,
   startDate,
-  endDate
+  endDate,
 ) => {
   const queryParams = new URLSearchParams({
     pageIndex,
@@ -208,7 +211,7 @@ export const getFixedPagination = async (
 
   const url = `${apiV2.replace(
     /{hotelId}/,
-    hotelId
+    hotelId,
   )}/pagination?${queryParams.toString()}`;
 
   const config = {
@@ -247,7 +250,7 @@ export const getTransactionVersions = async (transactionId, hotelId) => {
 export const getVersionSupportDocumentUrl = async (
   transactionId,
   versionId,
-  hotelId
+  hotelId,
 ) => {
   const config = {
     headers: {
@@ -256,7 +259,7 @@ export const getVersionSupportDocumentUrl = async (
     method: "GET",
     url: `${apiV2.replace(
       /{hotelId}/,
-      hotelId
+      hotelId,
     )}/${transactionId}/versions/${versionId}/document-url`,
   };
   try {

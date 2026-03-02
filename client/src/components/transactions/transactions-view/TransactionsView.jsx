@@ -13,7 +13,7 @@ import {
   getPagedTransactions,
   getFixedPagination,
 } from "services/transactionService";
-import { useTransactionsTableColumns } from "./constants";
+import { useTransactionsTableColumns, useExcelColumns } from "./constants";
 import { formatCurrency } from "utils/currencyHelper";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
@@ -59,6 +59,24 @@ const defaultData = {
   hasNextPage: false,
 };
 
+const defaultPaginationFilters = {
+  pageIndex: 0,
+  dates: {
+    start: "",
+    end: "",
+  },
+  categoryIds: [],
+  statusIds: [],
+  subcategoryIds: [],
+  financePartnerIds: [],
+  paymentMethodIds: [],
+  txnId: "",
+  referenceNumber: "",
+  description: "",
+  entityId: "",
+  hasDocumentUrl: "",
+};
+
 function TransactionsView() {
   const { hotelId } = useParams();
   const [data, setData] = useState({ ...defaultData });
@@ -66,6 +84,11 @@ function TransactionsView() {
   const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [transactionToUpdate, setTransactionToUpdate] = useState(null);
+  const [paginationData, setPaginationData] = useState({
+    pageSize: 5,
+    sortBy: [],
+    ...defaultPaginationFilters,
+  });
 
   const {
     paymentMethods,
@@ -76,6 +99,8 @@ function TransactionsView() {
 
   const transactionsTableColumns = useTransactionsTableColumns();
 
+  const columnOrderTranslated = useExcelColumns();
+
   const { hotel, user } = useAppContext();
 
   const { t } = useLanguage();
@@ -84,58 +109,17 @@ function TransactionsView() {
     () =>
       hotel.current.roleId === HOTEL_ROLES_IDS.ADMIN ||
       hotel.current.roleId === HOTEL_ROLES_IDS.OWNER,
-    [hotel]
+    [hotel],
   );
 
   const fetchTransactions = useMemo(
     () => (isUserAdmin ? getPagedTransactions : getFixedPagination),
-    [isUserAdmin]
+    [isUserAdmin],
   );
 
   const minDate = useMemo(() => {
     return dayjs().subtract(7, "day").toDate();
   }, []);
-
-  const columnOrderTranslated = [
-    { id: "id", label: t("transactions.table.id") },
-    { id: "transactionDate", label: t("transactions.table.transactionDate") },
-    { id: "amount", label: t("transactions.table.amount") },
-    { id: "currencyCode", label: t("transactions.table.currencyCode") },
-    { id: "category", label: t("transactions.table.category") },
-    { id: "subcategory-name", label: t("transactions.table.subcategory") },
-    { id: "paymentMethod-name", label: t("transactions.table.paymentMethod") },
-    { id: "description", label: t("transactions.table.description") },
-    { id: "referenceNumber", label: t("transactions.table.referenceNumber") },
-    { id: "status", label: t("transactions.table.status") },
-    { id: "entityId", label: t("transactions.table.entity") },
-    {
-      id: "financePartner-name",
-      label: t("transactions.table.financePartner"),
-    },
-    { id: "parentId", label: t("transactions.table.parentId") },
-    { id: "hasDocumentUrl", label: t("transactions.table.hasDocumentUrl") },
-  ];
-
-  const [paginationData, setPaginationData] = useState({
-    pageIndex: 0,
-    pageSize: 5,
-    sortBy: [],
-    dates: {
-      start: "",
-      end: "",
-    },
-    categoryId: "",
-    statusId: "",
-    subcategoryId: "",
-    financePartnerId: "",
-    paymentMethodId: "",
-    txnId: "",
-    referenceNumber: "",
-    description: "",
-    entityId: "",
-    hasDocumentUrl: "",
-    randomIdForUpdate: "",
-  });
 
   const breadcrumbs = useMemo(() => {
     return hotelId
@@ -148,7 +132,7 @@ function TransactionsView() {
 
   const columns = useMemo(
     () => transactionsTableColumns,
-    [transactionsTableColumns]
+    [transactionsTableColumns],
   );
 
   const table = useReactTable({
@@ -210,7 +194,7 @@ function TransactionsView() {
       columnOrderTranslated.reduce((acc, obj) => {
         acc[obj.label] = row[obj.id] ?? "";
         return acc;
-      }, {})
+      }, {}),
     );
     const worksheet = utils.json_to_sheet(rowData);
     const workbook = utils.book_new();
@@ -254,20 +238,20 @@ function TransactionsView() {
     table.setExpanded({});
   };
 
-  const handleCategoryChange = (categoryId) => {
+  const handleCategoryChange = (categoryIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      categoryId,
+      categoryIds,
     }));
     table.setExpanded({});
   };
 
-  const handleStatusChange = (statusId) => {
+  const handleStatusChange = (statusIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      statusId,
+      statusIds,
     }));
     table.setExpanded({});
   };
@@ -280,29 +264,29 @@ function TransactionsView() {
     }));
     table.setExpanded({});
   };
-  const handleSubcategoryChange = (subcategoryId) => {
+  const handleSubcategoryChange = (subcategoryIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      subcategoryId,
+      subcategoryIds,
     }));
     table.setExpanded({});
   };
 
-  const handleFinancePartnerChange = (financePartnerId) => {
+  const handleFinancePartnerChange = (financePartnerIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      financePartnerId,
+      financePartnerIds,
     }));
     table.setExpanded({});
   };
 
-  const handlePaymentMethodChange = (paymentMethodId) => {
+  const handlePaymentMethodChange = (paymentMethodIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      paymentMethodId,
+      paymentMethodIds,
     }));
     table.setExpanded({});
   };
@@ -368,21 +352,7 @@ function TransactionsView() {
   const handleClearAllFilters = () => {
     setPaginationData((prev) => ({
       ...prev,
-      pageIndex: 0,
-      dates: {
-        start: "",
-        end: "",
-      },
-      categoryId: "",
-      statusId: "",
-      subcategoryId: "",
-      financePartnerId: "",
-      paymentMethodId: "",
-      txnId: "",
-      referenceNumber: "",
-      description: "",
-      entityId: "",
-      hasDocumentUrl: "",
+      ...defaultPaginationFilters,
     }));
     table.setExpanded({});
   };
@@ -398,7 +368,7 @@ function TransactionsView() {
         });
       }, 100);
     },
-    [setTransactionToUpdate]
+    [setTransactionToUpdate],
   );
 
   const handleCancelUpdate = useCallback(() => {
@@ -418,7 +388,7 @@ function TransactionsView() {
       });
       setTransactionToUpdate(null);
     },
-    [setData]
+    [setData],
   );
 
   const fetchData = useCallback(
@@ -446,16 +416,16 @@ function TransactionsView() {
           sortDirection,
           startDate,
           endDate,
-          values.categoryId,
-          values.statusId,
-          values.subcategoryId,
-          values.financePartnerId,
-          values.paymentMethodId,
+          values.categoryIds,
+          values.statusIds,
+          values.subcategoryIds,
+          values.financePartnerIds,
+          values.paymentMethodIds,
           values.txnId,
           values.referenceNumber,
           values.description,
           values.entityId,
-          values.hasDocumentUrl
+          values.hasDocumentUrl,
         );
 
         if (res.isSuccessful) {
@@ -473,7 +443,7 @@ function TransactionsView() {
         setLoading(false);
       }
     },
-    [fetchTransactions]
+    [fetchTransactions],
   );
 
   const updateHasDocumentUrl = useCallback((id, hasDocumentUrl) => {
@@ -518,7 +488,7 @@ function TransactionsView() {
         return { ...prev, items: newItems };
       });
     },
-    [user]
+    [user],
   );
 
   useEffect(() => {
@@ -601,7 +571,7 @@ function TransactionsView() {
               {data.items?.length > 0
                 ? formatCurrency(
                     data.items[0].total,
-                    data.items[0].currencyCode
+                    data.items[0].currencyCode,
                   )
                 : 0}
             </span>
@@ -691,7 +661,7 @@ function TransactionsView() {
                             "cursor-pointer": header.column.getCanSort(),
                             "text-bg-info": header.column.getIsSorted(),
                             "cursor-not-allowed": loading,
-                          }
+                          },
                         )}
                         style={{
                           maxWidth: header.column.columnDef.maxSize || "none",
@@ -704,7 +674,7 @@ function TransactionsView() {
                             className="align-items-center">
                             {flexRender(
                               header.column.columnDef.header,
-                              header.getContext()
+                              header.getContext(),
                             )}
                             <span className="float-end ms-2">
                               {{
@@ -756,7 +726,7 @@ function TransactionsView() {
                             "text-center align-content-center",
                             {
                               "bg-info-subtle": row.getIsExpanded(),
-                            }
+                            },
                           )}
                           style={{
                             maxWidth: cell.column.columnDef.maxSize || "none",
@@ -766,7 +736,7 @@ function TransactionsView() {
                           key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </td>
                       ))}

@@ -133,8 +133,8 @@ function TransactionsTableFilters({
     };
   }, [t, selectData]);
 
-  const getCsvOptions = useCallback((selectedOptions) => {
-    const values = selectedOptions.map((option) => option.value).join(",");
+  const getNumberArray = useCallback((selectedOptions) => {
+    const values = selectedOptions.map((option) => option.value);
 
     return values;
   }, []);
@@ -151,19 +151,19 @@ function TransactionsTableFilters({
       const toSelect = toCompare.filter(
         (option) =>
           !selectedCategories?.some(
-            (selected) => selected.value === option.value
-          )
+            (selected) => selected.value === option.value,
+          ),
       );
       const newSelected = [...(selectedCategories || []), ...toSelect];
       setSelectedCategories(newSelected);
-      handleCategoryChange(getCsvOptions(newSelected));
+      handleCategoryChange(getNumberArray(newSelected));
     },
     [
       reactSelectOptions,
       selectedCategories,
-      getCsvOptions,
+      getNumberArray,
       handleCategoryChange,
-    ]
+    ],
   );
 
   const GroupHeading = (props) => (
@@ -222,27 +222,27 @@ function TransactionsTableFilters({
   };
 
   const onCategoryChange = (selectedOptions) => {
-    handleCategoryChange(getCsvOptions(selectedOptions));
+    handleCategoryChange(getNumberArray(selectedOptions));
     setSelectedCategories(selectedOptions);
   };
 
   const onSubcategoryChange = (selectedOptions) => {
-    handleSubcategoryChange(getCsvOptions(selectedOptions));
+    handleSubcategoryChange(getNumberArray(selectedOptions));
     setSelectedSubcategories(selectedOptions);
   };
 
   const onPaymentMethodChange = (selectedOptions) => {
-    handlePaymentMethodChange(getCsvOptions(selectedOptions));
+    handlePaymentMethodChange(getNumberArray(selectedOptions));
     setSelectedPaymentMethods(selectedOptions);
   };
 
   const onFinancePartnerChange = (selectedOptions) => {
-    handleFinancePartnerChange(getCsvOptions(selectedOptions));
+    handleFinancePartnerChange(getNumberArray(selectedOptions));
     setSelectedFinancePartners(selectedOptions);
   };
 
   const onStatusChange = (selectedOptions) => {
-    handleStatusChange(getCsvOptions(selectedOptions));
+    handleStatusChange(getNumberArray(selectedOptions));
     setSelectedStatuses(selectedOptions);
   };
 
@@ -279,11 +279,11 @@ function TransactionsTableFilters({
     if (
       !paginationData.dates?.start &&
       !paginationData.dates?.end &&
-      !paginationData.categoryId &&
-      !paginationData.subcategoryId &&
-      !paginationData.paymentMethodId &&
-      !paginationData.financePartnerId &&
-      !paginationData.statusId &&
+      !paginationData.categoryIds?.length &&
+      !paginationData.subcategoryIds?.length &&
+      !paginationData.paymentMethodIds?.length &&
+      !paginationData.financePartnerIds?.length &&
+      !paginationData.statusIds?.length &&
       !paginationData.hasDocumentUrl &&
       !paginationData.txnId &&
       !paginationData.referenceNumber &&
@@ -352,7 +352,7 @@ function TransactionsTableFilters({
           if (errors.length > 0) {
             toast.error(errors.join(" | "));
           }
-        }
+        },
       );
     }
   }, [hotelId]);
@@ -412,7 +412,7 @@ function TransactionsTableFilters({
                 id="referenceNumber"
                 type="text"
                 placeholder={t(
-                  "transactions.filters.referenceNumberPlaceholder"
+                  "transactions.filters.referenceNumberPlaceholder",
                 )}
                 value={referenceNumberInput}
                 disabled={loading}
