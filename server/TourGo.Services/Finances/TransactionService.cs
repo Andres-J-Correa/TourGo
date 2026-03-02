@@ -159,6 +159,71 @@ namespace TourGo.Services.Finances
             return paged;
         }
 
+        public Paged<Transaction>? GetPaginated(string hotelId, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
+            DateOnly? startDate, DateOnly? endDate, string? txnId, string? parentId, string? entityId, string? referenceNumber,
+            string? description, bool? hasDocumentUrl, List<int>? categoryIds, List<int>? subcategoryIds, List<int>? statusIds,
+            List<int>? paymentMethodIds, List<int>? financePartnerIds)
+        {
+            string proc = "transactions_select_paginated_v9";
+            Paged<Transaction>? paged = null;
+            List<Transaction>? transactions = null;
+            int totalCount = 0;
+
+            string mappedColumn = !string.IsNullOrEmpty(sortColumn) && TransactionSortColumns.TryGetValue(sortColumn, out var value) ? value : string.Empty;
+
+            _dataProvider.ExecuteCmd(proc, (col) =>
+            {
+                col.AddWithValue("p_pageIndex", pageIndex);
+                col.AddWithValue("p_pageSize", pageSize);
+                col.AddWithValue("p_hotelId", hotelId);
+
+
+                col.AddWithNullableValue("p_sortColumn", mappedColumn);
+                col.AddWithNullableValue("p_sortDirection", sortDirection);
+                col.AddWithNullableValue("p_startDate", startDate);
+                col.AddWithNullableValue("p_endDate", endDate);
+
+                col.AddWithNullableValue("p_id", txnId);
+                col.AddWithNullableValue("p_parentId", parentId);
+                col.AddWithNullableValue("p_entityId", entityId);
+                col.AddWithNullableValue("p_referenceNumber", referenceNumber);
+                col.AddWithNullableValue("p_description", description);
+                col.AddWithNullableValue("p_hasDocumentUrl", hasDocumentUrl);
+
+                col.AddWithValue("p_category_ids_json", categoryIds != null ? JsonConvert.SerializeObject(categoryIds) : DBNull.Value);
+                col.AddWithValue("p_subcategory_ids_json", subcategoryIds != null ? JsonConvert.SerializeObject(subcategoryIds) : DBNull.Value);
+                col.AddWithValue("p_status_ids_json", statusIds != null ? JsonConvert.SerializeObject(statusIds) : DBNull.Value);
+                col.AddWithValue("p_payment_method_ids_json", paymentMethodIds != null ? JsonConvert.SerializeObject(paymentMethodIds) : DBNull.Value);
+                col.AddWithValue("p_finance_partner_ids_json", financePartnerIds != null ? JsonConvert.SerializeObject(financePartnerIds) : DBNull.Value);
+
+            }, (reader, returnCol) =>
+            {
+                int index = 0;
+                Transaction transaction = MapTransaction(reader, ref index);
+                transaction.Total = reader.GetSafeDecimal(index++);
+
+                if (totalCount == 0)
+                {
+                    totalCount = reader.GetSafeInt32(index++);
+                }
+
+                transactions ??= new List<Transaction>();
+                transactions.Add(transaction);
+            });
+
+            if (transactions != null)
+            {
+                paged = new Paged<Transaction>(
+                        transactions,
+                        pageIndex,
+                        pageSize,
+                        totalCount
+                        );
+            }
+
+            return paged;
+        }
+
         public void UpdateDocumentUrl (string transactionId, string fileKey, string userId)
         {
 

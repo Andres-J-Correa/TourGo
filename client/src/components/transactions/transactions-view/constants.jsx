@@ -73,3 +73,27 @@ export const useTransactionsTableColumns = () => {
     },
   ];
 };
+
+export const useExcelColumns = () => {
+  const { t } = useLanguage();
+
+  return [
+    { id: "id", label: t("transactions.table.id") },
+    { id: "transactionDate", label: t("transactions.table.transactionDate") },
+    { id: "amount", label: t("transactions.table.amount") },
+    { id: "currencyCode", label: t("transactions.table.currencyCode") },
+    { id: "category", label: t("transactions.table.category") },
+    { id: "subcategory-name", label: t("transactions.table.subcategory") },
+    { id: "paymentMethod-name", label: t("transactions.table.paymentMethod") },
+    { id: "description", label: t("transactions.table.description") },
+    { id: "referenceNumber", label: t("transactions.table.referenceNumber") },
+    { id: "status", label: t("transactions.table.status") },
+    { id: "entityId", label: t("transactions.table.entity") },
+    {
+      id: "financePartner-name",
+      label: t("transactions.table.financePartner"),
+    },
+    { id: "parentId", label: t("transactions.table.parentId") },
+    { id: "hasDocumentUrl", label: t("transactions.table.hasDocumentUrl") },
+  ];
+};

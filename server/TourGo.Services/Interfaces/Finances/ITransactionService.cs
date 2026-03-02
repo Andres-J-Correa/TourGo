@@ -15,6 +15,10 @@ namespace TourGo.Services.Interfaces
         Paged<Transaction>? GetPaginated(string hotelId, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
             DateOnly? startDate, DateOnly? endDate, string? txnId, string? parentId, string? entityId, string? categoryId, string? statusId, string? referenceNumber,
             string? description, bool? hasDocumentUrl, string? paymentMethodId, string? subcategoryId, string? financePartnerId);
+        Paged<Transaction>? GetPaginated(string hotelId, int pageIndex, int pageSize, string? sortColumn, string? sortDirection,
+            DateOnly? startDate, DateOnly? endDate, string? txnId, string? parentId, string? entityId, string? referenceNumber,
+            string? description, bool? hasDocumentUrl, List<int>? categoryIds, List<int>? subcategoryIds, List<int>? statusIds,
+            List<int>? paymentMethodIds, List<int>? financePartnerIds);      
         bool IsValidSortDirection(string? direction);
         bool IsValidSortColumn(string? column);
         int Reverse(string txnId, string userId, string publicId);

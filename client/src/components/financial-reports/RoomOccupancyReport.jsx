@@ -24,14 +24,14 @@ const getMonthRange = () => ({
 function RoomOccupancyReport({ hotelId }) {
   const [rooms, setRooms] = useState([]);
   const [dates, setDates] = useState(getMonthRange());
-  const [selectedRooms, setSelectedRooms] = useState(null);
+  const [selectedRooms, setSelectedRooms] = useState([]);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingRooms, setLoadingRooms] = useState(false);
   const [showPrompt, setShowPrompt] = useState(true);
   const [appliedFilters, setAppliedFilters] = useState({
     dates: getMonthRange(),
-    selectedRooms: null,
+    selectedRooms: [],
   });
 
   const { t } = useLanguage();
@@ -251,6 +251,9 @@ function RoomOccupancyReport({ hotelId }) {
             color="dark"
             type="submit"
             disabled={isSearchDisabled || loading || !haveFiltersChanged}
+            className={classNames({
+              "filter-btn-glow": haveFiltersChanged && !isSearchDisabled,
+            })}
             onClick={handleSearch}>
             <FontAwesomeIcon
               icon={faMagnifyingGlass}

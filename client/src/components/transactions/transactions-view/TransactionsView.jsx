@@ -2,9 +2,8 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 import ErrorBoundary from "components/commonUI/ErrorBoundary";
-import Pagination from "components/commonUI/Pagination";
-import TransactionDetails from "components/transactions/TransactionDetails";
 import TransactionsTableFilters from "components/transactions/transactions-view/TransactionsTableFilters";
+import TransactionsTable from "./TransactionsTable";
 import TransactionAddForm from "components/transactions/TransactionAddForm";
 import LoadingOverlay from "components/commonUI/loaders/LoadingOverlay";
 import TransactionUpdateForm from "components/transactions/TransactionUpdateForm";
@@ -13,39 +12,17 @@ import {
   getPagedTransactions,
   getFixedPagination,
 } from "services/transactionService";
-import { useTransactionsTableColumns } from "./constants";
-import { formatCurrency } from "utils/currencyHelper";
 import { useAppContext } from "contexts/GlobalAppContext";
 import { HOTEL_ROLES_IDS } from "components/hotels/constants";
-import {
-  TRANSACTION_CATEGORIES_BY_ID,
-  TRANSACTION_STATUS_BY_ID,
-} from "components/transactions/constants";
 import useHotelFormData from "components/transactions/hooks/useHotelFormData";
 import { useLanguage } from "contexts/LanguageContext";
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 
-import { Button, Col, Label, Row, Spinner, Collapse } from "reactstrap";
-import classNames from "classnames";
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getPaginationRowModel,
-  flexRender,
-  getExpandedRowModel,
-} from "@tanstack/react-table";
+import { Button, Col, Row, Collapse } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowUpShortWide,
-  faArrowDownWideShort,
-  faSort,
-  faSquarePlus,
-  faSquareMinus,
-  faFileExcel,
-} from "@fortawesome/free-solid-svg-icons";
-import { flattenObject } from "utils/objectHelper";
+import { faSquarePlus, faSquareMinus } from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
+import isEqual from "lodash.isequal";
 import { getDateString } from "utils/dateHelper";
 
 import "./TransactionsView.css";
@@ -59,6 +36,24 @@ const defaultData = {
   hasNextPage: false,
 };
 
+const defaultPaginationFilters = {
+  pageIndex: 0,
+  dates: {
+    start: "",
+    end: "",
+  },
+  categoryIds: [],
+  statusIds: [],
+  subcategoryIds: [],
+  financePartnerIds: [],
+  paymentMethodIds: [],
+  txnId: "",
+  referenceNumber: "",
+  description: "",
+  entityId: "",
+  hasDocumentUrl: "",
+};
+
 function TransactionsView() {
   const { hotelId } = useParams();
   const [data, setData] = useState({ ...defaultData });
@@ -67,14 +62,23 @@ function TransactionsView() {
   const [showForm, setShowForm] = useState(false);
   const [transactionToUpdate, setTransactionToUpdate] = useState(null);
 
+  const [paginationData, setPaginationData] = useState({
+    pageSize: 5,
+    sortBy: [],
+    ...defaultPaginationFilters,
+  });
+  const [appliedPaginationData, setAppliedPaginationData] = useState({
+    pageSize: 5,
+    sortBy: [],
+    ...defaultPaginationFilters,
+  });
+
   const {
     paymentMethods,
     transactionSubcategories,
     financePartners,
     isLoadingHotelData,
   } = useHotelFormData(hotelId);
-
-  const transactionsTableColumns = useTransactionsTableColumns();
 
   const { hotel, user } = useAppContext();
 
@@ -84,58 +88,17 @@ function TransactionsView() {
     () =>
       hotel.current.roleId === HOTEL_ROLES_IDS.ADMIN ||
       hotel.current.roleId === HOTEL_ROLES_IDS.OWNER,
-    [hotel]
+    [hotel],
   );
 
   const fetchTransactions = useMemo(
     () => (isUserAdmin ? getPagedTransactions : getFixedPagination),
-    [isUserAdmin]
+    [isUserAdmin],
   );
 
   const minDate = useMemo(() => {
     return dayjs().subtract(7, "day").toDate();
   }, []);
-
-  const columnOrderTranslated = [
-    { id: "id", label: t("transactions.table.id") },
-    { id: "transactionDate", label: t("transactions.table.transactionDate") },
-    { id: "amount", label: t("transactions.table.amount") },
-    { id: "currencyCode", label: t("transactions.table.currencyCode") },
-    { id: "category", label: t("transactions.table.category") },
-    { id: "subcategory-name", label: t("transactions.table.subcategory") },
-    { id: "paymentMethod-name", label: t("transactions.table.paymentMethod") },
-    { id: "description", label: t("transactions.table.description") },
-    { id: "referenceNumber", label: t("transactions.table.referenceNumber") },
-    { id: "status", label: t("transactions.table.status") },
-    { id: "entityId", label: t("transactions.table.entity") },
-    {
-      id: "financePartner-name",
-      label: t("transactions.table.financePartner"),
-    },
-    { id: "parentId", label: t("transactions.table.parentId") },
-    { id: "hasDocumentUrl", label: t("transactions.table.hasDocumentUrl") },
-  ];
-
-  const [paginationData, setPaginationData] = useState({
-    pageIndex: 0,
-    pageSize: 5,
-    sortBy: [],
-    dates: {
-      start: "",
-      end: "",
-    },
-    categoryId: "",
-    statusId: "",
-    subcategoryId: "",
-    financePartnerId: "",
-    paymentMethodId: "",
-    txnId: "",
-    referenceNumber: "",
-    description: "",
-    entityId: "",
-    hasDocumentUrl: "",
-    randomIdForUpdate: "",
-  });
 
   const breadcrumbs = useMemo(() => {
     return hotelId
@@ -146,130 +109,48 @@ function TransactionsView() {
       : null;
   }, [hotelId, t]);
 
-  const columns = useMemo(
-    () => transactionsTableColumns,
-    [transactionsTableColumns]
-  );
-
-  const table = useReactTable({
-    data: data.items,
-    columns,
-    manualPagination: true,
-    manualSorting: true,
-    pageCount: data.totalPages,
-    defaultColumn: {
-      size: "auto",
-      minSize: 120,
-      maxSize: "none",
-    },
-    initialState: {
-      expanded: {}, // Initialize expanded state
-    },
-    state: {
-      pagination: {
-        pageIndex: paginationData.pageIndex,
-        pageSize: paginationData.pageSize,
-      },
-      sorting: paginationData.sortBy.map((s) => ({
-        id: s.id,
-        desc: s.desc,
-      })),
-    },
-    onSortingChange: (updater) => {
-      const sortArray =
-        typeof updater === "function"
-          ? updater(paginationData.sortBy)
-          : updater;
-      setPaginationData((prev) => ({
-        ...prev,
-        sortBy: sortArray,
-        pageIndex: 0,
-      }));
-      table.setExpanded({});
-    },
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getExpandedRowModel: getExpandedRowModel(), // Enable row expansion
-    getRowCanExpand: () => true,
-  });
-
-  const exportExcel = async (rows) => {
-    const { utils, writeFile } = await import("xlsx");
-
-    let rowData = rows.map((row) => {
-      let copy = { ...row.original };
-      copy = flattenObject(copy);
-      copy.category = t(TRANSACTION_CATEGORIES_BY_ID[copy.categoryId]) || "";
-      copy.status = t(TRANSACTION_STATUS_BY_ID[copy.statusId]) || "";
-      copy.transactionDate = dayjs(copy.transactionDate).format("YYYY-MM-DD");
-
-      return copy;
-    });
-    rowData = rowData.map((row) =>
-      columnOrderTranslated.reduce((acc, obj) => {
-        acc[obj.label] = row[obj.id] ?? "";
-        return acc;
-      }, {})
-    );
-    const worksheet = utils.json_to_sheet(rowData);
-    const workbook = utils.book_new();
-    utils.book_append_sheet(workbook, worksheet, t("transactions.view.title"));
-    writeFile(workbook, `${t("transactions.view.title")}.xlsx`, {
-      compression: true,
-    });
-  };
-
-  const onPageSizeChange = (e) =>
-    setPaginationData((prev) => ({
-      ...prev,
-      pageSize: Number(e.target.value),
-      pageIndex: 0,
-    }));
-
   const handleDateChange = (field) => (date) => {
-    setPaginationData((prev) => ({
+    const updater = (prev) => ({
       ...prev,
       pageIndex: 0,
       dates: { ...prev.dates, [field]: getDateString(date) },
-    }));
-    table.setExpanded({});
+    });
+
+    setPaginationData(updater);
+    if (!isUserAdmin) {
+      setAppliedPaginationData(updater);
+    }
   };
 
   const handleFixedStartDateChange = (date) => {
     if (dayjs(date).isBefore(dayjs(getDateString(minDate)))) {
       return;
     }
-    setPaginationData((prev) => ({
+    const updater = (prev) => ({
       ...prev,
       pageIndex: 0,
       dates: { ...prev.dates, start: getDateString(date) },
-    }));
-    table.setExpanded({});
+    });
+    setPaginationData(updater);
+    if (!isUserAdmin) {
+      setAppliedPaginationData(updater);
+    }
   };
 
-  const gotoPage = (pageIndex) => {
-    if (pageIndex < 0 || pageIndex >= data.totalPages) return;
-    setPaginationData((prev) => ({ ...prev, pageIndex }));
-    table.setExpanded({});
-  };
-
-  const handleCategoryChange = (categoryId) => {
+  const handleCategoryChange = (categoryIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      categoryId,
+      categoryIds,
     }));
-    table.setExpanded({});
   };
 
-  const handleStatusChange = (statusId) => {
+  const handleStatusChange = (statusIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      statusId,
+      statusIds,
     }));
-    table.setExpanded({});
   };
 
   const handleHasDocumentUrlChange = (hasDocumentUrl) => {
@@ -278,33 +159,29 @@ function TransactionsView() {
       pageIndex: 0,
       hasDocumentUrl,
     }));
-    table.setExpanded({});
   };
-  const handleSubcategoryChange = (subcategoryId) => {
+  const handleSubcategoryChange = (subcategoryIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      subcategoryId,
+      subcategoryIds,
     }));
-    table.setExpanded({});
   };
 
-  const handleFinancePartnerChange = (financePartnerId) => {
+  const handleFinancePartnerChange = (financePartnerIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      financePartnerId,
+      financePartnerIds,
     }));
-    table.setExpanded({});
   };
 
-  const handlePaymentMethodChange = (paymentMethodId) => {
+  const handlePaymentMethodChange = (paymentMethodIds) => {
     setPaginationData((prev) => ({
       ...prev,
       pageIndex: 0,
-      paymentMethodId,
+      paymentMethodIds,
     }));
-    table.setExpanded({});
   };
 
   const handleTransactionIdInputChange = (txnId) => {
@@ -313,7 +190,6 @@ function TransactionsView() {
       pageIndex: 0,
       txnId,
     }));
-    table.setExpanded({});
   };
 
   const handleReferenceNumberInputChange = (referenceNumber) => {
@@ -322,7 +198,6 @@ function TransactionsView() {
       pageIndex: 0,
       referenceNumber,
     }));
-    table.setExpanded({});
   };
 
   const handleDescriptionInputChange = (description) => {
@@ -331,7 +206,6 @@ function TransactionsView() {
       pageIndex: 0,
       description,
     }));
-    table.setExpanded({});
   };
 
   const handleEntityIdInputChange = (entityId) => {
@@ -340,7 +214,6 @@ function TransactionsView() {
       pageIndex: 0,
       entityId,
     }));
-    table.setExpanded({});
   };
 
   const handleToggleFilters = () => {
@@ -362,29 +235,17 @@ function TransactionsView() {
       ...prev,
       pageIndex: 0,
     }));
-    table.setExpanded({});
-  }, [setPaginationData, table]);
+    setAppliedPaginationData((prev) => ({
+      ...prev,
+      pageIndex: 0,
+    }));
+  }, [setPaginationData]);
 
   const handleClearAllFilters = () => {
     setPaginationData((prev) => ({
       ...prev,
-      pageIndex: 0,
-      dates: {
-        start: "",
-        end: "",
-      },
-      categoryId: "",
-      statusId: "",
-      subcategoryId: "",
-      financePartnerId: "",
-      paymentMethodId: "",
-      txnId: "",
-      referenceNumber: "",
-      description: "",
-      entityId: "",
-      hasDocumentUrl: "",
+      ...defaultPaginationFilters,
     }));
-    table.setExpanded({});
   };
 
   const onEditTransaction = useCallback(
@@ -398,7 +259,7 @@ function TransactionsView() {
         });
       }, 100);
     },
-    [setTransactionToUpdate]
+    [setTransactionToUpdate],
   );
 
   const handleCancelUpdate = useCallback(() => {
@@ -418,7 +279,7 @@ function TransactionsView() {
       });
       setTransactionToUpdate(null);
     },
-    [setData]
+    [setData],
   );
 
   const fetchData = useCallback(
@@ -446,16 +307,16 @@ function TransactionsView() {
           sortDirection,
           startDate,
           endDate,
-          values.categoryId,
-          values.statusId,
-          values.subcategoryId,
-          values.financePartnerId,
-          values.paymentMethodId,
+          values.categoryIds,
+          values.statusIds,
+          values.subcategoryIds,
+          values.financePartnerIds,
+          values.paymentMethodIds,
           values.txnId,
           values.referenceNumber,
           values.description,
           values.entityId,
-          values.hasDocumentUrl
+          values.hasDocumentUrl,
         );
 
         if (res.isSuccessful) {
@@ -473,7 +334,7 @@ function TransactionsView() {
         setLoading(false);
       }
     },
-    [fetchTransactions]
+    [fetchTransactions],
   );
 
   const updateHasDocumentUrl = useCallback((id, hasDocumentUrl) => {
@@ -494,8 +355,7 @@ function TransactionsView() {
     setPaginationData((prev) => ({
       ...prev,
     }));
-    table.setExpanded({});
-  }, [table]);
+  }, []);
 
   const onEditDescriptionSuccess = useCallback(
     (txnId, newDescription) => {
@@ -518,23 +378,38 @@ function TransactionsView() {
         return { ...prev, items: newItems };
       });
     },
-    [user]
+    [user],
   );
 
   useEffect(() => {
-    const hasDates =
-      Boolean(paginationData.dates.start) || Boolean(paginationData.dates.end);
+    const start = appliedPaginationData.dates.start;
+    const end = appliedPaginationData.dates.end;
 
     const isValidDateRange =
-      dayjs(paginationData.dates.start).isValid() &&
-      dayjs(paginationData.dates.end).isValid();
+      !!start && !!end
+        ? dayjs(start).isValid() &&
+          dayjs(end).isValid() &&
+          dayjs(start).isBefore(dayjs(end))
+        : true;
 
-    const shouldFetchData = (hasDates && isValidDateRange) || !hasDates;
-
-    if (hotelId && shouldFetchData && hotel.current.roleId !== 0) {
-      fetchData(hotelId, paginationData);
+    if (hotelId && isValidDateRange && hotel.current.roleId !== 0) {
+      fetchData(hotelId, appliedPaginationData);
     }
-  }, [hotelId, paginationData, fetchData, hotel]);
+  }, [hotelId, appliedPaginationData, fetchData, hotel]);
+
+  const handleSearch = () => {
+    setAppliedPaginationData(paginationData);
+  };
+
+  const hasPaginationDataChanged = useMemo(
+    () => !isEqual(paginationData, appliedPaginationData),
+    [paginationData, appliedPaginationData],
+  );
+
+  const updateBoth = (updater) => {
+    setPaginationData(updater);
+    setAppliedPaginationData(updater);
+  };
 
   return (
     <>
@@ -576,7 +451,6 @@ function TransactionsView() {
                 paginationData={paginationData}
                 loading={loading}
                 handleDateChange={handleDateChange}
-                onPageSizeChange={onPageSizeChange}
                 handleCategoryChange={handleCategoryChange}
                 handleStatusChange={handleStatusChange}
                 handleSubcategoryChange={handleSubcategoryChange}
@@ -590,47 +464,14 @@ function TransactionsView() {
                 handleEntityIdInputChange={handleEntityIdInputChange}
                 handleHasDocumentUrlChange={handleHasDocumentUrlChange}
                 handleClearAllFilters={handleClearAllFilters}
+                handleSearch={handleSearch}
+                hasPaginationDataChanged={hasPaginationDataChanged}
               />
             </div>
           </Collapse>
         </div>
-        <Row className="mb-3">
-          <Col md="auto" className="align-content-end">
-            <span className="text-dark fw-bold fs-5">
-              {t("transactions.view.totalActual")}:{" "}
-              {data.items?.length > 0
-                ? formatCurrency(
-                    data.items[0].total,
-                    data.items[0].currencyCode
-                  )
-                : 0}
-            </span>
-          </Col>
-          <Col>
-            <div className="float-end">
-              <Label for="pageSize" className="text-dark">
-                {t("transactions.view.rowsPerPage")}
-              </Label>
-              <select
-                id="pageSize"
-                className="form-select"
-                value={
-                  paginationData.pageSize > data.totalCount
-                    ? data.totalCount
-                    : paginationData.pageSize
-                }
-                disabled={loading}
-                onChange={onPageSizeChange}>
-                {[5, 10, 20, 50, 100, 200, 500].map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </Col>
-        </Row>
-        <Row>
+
+        <Row className="mb-2">
           {!showForm && (
             <div className="text-center">
               <Button color="primary" onClick={handleAddTransactionClick}>
@@ -638,180 +479,18 @@ function TransactionsView() {
               </Button>
             </div>
           )}
-          <div>
-            <Button
-              color="success"
-              className="float-end"
-              onClick={() => exportExcel(table.getRowModel().rows)}
-              disabled={loading || table.getRowModel().rows.length === 0}>
-              <FontAwesomeIcon icon={faFileExcel} className="me-2" />
-              {t("transactions.view.exportExcel")}
-            </Button>
-          </div>
         </Row>
-        <Row className="mt-3">
-          <Col>
-            <Pagination
-              pageIndex={paginationData.pageIndex}
-              totalPages={data.totalPages}
-              onPageChange={gotoPage}
-            />
-          </Col>
-        </Row>
-        <div className="table-responsive">
-          <span
-            className={classNames("float-end", {
-              invisible: data.items.length === 0 || loading,
-            })}>
-            {t("transactions.view.showing")}{" "}
-            {paginationData.pageSize * paginationData.pageIndex + 1}{" "}
-            {t("transactions.view.to")}{" "}
-            {!data.hasNextPage
-              ? data.totalCount
-              : paginationData.pageSize * (paginationData.pageIndex + 1)}{" "}
-            {t("transactions.view.of")} {data.totalCount}{" "}
-            {t("transactions.view.title").toLowerCase()}
-          </span>
-          <table className="table-sm table table-bordered table-hover table-striped mb-1">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <th
-                        key={header.id}
-                        onClick={
-                          !loading
-                            ? header.column.getToggleSortingHandler()
-                            : () => {}
-                        }
-                        className={classNames(
-                          "text-bg-dark text-center align-content-center",
-                          {
-                            "cursor-pointer": header.column.getCanSort(),
-                            "text-bg-info": header.column.getIsSorted(),
-                            "cursor-not-allowed": loading,
-                          }
-                        )}
-                        style={{
-                          maxWidth: header.column.columnDef.maxSize || "none",
-                          minWidth: header.column.columnDef.minSize || "none",
-                          width: header.column.getSize() || "auto",
-                        }}>
-                        {
-                          <div
-                            style={{ minWidth: "max-content" }}
-                            className="align-items-center">
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                            <span className="float-end ms-2">
-                              {{
-                                asc: (
-                                  <FontAwesomeIcon icon={faArrowUpShortWide} />
-                                ),
-                                desc: (
-                                  <FontAwesomeIcon
-                                    icon={faArrowDownWideShort}
-                                  />
-                                ),
-                              }[header.column.getIsSorted()] ||
-                                (header.column.getCanSort() && (
-                                  <FontAwesomeIcon icon={faSort} />
-                                ))}
-                            </span>
-                          </div>
-                        }
-                      </th>
-                    );
-                  })}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={columns.length} className="text-center">
-                    <Spinner size="sm" /> {t("common.loading")}
-                  </td>
-                </tr>
-              ) : table.getRowModel().rows.length === 0 ? (
-                <tr>
-                  <td colSpan={columns.length} className="text-center">
-                    {t("commonUI.dataTable.noRecords")}
-                  </td>
-                </tr>
-              ) : (
-                table.getRowModel().rows.map((row) => (
-                  <React.Fragment key={row.id}>
-                    <tr
-                      onClick={() =>
-                        table.setExpanded({ [row.id]: !row.getIsExpanded() })
-                      }
-                      className="cursor-pointer">
-                      {row.getVisibleCells().map((cell) => (
-                        <td
-                          className={classNames(
-                            "text-center align-content-center",
-                            {
-                              "bg-info-subtle": row.getIsExpanded(),
-                            }
-                          )}
-                          style={{
-                            maxWidth: cell.column.columnDef.maxSize || "none",
-                            minWidth: cell.column.columnDef.minSize || "none",
-                            width: cell.column.getSize() || "auto",
-                          }}
-                          key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                    {row.getIsExpanded() && (
-                      <tr>
-                        <td
-                          colSpan={row.getVisibleCells().length}
-                          className="p-0">
-                          <div className="p-2 border border-info-subtle bg-light">
-                            <TransactionDetails
-                              txn={row.original}
-                              updateHasDocumentUrl={updateHasDocumentUrl}
-                              onReverseSuccess={onReverseSuccess}
-                              onEditDescriptionSuccess={
-                                onEditDescriptionSuccess
-                              }
-                              onEditTransaction={onEditTransaction}
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))
-              )}
-            </tbody>
-          </table>
-          <p
-            className={classNames("mb-0 text-center text-dark", {
-              invisible: data.items.length === 0 || loading,
-            })}>
-            {t("transactions.view.page")} {paginationData.pageIndex + 1}{" "}
-            {t("transactions.view.of")} {data.totalPages}
-          </p>
-        </div>
-        <Row>
-          <Col>
-            <Pagination
-              pageIndex={paginationData.pageIndex}
-              totalPages={data.totalPages}
-              onPageChange={gotoPage}
-            />
-          </Col>
-        </Row>
+
+        <TransactionsTable
+          data={data}
+          loading={loading}
+          paginationData={appliedPaginationData}
+          setPaginationData={updateBoth}
+          onEditTransaction={onEditTransaction}
+          updateHasDocumentUrl={updateHasDocumentUrl}
+          onReverseSuccess={onReverseSuccess}
+          onEditDescriptionSuccess={onEditDescriptionSuccess}
+        />
 
         <div className="mt-5">
           <TransactionAddForm

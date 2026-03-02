@@ -88,3 +88,9 @@ td {
 .swal2-container {
   z-index: 3000;
 }
+
+.filter-btn-glow {
+  box-shadow:
+    0 0 10px var(--bs-dark),
+    0 0 20px var(--bs-dark);
+}

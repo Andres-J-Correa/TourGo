@@ -26,13 +26,8 @@ import { useHotelRooms } from "./hooks/useHotelRooms";
 import { BOOKING_STATUS_BY_ID } from "components/bookings/constants";
 import { Button, Col, Row } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFileExcel,
-  faMagnifyingGlass,
-} from "@fortawesome/free-solid-svg-icons";
+import { faFileExcel } from "@fortawesome/free-solid-svg-icons";
 import Alert from "components/commonUI/Alert";
-
-import "./BookingsViewV2.css";
 
 const defaultPaginationData: PaginationData = {
   pageIndex: 0,
