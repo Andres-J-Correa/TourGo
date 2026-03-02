@@ -401,10 +401,15 @@ function TransactionsView() {
     setAppliedPaginationData(paginationData);
   };
 
-  const hasPaginationDataChanged = useMemo(
-    () => !isEqual(paginationData, appliedPaginationData),
-    [paginationData, appliedPaginationData],
-  );
+  const hasPaginationDataChanged = useMemo(() => {
+    const paginationDataCopy = { ...paginationData };
+    const appliedPaginationDataCopy = { ...appliedPaginationData };
+
+    delete paginationDataCopy.pageIndex;
+    delete appliedPaginationDataCopy.pageIndex;
+
+    return !isEqual(paginationDataCopy, appliedPaginationDataCopy);
+  }, [paginationData, appliedPaginationData]);
 
   const updateBoth = (updater) => {
     setPaginationData(updater);
