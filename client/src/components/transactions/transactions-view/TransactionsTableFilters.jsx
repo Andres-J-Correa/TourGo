@@ -456,7 +456,7 @@ function TransactionsTableFilters({
         <Col>
           <Button
             color="dark"
-            type="button"
+            type="submit"
             onClick={handleSearch}
             disabled={loading || !hasPaginationDataChanged}
             className={classNames({
