@@ -358,6 +358,9 @@ function TransactionsView() {
     setPaginationData((prev) => ({
       ...prev,
     }));
+    setAppliedPaginationData((prev) => ({
+      ...prev,
+    }));
   }, []);
 
   const onEditDescriptionSuccess = useCallback(
