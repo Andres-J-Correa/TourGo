@@ -46,12 +46,6 @@ function RoomsPane({
 
     return (
       <ol>
-        <BookingViewOffCanvas
-          offCanvasOpen={offCanvasData.isOpen}
-          handleToggleOffcanvas={toggleOffCanvas()}
-          bookingId={offCanvasData.bookingId}
-          hotelId={hotelId}
-        />
         {rooms.map((item) => (
           <li key={`${prefix}-${item.room.id}-${item.bookingId}`}>
             {item.isRoomChange && (
@@ -73,60 +67,70 @@ function RoomsPane({
   };
 
   return (
-    <Row className="mb-4">
-      <Col md={12}>
-        <strong>{t("hotels.landing.infoTitle")}</strong>
-        <p className="mb-0 text-dark">{t("hotels.landing.infoText")}</p>
-        <ul>
-          <li>{t("hotels.landing.infoArrivingOrDeparting")}</li>
-          <li>{t("hotels.landing.infoRoomChanges")}</li>
-        </ul>
-      </Col>
+    <>
+      <BookingViewOffCanvas
+        offCanvasOpen={offCanvasData.isOpen}
+        handleToggleOffcanvas={toggleOffCanvas()}
+        bookingId={offCanvasData.bookingId}
+        hotelId={hotelId}
+      />
+      <Row className="mb-4">
+        <Col md={12}>
+          <strong>{t("hotels.landing.infoTitle")}</strong>
+          <p className="mb-0 text-dark">{t("hotels.landing.infoText")}</p>
+          <ul>
+            <li>{t("hotels.landing.infoArrivingOrDeparting")}</li>
+            <li>{t("hotels.landing.infoRoomChanges")}</li>
+          </ul>
+        </Col>
 
-      <Col md={12} lg={6} xl={4}>
-        <strong>
-          {t("hotels.landing.arriving")}
-          {arrivingRooms?.length > 0 ? ` (${arrivingRooms.length})` : ""}
-        </strong>
-        {renderRoomList(arrivingRooms, "arriving")}
-      </Col>
+        <Col md={12} lg={6} xl={4}>
+          <strong>
+            {t("hotels.landing.arriving")}
+            {arrivingRooms?.length > 0 ? ` (${arrivingRooms.length})` : ""}
+          </strong>
+          {renderRoomList(arrivingRooms, "arriving")}
+        </Col>
 
-      <Col md={12} lg={6} xl={4}>
-        <strong>
-          {t("hotels.landing.departing")}
-          {departingRooms?.length > 0 ? ` (${departingRooms.length})` : ""}
-        </strong>
-        {renderRoomList(departingRooms, "departing")}
-      </Col>
+        <Col md={12} lg={6} xl={4}>
+          <strong>
+            {t("hotels.landing.departing")}
+            {departingRooms?.length > 0 ? ` (${departingRooms.length})` : ""}
+          </strong>
+          {renderRoomList(departingRooms, "departing")}
+        </Col>
 
-      <Col md={12} lg={6} xl={4}>
-        <strong>
-          {t("hotels.landing.forCleaning")}
-          {forCleaningRooms?.length > 0 ? ` (${forCleaningRooms.length})` : ""}
-        </strong>
-        {renderRoomList(forCleaningRooms, "for-cleaning")}
-      </Col>
+        <Col md={12} lg={6} xl={4}>
+          <strong>
+            {t("hotels.landing.forCleaning")}
+            {forCleaningRooms?.length > 0
+              ? ` (${forCleaningRooms.length})`
+              : ""}
+          </strong>
+          {renderRoomList(forCleaningRooms, "for-cleaning")}
+        </Col>
 
-      <hr />
+        <hr />
 
-      <Col md={12}>
-        <strong>
-          {t("hotels.landing.availableRooms")}
-          {availableRooms?.length > 0 ? ` (${availableRooms.length})` : ""}
-        </strong>
-        {availableRooms?.length === 0 ? (
-          <p>{t("hotels.landing.none")}</p>
-        ) : (
-          <ol className="available-rooms-list">
-            {availableRooms.map((item) => (
-              <li key={`available-rooms-${item.id}`}>
-                <strong>{item.name}</strong>
-              </li>
-            ))}
-          </ol>
-        )}
-      </Col>
-    </Row>
+        <Col md={12}>
+          <strong>
+            {t("hotels.landing.availableRooms")}
+            {availableRooms?.length > 0 ? ` (${availableRooms.length})` : ""}
+          </strong>
+          {availableRooms?.length === 0 ? (
+            <p>{t("hotels.landing.none")}</p>
+          ) : (
+            <ol className="available-rooms-list">
+              {availableRooms.map((item) => (
+                <li key={`available-rooms-${item.id}`}>
+                  <strong>{item.name}</strong>
+                </li>
+              ))}
+            </ol>
+          )}
+        </Col>
+      </Row>
+    </>
   );
 }
 
