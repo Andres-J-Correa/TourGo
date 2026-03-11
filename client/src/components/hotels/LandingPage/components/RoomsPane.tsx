@@ -1,9 +1,11 @@
-import React from "react";
-import { Row, Col } from "reactstrap";
-import { Link } from "react-router-dom";
-import { useLanguage } from "contexts/LanguageContext";
 import { type RoomMovementItem } from "../types";
 import { type Room } from "types/entities/room.types";
+import { type JSX } from "react";
+
+import { useState } from "react";
+import { Row, Col } from "reactstrap";
+import { useLanguage } from "contexts/LanguageContext";
+import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
 
 interface RoomsPaneProps {
   arrivingRooms: RoomMovementItem[];
@@ -13,20 +15,43 @@ interface RoomsPaneProps {
   hotelId: string | undefined;
 }
 
-const RoomsPane: React.FC<RoomsPaneProps> = ({
+function RoomsPane({
   arrivingRooms,
   departingRooms,
   forCleaningRooms,
   availableRooms,
   hotelId,
-}) => {
+}: RoomsPaneProps): JSX.Element {
+  const [offCanvasData, setOffCanvasData] = useState<{
+    isOpen: boolean;
+    bookingId: string | null;
+  }>({
+    isOpen: false,
+    bookingId: null,
+  });
+
   const { t } = useLanguage();
+
+  const toggleOffCanvas =
+    (bookingId: string | null = null) =>
+    () => {
+      setOffCanvasData({
+        isOpen: !offCanvasData.isOpen,
+        bookingId,
+      });
+    };
 
   const renderRoomList = (rooms: RoomMovementItem[], prefix: string) => {
     if (rooms.length === 0) return <p>{t("hotels.landing.none")}</p>;
 
     return (
       <ol>
+        <BookingViewOffCanvas
+          offCanvasOpen={offCanvasData.isOpen}
+          handleToggleOffcanvas={toggleOffCanvas()}
+          bookingId={offCanvasData.bookingId}
+          hotelId={hotelId}
+        />
         {rooms.map((item) => (
           <li key={`${prefix}-${item.room.id}-${item.bookingId}`}>
             {item.isRoomChange && (
@@ -35,12 +60,12 @@ const RoomsPane: React.FC<RoomsPaneProps> = ({
               </strong>
             )}{" "}
             <strong>{item.room.name}</strong> —{" "}
-            <Link
-              className="link-primary"
-              to={`/hotels/${hotelId}/bookings/${item.bookingId}`}
-              title={t("hotels.landing.viewBookingDetails")}>
+            <span
+              className="link-primary cursor-pointer"
+              title={t("hotels.landing.viewBookingDetails")}
+              onClick={toggleOffCanvas(item.bookingId)}>
               {item.firstName} {item.lastName}
-            </Link>
+            </span>
           </li>
         ))}
       </ol>
@@ -103,6 +128,6 @@ const RoomsPane: React.FC<RoomsPaneProps> = ({
       </Col>
     </Row>
   );
-};
+}
 
 export default RoomsPane;
