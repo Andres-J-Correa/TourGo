@@ -29,13 +29,7 @@ export default defineConfig([
           varsIgnorePattern: "^_",
         },
       ],
-      "@typescript-eslint/no-require-imports": [
-        "warn",
-        {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-        },
-      ],
+      "@typescript-eslint/no-require-imports": ["warn"],
     },
   },
 ]);
