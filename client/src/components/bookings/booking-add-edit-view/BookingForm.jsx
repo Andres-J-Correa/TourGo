@@ -673,15 +673,18 @@ export default withFormik({
           const isCountCleaningInterval =
             newCount === Number(values.cleaningInterval);
 
-          if (isConsecutiveDate && !isCountCleaningInterval) {
+          if (!isConsecutiveDate) {
+            this.set(roomId, { prevDate: date, count: 0 });
+            return roomBooking;
+          }
+
+          if (!isCountCleaningInterval) {
             this.set(roomId, { prevDate: date, count: newCount });
             return roomBooking;
           }
 
-          if (isConsecutiveDate && isCountCleaningInterval) {
-            roomBooking.shouldClean = true;
-            this.delete(roomId);
-          }
+          roomBooking.shouldClean = true;
+          this.delete(roomId);
         }
 
         return roomBooking;
