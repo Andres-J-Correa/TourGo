@@ -123,9 +123,6 @@ function BookingForm({
     return !deepCompareBooking(currentForm, previousForm, bookingKeysToCompare);
   };
 
-  const isSubmitDisabled =
-    isSubmitting || (Boolean(values?.id) && !formChanged());
-
   const removeBookedRoomBookings = useCallback(
     (bookingsToCheck, roomBookings, roomAvailability) => {
       const roomBookingsMap = new Map();
@@ -596,13 +593,9 @@ function BookingForm({
           <div className="text-center my-3">
             <Button
               type="submit"
-              disabled={isSubmitDisabled}
+              disabled={isSubmitting}
               className="bg-gradient-success">
-              {isSubmitting ? (
-                <Spinner size="sm" />
-              ) : (
-                t("booking.form.saveBooking")
-              )}
+              {t("booking.form.saveBooking")}
             </Button>
           </div>
         </Form>
@@ -614,7 +607,7 @@ function BookingForm({
 export default withFormik({
   mapPropsToValues: ({ booking }) =>
     booking?.id
-      ? { ...sanitizeBooking(booking) }
+      ? { ...bookingDefaultInitialValues, ...sanitizeBooking(booking) }
       : { ...bookingDefaultInitialValues },
   validationSchema: (props) => props.bookingSchema,
   enableReinitialize: true,
@@ -655,9 +648,48 @@ export default withFormik({
 
       let res = null;
 
-      if (values.id) {
+      //organize room bookings by date and apply cleaning interval
+      let valuesCopy = { ...values };
+
+      valuesCopy.roomBookings.sort((a, b) => (a.date > b.date ? 1 : -1));
+
+      valuesCopy.roomBookings = valuesCopy.roomBookings.map(function (
+        roomBooking,
+      ) {
+        const { roomId, date } = roomBooking;
+
+        roomBooking.shouldClean = false;
+
+        if (!this.has(roomId)) {
+          this.set(roomId, { prevDate: date, count: 0 });
+        } else {
+          const { prevDate, count } = this.get(roomId);
+          const newCount = count + 1;
+
+          const isConsecutiveDate = dayjs(prevDate)
+            .add(1, "day")
+            .isSame(dayjs(date));
+
+          const isCountCleaningInterval =
+            newCount === Number(values.cleaningInterval);
+
+          if (isConsecutiveDate && !isCountCleaningInterval) {
+            this.set(roomId, { prevDate: date, count: newCount });
+            return roomBooking;
+          }
+
+          if (isConsecutiveDate && isCountCleaningInterval) {
+            roomBooking.shouldClean = true;
+            this.delete(roomId);
+          }
+        }
+
+        return roomBooking;
+      }, new Map());
+
+      if (valuesCopy.id) {
         res = await updateBooking(
-          { ...values, statusId: booking.status.id },
+          { ...valuesCopy, statusId: booking.status.id },
           hotelId,
         );
       } else {
@@ -667,7 +699,7 @@ export default withFormik({
 
         res = await addBooking(
           {
-            ...values,
+            ...valuesCopy,
             statusId,
           },
           hotelId,

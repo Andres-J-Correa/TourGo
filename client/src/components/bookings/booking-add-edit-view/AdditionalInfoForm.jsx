@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useFormikContext } from "formik";
-import { Row, Col } from "reactstrap";
+import { Row, Col, InputGroup, InputGroupText, Collapse } from "reactstrap";
 import { faPlusSquare, faMinusSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
@@ -92,17 +92,34 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
             onChange={(e) => handleInputChange(e, "adultGuests")}
           />
         </Col>
+        <Col md="4" className="justify-content-end">
+          <InputGroup>
+            <InputGroupText
+              className="mb-3 text-center fw-medium"
+              style={{ flex: "1 1 auto" }}>
+              Intervalo de Limpieza
+            </InputGroupText>
+            <CustomField
+              name="cleaningInterval"
+              type="number"
+              placeholder={"Días"}
+              disabled={submitting}
+            />
+          </InputGroup>
+        </Col>
       </Row>
-      <h5
-        className="mt-4 mb-3 cursor-pointer d-flex"
-        onClick={() => setShowOptionalFields(!showOptionalFields)}>
-        {t("booking.additionalInfo.optionalInfo")}
-        <FontAwesomeIcon
-          icon={showOptionalFields ? faMinusSquare : faPlusSquare}
-          className="ms-2 my-auto"
-        />
+      <h5 className="mt-4 mb-3 d-flex">
+        <span
+          className="cursor-pointer"
+          onClick={() => setShowOptionalFields(!showOptionalFields)}>
+          {t("booking.additionalInfo.optionalInfo")}
+          <FontAwesomeIcon
+            icon={showOptionalFields ? faMinusSquare : faPlusSquare}
+            className="ms-2 my-auto"
+          />
+        </span>
       </h5>
-      {showOptionalFields && (
+      <Collapse isOpen={showOptionalFields}>
         <>
           <Row>
             <Col md="4">
@@ -114,7 +131,7 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
                 onChange={(e) => handleInputChange(e, "childGuests")}
               />
             </Col>
-            <Col md="4">
+            <Col md="4" className="mb-3">
               <DateTimePicker
                 name="eta"
                 placeholder={t("booking.additionalInfo.eta")}
@@ -172,7 +189,7 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
             </Col>
           </Row>
         </>
-      )}
+      </Collapse>
     </>
   );
 }

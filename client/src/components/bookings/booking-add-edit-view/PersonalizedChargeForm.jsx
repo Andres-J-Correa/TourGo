@@ -50,16 +50,16 @@ function PersonalizedChargeForm({ onSubmit }) {
                   name="name"
                   type="text"
                   placeholder={t(
-                    "booking.personalizedChargeForm.namePlaceholder"
+                    "booking.personalizedChargeForm.namePlaceholder",
                   )}
                   isRequired={true}
                 />
-                <InputGroupText className="mb-3">$</InputGroupText>
+                <InputGroupText className="mb-3 fw-medium">$</InputGroupText>
                 <CustomField
                   name="amount"
                   type="text"
                   placeholder={t(
-                    "booking.personalizedChargeForm.amountPlaceholder"
+                    "booking.personalizedChargeForm.amountPlaceholder",
                   )}
                   isRequired={true}
                   onChange={handleAmountChange(setFieldValue)}
