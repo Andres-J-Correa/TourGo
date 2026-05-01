@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { BrowserRouter } from "react-router-dom";
+//import { BrowserRouter } from "react-router-dom";
 import { AppContextProvider } from "../contexts/GlobalAppContext";
 import { LanguageProvider } from "../contexts/LanguageContext";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";

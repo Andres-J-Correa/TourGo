@@ -70,7 +70,7 @@ export const useHotelActions = (
 
       let swalText = t("hotels.landing.checkInText");
       let swalTitle = t("hotels.landing.checkInTitle");
-      let hasBalanceDue = booking.balanceDue > 0;
+      const hasBalanceDue = booking.balanceDue > 0;
       if (hasBalanceDue) {
         swalText = t("hotels.landing.checkInBalanceDueText");
         swalTitle = t("hotels.landing.checkInBalanceDueTitle");

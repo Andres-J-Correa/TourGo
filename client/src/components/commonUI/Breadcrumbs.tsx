@@ -16,7 +16,7 @@ const Breadcrumbs = ({
       const mapped: JSX.Element[] = [];
 
       breadcrumbs.forEach((breadcrumb, index) => {
-        if (!!breadcrumb) {
+        if (breadcrumb) {
           mapped.push(
             <li key={`breadcrumb-${index}`} className={`breadcrumb-item`}>
               {breadcrumb.path ? (

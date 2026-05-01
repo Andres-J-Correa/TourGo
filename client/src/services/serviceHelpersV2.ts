@@ -52,12 +52,12 @@ export const handleGlobalError = (error: unknown): ErrorResponse => {
 type ReplaceEmptyWithNull<T> = T extends ""
   ? null // replace empty string
   : T extends Array<infer U>
-  ? Array<ReplaceEmptyWithNull<U>> // handle arrays
-  : T extends object
-  ? {
-      [K in keyof T]: ReplaceEmptyWithNull<T[K]>;
-    }
-  : T;
+    ? Array<ReplaceEmptyWithNull<U>> // handle arrays
+    : T extends object
+      ? {
+          [K in keyof T]: ReplaceEmptyWithNull<T[K]>;
+        }
+      : T;
 
 function replaceEmptyStringsWithNull<T>(data: T): ReplaceEmptyWithNull<T> {
   if (data === null || typeof data !== "object") {
@@ -73,12 +73,13 @@ function replaceEmptyStringsWithNull<T>(data: T): ReplaceEmptyWithNull<T> {
       value === ""
         ? null
         : typeof value === "object" && value !== null
-        ? replaceEmptyStringsWithNull(value)
-        : value;
+          ? replaceEmptyStringsWithNull(value)
+          : value;
 
     if (isArray) {
       (result as unknown as unknown[]).push(val);
     } else {
+      //eslint-disable-next-line @typescript-eslint/no-explicit-any
       (result as any)[key] = val;
     }
   }

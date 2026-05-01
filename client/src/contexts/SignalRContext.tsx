@@ -34,45 +34,44 @@ export const SignalRProvider: React.FC<SignalRProviderProps> = ({
   children,
 }) => {
   // Store connections in a Record keyed by the hub name
-  const [connections, setConnections] = useState(initialConnections);
+  const [connections] = useState<Record<HubKey, signalR.HubConnection | null>>(
+    () => {
+      const conns = { ...initialConnections };
+
+      (Object.keys(HUB_CONFIG) as HubKey[]).forEach((key) => {
+        const connection = new signalR.HubConnectionBuilder()
+          .withUrl(HUB_CONFIG[key], { withCredentials: true })
+          .withAutomaticReconnect()
+          .configureLogging(signalR.LogLevel.Information)
+          .build();
+
+        conns[key] = connection;
+      });
+
+      return conns;
+    },
+  );
 
   useEffect(() => {
-    const newConnections = { ...initialConnections };
     const connectionPromises: Promise<void>[] = [];
 
-    (Object.keys(HUB_CONFIG) as HubKey[]).forEach((key) => {
-      const url = HUB_CONFIG[key];
+    Object.entries(connections).forEach(([key, conn]) => {
+      if (!conn) return;
 
-      // Build the connection
-      const connection = new signalR.HubConnectionBuilder()
-        .withUrl(url, {
-          withCredentials: true,
-        })
-        .withAutomaticReconnect()
-        .configureLogging(signalR.LogLevel.Information)
-        .build();
-
-      newConnections[key] = connection;
-
-      // Start the connection
-      const startPromise = connection
+      const startPromise = conn
         .start()
         .then(() => _logger(`Connected to ${key} hub`))
-        .catch((err: any) => _logger(`Failed to connect to ${key} hub`, err));
+        .catch((err) => _logger(`Failed to connect to ${key} hub`, err));
 
       connectionPromises.push(startPromise);
     });
 
-    // Update state once connections are created (even if they haven't finished connecting yet)
-    setConnections(newConnections);
-
-    // Cleanup: Stop all connections when the Provider unmounts
     return () => {
-      Object.values(newConnections).forEach((conn) => {
+      Object.values(connections).forEach((conn) => {
         if (conn) conn.stop();
       });
     };
-  }, []);
+  }, [connections]);
 
   const getConnection = (key: HubKey) => {
     return connections[key];

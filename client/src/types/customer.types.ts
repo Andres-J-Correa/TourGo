@@ -10,5 +10,7 @@ export interface Customer extends AuditableEntity {
   isActive: boolean;
 }
 
-export interface CustomerPayload
-  extends Omit<Customer, keyof AuditableEntity | "id" | "isActive"> {}
+export type CustomerPayload = Omit<
+  Customer,
+  keyof AuditableEntity | "id" | "isActive"
+>;

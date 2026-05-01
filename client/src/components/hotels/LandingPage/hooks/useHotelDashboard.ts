@@ -22,7 +22,7 @@ const getValueOrNull = <T>(result: PromiseSettledResult<T>): T | null => {
 
 export const useHotelDashboard = (
   hotelId: string | undefined,
-  date: string
+  date: string,
 ) => {
   const [data, setData] = useState<HotelDashboardData>({
     arrivals: [],
@@ -136,7 +136,7 @@ export const useHotelDashboard = (
           if (errors.length > 0) {
             toast.error(errors.join(" | "));
           }
-        }
+        },
       )
       .finally(() => {
         setLoading(false);

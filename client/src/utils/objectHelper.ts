@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const flattenObject = (
   obj: Record<string, any>,
   prefix: string = "",
-  result: Record<string, any> = {}
+  result: Record<string, any> = {},
 ): Record<string, any> => {
   for (const [key, value] of Object.entries(obj)) {
     const newKey: string = prefix ? `${prefix}-${key}` : key;
