@@ -287,7 +287,8 @@
       "externalIdMax": "External identification cannot exceed {{max}} characters",
       "externalIdRequired": "External identification is required",
       "externalCommissionRequired": "External commission is required",
-      "externalCommissionMin": "External commission cannot be negative"
+      "externalCommissionMin": "External commission cannot be negative",
+      "cleaningIntervalMin": "The cleaning interval cannot be negative"
     },
     "customerForm": {
       "searching": "Searching for customer...",

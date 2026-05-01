@@ -186,7 +186,7 @@ namespace TourGo.Services.Hotels
         {
             BookingAddResponse? response = null;
 
-            string proc = "bookings_insert_v9";
+            string proc = "bookings_insert_v10";
             _mySqlDataProvider.ExecuteCmd(proc, (param) =>
             {
                 param.AddWithValue("p_customerId", model.CustomerId);
@@ -233,7 +233,7 @@ namespace TourGo.Services.Hotels
 
         public void Update(BookingsUpdateRequest model, string userId, string hotelId)
         {
-            string proc = "bookings_update_v7";
+            string proc = "bookings_update_v8";
             _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
             {
                 param.AddWithValue("p_id", model.Id);

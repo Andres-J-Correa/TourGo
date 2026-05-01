@@ -11,5 +11,6 @@ namespace TourGo.Models.Requests.Bookings
         public int RoomId { get; set; }
         public DateOnly Date { get; set; }
         public decimal Price { get; set; }
+        public bool ShouldClean { get; set; } = false;
     }
 }

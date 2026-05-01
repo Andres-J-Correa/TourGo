@@ -287,7 +287,8 @@
       "externalIdMax": "La identificación externa no puede exceder los {{max}} caracteres",
       "externalIdRequired": "La identificación externa es obligatoria",
       "externalCommissionRequired": "La comisión externa es obligatoria",
-      "externalCommissionMin": "La comisión externa no puede ser negativa"
+      "externalCommissionMin": "La comisión externa no puede ser negativa",
+      "cleaningIntervalMin": "El intervalo de limpieza no puede ser negativo"
     },
     "customerForm": {
       "searching": "Buscando cliente...",

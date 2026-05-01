@@ -33,7 +33,7 @@ export default function useBookingSchemas() {
       .test(
         "is-valid-phone",
         (params) => t("booking.validation.phoneValid", params),
-        (value) => isValidPhoneNumber(value)
+        (value) => isValidPhoneNumber(value),
       ),
   });
 
@@ -67,7 +67,7 @@ export default function useBookingSchemas() {
           date: Yup.string().required(),
           roomId: Yup.number().required(),
           price: Yup.number().required(),
-        })
+        }),
       )
       .test("all-dates-covered", function (bookings) {
         const start = this.options.context?.arrivalDate;
@@ -87,7 +87,7 @@ export default function useBookingSchemas() {
         const bookedDates = new Set(bookings.map((b) => b.date));
 
         const missingDates = expectedDates.filter(
-          (date) => !bookedDates.has(date)
+          (date) => !bookedDates.has(date),
         );
 
         return missingDates.length > 0
@@ -111,7 +111,7 @@ export default function useBookingSchemas() {
           .min(2, (params) => t("booking.validation.externalIdMin", params))
           .max(100, (params) => t("booking.validation.externalIdMax", params))
           .required((params) =>
-            t("booking.validation.externalIdRequired", params)
+            t("booking.validation.externalIdRequired", params),
           ),
       otherwise: () =>
         Yup.string()
@@ -125,18 +125,21 @@ export default function useBookingSchemas() {
       then: () =>
         Yup.number()
           .required((params) =>
-            t("booking.validation.externalCommissionRequired", params)
+            t("booking.validation.externalCommissionRequired", params),
           )
           .min(0, (params) =>
-            t("booking.validation.externalCommissionMin", params)
+            t("booking.validation.externalCommissionMin", params),
           ),
       otherwise: () =>
         Yup.number()
           .min(0, (params) =>
-            t("booking.validation.externalCommissionMin", params)
+            t("booking.validation.externalCommissionMin", params),
           )
           .nullable(),
     }),
+    cleaningInterval: Yup.number().min(0, (params) =>
+      t("booking.validation.cleaningIntervalMin", params),
+    ),
   });
 
   return {

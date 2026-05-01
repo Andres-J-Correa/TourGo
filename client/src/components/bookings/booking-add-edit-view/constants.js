@@ -48,6 +48,7 @@ export const bookingDefaultInitialValues = {
   status: {
     id: BOOKING_STATUS_IDS.ACTIVE,
   },
+  cleaningInterval: 2,
 };
 
 export const sanitizeBooking = (booking) => {
@@ -71,7 +72,6 @@ export const sanitizeBooking = (booking) => {
   sanitizedBooking.status = booking.status?.id
     ? booking.status
     : { id: BOOKING_STATUS_IDS.ACTIVE };
-
   return sanitizedBooking;
 };
 
@@ -144,7 +144,7 @@ export const deepCompareBooking = (obj1, obj2, keysToCompare) => {
         fields.reduce((obj, key) => {
           obj[key] = item?.[key];
           return obj;
-        }, {})
+        }, {}),
       );
 
     const getHashCountMap = (arr) => {
