@@ -26,7 +26,8 @@
     "downloading": "Downloading",
     "recaptchaError": "reCAPTCHA error, please notify the site administrator",
     "noOptions": "No options available",
-    "search": "Search"
+    "search": "Search",
+    "days": "Days"
   },
   "yup": {
     "required": "{{label}} is required",
@@ -213,7 +214,8 @@
       "externalCommission": "External Commission",
       "notes": "Notes",
       "requiredInfo": "Required information",
-      "optionalInfo": "Optional information"
+      "optionalInfo": "Optional information",
+      "cleaningInterval": "Cleaning Interval"
     },
     "breadcrumb": {
       "home": "Home",

@@ -26,7 +26,8 @@
     "downloading": "Descargando",
     "recaptchaError": "Error de reCAPTCHA, por favor avisale al administrador del sitio",
     "noOptions": "Sin opciones",
-    "search": "Buscar"
+    "search": "Buscar",
+    "days": "Días"
   },
   "yup": {
     "required": "{{label}} es obligatorio",
@@ -213,7 +214,8 @@
       "externalCommission": "Comisión externa",
       "notes": "Notas",
       "requiredInfo": "Información requerida",
-      "optionalInfo": "Información opcional"
+      "optionalInfo": "Información opcional",
+      "cleaningInterval": "Intervalo de Limpieza"
     },
     "breadcrumb": {
       "home": "Inicio",

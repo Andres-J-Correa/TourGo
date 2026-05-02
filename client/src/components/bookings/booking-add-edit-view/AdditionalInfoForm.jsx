@@ -97,12 +97,12 @@ function AdditionalInfoForm({ submitting, bookingProviderOptions }) {
             <InputGroupText
               className="mb-3 text-center fw-medium"
               style={{ flex: "1 1 auto" }}>
-              Intervalo de Limpieza
+              {t("booking.additionalInfo.cleaningInterval")}
             </InputGroupText>
             <CustomField
               name="cleaningInterval"
               type="number"
-              placeholder={"Días"}
+              placeholder={t("common.days")}
               disabled={submitting}
             />
           </InputGroup>
