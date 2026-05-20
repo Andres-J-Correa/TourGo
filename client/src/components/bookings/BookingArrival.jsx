@@ -92,7 +92,7 @@ const BookingArrival = ({
         <Row>
           <Col>
             <strong>{t("booking.arrival.eta")}</strong>{" "}
-            {dayjs.utc(arrival.eta).format("DD/MM/YYYY h:mm")}
+            {dayjs.utc(arrival.eta).format("DD/MM/YYYY h:mm a")}
           </Col>
         </Row>
       )}
