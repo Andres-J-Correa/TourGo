@@ -29,7 +29,7 @@ export type RoomBookingsByDateAndRoom = Record<
 export const useCalendarTableData = (
   startDate: Date | null,
   endDate: Date | null,
-  hotelId?: string
+  hotelId?: string,
 ): {
   rooms: Room[];
   roomBookings: RoomBookingsByDateAndRoom;
@@ -39,12 +39,12 @@ export const useCalendarTableData = (
   roomAvailability: RoomAvailabilityByDateAndRoom;
   handleUpsertRoomAvailability: (
     hotel: string,
-    availability: RoomAvailabilityRequest
+    availability: RoomAvailabilityRequest,
   ) => Promise<void>;
 } => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomBookings, setRoomBookings] = useState<RoomBookingsByDateAndRoom>(
-    {}
+    {},
   );
   const [roomAvailability, setRoomAvailability] =
     useState<RoomAvailabilityByDateAndRoom>({});
@@ -56,7 +56,7 @@ export const useCalendarTableData = (
   const { t } = useLanguage();
 
   const mapRoomAvailabilityByDateAndRoom = (
-    roomAvailability: RoomAvailability[]
+    roomAvailability: RoomAvailability[],
   ): RoomAvailabilityByDateAndRoom => {
     const roomAvailabilityByDate: Record<
       string,
@@ -88,7 +88,7 @@ export const useCalendarTableData = (
 
   const handleUpsertRoomAvailability = async (
     hotelId: string,
-    availability: RoomAvailabilityRequest
+    availability: RoomAvailabilityRequest,
   ): Promise<void> => {
     const response = await upsertRoomAvailability(hotelId, availability);
     if (response.isSuccessful) {
@@ -115,7 +115,7 @@ export const useCalendarTableData = (
 
     const fetchRooms = async () => {
       setLoadingRooms(true);
-      const response = await getRoomsByHotelId(hotelId);
+      const response = await getRoomsByHotelId(hotelId, true);
 
       if (response.isSuccessful) {
         setRooms(response.items);
@@ -180,7 +180,7 @@ export const useCalendarTableData = (
       const response = await getRoomAvailabilityByDateRange(
         hotelId,
         start,
-        end
+        end,
       );
 
       if (response.isSuccessful) {

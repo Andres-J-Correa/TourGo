@@ -258,6 +258,33 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
+        [HttpPatch("{id}/active")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> UpdateStatusToActive(string id, string hotelId)
+        {
+            ObjectResult result = null;
+
+            try
+            {
+                string userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.UpdateStatus(id, userId, BookingStatusEnum.Active, hotelId);
+
+                SuccessResponse response = new SuccessResponse();
+
+                result = Ok200(response);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+
         [HttpPatch("{id}/activate")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
         public ActionResult<SuccessResponse> Activate(string id, string hotelId, [FromBody] int customerId)

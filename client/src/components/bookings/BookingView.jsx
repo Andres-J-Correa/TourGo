@@ -8,6 +8,7 @@ import {
   updateStatusToCompleted,
   updateStatusToCancelled,
   activateBooking,
+  updateStatusToActive,
 } from "services/bookingService";
 import {
   BOOKING_STATUS_IDS,
@@ -43,6 +44,7 @@ import {
   faPenToSquare,
   faFileInvoiceDollar,
   faCheckCircle,
+  faArrowRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAppContext } from "contexts/GlobalAppContext";
@@ -69,7 +71,7 @@ function BookingView() {
       firstName: user.current?.firstName,
       lastName: user.current?.lastName,
     }),
-    [user]
+    [user],
   );
 
   const hasBalanceDue = useMemo(() => {
@@ -107,8 +109,39 @@ function BookingView() {
         toast.error(t("booking.view.errors.loadBooking"));
       }
     },
-    [t]
+    [t],
   );
+
+  const handleUpdateStatusToActive = useCallback(async () => {
+    try {
+      setIsUploading(true);
+      const res = await updateStatusToActive(bookingId, hotelId);
+      if (res.isSuccessful) {
+        setBooking((prevBooking) => ({
+          ...prevBooking,
+          status: { id: BOOKING_STATUS_IDS.ACTIVE },
+          modifiedBy: { ...modifiedBy },
+          dateModified: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
+        }));
+
+        Swal.fire({
+          title: t("common.success"),
+          icon: "success",
+          confirmButtonText: t("common.ok"),
+        });
+      } else {
+        throw new Error("Error al marcar como activa");
+      }
+    } catch (error) {
+      Swal.close();
+      await Swal.fire({
+        icon: "error",
+        title: t("common.error"),
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  }, []);
 
   const handleCheckIn = useCallback(async () => {
     let swalText = t("booking.view.checkInConfirmText");
@@ -415,6 +448,16 @@ function BookingView() {
         </Modal>
         <Row className="mb-1">
           <Col md={6} className="ps-3 gap-1">
+            {booking?.status?.id === BOOKING_STATUS_IDS.ARRIVED && (
+              <Button
+                color="outline-dark"
+                onClick={handleUpdateStatusToActive}
+                disabled={isUploading || isLoading}
+                className="mb-2 me-2">
+                {t("booking.view.markActive")}
+                <FontAwesomeIcon icon={faArrowRotateLeft} className="ms-2" />
+              </Button>
+            )}
             {booking?.status?.id === BOOKING_STATUS_IDS.ACTIVE && (
               <Button
                 color="outline-dark"

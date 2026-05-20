@@ -7,6 +7,7 @@ import {
   faPlaneArrival,
   faClipboardList,
 } from "@fortawesome/free-solid-svg-icons";
+import utc from "dayjs/plugin/utc";
 
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
@@ -15,6 +16,8 @@ import PhoneWspLink from "components/commonUI/PhoneWspLink";
 import { BOOKING_STATUS_IDS } from "components/bookings/constants";
 import { formatCurrency } from "utils/currencyHelper";
 import { useLanguage } from "contexts/LanguageContext";
+
+dayjs.extend(utc);
 
 const BookingArrival = ({
   arrival,
@@ -89,7 +92,7 @@ const BookingArrival = ({
         <Row>
           <Col>
             <strong>{t("booking.arrival.eta")}</strong>{" "}
-            {dayjs(arrival.eta).format("DD/MM/YYYY h:mm")}
+            {dayjs.utc(arrival.eta).format("DD/MM/YYYY h:mm")}
           </Col>
         </Row>
       )}

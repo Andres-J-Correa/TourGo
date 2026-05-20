@@ -36,7 +36,7 @@ export const getPagedMinimalBookingsByDateRange = async (
   firstName,
   lastName,
   externalBookingId,
-  statusId
+  statusId,
 ) => {
   const queryParams = new URLSearchParams({
     pageIndex,
@@ -56,7 +56,7 @@ export const getPagedMinimalBookingsByDateRange = async (
 
   const url = `${apiV2.replace(
     /{hotelId}/,
-    hotelId
+    hotelId,
   )}/date-range?${queryParams.toString()}`;
 
   const config = {
@@ -180,7 +180,7 @@ export const getChargesByBookingId = async (bookingId, hotelId) => {
 export const getRoomBookingsByDateRange = async (
   hotelId,
   startDate,
-  endDate
+  endDate,
 ) => {
   const config = {
     headers: {
@@ -189,7 +189,7 @@ export const getRoomBookingsByDateRange = async (
     method: "GET",
     url: `${apiV2.replace(
       /{hotelId}/,
-      hotelId
+      hotelId,
     )}/room-bookings?startDate=${startDate}&endDate=${endDate}`,
   };
   try {
@@ -294,7 +294,7 @@ export const getForCleaningRooms = async (hotelId, date) => {
     method: "GET",
     url: `${apiV2.replace(
       /{hotelId}/,
-      hotelId
+      hotelId,
     )}/for-cleaning/rooms?date=${date}`,
   };
   try {
@@ -350,6 +350,23 @@ export const activateBooking = async (bookingId, hotelId, customerId) => {
     method: "PATCH",
     url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/activate`,
     data: customerId,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const updateStatusToActive = async (bookingId, hotelId) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/active`,
   };
   try {
     const response = await axiosClient(config);

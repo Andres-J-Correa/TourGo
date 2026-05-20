@@ -612,7 +612,8 @@
       "errors": {
         "loadBooking": "Error loading booking",
         "downloadInvoice": "Error downloading invoice"
-      }
+      },
+      "markActive": "Mark Active"
     },
     "viewOffCanvas": {
       "title": "Booking Details",

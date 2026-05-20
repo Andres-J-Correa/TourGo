@@ -612,7 +612,8 @@
       "errors": {
         "loadBooking": "Error al cargar reserva",
         "downloadInvoice": "Error al descargar factura"
-      }
+      },
+      "markActive": "Marcar Activa"
     },
     "viewOffCanvas": {
       "title": "Detalles de la Reserva",
