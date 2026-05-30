@@ -967,7 +967,9 @@
       "activeRooms": "Active Rooms",
       "inactiveRooms": "Inactive Rooms",
       "chartTitle": "Room Occupancy vs Revenue",
-      "revenue": "Revenue"
+      "revenue": "Revenue",
+      "avgRevenue": "Average revenue per room",
+      "avgOccupancyRate": "Average occupancy rate"
     },
     "subcategoryAnalysisReport": {
       "title": "Subcategory Analysis",
