@@ -376,3 +376,42 @@ export const updateStatusToActive = async (bookingId, hotelId) => {
     return onGlobalError(error);
   }
 };
+
+export const updateBookingNotes = async (bookingId, hotelId, notes) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/notes`,
+    data: { notes },
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};
+
+export const updateBookingEta = async (bookingId, hotelId, eta) => {
+  const queryParams = new URLSearchParams();
+
+  if (eta) queryParams.append("eta", eta);
+
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "PATCH",
+    url: `${apiV2.replace(/{hotelId}/, hotelId)}/${bookingId}/eta?${queryParams.toString()}`,
+  };
+  try {
+    const response = await axiosClient(config);
+    onGlobalSuccess(response);
+    return response.data;
+  } catch (error) {
+    return onGlobalError(error);
+  }
+};

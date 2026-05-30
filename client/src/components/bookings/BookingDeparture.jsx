@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Row, Col, Button } from "reactstrap";
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
+import BookingFieldEditModal from "components/bookings/BookingFieldEditModal";
 import { BOOKING_STATUS_IDS } from "components/bookings/constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -21,8 +22,31 @@ const BookingDeparture = ({
   renderRooms,
 }) => {
   const [offCanvasOpen, setOffCanvasOpen] = useState(false);
+  const [fieldModalOpen, setFieldModalOpen] = useState(false);
+  const [localNotes, setLocalNotes] = useState(departure.notes);
+  const [editingField, setEditingField] = useState(null);
   const { t } = useLanguage();
   const toggleOffCanvas = () => setOffCanvasOpen((prev) => !prev);
+
+  useEffect(() => {
+    setLocalNotes(departure.notes);
+  }, [departure.notes]);
+
+  const handleOpenFieldModal = (field) => {
+    setEditingField(field);
+    setFieldModalOpen(true);
+  };
+
+  const handleCloseFieldModal = () => {
+    setFieldModalOpen(false);
+    setEditingField(null);
+  };
+
+  const handleFieldSaved = (value) => {
+    if (editingField === "notes") {
+      setLocalNotes(value);
+    }
+  };
 
   return (
     <div
@@ -34,6 +58,15 @@ const BookingDeparture = ({
         handleToggleOffcanvas={toggleOffCanvas}
         bookingId={departure.id}
         hotelId={hotelId}
+      />
+      <BookingFieldEditModal
+        isOpen={fieldModalOpen}
+        toggle={handleCloseFieldModal}
+        bookingId={departure.id}
+        hotelId={hotelId}
+        fieldType={editingField}
+        currentValue={localNotes}
+        onSaved={handleFieldSaved}
       />
       <Row className="justify-content-between">
         <Col md={5}>
@@ -81,12 +114,19 @@ const BookingDeparture = ({
                 ))}
           </ul>
         </Col>
-        {departure.notes && (
-          <Col lg={4} md={6} xs={12} className="mb-2">
-            <strong>{t("booking.departure.notes")}</strong>
-            <p className="mb-0">{departure.notes}</p>
-          </Col>
-        )}
+        <Col lg={4} md={6} xs={12} className="mb-2">
+          <strong>{t("booking.departure.notes")}</strong>
+          <p className="mb-0">
+            <Button
+              type="button"
+              color="link"
+              className="p-0 align-baseline text-decoration-none"
+              onClick={() => handleOpenFieldModal("notes")}
+              title={t("booking.fieldEditModal.notes.title")}>
+              {localNotes ? localNotes : t("booking.fieldEditModal.add")}
+            </Button>
+          </p>
+        </Col>
         <Col className="text-end align-content-end mb-2">
           <Row>
             <Col xs={12} className="mb-2">

@@ -27,7 +27,8 @@
     "recaptchaError": "Error de reCAPTCHA, por favor avisale al administrador del sitio",
     "noOptions": "Sin opciones",
     "search": "Buscar",
-    "days": "Días"
+    "days": "Días",
+    "save": "Guardar"
   },
   "yup": {
     "required": "{{label}} es obligatorio",
@@ -618,6 +619,21 @@
     "viewOffCanvas": {
       "title": "Detalles de la Reserva",
       "goToSummary": "Resumen"
+    },
+    "fieldEditModal": {
+      "add": "Agregar",
+      "notes": {
+        "title": "Editar Notas",
+        "placeholder": "Ingrese las notas aquí...",
+        "label": "Notas",
+        "success": "Notas actualizadas correctamente."
+      },
+      "eta": {
+        "title": "Editar Llegada Estimada",
+        "placeholder": "Seleccione la fecha y hora estimada de llegada",
+        "label": "Llegada Estimada",
+        "success": "Llegada estimada actualizada correctamente."
+      }
     }
   },
   "commonUI": {

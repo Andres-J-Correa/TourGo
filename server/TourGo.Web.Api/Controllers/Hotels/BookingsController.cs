@@ -345,6 +345,51 @@ namespace TourGo.Web.Api.Controllers.Hotels
             return result;
         }
 
+        [HttpPatch("{id}/notes")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> UpdateNotes(string hotelId, string id, BookingUpdateNotesRequest model)
+        {
+            ObjectResult result;
+
+            try
+            {
+                string userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.UpdateNotes(id, hotelId, userId, model.Notes);
+                result = Ok200(new SuccessResponse());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
+
+        [HttpPatch("{id}/eta")]
+        [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Update)]
+        public ActionResult<SuccessResponse> UpdateEta(string hotelId, string id, [FromQuery] DateTime? eta)
+        {
+            ObjectResult result;
+
+            try
+            {
+                string userId = _webAuthService.GetCurrentUserId();
+
+                _bookingService.UpdateEta(id, hotelId, userId, eta);
+                result = Ok200(new SuccessResponse());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogErrorWithDb(ex, _errorLoggingService, HttpContext);
+                ErrorResponse response = new ErrorResponse();
+                result = StatusCode(500, response);
+            }
+
+            return result;
+        }
 
         [HttpGet("{id}")]
         [EntityAuth(EntityTypeEnum.Bookings, EntityActionTypeEnum.Read)]

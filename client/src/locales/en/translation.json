@@ -27,7 +27,8 @@
     "recaptchaError": "reCAPTCHA error, please notify the site administrator",
     "noOptions": "No options available",
     "search": "Search",
-    "days": "Days"
+    "days": "Days",
+    "save": "Save"
   },
   "yup": {
     "required": "{{label}} is required",
@@ -618,6 +619,21 @@
     "viewOffCanvas": {
       "title": "Booking Details",
       "goToSummary": "Summary"
+    },
+    "fieldEditModal": {
+      "add": "Add",
+      "notes:": {
+        "title": "Edit Notes",
+        "placeholder": "Enter notes here...",
+        "label": "Notes",
+        "success": "Notes updated successfully"
+      },
+      "eta": {
+        "title": "Edit Estimated Arrival",
+        "placeholder": "Select estimated arrival date and time",
+        "label": "Estimated Arrival",
+        "success": "Estimated arrival updated successfully"
+      }
     }
   },
   "commonUI": {

@@ -32,5 +32,7 @@ namespace TourGo.Services.Interfaces
         void ToggleRoomBookingShouldClean(ToggleRoomBookingShouldCleanRequest model, string hotelId);
         List<RoomBooking>? GetForCleaningRoomBookings(DateOnly date, string hotelId);
         void Activate(string bookingId, string hotelId, int customerId, string userId);
+        void UpdateNotes(string id, string hotelId, string userId, string? notes);
+        void UpdateEta(string id, string hotelId, string userId, DateTime? eta);
     }
 }
