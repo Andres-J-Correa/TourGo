@@ -88,14 +88,14 @@ const BookingArrival = ({
           <strong>{t("booking.arrival.nights")}</strong> {arrival.nights}
         </Col>
       </Row>
-      {dayjs(arrival.eta).isValid() && (
-        <Row>
-          <Col>
-            <strong>{t("booking.arrival.eta")}</strong>{" "}
-            {dayjs.utc(arrival.eta).format("DD/MM/YYYY h:mm a")}
-          </Col>
-        </Row>
-      )}
+      <Row>
+        <Col>
+          <strong>{t("booking.arrival.eta")}</strong>{" "}
+          {dayjs(arrival.eta).isValid()
+            ? dayjs.utc(arrival.eta).format("DD/MM/YYYY h:mm a")
+            : "Agregar"}
+        </Col>
+      </Row>
       <Row>
         <Col lg={4} md={6} xs={12}>
           <strong>{t("booking.arrival.arrivingRooms")}</strong>{" "}
@@ -107,12 +107,10 @@ const BookingArrival = ({
             <ul className="mb-0">{renderRooms(filteredRooms)}</ul>
           </Col>
         )}
-        {arrival.notes && (
-          <Col lg={4} md={6} xs={12}>
-            <strong>{t("booking.arrival.notes")}</strong>
-            <p className="mb-0">{arrival.notes}</p>
-          </Col>
-        )}
+        <Col lg={4} md={6} xs={12}>
+          <strong>{t("booking.arrival.notes")}</strong>
+          <p className="mb-0">{arrival.notes ? arrival.notes : "Agregar"}</p>
+        </Col>
         <Col className="text-end align-content-end">
           <Row>
             <Col xs={12} className="mb-2">

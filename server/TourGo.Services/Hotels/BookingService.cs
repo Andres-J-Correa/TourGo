@@ -471,6 +471,34 @@ namespace TourGo.Services.Hotels
             return list;
         }
 
+        public void UpdateNotes(string id, string hotelId, string userId, string? notes)
+        {
+            string proc = "bookings_update_notes";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+
+                param.AddWithValue("p_id", id);
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithNullableValue("p_notes", notes);
+            });
+        }
+
+        public void UpdateEta(string id, string hotelId, string userId, DateTime? eta)
+        {
+            string proc = "bookings_update_eta";
+
+            _mySqlDataProvider.ExecuteNonQuery(proc, (param) =>
+            {
+
+                param.AddWithValue("p_id", id);
+                param.AddWithValue("p_hotelId", hotelId);
+                param.AddWithValue("p_modifiedBy", userId);
+                param.AddWithValue("p_eta", eta);
+            });
+        }
+
         public bool IsValidSortDirection(string? direction)
         {
             return string.Equals(direction, "ASC", StringComparison.OrdinalIgnoreCase)
