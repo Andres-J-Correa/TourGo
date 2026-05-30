@@ -967,7 +967,9 @@
       "activeRooms": "Habitaciones activas",
       "inactiveRooms": "Habitaciones inactivas",
       "chartTitle": "Ocupación de habitación vs ingresos",
-      "revenue": "Ingresos"
+      "revenue": "Ingresos",
+      "avgRevenue": "Ingreso promedio por habitación",
+      "avgOccupancyRate": "Promedio de ocupación"
     },
     "subcategoryAnalysisReport": {
       "title": "Análisis de Subcategorías",

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Row, Col, Button } from "reactstrap";
 import { Chart } from "react-google-charts";
-import Select from "react-select";
+import Select, { components } from "react-select";
 import DatePickersV2 from "components/commonUI/forms/DatePickersV2";
 import Alert from "components/commonUI/Alert";
 import SimpleLoader from "components/commonUI/loaders/SimpleLoader";
@@ -15,6 +15,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import isEqual from "lodash.isequal";
 import classNames from "classnames";
+import { useNumericFormat } from "react-number-format";
+
+import "./RoomOccupancyReport.css";
 
 const getMonthRange = () => ({
   start: dayjs().startOf("month").format("YYYY-MM-DD"),
@@ -34,7 +37,38 @@ function RoomOccupancyReport({ hotelId }) {
     selectedRooms: [],
   });
 
+  const totalsAverage = useMemo(() => {
+    const initial = { occupancyRate: 0, collectedAmount: 0 };
+
+    if (data === null) {
+      return initial;
+    }
+
+    const result = data.reduce((acc, curr, i, array) => {
+      let { occupancyRate, collectedAmount } = acc;
+      let {
+        occupancyRate: currOccupancyRate,
+        collectedAmount: currCollectedAmount,
+      } = curr;
+
+      currOccupancyRate /= array.length;
+      currCollectedAmount /= array.length;
+
+      occupancyRate += currOccupancyRate;
+      collectedAmount += currCollectedAmount;
+
+      return { occupancyRate, collectedAmount };
+    }, initial);
+
+    return result;
+  }, [data]);
+
   const { t } = useLanguage();
+
+  const { format } = useNumericFormat({
+    thousandSeparator: ".",
+    decimalSeparator: ",",
+  });
 
   const handleDateChange = (type) => (date) => {
     setDates((prev) => ({
@@ -76,6 +110,7 @@ function RoomOccupancyReport({ hotelId }) {
       options.push({
         label: t("financialReports.roomOccupancyReport.activeRooms"),
         options: activeRooms,
+        id: "active-rooms",
       });
     }
 
@@ -83,10 +118,11 @@ function RoomOccupancyReport({ hotelId }) {
       options.push({
         label: t("financialReports.roomOccupancyReport.inactiveRooms"),
         options: inactiveRooms,
+        id: "inactive-rooms",
       });
     }
 
-    return options;
+    return { options, activeRooms, inactiveRooms };
   }, [rooms, t]);
 
   const handleRoomChange = (selectedOptions) => {
@@ -185,6 +221,34 @@ function RoomOccupancyReport({ hotelId }) {
     animation: { duration: 1000, easing: "out" },
   };
 
+  const onGroupHeadingClick = (e) => {
+    const headingId = e.currentTarget.id;
+
+    const toCompare =
+      headingId === "active-rooms"
+        ? roomSelectOptions.activeRooms
+        : roomSelectOptions.inactiveRooms;
+
+    const toSelect = toCompare.filter(
+      (option) =>
+        !selectedRooms?.some((selected) => selected.value === option.value),
+    );
+
+    const newSelected = [...(selectedRooms || []), ...toSelect];
+    setSelectedRooms(newSelected);
+  };
+
+  const GroupHeading = (props) => (
+    <components.GroupHeading {...props}>
+      <div
+        id={props?.data?.id}
+        className="cursor-pointer room-occupancy-report-group-header"
+        onClick={onGroupHeadingClick}>
+        <span>{props.children}</span>
+      </div>
+    </components.GroupHeading>
+  );
+
   useEffect(() => {
     if (!hotelId) return;
     setLoadingRooms(true);
@@ -227,7 +291,7 @@ function RoomOccupancyReport({ hotelId }) {
           </label>
           <Select
             isMulti
-            options={roomSelectOptions}
+            options={roomSelectOptions.options}
             value={selectedRooms}
             onChange={handleRoomChange}
             closeMenuOnSelect={false}
@@ -241,6 +305,7 @@ function RoomOccupancyReport({ hotelId }) {
             styles={{
               menu: (provided) => ({ ...provided, zIndex: 4 }),
             }}
+            components={{ GroupHeading }}
           />
         </Col>
       </Row>
@@ -285,6 +350,14 @@ function RoomOccupancyReport({ hotelId }) {
       )}
       {!showPrompt && !loading && chartData && (
         <div className="d-flex flex-column align-items-center w-100">
+          <h6>
+            {t("financialReports.roomOccupancyReport.avgRevenue")} ${" "}
+            {format(String(totalsAverage.collectedAmount.toFixed(2)))}
+          </h6>
+          <h6>
+            {t("financialReports.roomOccupancyReport.avgOccupancyRate")}{" "}
+            {Number(totalsAverage.occupancyRate * 100).toFixed(2)}%
+          </h6>
           <Chart
             chartType="ComboChart"
             width="100%"
