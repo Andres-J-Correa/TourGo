@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Row, Col, Button } from "reactstrap";
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
+import BookingFieldEditModal from "components/bookings/BookingFieldEditModal";
 import dayjs from "dayjs";
 import classnames from "classnames";
 import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
@@ -11,8 +12,31 @@ import PhoneWspLink from "components/commonUI/PhoneWspLink";
 
 const BookingStay = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
   const [offCanvasOpen, setOffCanvasOpen] = useState(false);
+  const [fieldModalOpen, setFieldModalOpen] = useState(false);
+  const [localNotes, setLocalNotes] = useState(stay.notes);
+  const [editingField, setEditingField] = useState(null);
   const { t } = useLanguage(); // added
   const toggleOffCanvas = () => setOffCanvasOpen((prev) => !prev);
+
+  useEffect(() => {
+    setLocalNotes(stay.notes);
+  }, [stay.notes]);
+
+  const handleOpenFieldModal = (field) => {
+    setEditingField(field);
+    setFieldModalOpen(true);
+  };
+
+  const handleCloseFieldModal = () => {
+    setFieldModalOpen(false);
+    setEditingField(null);
+  };
+
+  const handleFieldSaved = (value) => {
+    if (editingField === "notes") {
+      setLocalNotes(value);
+    }
+  };
 
   return (
     <div
@@ -24,6 +48,15 @@ const BookingStay = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
         handleToggleOffcanvas={toggleOffCanvas}
         bookingId={stay.id}
         hotelId={hotelId}
+      />
+      <BookingFieldEditModal
+        isOpen={fieldModalOpen}
+        toggle={handleCloseFieldModal}
+        bookingId={stay.id}
+        hotelId={hotelId}
+        fieldType={editingField}
+        currentValue={localNotes}
+        onSaved={handleFieldSaved}
       />
       <Row className="justify-content-between">
         <Col md={5}>
@@ -68,12 +101,19 @@ const BookingStay = ({ stay, hotelId, hasBottomBorder, renderRooms }) => {
               : stay.rooms.map((room) => <li key={room.id}>{room.name}</li>)}
           </ul>
         </Col>
-        {stay.notes && (
-          <Col lg={4} md={6} xs={12}>
-            <strong>{t("booking.stay.notes")}</strong>
-            <p className="mb-0">{stay.notes}</p>
-          </Col>
-        )}
+        <Col lg={4} md={6} xs={12}>
+          <strong>{t("booking.stay.notes")}</strong>
+          <p className="mb-0">
+            <Button
+              type="button"
+              color="link"
+              className="p-0 align-baseline text-decoration-none"
+              onClick={() => handleOpenFieldModal("notes")}
+              title={t("booking.fieldEditModal.notes.title")}>
+              {localNotes ? localNotes : t("booking.fieldEditModal.add")}
+            </Button>
+          </p>
+        </Col>
         <Col className="text-end align-content-end">
           <Button
             type="button"

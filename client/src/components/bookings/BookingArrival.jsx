@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Row, Col, Button } from "reactstrap";
 import classnames from "classnames";
 import dayjs from "dayjs";
@@ -11,6 +11,7 @@ import utc from "dayjs/plugin/utc";
 
 import BookingStatusBadge from "components/bookings/BookingStatusBadge";
 import BookingViewOffCanvas from "components/bookings/BookingViewOffCanvas";
+import BookingFieldEditModal from "components/bookings/BookingFieldEditModal";
 import PhoneWspLink from "components/commonUI/PhoneWspLink";
 
 import { BOOKING_STATUS_IDS } from "components/bookings/constants";
@@ -27,9 +28,35 @@ const BookingArrival = ({
   renderRooms,
 }) => {
   const [offCanvasOpen, setOffCanvasOpen] = useState(false);
+  const [fieldModalOpen, setFieldModalOpen] = useState(false);
+  const [editingField, setEditingField] = useState(null);
+  const [localNotes, setLocalNotes] = useState(arrival.notes);
+  const [localEta, setLocalEta] = useState(arrival.eta);
   const { t } = useLanguage();
 
   const toggleOffCanvas = () => setOffCanvasOpen((prev) => !prev);
+
+  const handleOpenFieldModal = (field) => {
+    setEditingField(field);
+    setFieldModalOpen(true);
+  };
+  const handleCloseFieldModal = () => {
+    setFieldModalOpen(false);
+    setEditingField(null);
+  };
+  const handleFieldSaved = (value) => {
+    if (editingField === "notes") {
+      setLocalNotes(value);
+    }
+    if (editingField === "eta") {
+      setLocalEta(value);
+    }
+  };
+
+  useEffect(() => {
+    setLocalNotes(arrival.notes);
+    setLocalEta(arrival.eta);
+  }, [arrival.notes, arrival.eta]);
 
   const { arrivingRooms, otherRooms } = arrival;
   const arrivingRoomIds = new Set(arrivingRooms.map((ar) => ar.id));
@@ -48,6 +75,15 @@ const BookingArrival = ({
         handleToggleOffcanvas={toggleOffCanvas}
         bookingId={arrival.id}
         hotelId={hotelId}
+      />
+      <BookingFieldEditModal
+        isOpen={fieldModalOpen}
+        toggle={handleCloseFieldModal}
+        bookingId={arrival.id}
+        hotelId={hotelId}
+        fieldType={editingField}
+        currentValue={editingField === "eta" ? localEta : localNotes}
+        onSaved={handleFieldSaved}
       />
       <Row className="justify-content-between">
         <Col md={5}>
@@ -91,9 +127,16 @@ const BookingArrival = ({
       <Row>
         <Col>
           <strong>{t("booking.arrival.eta")}</strong>{" "}
-          {dayjs(arrival.eta).isValid()
-            ? dayjs.utc(arrival.eta).format("DD/MM/YYYY h:mm a")
-            : "Agregar"}
+          <Button
+            type="button"
+            color="link"
+            className="p-0 align-baseline text-decoration-none"
+            onClick={() => handleOpenFieldModal("eta")}
+            title={t("booking.fieldEditModal.eta.title")}>
+            {dayjs(localEta).isValid()
+              ? dayjs.utc(localEta).format("DD/MM/YYYY h:mm a")
+              : t("booking.fieldEditModal.add")}
+          </Button>
         </Col>
       </Row>
       <Row>
@@ -109,7 +152,16 @@ const BookingArrival = ({
         )}
         <Col lg={4} md={6} xs={12}>
           <strong>{t("booking.arrival.notes")}</strong>
-          <p className="mb-0">{arrival.notes ? arrival.notes : "Agregar"}</p>
+          <p className="mb-0">
+            <Button
+              type="button"
+              color="link"
+              className="p-0 align-baseline text-decoration-none"
+              onClick={() => handleOpenFieldModal("notes")}
+              title={t("booking.fieldEditModal.notes.title")}>
+              {localNotes ? localNotes : t("booking.fieldEditModal.add")}
+            </Button>
+          </p>
         </Col>
         <Col className="text-end align-content-end">
           <Row>

@@ -18,7 +18,11 @@ const CustomDateTimePicker = ({ isRequired, ...props }) => {
   const isMobile = useIsMobile();
 
   const handleChange = (date) => {
-    setFieldValue(field.name, dayjs(date).format("YYYY-MM-DDTHH:mm:ss"));
+    if (!date) {
+      setFieldValue(field.name, null);
+    } else {
+      setFieldValue(field.name, dayjs(date).format("YYYY-MM-DDTHH:mm:ss"));
+    }
     helpers.setTouched(true);
   };
 
