@@ -40,27 +40,22 @@ function RoomOccupancyReport({ hotelId }) {
   const totalsAverage = useMemo(() => {
     const initial = { occupancyRate: 0, collectedAmount: 0 };
 
-    if (data === null) {
+    if (!Array.isArray(data) || data.length === 0) {
       return initial;
     }
 
-    const result = data.reduce((acc, curr, i, array) => {
-      let { occupancyRate, collectedAmount } = acc;
-      let {
-        occupancyRate: currOccupancyRate,
-        collectedAmount: currCollectedAmount,
-      } = curr;
+    const totals = data.reduce(
+      (acc, { occupancyRate = 0, collectedAmount = 0 }) => ({
+        occupancyRate: acc.occupancyRate + occupancyRate,
+        collectedAmount: acc.collectedAmount + collectedAmount,
+      }),
+      initial,
+    );
 
-      currOccupancyRate /= array.length;
-      currCollectedAmount /= array.length;
-
-      occupancyRate += currOccupancyRate;
-      collectedAmount += currCollectedAmount;
-
-      return { occupancyRate, collectedAmount };
-    }, initial);
-
-    return result;
+    return {
+      occupancyRate: totals.occupancyRate / data.length,
+      collectedAmount: totals.collectedAmount / data.length,
+    };
   }, [data]);
 
   const { t } = useLanguage();
