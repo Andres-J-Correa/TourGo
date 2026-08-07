@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Formik, Form } from "formik";
 import {
   Button,
@@ -44,6 +44,18 @@ const BookingFieldEditModal = ({
   const { t, getTranslatedErrorMessage } = useLanguage();
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const initialValues = useMemo(() => {
+    if (!currentValue) return { value: "" };
+
+    if (fieldType === "eta") {
+      return { value: new Date(currentValue.replace("Z", "")) };
+    }
+
+    if (fieldType === "notes") {
+      return { value: currentValue };
+    }
+  }, [fieldType, currentValue]);
 
   useEffect(() => {
     if (isOpen) {
@@ -96,7 +108,7 @@ const BookingFieldEditModal = ({
       <ModalHeader toggle={handleClose}>{t(meta.title)}</ModalHeader>
       <Formik
         enableReinitialize
-        initialValues={{ value: currentValue || "" }}
+        initialValues={initialValues}
         onSubmit={handleSubmit}>
         {({ values, setFieldValue, handleSubmit }) => (
           <Form onSubmit={handleSubmit}>
