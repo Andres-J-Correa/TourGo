@@ -35,7 +35,7 @@ function RoomTable({
   handleBookingCellClick: (
     date: string,
     roomId: number,
-    isOpen: boolean
+    isOpen: boolean,
   ) => Promise<void>;
   hotelId?: string;
   isCleaningMode: boolean;
@@ -69,7 +69,7 @@ function RoomTable({
         toast.error(t("booking.calendar.errors.toggleShouldClean"));
       }
     },
-    [hotelId, t]
+    [hotelId, t],
   );
 
   const components = useMemo((): {
@@ -91,13 +91,13 @@ function RoomTable({
 
     const getAvailability = (date?: string): boolean =>
       date
-        ? datesWithAvailabilityByRoom[date]?.[room.id]?.isOpen ?? true
+        ? (datesWithAvailabilityByRoom[date]?.[room.id]?.isOpen ?? true)
         : true;
 
     const createPriceCell = (
       date: string,
       price?: number,
-      hasCleaning?: boolean
+      hasCleaning?: boolean,
     ) => (
       <PriceCell
         key={`price-${room.id}-${date}`}
@@ -109,7 +109,7 @@ function RoomTable({
     const createCleaningCell = (
       date: string,
       roomBooking?: RoomBooking,
-      showBookingName?: boolean
+      showBookingName?: boolean,
     ) => (
       <CleaningCell
         key={`cleaning-${room.id}-${date}`}
@@ -128,7 +128,7 @@ function RoomTable({
         isFirst: boolean;
         isAvailable: boolean;
         onClick: () => Promise<void>;
-      }>
+      }>,
     ): JSX.Element => (
       <BookingCell
         key={`booking-${room.id}-${date}`}
@@ -143,7 +143,7 @@ function RoomTable({
 
       const roomBooking = getRoomBooking(date);
       prices.push(
-        createPriceCell(date, roomBooking?.price, roomBooking?.shouldClean)
+        createPriceCell(date, roomBooking?.price, roomBooking?.shouldClean),
       );
 
       const previousDate = getDate(i - 1);
@@ -159,7 +159,7 @@ function RoomTable({
           nextRoomBooking?.bookingId === roomBooking.bookingId;
 
         cleaningCells.push(
-          createCleaningCell(date, roomBooking, !isSameAsPrevious)
+          createCleaningCell(date, roomBooking, !isSameAsPrevious),
         );
 
         if (isSameAsNext) {
@@ -171,7 +171,7 @@ function RoomTable({
           createBookingCell(date, {
             roomBooking,
             colSpan,
-          })
+          }),
         );
       } else {
         const isAvailable = getAvailability(date);
@@ -191,7 +191,7 @@ function RoomTable({
             isFirst,
             isAvailable,
             onClick: handleClick,
-          })
+          }),
         );
       }
 
@@ -218,25 +218,23 @@ function RoomTable({
 
   return (
     <Fragment>
-      <h6 className="room-header mb-1 text-decoration-underline">
-        {room.name}
-      </h6>
-      <table className="table table-bordered table-sm mb-2">
-        <tbody>
-          <tr>
-            <td className="first-column text-center align-content-center bg-light text-dark fw-bold">
-              {t("booking.calendar.reservation")}
-            </td>
-            {isCleaningMode ? components.cleaningCells : components.bookings}
-          </tr>
-          <tr>
-            <td className="first-column text-center align-content-center bg-light text-dark fw-bold">
-              {t("booking.calendar.price")}
-            </td>
-            {components.prices}
-          </tr>
-        </tbody>
-      </table>
+      <tr>
+        <th colSpan={datesArray.length + 1} className="room-header text-start">
+          <span className="room-header-text ms-2">{room.name}</span>
+        </th>
+      </tr>
+      <tr>
+        <td className="first-column text-center align-content-center bg-light text-dark fw-bold">
+          {t("booking.calendar.reservation")}
+        </td>
+        {isCleaningMode ? components.cleaningCells : components.bookings}
+      </tr>
+      <tr>
+        <td className="first-column text-center align-content-center bg-light text-dark fw-bold">
+          {t("booking.calendar.price")}
+        </td>
+        {components.prices}
+      </tr>
     </Fragment>
   );
 }

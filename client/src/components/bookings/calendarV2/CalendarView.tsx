@@ -53,7 +53,7 @@ function CalendarView(): JSX.Element {
       dayjs(dates.start).isValid() &&
       dayjs(dates.end).isValid() &&
       dayjs(getDateString(dates.start)).isSameOrBefore(
-        dayjs(getDateString(dates.end))
+        dayjs(getDateString(dates.end)),
       )
     );
   }, [dates.start, dates.end]);
@@ -69,7 +69,7 @@ function CalendarView(): JSX.Element {
   } = useCalendarTableData(
     isDateRangeValid ? dates.start : null,
     isDateRangeValid ? dates.end : null,
-    hotelId
+    hotelId,
   );
 
   const datesArray: Dayjs[] = useMemo(() => {
@@ -105,7 +105,7 @@ function CalendarView(): JSX.Element {
         isOpen: !isOpen,
       });
     },
-    [hotelId, handleUpsertRoomAvailability]
+    [hotelId, handleUpsertRoomAvailability],
   );
 
   const handleCleaningModeToggle = (isCleaning: boolean): void => {
@@ -149,20 +149,23 @@ function CalendarView(): JSX.Element {
           <Alert type="danger">{t("booking.calendar.invalidDateRange")}</Alert>
         ) : (
           <div className="table-responsive table-calendar fs-7">
-            <DatesTable datesArray={datesArray} />
-
-            {rooms.map((room, index) => (
-              <RoomTable
-                key={`room-${index}`}
-                room={room}
-                datesArray={datesArray}
-                datesWithBookingsByRoom={roomBookings}
-                datesWithAvailabilityByRoom={roomAvailability}
-                hotelId={hotelId}
-                handleBookingCellClick={handleBookingCellClick}
-                isCleaningMode={isCleaningMode}
-              />
-            ))}
+            <table className="table table-bordered table-sm mb-2">
+              <DatesTable datesArray={datesArray} />
+              <tbody>
+                {rooms.map((room, index) => (
+                  <RoomTable
+                    key={`room-${index}`}
+                    room={room}
+                    datesArray={datesArray}
+                    datesWithBookingsByRoom={roomBookings}
+                    datesWithAvailabilityByRoom={roomAvailability}
+                    hotelId={hotelId}
+                    handleBookingCellClick={handleBookingCellClick}
+                    isCleaningMode={isCleaningMode}
+                  />
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </ErrorBoundary>

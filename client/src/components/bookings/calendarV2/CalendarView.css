@@ -1,7 +1,13 @@
 .table-calendar {
-  height: calc(100vh - 200px);
-  overflow-y: auto;
-  will-change: scroll-position;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.dates-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: white;
 }
 
 .booking-data-cell {
@@ -23,14 +29,18 @@
 }
 
 .room-header {
-  position: sticky;
-  left: 0;
+  background: white;
 }
 
-.dates-header {
+.room-header-text {
   position: sticky;
-  top: 0;
+  left: 0;
   z-index: 2;
+  display: block;
+  width: max-content;
+  white-space: nowrap;
+  background: white;
+  color: var(--bs-dark);
 }
 
 .date-header-text {

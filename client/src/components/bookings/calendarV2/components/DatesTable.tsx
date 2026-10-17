@@ -20,7 +20,7 @@ function DatesTable({ datesArray }: { datesArray: Dayjs[] }): JSX.Element {
     const dateString: string = date.format("YYYY-MM-DD");
 
     daysComponents.push(
-      <DayHeader key={`day-${i}-${dateString}`} date={date} />
+      <DayHeader key={`day-${i}-${dateString}`} date={date} />,
     );
 
     const nextDate: Dayjs | undefined = datesArray[i + 1];
@@ -36,22 +36,20 @@ function DatesTable({ datesArray }: { datesArray: Dayjs[] }): JSX.Element {
           key={`month-year-${i}-${dateString}`}
           date={date}
           colSpan={colSpan}
-        />
+        />,
       );
       colSpan = 1;
     }
   }
 
   return (
-    <table className="table table-bordered dates-header table-sm mb-2">
-      <thead>
-        <tr>
-          <th rowSpan={2} className="bg-light first-column"></th>
-          {monthAndYearComponents}
-        </tr>
-        <tr>{daysComponents}</tr>
-      </thead>
-    </table>
+    <thead className="dates-header">
+      <tr>
+        <th rowSpan={2} className="bg-light first-column"></th>
+        {monthAndYearComponents}
+      </tr>
+      <tr>{daysComponents}</tr>
+    </thead>
   );
 }
 

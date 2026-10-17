@@ -1,5 +1,5 @@
 import { Suspense, Fragment, useEffect } from "react";
-import { Outlet, useParams, useNavigation } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
 import { Container } from "reactstrap";
 import { ToastContainer } from "react-toastify";
@@ -26,7 +26,7 @@ function App() {
     if (hotelId) {
       hotel.setHotelId(hotelId);
     }
-  }, [hotelId]);
+  }, [hotelId, hotel]);
 
   if (maintenanceMode) {
     return <SiteUnderMaintenance />;

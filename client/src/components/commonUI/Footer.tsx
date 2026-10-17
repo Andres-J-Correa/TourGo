@@ -136,7 +136,7 @@ function Footer({ hotelId }: FooterProps) {
       <footer className="footer mt-5">
         <Container fluid={true}>
           <FooterNavigation hotelId={hotelId} />
-          <FooterInfo />
+          {/* <FooterInfo /> */}
         </Container>
       </footer>
     </React.Fragment>
