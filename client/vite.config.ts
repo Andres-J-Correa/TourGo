@@ -55,12 +55,12 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://localhost:50001",
+        target: "http://localhost:50001",
         changeOrigin: true,
         secure: false,
       },
       "/hubs": {
-        target: "https://localhost:50001",
+        target: "http://localhost:50001",
         changeOrigin: true,
         secure: false,
       },
