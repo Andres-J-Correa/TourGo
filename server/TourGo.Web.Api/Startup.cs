@@ -24,7 +24,7 @@ namespace TourGo.Web.Api
     {
         public IConfiguration Configuration { get; }
 
-        public Startup(IConfiguration configuration) 
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
@@ -88,7 +88,7 @@ namespace TourGo.Web.Api
             services.Configure<UsersPublicIdConfig>(Configuration.GetSection("UsersPublicIdConfig"));
             services.Configure<HotelsPublicIdConfig>(Configuration.GetSection("HotelsPublicIdConfig"));
             services.Configure<BookingsPublicIdConfig>(Configuration.GetSection("BookingsPublicIdConfig"));
-            services.Configure<TransactionsPublicIdConfig>(Configuration.GetSection("TransactionsPublicIdConfig")); 
+            services.Configure<TransactionsPublicIdConfig>(Configuration.GetSection("TransactionsPublicIdConfig"));
             services.Configure<GoogleRecaptchaConfig>(Configuration.GetSection("GoogleRecaptchaConfig"));
         }
 

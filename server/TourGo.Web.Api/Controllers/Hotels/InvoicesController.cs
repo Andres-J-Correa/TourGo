@@ -101,8 +101,11 @@ namespace TourGo.Web.Api.Controllers.Hotels
                         }
                     }
                 };
-                    byte[] pdfStream = _converter.Convert(doc);
-                    return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
+                byte[] pdfStream = _converter.Convert(doc);
+
+                string fileName = _invoiceService.Sanitize($"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
+
+                return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
             }
             catch (Exception ex)
             {

@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <StaticWebAssetsEnabled Condition="'$(Configuration)' == 'Debug'">false</StaticWebAssetsEnabled>
   </PropertyGroup>
 
   <ItemGroup>

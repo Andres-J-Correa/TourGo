@@ -9,5 +9,6 @@ namespace TourGo.Services.Interfaces.Hotels
         void Update(InvoiceUpdateRequest model, string userId);
         InvoiceWithEntities? GetWithEntitiesById(string invoiceId, string hotelId);
         InvoicePdfModel? GetInvoicePdfModel(string invoiceId, string hotelId);
+        string Sanitize(string input, char replacement = '_');
     }
 }

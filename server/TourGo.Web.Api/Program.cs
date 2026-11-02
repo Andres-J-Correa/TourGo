@@ -40,8 +40,8 @@ namespace TourGo.Web.Api
                     options.UseGrafana();
                     options.IncludeScopes = true;
                 });
-            } 
-            
+            }
+
             logging.AddSimpleConsole();
             logging.AddDebug();
         }

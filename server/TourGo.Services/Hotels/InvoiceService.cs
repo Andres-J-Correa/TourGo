@@ -163,7 +163,7 @@ namespace TourGo.Services.Hotels
                     booking.Total = reader.GetSafeDecimal(index++);
                     booking.Subtotal = reader.GetSafeDecimal(index++);
                     booking.Charges = reader.GetSafeDecimal(index++);
-                    booking.RawRoomBookings  = reader.DeserializeObjectSafely<List<RoomBooking>>(index++, () => null) ?? [];
+                    booking.RawRoomBookings = reader.DeserializeObjectSafely<List<RoomBooking>>(index++, () => null) ?? [];
                     booking.ExtraCharges = reader.DeserializeObjectSafely<List<ExtraCharge>>(index++, () => null) ?? [];
                     booking.GeneralCharges = reader.DeserializeObjectSafely<List<ExtraCharge>>(index++, () => null) ?? [];
 
@@ -171,7 +171,7 @@ namespace TourGo.Services.Hotels
                 }
             });
 
-            if(pdfModel == null)
+            if (pdfModel == null)
             {
                 return null;
             }
@@ -217,6 +217,25 @@ namespace TourGo.Services.Hotels
             return pdfModel;
         }
 
+        public string Sanitize(string input, char replacement = '_')
+        {
+            string defaultFilename = "file";
+
+            if (string.IsNullOrWhiteSpace(input))
+                return defaultFilename;
+
+            // 1. Get the array of invalid characters for the current OS
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+
+            // 2. Split the string by invalid characters and join back with your replacement
+            string[] segments = input.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries);
+            string cleanName = string.Join(replacement, segments);
+
+            // 3. Optional: Trim trailing periods or spaces which cause issues on Windows
+            cleanName = cleanName.TrimEnd('.', ' ');
+
+            return cleanName.Length > 0 ? cleanName : defaultFilename;
+        }
         private static Invoice MapInvoice(IDataReader reader, ref int index)
         {
             Invoice invoice = new Invoice();

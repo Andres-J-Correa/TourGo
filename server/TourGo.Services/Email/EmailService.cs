@@ -14,23 +14,20 @@ namespace TourGo.Services.Email
 {
     public class EmailService : IEmailService
     {
-        private readonly IWebHostEnvironment _environment;
         private readonly BrevoConfig _brevoConfig;
         private readonly EmailConfig _emailConfig;
         private readonly TransactionalEmailsApi _emailsApi;
-        private readonly ITemplateLoader _templateLoader;
+        private readonly ITemplateService _templateService;
 
         public EmailService(
-            IWebHostEnvironment environment,
             IOptions<EmailConfig> emailConfig,
             IOptions<BrevoConfig> brevoConfig,
             TransactionalEmailsApi emailsApi,
-            ITemplateLoader templateLoader)
+            ITemplateService templateService)
         {
-            _environment = environment;
             _emailConfig = emailConfig.Value;
             _brevoConfig = brevoConfig.Value;
-            _templateLoader = templateLoader;
+            _templateService = templateService;
             _emailsApi = emailsApi;
         }
 
@@ -42,7 +39,7 @@ namespace TourGo.Services.Email
                 var recipient = new SendSmtpEmailTo(user.Email, user.FirstName);
                 var recipients = new List<SendSmtpEmailTo> { recipient };
 
-                string htmlTemplate = _templateLoader.LoadTemplate("passwordReset.html");
+                string htmlTemplate = await _templateService.GetTemplateByName("password-reset");
 
                 if (string.IsNullOrEmpty(htmlTemplate))
                 {
@@ -75,7 +72,7 @@ namespace TourGo.Services.Email
                 var recipient = new SendSmtpEmailTo(user.Email, user.FirstName);
                 var recipients = new List<SendSmtpEmailTo> { recipient };
 
-                string htmlTemplate = _templateLoader.LoadTemplate("emailVerification.html");
+                string htmlTemplate = await _templateService.GetTemplateByName("email-verification");
 
                 if (string.IsNullOrEmpty(htmlTemplate))
                 {
@@ -99,7 +96,7 @@ namespace TourGo.Services.Email
                 throw;
             }
         }
-    
+
         public async Task HotelStaffInvitation(string email, string hotel, string role)
         {
             try
@@ -109,7 +106,7 @@ namespace TourGo.Services.Email
                 var recipients = new List<SendSmtpEmailTo> { recipient };
                 string invitationLink = $"{_emailConfig.DomainUrl}/hotels/invites";
 
-                string htmlTemplate = _templateLoader.LoadTemplate("staffInvitation.html");
+                string htmlTemplate = await _templateService.GetTemplateByName("staff-invitation");
 
                 if (string.IsNullOrEmpty(htmlTemplate))
                 {

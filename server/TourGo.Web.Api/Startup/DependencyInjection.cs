@@ -62,13 +62,13 @@ namespace TourGo.Web.StartUp
 
             services.AddSingleton<IWebAuthenticationService<string>, WebAuthenticationService>();
 
-            services.AddSingleton<ISqlDataProvider, SqlDataProvider>(delegate (IServiceProvider provider)
+            services.AddScoped<ISqlDataProvider, SqlDataProvider>(delegate (IServiceProvider provider)
             {
                 return new SqlDataProvider(sqlConnString);
             }
             );
 
-            services.AddSingleton<IMySqlDataProvider, MySqlDataProvider>(delegate (IServiceProvider provider)
+            services.AddScoped<IMySqlDataProvider, MySqlDataProvider>(delegate (IServiceProvider provider)
             {
                 return new MySqlDataProvider(mySqlConnString);
             });
@@ -76,13 +76,13 @@ namespace TourGo.Web.StartUp
             services.AddSingleton<IIdentityProvider<string>, WebAuthenticationService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddSingleton<IUserService, UserService>();
-            services.AddSingleton<ICacheService,MemoryCacheDefault>(delegate (IServiceProvider provider)
+            services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<ICacheService, MemoryCacheDefault>(delegate (IServiceProvider provider)
             {
                 return MemoryCacheDefault.Instance;
             });
 
-            services.AddSingleton<TransactionalEmailsApi>(provider =>
+            services.AddScoped<TransactionalEmailsApi>(provider =>
             {
                 Configuration.Default.ApiKey["api-key"] = configuration.GetSection("BrevoConfig:ApiKey").Value;
                 return new TransactionalEmailsApi();
@@ -98,31 +98,30 @@ namespace TourGo.Web.StartUp
                 client.BaseAddress = new Uri(baseUrl);
             });
 
-            services.AddSingleton<IEmailService, EmailService>();
-            services.AddSingleton<ITemplateLoader, TemplateLoader>();
-            services.AddSingleton<IUserTokenService, UserTokenService>();
-            services.AddSingleton<IUserAuthService, UserAuthService>();
-            services.AddSingleton<IBookingService, BookingService>();
-            services.AddSingleton<ISecureEntities<string,object>, EntityAuthService>();
-            services.AddSingleton<IHotelService, HotelService>();
-            services.AddSingleton<IRoomService, RoomService>();
-            services.AddSingleton<IExtraChargeService, ExtraChargeService>();
-            services.AddSingleton<ICustomerService, CustomerService>();
-            services.AddSingleton<ITransactionService, TransactionService>();
-            services.AddSingleton<IInvoiceService, InvoiceService>();
-            services.AddSingleton<IErrorLoggingService, ErrorLoggingService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IUserTokenService, UserTokenService>();
+            services.AddScoped<IUserAuthService, UserAuthService>();
+            services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<ISecureEntities<string, object>, EntityAuthService>();
+            services.AddScoped<IHotelService, HotelService>();
+            services.AddScoped<IRoomService, RoomService>();
+            services.AddScoped<IExtraChargeService, ExtraChargeService>();
+            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddScoped<IErrorLoggingService, ErrorLoggingService>();
             services.AddSingleton<IFileService, FileService>();
-            services.AddSingleton<ITransactionSubcategoryService, TransactionSubcategoryService>();
-            services.AddSingleton<IPaymentMethodService, PaymentMethodService>();
-            services.AddSingleton<IBookingProviderService, BookingProviderService>();
-            services.AddSingleton<IFinancePartnerService, FinancePartnerService>();
-            services.AddSingleton<IStaffService, StaffService>();
-            services.AddSingleton<IFinancialReportService, FinancialReportService>();
+            services.AddScoped<ITransactionSubcategoryService, TransactionSubcategoryService>();
+            services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            services.AddScoped<IBookingProviderService, BookingProviderService>();
+            services.AddScoped<IFinancePartnerService, FinancePartnerService>();
+            services.AddScoped<IStaffService, StaffService>();
+            services.AddScoped<IFinancialReportService, FinancialReportService>();
             services.AddSingleton<IEncryptionService, EncryptionService>();
-            services.AddSingleton<IGoogleRecaptchaService, GoogleRecaptchaService>();
-            services.AddSingleton<IRoomAvailabilityService, RoomAvailabilityService>();
-            services.AddSingleton<ITemplateService, TemplateService>();
-            services.AddSingleton<ITaskService, TaskService>();
+            services.AddScoped<IGoogleRecaptchaService, GoogleRecaptchaService>();
+            services.AddScoped<IRoomAvailabilityService, RoomAvailabilityService>();
+            services.AddScoped<ITemplateService, TemplateService>();
+            services.AddScoped<ITaskService, TaskService>();
             services.AddSingleton<IUserIdProvider, SIdUserProvider>();
 
             services.AddScoped<IClaimsTransformation, ClaimsEnrichmentTransformation>();

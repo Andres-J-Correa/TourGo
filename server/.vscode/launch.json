@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Containers .NET Attach (Preview)",
+      "type": "docker",
+      "request": "attach",
+      "platform": "netCore",
+      "netCore": {
+        "debuggerPath": "/remote_debugger/vsdbg"
+      },
+      "sourceFileMap": {
+        "/src": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": ".NET Core Launch (web)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/TourGo.Web.Api/bin/Debug/net8.0/TourGo.Web.Api.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/TourGo.Web.Api",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach"
+    }
+  ]
+}

@@ -54,10 +54,23 @@ services:
     image: tourgo-api-dev
     build:
       context: .
-      dockerfile: TourGo.Web.Api/Dockerfile
+      dockerfile: TourGo.Web.Api/Dockerfile.dev
+      args:
+        - BUILD_CONFIGURATION=Debug
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:50002
+      - ASPNETCORE_URLS=http://+:50001
     ports:
-      - "50001:50002"
+      - "50001:50001"
     restart: always
+    volumes:
+      - ${HOME}/.vsdbg:/remote_debugger:rw
+    networks:
+      - tourgo-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  tourgo-network:
+    external: true
+
