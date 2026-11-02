@@ -232,7 +232,7 @@ namespace TourGo.Services.Hotels
             string cleanName = string.Join(replacement, segments);
 
             // 3. Optional: Trim trailing periods or spaces which cause issues on Windows
-            cleanName = cleanName.TrimEnd('.', ' ');
+            cleanName = cleanName.Replace('.', replacement);
 
             return cleanName.Length > 0 ? cleanName : defaultFilename;
         }
