@@ -39,7 +39,7 @@ namespace TourGo.Services.Email
                 var recipient = new SendSmtpEmailTo(user.Email, user.FirstName);
                 var recipients = new List<SendSmtpEmailTo> { recipient };
 
-                string htmlTemplate = await _templateService.GetTemplateByName("password-reset");
+                string htmlTemplate = await _templateService.GetTemplateByName("passwordReset");
 
                 if (string.IsNullOrEmpty(htmlTemplate))
                 {
@@ -72,7 +72,7 @@ namespace TourGo.Services.Email
                 var recipient = new SendSmtpEmailTo(user.Email, user.FirstName);
                 var recipients = new List<SendSmtpEmailTo> { recipient };
 
-                string htmlTemplate = await _templateService.GetTemplateByName("email-verification");
+                string htmlTemplate = await _templateService.GetTemplateByName("emailVerification");
 
                 if (string.IsNullOrEmpty(htmlTemplate))
                 {
@@ -106,7 +106,7 @@ namespace TourGo.Services.Email
                 var recipients = new List<SendSmtpEmailTo> { recipient };
                 string invitationLink = $"{_emailConfig.DomainUrl}/hotels/invites";
 
-                string htmlTemplate = await _templateService.GetTemplateByName("staff-invitation");
+                string htmlTemplate = await _templateService.GetTemplateByName("staffInvitation");
 
                 if (string.IsNullOrEmpty(htmlTemplate))
                 {
