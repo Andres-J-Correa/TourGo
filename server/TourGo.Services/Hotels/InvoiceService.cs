@@ -219,6 +219,11 @@ namespace TourGo.Services.Hotels
 
         public string Sanitize(string input, char replacement = '_')
         {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+
             string defaultFilename = "file";
 
             if (string.IsNullOrWhiteSpace(input))

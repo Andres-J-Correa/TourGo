@@ -105,7 +105,7 @@ namespace TourGo.Web.Api.Controllers.Hotels
 
                 string fileName = _invoiceService.Sanitize($"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
 
-                return File(pdfStream, "application/pdf", $"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
+                return File(pdfStream, "application/pdf", $"CxC_{id}_{fileName}");
             }
             catch (Exception ex)
             {
