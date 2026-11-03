@@ -1,6 +1,7 @@
 .table-calendar {
   overflow-x: auto;
   overflow-y: visible;
+  height: 90vh;
 }
 
 .dates-header {

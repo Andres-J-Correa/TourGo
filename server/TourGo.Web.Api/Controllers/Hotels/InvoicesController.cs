@@ -103,9 +103,9 @@ namespace TourGo.Web.Api.Controllers.Hotels
                 };
                 byte[] pdfStream = _converter.Convert(doc);
 
-                string fileName = _invoiceService.Sanitize($"CxC_{id}_{invoicePdfModel.CustomerFirstName}");
+                string sanitizedCustomerName = _invoiceService.Sanitize(invoicePdfModel.CustomerFirstName);
 
-                return File(pdfStream, "application/pdf", $"CxC_{id}_{fileName}");
+                return File(pdfStream, "application/pdf", $"CxC_{id}_{sanitizedCustomerName}");
             }
             catch (Exception ex)
             {
